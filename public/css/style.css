@@ -1,0 +1,101 @@
+@font-face {
+	font-family: 'runescape';
+	src: url('fonts/runescape/runescape.eot');
+	src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
+	url('fonts/runescape/runescape.woff') format('woff'),
+	url('fonts/runescape/runescape.ttf') format('truetype'),
+	url('fonts/runescape/runescape.svg') format('svg');
+}
+
+body, html {
+	font-family: sans-serif;
+	background: url('/images/background_2.png') no-repeat;
+	background-position: center center;
+	background-attachment: fixed;
+}
+
+h1, h2 {
+	font-family: "runescape", sans-serif;
+	/*text-align: center;*/
+	font-weight: bold;
+	/*color: #947bb7;*/
+}
+
+.top {
+	background-image: url('/images/scroll_top.gif');
+	width: 765px;
+	height: 50px;
+	z-index: 1;
+}
+
+.main-page {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	width: 745px;
+	word-wrap: break-word;
+	background-clip: border-box;
+	background-image: url(/images/scroll_middle.gif);
+	background-repeat: repeat-y;
+	margin-top: -25px;
+	margin-bottom: -25px;
+}
+
+.main-page-header {
+	margin: 0 auto;
+	width: 100%;
+	padding: 30px 25px 0px 25px;
+}
+
+.main-page-body {
+	margin: 0 auto;
+	width: 100%;
+	padding: 25px 25px 75px 25px;
+}
+
+.bottom {
+	background-image: url('/images/scroll_bottom.gif');
+	width: 765px;
+	height: 50px;
+	z-index: 1;
+}
+
+.member-body {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-around;
+}
+
+.member-box {
+	background: tomato;
+	padding: 5px;
+	width: 200px;
+	height: 100px;
+	margin-top: 10px;
+	color: white;
+	font-size: 1.25em;
+	font-weight: bold;
+	text-align: center;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	transition: all .2s ease-in;
+}
+
+table td, table th {
+	padding: 3px 5px;
+	border-bottom: 1px solid black;
+	min-width: 3rem;
+}
+
+table th {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+}
