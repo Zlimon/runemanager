@@ -19,7 +19,6 @@ class CreateSkillsTables extends Migration
             Schema::create($skill, function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->bigInteger('user_id')->unsigned();
-                $table->string('username', 13);
                 $table->integer('rank')->nullable();
                 $table->integer('level')->default(1);
                 $table->string('xp')->default(0);

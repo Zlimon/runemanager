@@ -11,12 +11,20 @@ return [
     |
     */
 
-    'index' => 'Home',
+    /*==========Pages Titles=============*/
     'hiscore' => 'Hiscores',
+    'home' => 'Profile',
+    'index' => 'Home',
     'update-log' => 'Update Log',
+    /*==========Member Titles=============*/
+    'create-member' => 'Link Old School RuneScape account',
     'member' => 'Members',
+    /*==========Skill Titles=============*/
     'skill' => 'Skill Hiscores',
-
+    /*==========User Titles=============*/
+    'edit-member' => 'Edit profile',
+    
+    /*==========Auth Titles=============*/
     'login' => 'Login',
-    'register' => 'Register'
+    'register' => 'Register',
 ];
