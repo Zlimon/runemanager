@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->integer('icon_id')->nullable();
-            $table->enum('private', ['false', 'true'])->default('false');
+            $table->boolean('private')->default(false);
             $table->timestamps();
         });
     }

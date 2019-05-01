@@ -33,7 +33,7 @@
 
 						<h1>Welcome, {{ Auth::user()->name }}</h1>
 
-						<p>RuneScape account: {{ $member->username }}</p>
+						<p>RuneScape account: <strong>{{ $member->username }}</strong></p>
 
 						<h1>Your personal scores</h1>
 						<table>

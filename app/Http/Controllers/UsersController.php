@@ -44,13 +44,20 @@ class UsersController extends Controller
         $user = Auth::user();
 
         if ($user) {
-            if (Helper::verifyItem(request('icon_id'))) {
+            $iconId = request('icon_id');
+
+            if ($iconId == null) {
+                $iconId = 0;
+            }
+
+            if (Helper::verifyItem($iconId)) {
                 $user->update(request()->validate([
                     'name' => ['required', 'string', 'max:255'],
                     'email' => ['required', 'string', 'email', 'max:255', 
                         Rule::unique('users')->ignore($user->id),
                     ],
-                    'icon_id' => ['integer']
+                    'private' => ['boolean'],
+                    'icon_id' => ['nullable', 'integer']
                 ]));
 
                 return redirect(route('home'))->with('message', 'Profile updated!');

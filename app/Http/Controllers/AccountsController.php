@@ -125,6 +125,10 @@ class AccountsController extends Controller
      * @return
      */
     public function show($member) {
+        // $member = Account::with('user')->whereHas('user', function ($query) {
+        //     $query->where('private', '=', 0);
+        // })->inRandomOrder()->findOrFail($member);
+
         $member = Account::findOrFail($member);
 
         $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
