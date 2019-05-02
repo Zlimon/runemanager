@@ -11,7 +11,7 @@
 			<div class="main-page">
 				<div class="main-page-header">
 					<span><a href="{{ route('index') }}">{{ __('title.index') }}</a> <i class="fas fa-long-arrow-alt-right"></i> {{ __('title.hiscore') }}</span>
-					<span class="float-right">Next update: </span>
+					<span class="float-right">Next update: {{ Helper::roundToNextHour() }}</span>
 				</div>
 				<div class="main-page-body">
 					<h1 class="float-left">{{ __('title.hiscore') }}</h1>
@@ -31,7 +31,7 @@
 						@foreach ($members as $member)
 							<tr>
 								<td>{{ $rankCounter }}</td>
-								<td><a href="{{ route('show-member', $member->username) }}">{{ $member->username }}</a></td>
+								<td><a href="{{ route('show-member', $member->id) }}">{{ $member->username }}</a></td>
 								<td>{{ $member->level }}</td>
 								<td>{{ number_format($member->xp) }}</td>
 								<td>{{ number_format($member->rank) }}</td>

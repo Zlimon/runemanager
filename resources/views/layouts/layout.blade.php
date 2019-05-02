@@ -33,10 +33,10 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('hiscore') }}">{{ __('Hiscores') }}</a>
+                            <a class="nav-link" href="{{ route('hiscore') }}">{{ __('title.hiscore') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('member') }}">{{ __('Members') }}</a>
+                            <a class="nav-link" href="{{ route('member') }}">{{ __('title.member') }}</a>
                         </li>
                     </ul>
 
@@ -59,6 +59,8 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('home') }}">{{ __('title.home') }}</a>
+                                    <a class="dropdown-item" href="{{ route('edit-user') }}">{{ __('title.edit-member') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
@@ -77,6 +79,20 @@
         </nav>
 
         <main class="py-4">
+            @if ($errors->any())
+                <div class="alert alert-danger col-md-4" style="margin: auto; margin-bottom: 1rem;">
+                    @foreach ($errors->all() as $errorMessage)
+                        <strong>Error!</strong> {{ $errorMessage }}<br>
+                    @endforeach
+                </div>
+            @endif
+
+            @if(Session::has('message'))
+                <div class="alert alert-success col-md-4" style="margin: auto; margin-bottom: 1rem;">
+                    <strong>Success!</strong> {{ Session::get('message') }}<br>
+                </div>
+            @endif
+
             @yield('content')
         </main>
     </div>

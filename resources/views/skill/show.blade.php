@@ -11,11 +11,11 @@
 			<div class="main-page">
 				<div class="main-page-header">
 					<span><a href="{{ route('index') }}">{{ __('title.index') }}</a> <i class="fas fa-long-arrow-alt-right"></i> <a href="{{ route('hiscore') }}">{{ __('title.hiscore') }}</a> <i class="fas fa-long-arrow-alt-right"></i> <a href="{{ route('skill') }}">{{ __('title.skill') }}</a> <i class="fas fa-long-arrow-alt-right"></i> {{ ucfirst($skillname) }}</span>
-					<span class="float-right">Next update: </span>
+					<span class="float-right">Next update: {{ Helper::roundToNextHour() }}</span>
 				</div>
 				<div class="main-page-body">
 					<h1>
-						<img class="align" src="{{ asset('images/skills/') }}/{{ ucfirst($skillname) }}.png" width="35px" alt="{{ ucfirst($skillname) }} skill icon" />
+						<img class="align" src="{{ asset('images/skills/') }}/{{ ucfirst($skillname) }}.png" width="35px" alt="{{ ucfirst($skillname) }} skill icon">
 						{{ ucfirst($skillname) }}
 					</h1>
 
@@ -35,7 +35,7 @@
 							<tr>
 								<td>{{ $rankCounter }}</td>
 								<td>
-									<a href="{{ route('show-member', $skill->username) }}">
+									<a href="{{ route('show-member', $skill->user_id) }}">
 										{{ $skill->username }}
 									</a>
 								</td>

@@ -11,7 +11,7 @@
 			<div class="main-page">
 				<div class="main-page-header">
 					<span><a href="{{ route('index') }}">{{ __('title.index') }}</a> <i class="fas fa-long-arrow-alt-right"></i> <a href="{{ route('hiscore') }}">{{ __('title.hiscore') }}</a> <i class="fas fa-long-arrow-alt-right"></i> {{ __('title.skill') }}</span>
-					<span class="float-right">Next update: </span>
+					<span class="float-right">Next update: {{ Helper::roundToNextHour() }}</span>
 				</div>
 				<div class="main-page-body">
 					<h1>{{ __('title.skill') }}</h1>

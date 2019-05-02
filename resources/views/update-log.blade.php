@@ -11,7 +11,7 @@
 			<div class="main-page">
 				<div class="main-page-header">
 					<span><a href="{{ route('index') }}">{{ __('title.index') }}</a> <i class="fas fa-long-arrow-alt-right"></i> {{ __('title.update-log') }}</span>
-					<span class="float-right">Next update: </span>
+					<span class="float-right">Next update: {{ Helper::roundToNextHour() }}</span>
 				</div>
 				<div class="main-page-body">
 					<h1>{{ __('title.update-log') }}</h1>

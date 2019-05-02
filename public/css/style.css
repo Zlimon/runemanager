@@ -22,7 +22,7 @@ h1, h2 {
 }
 
 .top {
-	background-image: url('/images/scroll_top.gif');
+	background: url('/images/scroll_top.gif');
 	width: 765px;
 	height: 50px;
 	z-index: 1;
@@ -35,8 +35,8 @@ h1, h2 {
 	min-width: 0;
 	width: 745px;
 	word-wrap: break-word;
+	background: url(/images/scroll_middle.gif);
 	background-clip: border-box;
-	background-image: url(/images/scroll_middle.gif);
 	background-repeat: repeat-y;
 	margin-top: -25px;
 	margin-bottom: -25px;
@@ -44,8 +44,12 @@ h1, h2 {
 
 .main-page-header {
 	margin: 0 auto;
-	width: 100%;
-	padding: 30px 25px 0px 25px;
+	margin-top: 30px;
+	padding: 0 15px 0 15px;
+	width: 90%;
+	background: #99855D;
+	border: solid #755B41 3px;
+	border-radius: 5px;
 }
 
 .main-page-body {
@@ -55,7 +59,7 @@ h1, h2 {
 }
 
 .bottom {
-	background-image: url('/images/scroll_bottom.gif');
+	background: url('/images/scroll_bottom.gif');
 	width: 765px;
 	height: 50px;
 	z-index: 1;
@@ -71,15 +75,64 @@ h1, h2 {
 }
 
 .member-box {
-	background: tomato;
-	padding: 5px;
-	width: 200px;
-	height: 100px;
+	background: url('/images/button.gif') no-repeat;
+	background-position: center;
+	padding: 10px 5px 0px 5px;
+	width: 152px;
+	height: 126px;
 	margin-top: 10px;
 	color: white;
-	font-size: 1.25em;
+	font-size: 1.5em;
 	font-weight: bold;
 	text-align: center;
+	transition: width .5s, height .5s, padding .5s;
+}
+
+.member-box:hover {
+	width: 172px;
+	height: 146px;
+	padding: 20px 5px 0px 5px;
+}
+
+.pixel {
+	image-rendering: pixelated;
+}
+
+.profile-icon {
+	background: #99855D;
+	border: solid #755B41 3px;
+	border-radius: 5px;
+	padding: 5px 5px 5px 15px;
+	text-align: center;
+	float: right;
+}
+
+.profile-icon p {
+	padding-right: 10px;
+}
+
+.icon-radio [type=radio] { 
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.icon-radio [type=radio] + img {
+	cursor: pointer;
+	padding: 8px 8px 8px 8px;
+}
+
+.icon-radio [type=radio] + img:hover {
+	background: #99855D;
+	border-radius: 5px;
+}
+
+.icon-radio [type=radio]:checked + img {
+	background: #99855D;
+	border: solid #755B41 3px;
+	border-radius: 5px;
+	padding: 5px 5px 5px 5px;
 }
 
 table {
@@ -92,6 +145,7 @@ table td, table th {
 	padding: 3px 5px;
 	border-bottom: 1px solid black;
 	min-width: 3rem;
+	height: 55px;
 }
 
 table th {

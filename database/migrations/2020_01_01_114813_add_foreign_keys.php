@@ -20,10 +20,6 @@ class AddForeignKeys extends Migration
         //         $table->foreign('user_id')->references('id')->on('users');
         //     });
         // }
-
-        // Schema::table('members', function($table) {
-        //     $table->foreign('user_id')->references('id')->on('users');
-        // });
     }
 
     /**
