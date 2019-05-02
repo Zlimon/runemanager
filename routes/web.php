@@ -33,4 +33,9 @@ Route::get('/skill/{skill}', 'SkillsController@show')->name('show-skill');
 Route::get('/user/edit', 'UsersController@edit')->name('edit-user');
 Route::patch('/user/edit', 'UsersController@update')->name('update-user');
 
+/*==========Tasks Controller=============*/
+Route::get('/task', 'TasksController@index')->name('task');
+Route::post('/task', 'TasksController@store')->name('store-task');
+// Route::post('/task', 'TasksController@update')->name('update-task');
+
 Auth::routes();
