@@ -14,11 +14,15 @@ body, html {
 	background-attachment: fixed;
 }
 
-h1, h2 {
+h1, h2, h3 {
 	font-family: "runescape", sans-serif;
-	/*text-align: center;*/
+	text-align: center;
 	font-weight: bold;
 	/*color: #947bb7;*/
+}
+
+h2, h3 {
+	text-align: left;
 }
 
 .top {
@@ -133,6 +137,30 @@ h1, h2 {
 	border: solid #755B41 3px;
 	border-radius: 5px;
 	padding: 5px 5px 5px 5px;
+}
+
+.task-progress-body {
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+}
+
+.task-body {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	display: flex;
+	flex-flow: row;
+	justify-content: space-around;
+}
+
+.task-box {
+	background: #99855D;
+	border: solid #755B41 3px;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 5px;
+	transition: padding .5s;
 }
 
 table {

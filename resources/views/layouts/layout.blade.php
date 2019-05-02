@@ -38,6 +38,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('member') }}">{{ __('title.member') }}</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('task') }}">{{ __('title.task') }}</a>
+                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

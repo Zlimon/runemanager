@@ -4,18 +4,17 @@ namespace OSRSCM;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Account extends Model
+class UserTask extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
-        'user_id', 'username', 'rank', 'level', 'xp', 'private'
+        'user_id', 'task_id', 'status',
     ];
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function task() {
+        return $this->belongsTo(Task::class);
     }
 }

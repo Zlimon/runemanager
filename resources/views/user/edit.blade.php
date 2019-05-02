@@ -26,6 +26,8 @@
 				</div>
 
 				<div class="main-page-body">
+					<h1>{{ __('title.edit-member') }}: {{ $user->name }}</h1>
+
 					<form method="POST" action="{{ route('update-user') }}">
 						@method('PATCH')
 						@csrf

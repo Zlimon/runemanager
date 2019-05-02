@@ -80,4 +80,18 @@ class Helper
             return false;
         }
     }
+
+    /**
+     * Grabs data about item and return data based on attribute.
+     *
+     * @param integer $itemId, string $attribute
+     * @return
+     */
+    public static function itemData($itemId, $attribute) {
+        $itemData = [];
+
+        array_push($itemData, json_decode(file_get_contents('https://www.osrsbox.com/osrsbox-db/items-json/'.$itemId.'.json'), true));
+
+        return $itemData[0][$attribute];
+    }
 }
