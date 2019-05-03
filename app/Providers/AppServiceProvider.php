@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Providers;
+namespace RuneManager\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;

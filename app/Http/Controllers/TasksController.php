@@ -1,11 +1,11 @@
 <?php
 
-namespace OSRSCM\Http\Controllers;
+namespace RuneManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use OSRSCM\Task;
-use OSRSCM\UserTask;
+use RuneManager\Task;
+use RuneManager\UserTask;
 
 class TasksController extends Controller
 {

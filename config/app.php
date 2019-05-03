@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Europe/London',
 
     /*
     |--------------------------------------------------------------------------
@@ -169,11 +169,11 @@ return [
         /*
          * Application Service Providers...
          */
-        OSRSCM\Providers\AppServiceProvider::class,
-        OSRSCM\Providers\AuthServiceProvider::class,
-        // OSRSCM\Providers\BroadcastServiceProvider::class,
-        OSRSCM\Providers\EventServiceProvider::class,
-        OSRSCM\Providers\RouteServiceProvider::class,
+        RuneManager\Providers\AppServiceProvider::class,
+        RuneManager\Providers\AuthServiceProvider::class,
+        // RuneManager\Providers\BroadcastServiceProvider::class,
+        RuneManager\Providers\EventServiceProvider::class,
+        RuneManager\Providers\RouteServiceProvider::class,
 
     ],
 
@@ -226,7 +226,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
-        'Helper' => OSRSCM\Helpers\Helper::class,
+        'Helper' => RuneManager\Helpers\Helper::class,
 
     ],
 

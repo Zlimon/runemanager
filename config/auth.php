@@ -68,7 +68,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => OSRSCM\User::class,
+            'model' => RuneManager\User::class,
         ],
 
         // 'users' => [

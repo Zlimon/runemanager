@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Http\Controllers;
+namespace RuneManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

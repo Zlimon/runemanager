@@ -1,6 +1,6 @@
 <?php
 
-use OSRSCM\User;
+use RuneManager\User;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 

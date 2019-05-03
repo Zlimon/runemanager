@@ -28,17 +28,17 @@ $app = new Illuminate\Foundation\Application(
 
 $app->singleton(
     Illuminate\Contracts\Http\Kernel::class,
-    OSRSCM\Http\Kernel::class
+    RuneManager\Http\Kernel::class
 );
 
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
-    OSRSCM\Console\Kernel::class
+    RuneManager\Console\Kernel::class
 );
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
-    OSRSCM\Exceptions\Handler::class
+    RuneManager\Exceptions\Handler::class
 );
 
 /*
