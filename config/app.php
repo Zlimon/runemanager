@@ -226,7 +226,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
-        'Helper' => OSRSCM\Helpers\Helper::class,
+        'Helper' => RuneManager\Helpers\Helper::class,
 
     ],
 
