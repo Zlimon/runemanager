@@ -1,8 +1,8 @@
 <?php
 
-namespace OSRSCM\Http\Controllers\Auth;
+namespace RuneManager\Http\Controllers\Auth;
 
-use OSRSCM\Http\Controllers\Controller;
+use RuneManager\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller

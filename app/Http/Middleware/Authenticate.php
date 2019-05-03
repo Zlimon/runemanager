@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Http\Middleware;
+namespace RuneManager\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 

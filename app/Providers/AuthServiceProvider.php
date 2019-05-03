@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Providers;
+namespace RuneManager\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -13,7 +13,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        // 'OSRSCM\Model' => 'OSRSCM\Policies\ModelPolicy',
+        // 'RuneManager\Model' => 'RuneManager\Policies\ModelPolicy',
     ];
 
     /**

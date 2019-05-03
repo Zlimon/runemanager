@@ -1,9 +1,9 @@
 <?php
 
-namespace OSRSCM\Http\Controllers\Auth;
+namespace RuneManager\Http\Controllers\Auth;
 
-use OSRSCM\User;
-use OSRSCM\Http\Controllers\Controller;
+use RuneManager\User;
+use RuneManager\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -59,7 +59,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \OSRSCM\User
+     * @return \RuneManager\User
      */
     protected function create(array $data)
     {

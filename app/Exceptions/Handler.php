@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Exceptions;
+namespace RuneManager\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;

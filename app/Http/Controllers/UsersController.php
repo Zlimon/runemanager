@@ -1,12 +1,12 @@
 <?php
 
-namespace OSRSCM\Http\Controllers;
+namespace RuneManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use OSRSCM\User;
-use OSRSCM\Helpers\Helper;
+use RuneManager\User;
+use RuneManager\Helpers\Helper;
 
 class UsersController extends Controller
 {

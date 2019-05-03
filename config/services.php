@@ -35,7 +35,7 @@ return [
     ],
 
     'stripe' => [
-        'model' => OSRSCM\User::class,
+        'model' => RuneManager\User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
         'webhook' => [

@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Helpers;
+namespace RuneManager\Helpers;
 
 use DateTime;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM;
+namespace RuneManager;
 
 use Illuminate\Database\Eloquent\Model;
 

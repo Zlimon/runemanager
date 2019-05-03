@@ -1,13 +1,13 @@
 <?php
 
-namespace OSRSCM\Http\Controllers;
+namespace RuneManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use OSRSCM\Account;
-use OSRSCM\User;
-use OSRSCM\Helpers\Helper;
+use RuneManager\Account;
+use RuneManager\User;
+use RuneManager\Helpers\Helper;
 
 class AccountsController extends Controller
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace OSRSCM\Http\Controllers;
+namespace RuneManager\Http\Controllers;
 
 use Illuminate\Http\Request;
-use OSRSCM\Account;
+use RuneManager\Account;
 
 class PagesController extends Controller
 {

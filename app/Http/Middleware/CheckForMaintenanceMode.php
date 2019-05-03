@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Http\Middleware;
+namespace RuneManager\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode as Middleware;
 

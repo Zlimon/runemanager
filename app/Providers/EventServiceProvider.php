@@ -1,6 +1,6 @@
 <?php
 
-namespace OSRSCM\Providers;
+namespace RuneManager\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
