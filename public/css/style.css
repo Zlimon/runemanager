@@ -108,10 +108,10 @@ h2, h3 {
 	border-radius: 5px;
 	padding: 5px 5px 5px 15px;
 	text-align: center;
-	float: right;
+	float: left;
 }
 
-.profile-icon p {
+.profile-icon span {
 	padding-right: 10px;
 }
 
