@@ -175,6 +175,8 @@ return [
         RuneManager\Providers\EventServiceProvider::class,
         RuneManager\Providers\RouteServiceProvider::class,
 
+        Unisharp\Ckeditor\ServiceProvider::class,
+
     ],
 
     /*
