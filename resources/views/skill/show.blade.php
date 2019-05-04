@@ -35,7 +35,7 @@
 							<tr>
 								<td>{{ $rankCounter }}</td>
 								<td>
-									<a href="{{ route('show-member', $skill->user_id) }}">
+									<a href="{{ route('show-member', $skill->account_id) }}">
 										{{ $skill->username }}
 									</a>
 								</td>

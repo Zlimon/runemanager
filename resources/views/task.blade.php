@@ -41,7 +41,7 @@
 					<h2>Current task</h2>
 
 					<div class="task-body">
-						@foreach ($currentUserTasks as $task)
+						@foreach ($currentAccountTasks as $task)
 							@switch($task->task->difficulty)
 								@case('easy')
 									<div class="task-box text-center border-success">
@@ -88,7 +88,7 @@
 							<th>Reward</th>
 							<th>Completed</th>
 						</tr>
-						@foreach ($completedUserTasks as $task)
+						@foreach ($completedAccountTasks as $task)
 							<tr>
 							@switch($task->task->difficulty)
 								@case('easy')

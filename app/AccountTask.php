@@ -4,14 +4,14 @@ namespace RuneManager;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserTask extends Model
+class AccountTask extends Model
 {
     protected $fillable = [
-        'user_id', 'task_id', 'status',
+        'account_id', 'task_id', 'status',
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class);
+    public function member() {
+        return $this->belongsTo(Account::class);
     }
 
     public function task() {

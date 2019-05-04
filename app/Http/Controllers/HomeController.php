@@ -37,7 +37,7 @@ class HomeController extends Controller
             $stats = [];
 
             foreach ($skills as $skillName) {
-                array_push($stats, DB::table($skillName)->where('user_id', Auth::user()->id)->get());
+                array_push($stats, DB::table($skillName)->where('account_id', Auth::user()->id)->get());
             }
 
             return view('home', compact('member', 'stats', 'skills'));

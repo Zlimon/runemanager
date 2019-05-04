@@ -28,8 +28,8 @@ class SkillsController extends Controller
         $castXpAsInt = 'CAST('.$skillname.'.xp AS INT)';
 
         $hiscores = DB::table($skillname)
-            ->select($skillname.'.user_id', $skillname.'.level', $skillname.'.xp', $skillname.'.rank', 'username')
-            ->join('accounts', $skillname.'.user_id', '=', 'accounts.id')
+            ->select($skillname.'.account_id', $skillname.'.level', $skillname.'.xp', $skillname.'.rank', 'username')
+            ->join('accounts', $skillname.'.account_id', '=', 'accounts.id')
             ->orderBy('rank', 'ASC')
             ->orderBy('level', 'DESC')
             ->orderByRaw($castXpAsInt, 'DESC')
