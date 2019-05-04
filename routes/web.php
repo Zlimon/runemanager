@@ -12,9 +12,7 @@
 */
 
 /*==========Pages Controller=============*/
-Route::get('/', function () {
-    return view('index');
-})->name('index');
+Route::get('/', 'PagesController@index')->name('index');
 Route::get('/hiscore', 'PagesController@hiscore')->name('hiscore');
 Route::get('/update-log', 'PagesController@updateLog')->name('update-log');
 Route::get('/home', 'HomeController@index')->name('home');
