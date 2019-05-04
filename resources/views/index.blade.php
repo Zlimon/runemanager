@@ -13,24 +13,24 @@
 					<div class="main-page-body">
 						<h1>Latest news</h1>
 
-						@for ($i = 0; $i < 5; $i++)
+						@foreach ($recentPosts as $post)
 							<article class="news-latest-box">
-								<a href="">
+								<a href="{{ route('show-newspost', $post->id) }}">
 									<div class="news-latest-date text-dark">
 										<span class="news-latest-date-month">May</span>
-										<span class="news-latest-date-date">4</span>
+										<span class="news-latest-date-date">{{ Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $post->created_at)->day }}</span>
 									</div>
 									<div class="news-latest-title">
-										<span><strong>Habski Hotel is now in english!</strong></span>
+										<span><strong>{{ $post->title }}</strong></span>
 										<div class="triangle-right"></div>
 									</div>
 									<div class="news-latest-title-meta">
-										<span>Zlimon | Category</span>
+										<span>{{ $post->user->name }} | {{ $post->category->category }}</span>
 									</div>
-									<span>Velkommen til Habski Hotel! Habski er fortsatt under vedlikehold!</span>
+									<span>{{ $post->shortstory }}</span>
 								</a>
 							</article>
-						@endfor
+						@endforeach
 					</div>
 				</div>
 				<div class="bottom"></div>

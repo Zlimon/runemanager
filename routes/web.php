@@ -36,4 +36,10 @@ Route::get('/task', 'TasksController@index')->name('task');
 Route::post('/task', 'TasksController@store')->name('store-task');
 // Route::post('/task', 'TasksController@update')->name('update-task');
 
+/*==========Admin Controller=============*/
+	/*==========News Controller=============*/
+	Route::get('/news/{id}', 'NewsController@show')->name('show-newspost');
+	Route::get('/admin/news/create', 'NewsController@create')->name('create-newspost');
+	Route::post('/admin/news/create', 'NewsController@store')->name('store-newspost');
+
 Auth::routes();
