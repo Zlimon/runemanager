@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use RuneManager\Account;
 use RuneManager\User;
 use RuneManager\Helpers\Helper;
+use Carbon\Carbon;
 
 class AccountsController extends Controller
 {
@@ -108,7 +109,9 @@ class AccountsController extends Controller
                     'account_id' => $account->id,
                     'rank' => $playerData[$i+1][0],
                     'level' => $playerData[$i+1][1],
-                    'xp' => $playerData[$i+1][2]
+                    'xp' => $playerData[$i+1][2],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ]);
             }
 
