@@ -29,6 +29,11 @@ class AddForeignKeys extends Migration
             $table->foreign('account_id')->references('id')->on('accounts');
             $table->foreign('task_id')->references('id')->on('tasks');
         });
+
+        Schema::table('news_posts', function($table) {
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('category_id')->references('id')->on('categories');
+        });
     }
 
     /**

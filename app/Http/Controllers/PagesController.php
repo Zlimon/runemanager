@@ -4,13 +4,15 @@ namespace RuneManager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use RuneManager\Account;
+use RuneManager\NewsPost;
 
 class PagesController extends Controller
 {
     public function index() {
         //$recentMembers = Account::orderBy('created_at', 'DESC')->limit(5)->get();
+        $recentPosts = NewsPost::with('user')->with('category')->limit(5)->orderBy('created_at', 'DESC')->get();
 
-        return view('index', compact('recentMembers'));
+        return view('index', compact('recentMembers', 'recentPosts'));
     }
 
     /**
