@@ -18,7 +18,7 @@ class CreateSkillsTables extends Migration
         foreach ($skills as $skill) {
             Schema::create($skill, function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->bigInteger('user_id')->unsigned();
+                $table->bigInteger('account_id')->unsigned();
                 $table->integer('rank')->nullable();
                 $table->integer('level')->default(1);
                 $table->string('xp')->default(0);
