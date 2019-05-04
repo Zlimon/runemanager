@@ -7,6 +7,12 @@ use RuneManager\Account;
 
 class PagesController extends Controller
 {
+    public function index() {
+        //$recentMembers = Account::orderBy('created_at', 'DESC')->limit(5)->get();
+
+        return view('index', compact('recentMembers'));
+    }
+
     /**
      * Show the application hiscores.
      *

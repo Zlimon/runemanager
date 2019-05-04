@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserTasksTable extends Migration
+class CreateAccountTasksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateUserTasksTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_tasks', function (Blueprint $table) {
+        Schema::create('account_tasks', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id')->unsigned();
-            $table->bigInteger('task_id')->unsigner();
+            $table->bigInteger('account_id')->unsigned();
+            $table->bigInteger('task_id')->unsigned();
             $table->enum('status', ['incomplete', 'complete']);
             $table->timestamps();
         });
@@ -29,6 +29,6 @@ class CreateUserTasksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_tasks');
+        Schema::dropIfExists('account_tasks');
     }
 }

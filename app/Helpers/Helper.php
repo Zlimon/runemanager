@@ -3,6 +3,8 @@
 namespace RuneManager\Helpers;
 
 use DateTime;
+use Illuminate\Support\Facades\Auth;
+use RuneManager\Account;
 
 class Helper
 {
@@ -94,4 +96,15 @@ class Helper
 
         return $itemData[0][$attribute];
     }
+
+    /**
+     * Returns the account ID for currently logged in user.
+     *
+     * @return
+     */
+    public static function sessionAccountId() {
+        $accountSession = Account::where('user_id', Auth::user()->id)->first();
+
+        return $accountSession->id;
+    } 
 }

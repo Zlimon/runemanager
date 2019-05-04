@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use RuneManager\Account;
 use RuneManager\User;
 use RuneManager\Helpers\Helper;
+use Carbon\Carbon;
 
 class AccountsController extends Controller
 {
@@ -93,7 +94,7 @@ class AccountsController extends Controller
      */
     public function store(Array $playerData) {
         if (Auth::check()) {
-            Account::create([
+            $account = Account::create([
                 'user_id' => Auth::user()->id,
                 'username' => request('username'),
                 'rank' => $playerData[0][0],
@@ -105,10 +106,12 @@ class AccountsController extends Controller
 
             for ($i = 0; $i < count($skills); $i++) {
                 DB::table($skills[$i])->insert([
-                    'user_id' => Auth::user()->id,
+                    'account_id' => $account->id,
                     'rank' => $playerData[$i+1][0],
                     'level' => $playerData[$i+1][1],
-                    'xp' => $playerData[$i+1][2]
+                    'xp' => $playerData[$i+1][2],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ]);
             }
 
@@ -136,7 +139,7 @@ class AccountsController extends Controller
         $stats = [];
 
         foreach ($skills as $skillName) {
-            array_push($stats, DB::table($skillName)->where('user_id', $member->user_id)->get());
+            array_push($stats, DB::table($skillName)->where('account_id', $member->id)->get());
         }
 
         return view('member.show', compact('member', 'stats', 'skills'));

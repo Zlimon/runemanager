@@ -18,12 +18,22 @@ h1, h2, h3 {
 	font-family: "runescape", sans-serif;
 	text-align: center;
 	font-weight: bold;
-	/*color: #947bb7;*/
+	color: #343a40;
 }
 
 h2, h3 {
 	text-align: left;
 }
+
+a:link {color: #1e6dae;}
+a:visited {color: #1e6dae;}
+a:hover {color: black;}
+a:active {color: black;}
+
+a:link {text-decoration: none;}
+a:visited {text-decoration: none;}
+a:hover {text-decoration: underline;}
+a:active {text-decoration: none;}
 
 .top {
 	background: url('/images/scroll_top.gif');
@@ -33,17 +43,15 @@ h2, h3 {
 }
 
 .main-page {
-	position: relative;
-	display: flex;
-	flex-direction: column;
 	min-width: 0;
 	width: 745px;
 	word-wrap: break-word;
 	background: url(/images/scroll_middle.gif);
-	background-clip: border-box;
 	background-repeat: repeat-y;
+	margin: 0 auto;
 	margin-top: -25px;
 	margin-bottom: -25px;
+
 }
 
 .main-page-header {
@@ -67,6 +75,71 @@ h2, h3 {
 	width: 765px;
 	height: 50px;
 	z-index: 1;
+}
+
+.news-latest-box {
+	border-bottom: solid black 1px;
+	padding: 20px 0px 20px 0px;
+	transition: all .2s ease-in;
+}
+
+.news-latest-box:hover {
+	background: rgba(0, 0, 0, 0.2);
+}
+
+.news-latest-box a:link {color: black;}
+.news-latest-box a:visited {color: black;}
+.news-latest-box a:hover {color: black;}
+.news-latest-box a:active {color: black;}
+
+.news-latest-box a:link {text-decoration: none;}
+.news-latest-box a:visited {text-decoration: none;}
+.news-latest-box a:hover {text-decoration: none;}
+.news-latest-box a:active {text-decoration: none;}
+
+.news-latest-date {
+	text-align: center;
+	float: left;
+	margin-left: 15px;
+	margin-right: 15px;
+	width: 3em;
+	text-align: center;
+	display: block;
+}
+
+.news-latest-date-month {
+	font-size: 1.25em;
+}
+
+.news-latest-date-date {
+	font-size: 2em;
+}
+
+.news-latest-title {
+	font-size: 1.5em;
+	margin:  -5px;
+}
+
+.news-latest-title:hover {
+	color: #666666;
+}
+
+.news-latest-title-meta {
+	padding-bottom: 20px;
+}
+
+.triangle-right {
+	float: right;
+	width: 0;
+	height: 0;
+	border-top: 10px solid transparent;
+	border-left: 10px solid black;
+	border-bottom: 10px solid transparent;
+	margin-right: 5px;
+}
+
+.triangle-right:hover {
+	border-left: 10px solid #666666;
 }
 
 .member-body {
@@ -166,7 +239,6 @@ h2, h3 {
 table {
 	border-collapse: collapse;
 	width: 100%;
-	transition: all .2s ease-in;
 }
 
 table td, table th {

@@ -5,7 +5,8 @@ namespace RuneManager\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RuneManager\Task;
-use RuneManager\UserTask;
+use RuneManager\AccountTask;
+use RuneManager\Helpers\Helper;
 
 class TasksController extends Controller
 {
@@ -25,20 +26,20 @@ class TasksController extends Controller
      * @return
      */
     public function index() {
-        $currentUserTasks = UserTask::with('task')->where('user_id', Auth::user()->id)->where('status', 'incomplete')->limit(3)->get();
+        $currentAccountTasks = AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'incomplete')->limit(3)->get();
 
-        $completedUserTasks = UserTask::with('task')->where('user_id', Auth::user()->id)->where('status', 'complete')->orderBy('updated_at', 'DESC')->get();
+        $completedAccountTasks = AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'complete')->orderBy('updated_at', 'DESC')->get();
 
-        $completedUserTasksEasy = count(UserTask::with('task')->where('user_id', Auth::user()->id)->where('status', 'complete')->whereHas('task', function ($query) {
+        $completedAccountTasksEasy = count(AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'complete')->whereHas('task', function ($query) {
             $query->where('difficulty', '=', 'easy');
         })->get());
-        $completedUserTasksMedium = count(UserTask::with('task')->where('user_id', Auth::user()->id)->where('status', 'complete')->whereHas('task', function ($query) {
+        $completedAccountTasksMedium = count(AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'complete')->whereHas('task', function ($query) {
             $query->where('difficulty', '=', 'medium');
         })->get());
-        $completedUserTasksHard = count(UserTask::with('task')->where('user_id', Auth::user()->id)->where('status', 'complete')->whereHas('task', function ($query) {
+        $completedAccountTasksHard = count(AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'complete')->whereHas('task', function ($query) {
             $query->where('difficulty', '=', 'hard');
         })->get());
-        $completedUserTasksElite = count(UserTask::with('task')->where('user_id', Auth::user()->id)->where('status', 'complete')->whereHas('task', function ($query) {
+        $completedAccountTasksElite = count(AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'complete')->whereHas('task', function ($query) {
             $query->where('difficulty', '=', 'elite');
         })->get());
 
@@ -47,12 +48,12 @@ class TasksController extends Controller
         $hardTaskAmount = count(Task::where('difficulty', 'hard')->get());
         $eliteTaskAmount = count(Task::where('difficulty', 'elite')->get());
 
-        $easyProgress = ($completedUserTasksEasy / 100) * $easyTaskAmount;
-        $mediumProgress = ($completedUserTasksMedium / 100) * $mediumTaskAmount;
-        $hardProgress = ($completedUserTasksHard / 100) * $hardTaskAmount;
-        $eliteProgress = ($completedUserTasksElite / 100) * $eliteTaskAmount;
+        $easyProgress = ($completedAccountTasksEasy / 100) * $easyTaskAmount;
+        $mediumProgress = ($completedAccountTasksMedium / 100) * $mediumTaskAmount;
+        $hardProgress = ($completedAccountTasksHard / 100) * $hardTaskAmount;
+        $eliteProgress = ($completedAccountTasksElite / 100) * $eliteTaskAmount;
 
-        return view('task', compact('currentUserTasks', 'completedUserTasks', 'easyProgress', 'mediumProgress', 'hardProgress', 'eliteProgress'));
+        return view('task', compact('currentAccountTasks', 'completedAccountTasks', 'easyProgress', 'mediumProgress', 'hardProgress', 'eliteProgress'));
     }
 
     /**
@@ -61,13 +62,13 @@ class TasksController extends Controller
      * @return
      */
     public function store() {
-        $userTasks = UserTask::with('task')->where('user_id', Auth::user()->id)->where('status', 'incomplete')->get();
+        $AccountTasks = AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'incomplete')->get();
 
-        if (count($userTasks) <= 2) {
-            $randomTask = Task::doesntHave('userTask')->inRandomOrder()->first();
+        if (count($AccountTasks) <= 2) {
+            $randomTask = Task::doesntHave('AccountTask')->inRandomOrder()->first();
 
-            UserTask::create([
-                'user_id' => Auth::user()->id,
+            AccountTask::create([
+                'account_id' => Helper::sessionAccountId(),
                 'task_id' => $randomTask['id'],
                 'status' => 'incomplete',
             ]);
