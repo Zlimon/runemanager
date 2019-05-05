@@ -31,15 +31,13 @@ class AccountsController extends Controller
      */
     public function create() {
         if (Auth::check()) {
-            $checkIfAccountIsLinked = Account::where('user_id', Auth::user()->id)->first();
-
-            if ($checkIfAccountIsLinked == null) {
-                return view('member.create');
+            if (Auth::user()->member->first()) {
+                return redirect()->back()->withErrors('This profile has already been linked to a Old School RuneScape account!');
             } else {
-                return redirect()->back()->withErrors('This profile has already been linked to a RuneScape account!');
+                return view('member.create');
             }
         } else {
-            return redirect('/login')->withErrors(['You have to log in before linking a RuneScape account!']);
+            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
         }
     }
 
@@ -51,15 +49,13 @@ class AccountsController extends Controller
     public function verifyAccount() {
         if (Auth::check()) {
             request()->validate([
-                'username' => ['required', 'min:1', 'max:13'],
+                'username' => ['required', 'string', 'min:1', 'max:13'],
             ]);
 
-            $username = request('username');
-
-            $checkIfAccountExists = Account::where('username', $username)->first();
-
-            if ($checkIfAccountExists == null) {
-                $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.$username;
+            if (Account::where('username', request('username'))->first()) {
+                return redirect()->back()->withErrors('This account has already been linked to another profile!');
+            } else {
+                $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.request('username');
 
                 if (Helper::verifyUrl($playerDataUrl)) {
                     /* Get the $playerDataUrl file content. */
@@ -78,11 +74,9 @@ class AccountsController extends Controller
                 } else {
                     return redirect()->back()->withErrors('Could not find this Old School RuneScape account!');
                 }
-            } else {
-                return redirect()->back()->withErrors('This account has already been linked to another profile!');
             }
         } else {
-            return redirect('/login')->withErrors(['You have to log in before linking a Old School RuneScape account!']);
+            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
         }
     }
 
@@ -115,9 +109,9 @@ class AccountsController extends Controller
                 ]);
             }
 
-            return redirect(route('home'))->with('message', 'RuneScape account "'.request('username').'" linked!');
+            return redirect(route('home'))->with('message', 'Old School RuneScape account "'.request('username').'" linked!');
         } else {
-            return redirect ('/login')->withErrors(['You have to log in before linking a RuneScape account!']);
+            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
         }
     }
 
@@ -128,10 +122,6 @@ class AccountsController extends Controller
      * @return
      */
     public function show($member) {
-        // $member = Account::with('user')->whereHas('user', function ($query) {
-        //     $query->where('private', '=', 0);
-        // })->inRandomOrder()->findOrFail($member);
-
         $member = Account::findOrFail($member);
 
         $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];

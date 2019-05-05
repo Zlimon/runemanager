@@ -1,49 +1,156 @@
-@extends('layouts.layout')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-@section('title')
-	| {{ __('title.index') }}
-@endsection
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-@section('content')
-	<div class="container">
-		<div class="row">
-			<div class="col" style="width: 75%;">
-				<div class="top"></div>
-				<div class="main-page">
-					<div class="main-page-body">
-						<h1>Latest news</h1>
+    <title>{{ config('app.name', 'RuneManager') }}</title>
 
-						@foreach ($recentPosts as $post)
-							<article class="news-latest-box">
-								<a href="{{ route('show-newspost', $post->id) }}">
-									<div class="news-latest-date text-dark">
-										<span class="news-latest-date-month">May</span>
-										<span class="news-latest-date-date">{{ Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $post->created_at)->day }}</span>
-									</div>
-									<div class="news-latest-title">
-										<span><strong>{{ $post->title }}</strong></span>
-										<div class="triangle-right"></div>
-									</div>
-									<div class="news-latest-title-meta">
-										<span>{{ $post->user->name }} | {{ $post->category->category }}</span>
-									</div>
-									<span>{{ $post->shortstory }}</span>
-								</a>
-							</article>
-						@endforeach
+    <!-- Scripts -->
+    <script src="{{ asset('js/app.js') }}"></script>
+
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark navbar-laravel">
+            <div class="container">
+                <a class="navbar-brand" href="{{ route('index') }}">
+                    {{ config('app.name', 'RuneManager') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <!-- Left Side Of Navbar -->
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('index') }}">{{ __('title.index') }}</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                {{ __('title.hiscore') }} <span class="caret"></span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('hiscore') }}">{{ __('title.hiscore') }}</a>
+                                <a class="dropdown-item" href="{{ route('skill') }}">{{ __('title.skill') }}</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('member') }}">{{ __('title.member') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('task') }}">{{ __('title.task') }}</a>
+                        </li>
+                    </ul>
+
+                    <!-- Right Side Of Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link">Next update: {{ Helper::roundToNextHour() }}</a>
+                        </li>
+                        <!-- Authentication Links -->
+                        @guest
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            </li>
+                            @if (Route::has('register'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                </li>
+                            @endif
+                        @else
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    {{ Auth::user()->name }} <span class="caret"></span>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('home') }}">{{ __('title.home') }}</a>
+                                    <a class="dropdown-item" href="{{ route('edit-user') }}">{{ __('title.edit-member') }}</a>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        @csrf
+                                    </form>
+                                </div>
+                            </li>
+                        @endguest
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="py-4">
+            @if ($errors->any())
+                <div class="alert alert-danger col-md-4" style="margin: auto; margin-bottom: 1rem;">
+                    @foreach ($errors->all() as $errorMessage)
+                        <strong>Error!</strong> {{ $errorMessage }}<br>
+                    @endforeach
+                </div>
+            @endif
+
+            @if (Session::has('message'))
+                <div class="alert alert-success col-md-4" style="margin: auto; margin-bottom: 1rem;">
+                    <strong>Success!</strong> {{ Session::get('message') }}<br>
+                </div>
+            @endif
+
+            <div class="container">
+				<div class="row no-gutters justify-content-center">
+					<div class="col-md-7" style="min-width: 765px; max-width: 765px;">
+						<div class="main-page">
+							<div class="main-page-body" style="padding: 0; width: 100%;">
+								<h1>Latest news and updates</h1>
+
+								@foreach ($recentPosts as $post)
+									<article class="latest-news">
+										<div class="content">
+											<a href="{{ route('show-newspost', $post->id) }}">
+												<div class="date text-dark">
+													<span class="month">May</span>
+													<span class="day">{{ Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $post->created_at)->day }}</span>
+												</div>
+												<div class="title">
+													<span>{{ $post->title }}</span>
+												</div>
+												<div class="meta">
+													<span>{{ $post->user->name }} | {{ $post->category->category }}</span>
+												</div>
+												<p>{{ $post->shortstory }}</p>
+											</a>
+										</div>
+										<span><strong><a href="{{ route('show-newspost', $post->id) }}">Read more <i class="fas fa-long-arrow-alt-right"></i></a></strong></span>
+									</article>
+								@endforeach
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4 ml-auto">
+						<div class="text-light bg-dark p-4 mb-4" style="border-radius: 3px;">
+							<h1 class="text-light">Welcome to {{ config('app.name', 'RuneManager') }}</h1>
+							<p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+						</div>
+
+						<iframe src="https://discordapp.com/widget?id=351850127209660416&theme=dark" width="100%" height="500" allowtransparency="true" frameborder="0"></iframe>
 					</div>
 				</div>
-				<div class="bottom"></div>
 			</div>
-
-			<div class="col" style="width: 25%;">
-				<div class="text-light bg-dark p-4 mb-4">
-					<h1 class="text-light">Welcome to {{ config('app.name', 'RuneManager') }}</h1>
-					<p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-				</div>
-
-				<iframe src="https://discordapp.com/widget?id=351850127209660416&theme=dark" width="100%" height="500" allowtransparency="true" frameborder="0"></iframe>
-			</div>
-		</div>
+		</main>
 	</div>
-@endsection
+</body>
+</html>

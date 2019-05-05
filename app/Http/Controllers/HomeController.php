@@ -27,7 +27,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $member = Account::with('user')->where('user_id', Auth::user()->id)->first();
+        $member = Auth::user()->member->first();
 
         if ($member == null) {
             return view('home')->withErrors(['You have not linked your RuneScape account with this profile!']);
@@ -37,7 +37,7 @@ class HomeController extends Controller
             $stats = [];
 
             foreach ($skills as $skillName) {
-                array_push($stats, DB::table($skillName)->where('account_id', Auth::user()->id)->get());
+                array_push($stats, DB::table($skillName)->where('account_id', $member->user_id)->get());
             }
 
             return view('home', compact('member', 'stats', 'skills'));

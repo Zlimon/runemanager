@@ -103,8 +103,6 @@ class Helper
      * @return
      */
     public static function sessionAccountId() {
-        $accountSession = Account::where('user_id', Auth::user()->id)->first();
-
-        return $accountSession->id;
+        return Auth::user()->member->first()->user_id;
     } 
 }

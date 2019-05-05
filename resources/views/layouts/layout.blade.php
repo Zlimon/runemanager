@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }} @yield('title')</title>
+    <title>{{ config('app.name', 'RuneManager') }} | @yield('title')</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
@@ -20,10 +20,10 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark navbar-laravel">
+        <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark navbar-laravel">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                <a class="navbar-brand" href="{{ route('index') }}">
+                    {{ config('app.name', 'RuneManager') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -33,7 +33,17 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('hiscore') }}">{{ __('title.hiscore') }}</a>
+                            <a class="nav-link" href="{{ route('index') }}">{{ __('title.index') }}</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                {{ __('title.hiscore') }} <span class="caret"></span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('hiscore') }}">{{ __('title.hiscore') }}</a>
+                                <a class="dropdown-item" href="{{ route('skill') }}">{{ __('title.skill') }}</a>
+                            </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('member') }}">{{ __('title.member') }}</a>
@@ -45,6 +55,9 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link">Next update: {{ Helper::roundToNextHour() }}</a>
+                        </li>
                         <!-- Authentication Links -->
                         @guest
                             <li class="nav-item">
@@ -90,13 +103,21 @@
                 </div>
             @endif
 
-            @if(Session::has('message'))
+            @if (Session::has('message'))
                 <div class="alert alert-success col-md-4" style="margin: auto; margin-bottom: 1rem;">
                     <strong>Success!</strong> {{ Session::get('message') }}<br>
                 </div>
             @endif
 
-            @yield('content')
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="main-page">
+                        <div class="main-page-body">
+                            @yield('content')
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </body>
