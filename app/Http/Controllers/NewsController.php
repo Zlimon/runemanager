@@ -33,7 +33,7 @@ class NewsController extends Controller
         $newsPost = NewsPost::create([
             'user_id' => Auth::user()->id,
             'category_id' => request('category_id'),
-            'image' => 'test',
+            'image' => '0',
             'title' => request('title'),
             'shortstory' => request('shortstory'),
             'longstory' => request('longstory')

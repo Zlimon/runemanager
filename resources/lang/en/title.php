@@ -30,6 +30,10 @@ return [
     /*==========Task Titles=============*/
     'task' => 'Tasks',
 
+    /*==========Admin Titles=============*/
+        /*==========News Titles=============*/
+        'create-newspost' => 'Create news post',
+
     /*==========Auth Titles=============*/
     'login' => 'Login',
     'register' => 'Register',

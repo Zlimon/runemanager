@@ -1,11 +1,11 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ __('title.update-log') }}
+	{{ __('title.create-newspost') }}
 @endsection
 
 @section('content')
-	<h1>Create news post</h1>
+	<h1>{{ __('title.create-newspost') }}</h1>
 
 	<form method="POST" action="{{ route('create-newspost') }}">
 		@csrf

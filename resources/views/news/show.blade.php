@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ __('title.update-log') }}
+	"{{ $post->title }}"
 @endsection
 
 @section('content')
