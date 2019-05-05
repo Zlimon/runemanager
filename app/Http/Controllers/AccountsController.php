@@ -37,7 +37,7 @@ class AccountsController extends Controller
                 return view('member.create');
             }
         } else {
-            return redirect('/login')->withErrors(['You have to log in before linking a Old School RuneScape account!']);
+            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
         }
     }
 
@@ -76,7 +76,7 @@ class AccountsController extends Controller
                 }
             }
         } else {
-            return redirect('/login')->withErrors(['You have to log in before linking a Old School RuneScape account!']);
+            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
         }
     }
 
@@ -111,7 +111,7 @@ class AccountsController extends Controller
 
             return redirect(route('home'))->with('message', 'Old School RuneScape account "'.request('username').'" linked!');
         } else {
-            return redirect ('/login')->withErrors(['You have to log in before linking a Old School RuneScape account!']);
+            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
         }
     }
 

@@ -49,10 +49,13 @@ class TasksController extends Controller
             $hardTaskAmount = count(Task::where('difficulty', 'hard')->get());
             $eliteTaskAmount = count(Task::where('difficulty', 'elite')->get());
 
-            $easyProgress = ($completedAccountTasksEasy / 100) * $easyTaskAmount;
-            $mediumProgress = ($completedAccountTasksMedium / 100) * $mediumTaskAmount;
-            $hardProgress = ($completedAccountTasksHard / 100) * $hardTaskAmount;
-            $eliteProgress = ($completedAccountTasksElite / 100) * $eliteTaskAmount;
+            $easyProgress = round(($completedAccountTasksEasy / $easyTaskAmount) * 100);
+            // $mediumProgress = round(($completedAccountTasksMedium / $mediumTaskAmount) * 100);
+            // $hardProgress = round(($completedAccountTasksHard / $hardTaskAmount) * 100);
+            // $eliteProgress = round(($completedAccountTasksElite / $eliteTaskAmount) * 100);
+            $mediumProgress = 0;
+            $hardProgress = 0;
+            $eliteProgress = 0;
 
             return view('task', compact('currentAccountTasks', 'completedAccountTasks', 'easyProgress', 'mediumProgress', 'hardProgress', 'eliteProgress'));    
         } else {
@@ -69,15 +72,29 @@ class TasksController extends Controller
         if (count(AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('status', 'incomplete')->get()) <= 2) {
             $randomTask = Task::doesntHave('AccountTask')->inRandomOrder()->first();
 
-            AccountTask::create([
-                'account_id' => Helper::sessionAccountId(),
-                'task_id' => $randomTask['id'],
-                'status' => 'incomplete',
-            ]);
+            if ($randomTask) {
+                AccountTask::create([
+                    'account_id' => Helper::sessionAccountId(),
+                    'task_id' => $randomTask['id'],
+                    'status' => 'incomplete',
+                ]);
 
-            return redirect(route('task'))->with('message', 'Task generated!');
+                return redirect(route('task'))->with('message', 'Task generated!');
+            } else {
+                return redirect()->back()->withErrors(['There are no more tasks for you to do!']);
+            }
         } else {
             return redirect()->back()->withErrors(['You have reached the limit of three tasks!']);
+        }
+    }
+
+    public function update(AccountTask $task) {
+        $task = AccountTask::with('task')->where('account_id', Helper::sessionAccountId())->where('task_id', request('task_id'))->first();
+
+        if ($task) {
+            AccountTask::where('task_id', request('task_id'))->update(['status' => 'complete']);
+
+            return redirect()->back()->with('message', 'Task "'.$task->task->task.'" complete! Reward: "'.$task->task->reward.'"');
         }
     }
 }

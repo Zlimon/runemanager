@@ -34,7 +34,7 @@ Route::patch('/user/edit', 'UsersController@update')->name('update-user');
 /*==========Tasks Controller=============*/
 Route::get('/task', 'TasksController@index')->name('task');
 Route::post('/task', 'TasksController@store')->name('store-task');
-// Route::post('/task', 'TasksController@update')->name('update-task');
+Route::patch('/task', 'TasksController@update')->name('update-task');
 
 /*==========Admin Controller=============*/
 	/*==========News Controller=============*/

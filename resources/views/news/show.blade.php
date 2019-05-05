@@ -15,8 +15,8 @@
 				</div>
 				<div class="main-page-body">
 					<h1>{{ $post->title }}</h1>
-					<p>{{ $post->shortstory }}</p>
-					{{ $post->longstory }}
+					<p class="text-center">{{ $post->shortstory }}</p>
+					{!! $post->longstory !!}
 				</div>
 			</div>
 			<div class="bottom"></div>

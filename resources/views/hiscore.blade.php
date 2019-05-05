@@ -7,7 +7,6 @@
 @section('content')
 	<div class="container">
 		<div class="row justify-content-center">
-			<div class="top"></div>
 			<div class="main-page">
 				<div class="main-page-header">
 					<span><a href="{{ route('index') }}">{{ __('title.index') }}</a> <i class="fas fa-long-arrow-alt-right"></i> {{ __('title.hiscore') }}</span>
@@ -42,8 +41,7 @@
 						@endforeach
 					</table>
 				</div>
-			</div>
-			<div class="bottom"></div>
+			</dov>
 		</div>
 	</div>
 @endsection

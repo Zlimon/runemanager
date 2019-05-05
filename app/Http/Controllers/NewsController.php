@@ -26,8 +26,8 @@ class NewsController extends Controller
             'category_id' => ['required', 'integer'],
             //'image' => ['required'],
             'title' => ['required', 'string', 'min:5', 'max:75'],
-            'shortstory' => ['required', 'string', 'min:1', 'max:1000'],
-            'longstory' => ['required', 'string', 'min:1', 'max:1000']
+            'shortstory' => ['required', 'string', 'min:1', 'max:190'],
+            'longstory' => ['required', 'string', 'min:1', 'max:5000']
         ]);
 
         $newsPost = NewsPost::create([
