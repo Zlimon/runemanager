@@ -50,12 +50,11 @@ class TasksController extends Controller
             $eliteTaskAmount = count(Task::where('difficulty', 'elite')->get());
 
             $easyProgress = round(($completedAccountTasksEasy / $easyTaskAmount) * 100);
-            // $mediumProgress = round(($completedAccountTasksMedium / $mediumTaskAmount) * 100);
-            // $hardProgress = round(($completedAccountTasksHard / $hardTaskAmount) * 100);
-            // $eliteProgress = round(($completedAccountTasksElite / $eliteTaskAmount) * 100);
-            $mediumProgress = 0;
-            $hardProgress = 0;
-            $eliteProgress = 0;
+            $mediumProgress = round(($completedAccountTasksMedium / $mediumTaskAmount) * 100);
+            $hardProgress = round(($completedAccountTasksHard / $hardTaskAmount) * 100);
+            $eliteProgress = round(($completedAccountTasksElite / $eliteTaskAmount) * 100);
+
+            //$total = ($easyTaskAmount + $mediumTaskAmount + $hardTaskAmount + $eliteTaskAmount);
 
             return view('task', compact('currentAccountTasks', 'completedAccountTasks', 'easyProgress', 'mediumProgress', 'hardProgress', 'eliteProgress'));    
         } else {

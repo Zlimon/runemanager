@@ -31,7 +31,7 @@ class UsersController extends Controller
 
         $randomIcons = [];
 
-        for ($i=0; count($randomIcons) < 12; $i++) {
+        for ($i=0; count($randomIcons) < 10; $i++) {
             if ($icon_id = Helper::randomItemId()) {
                 array_push($randomIcons, $icon_id);
             }
