@@ -67,7 +67,7 @@ class UpdateAccounts extends Command
                     );
 
                 for ($skillCounter = 0; $skillCounter < count($skills); $skillCounter++) {
-                    $updatePlayerSkill = DB::table($skills[$skillCounter])->where('user_id', $member->id)
+                    $updatePlayerSkill = DB::table($skills[$skillCounter])->where('account_id', $member->id)
                         ->update(
                             ['rank' => $playerData[$skillCounter+1][0], 'level' => $playerData[$skillCounter+1][1], 'xp' => $playerData[$skillCounter+1][2], 'updated_at' => Carbon::now()]
                         );
