@@ -36,6 +36,9 @@
                             <a class="nav-link" href="{{ route('index') }}">{{ __('title.index') }}</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('news') }}">{{ __('title.news') }}</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('show-skill', 'overall') }}">{{ __('title.hiscore') }}</a>
                         </li>
                         <li class="nav-item">

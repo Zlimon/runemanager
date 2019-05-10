@@ -21,14 +21,14 @@ return [
     'create-member' => 'Link Old School RuneScape account',
     'member' => 'Members',
 
-    /*==========Skill Titles=============*/
-    'skill' => 'Skill Hiscores',
-
     /*==========User Titles=============*/
     'edit-member' => 'Edit profile',
 
     /*==========Task Titles=============*/
     'task' => 'Tasks',
+
+    /*==========News Titles=============*/
+    'news' => 'News posts',
 
     /*==========Admin Titles=============*/
         /*==========News Titles=============*/

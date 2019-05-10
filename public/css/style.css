@@ -108,9 +108,9 @@ img.middle-img-icon {
 /* NEWS */
 .latest-news {
 	border-bottom: solid black 1px;
-	padding: 20px 20px 20px 0px;
+	padding: 20px 0px 20px 0px;
 	transition: all .2s ease-in;
-	height: 200px;
+	height: 175px;
 }
 
 .latest-news:hover {
@@ -127,15 +127,38 @@ img.middle-img-icon {
 .latest-news .content a:hover {text-decoration: none;}
 .latest-news .content a:active {text-decoration: none;}
 
+.latest-news .image {
+	text-align: center;
+}
+
+.latest-news .image img {
+	max-height: 175px;
+	max-width: 175px;
+}
+
+.latest-news .title {
+	font-family: 'runescape', sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+	margin-top: -10px;
+}
+
+.latest-news .title:hover {
+	color: #666666;
+}
+
+.latest-news .meta {
+	padding-bottom: 5px;
+}
+
+.latest-news .title, .latest-news .meta, .latest-news .shortstory {
+	margin-left: -15px;
+}
+
 .latest-news .date {
 	text-align: center;
-	float: left;
-	margin: 0px 15px 0px 15px;
-
-	width: 3em;
-	text-align: center;
-	display: block;
-	height: 180px;
+	margin-top: -10px;
+	margin-left: -15px;
 }
 
 .latest-news .month {
@@ -148,21 +171,6 @@ img.middle-img-icon {
 	font-family: 'runescape', sans-serif;
 	font-weight: bold;
 	font-size: 2em;
-}
-
-.latest-news .title {
-	font-family: 'runescape', sans-serif;
-	font-weight: bold;
-	font-size: 2em;
-	margin:  -5px;
-}
-
-.latest-news .title:hover {
-	color: #666666;
-}
-
-.latest-news .meta {
-	padding-bottom: 5px;
 }
 
 /* MEMBER */
