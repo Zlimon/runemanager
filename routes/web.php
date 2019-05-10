@@ -32,10 +32,13 @@ Route::get('/task', 'TasksController@index')->name('task');
 Route::post('/task', 'TasksController@store')->name('store-task');
 Route::patch('/task', 'TasksController@update')->name('update-task');
 
+/*==========News Controller=============*/
+Route::get('/news', 'NewsController@index')->name('news');
+Route::get('/news/{id}', 'NewsController@show')->name('show-newspost');
+
 /*==========Admin Controller=============*/
 	/*==========News Controller=============*/
-	Route::get('/news/{id}', 'NewsController@show')->name('show-newspost');
 	Route::get('/admin/news/create', 'NewsController@create')->name('create-newspost');
-	Route::post('/admin/news/create', 'NewsController@store')->name('store-newspost');
+	Route::post('/admin/news/create', 'NewsController@imageUpload')->name('store-newspost');
 
 Auth::routes();

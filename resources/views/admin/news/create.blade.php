@@ -7,8 +7,16 @@
 @section('content')
 	<h1>{{ __('title.create-newspost') }}</h1>
 
-	<form method="POST" action="{{ route('create-newspost') }}">
+	<form method="POST" action="{{ route('create-newspost') }}" enctype="multipart/form-data">
 		@csrf
+
+        <div class="form-group row">
+            <label for="image" class="col-md-4 col-form-label text-md-right">Image file</label>
+
+            <div class="col-md-6">
+            	<input id="image" type="file" class="form-control-file border rounded bg-white p-1 @error('image') border-danger @enderror" name="image">
+            </div>
+        </div>
 
 		<div class="form-group row">
 			<label for="title" class="col-md-4 col-form-label text-md-right">Title</label>

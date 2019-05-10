@@ -17,7 +17,7 @@ class CreateNewsPostsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('category_id')->unsigned();
-            $table->string('image');
+            $table->bigInteger('image_id')->unsigned()->default('1');
             $table->string('title');
             $table->string('shortstory');
             $table->longText('longstory');

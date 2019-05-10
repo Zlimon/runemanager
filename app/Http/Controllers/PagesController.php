@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuneManager\NewsPost;
 use RuneManager\Account;
+use RuneManager\Image;
 
 class PagesController extends Controller
 {
     public function index() {
         //$recentMembers = Account::orderBy('created_at', 'DESC')->limit(5)->get();
-        $recentPosts = NewsPost::with('user')->with('category')->limit(5)->orderBy('created_at', 'DESC')->get();
+        $recentPosts = NewsPost::with('user')->with('category')->with('image')->limit(5)->orderBy('created_at', 'DESC')->get();
 
         return view('index', compact('recentPosts'));
     }
