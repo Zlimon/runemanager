@@ -30,7 +30,7 @@ class HomeController extends Controller
         $member = Auth::user()->member->first();
 
         if ($member == null) {
-            return view('home')->withErrors(['You have not linked your RuneScape account with this profile!']);
+            return redirect(route('create-member'))->withErrors(['You must link an Old School RuneScape account to access this feature!']);
         } else {
             $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
 
