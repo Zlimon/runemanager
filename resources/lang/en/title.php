@@ -12,14 +12,15 @@ return [
     */
 
     /*==========Pages Titles=============*/
-    'hiscore' => 'Hiscores',
-    'home' => 'Profile',
     'index' => 'Home',
     'update-log' => 'Update Log',
+    'hiscore' => 'Hiscores',
+    'home' => 'Profile',
 
     /*==========Member Titles=============*/
-    'create-member' => 'Link Old School RuneScape account',
     'member' => 'Members',
+    'search-member' => 'Search results for ',
+    'create-member' => 'Link Old School RuneScape account',
 
     /*==========User Titles=============*/
     'edit-member' => 'Edit profile',
