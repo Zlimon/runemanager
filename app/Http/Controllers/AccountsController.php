@@ -134,4 +134,25 @@ class AccountsController extends Controller
 
         return view('member.show', compact('member', 'stats', 'skills'));
     }
+
+    /**
+     * Returns search results from query.
+     *
+     * @return
+     */
+    public function search() {
+        request()->validate([
+            'search' => ['required', 'string', 'min:1', 'max:13'],
+        ]);
+
+        $query = request('search');
+
+        $searchResults = Account::with('user')->where('username', 'LIKE', '%' . $query . '%')->paginate(10);
+
+        if (count($searchResults) === 0) {
+            return redirect(route('member'))->withErrors(['No search results for "'.$query.'"!']);
+        } else {
+            return view('member.search', compact('searchResults', 'query'));
+        }
+    }
 }

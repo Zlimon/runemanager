@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ __('title.skill') }}
+	{{ ucfirst($skillname) }} {{ __('title.hiscore') }}
 @endsection
 
 @section('content')
