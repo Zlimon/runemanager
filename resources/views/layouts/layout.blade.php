@@ -107,8 +107,8 @@
 
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="main-page">
-                        <div class="main-page-body">
+                    <div class="col-md-8">
+                        <div class="main-page">
                             @yield('content')
                         </div>
                     </div>

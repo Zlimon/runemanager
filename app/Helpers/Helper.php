@@ -4,7 +4,9 @@ namespace RuneManager\Helpers;
 
 use DateTime;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use RuneManager\Account;
+use Carbon\Carbon;
 
 class Helper
 {
@@ -104,5 +106,65 @@ class Helper
      */
     public static function sessionAccountId() {
         return Auth::user()->member->first()->user_id;
-    } 
+    }
+
+    public static function listSkills() {
+        $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
+
+        return $skills;
+    }
+
+    public static function registerAccount($accountName) {
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.$accountName;
+
+        if (self::verifyUrl($playerDataUrl)) {
+            // Get the $playerDataUrl file content.
+            $getPlayerData = file_get_contents($playerDataUrl);
+
+            // Fetch the content from $playerDataUrl.
+            $playerStats = explode("\n", $getPlayerData);
+
+            // Convert the CSV file of player stats into an array.
+            $playerData = [];
+            foreach ($playerStats as $playerStat) {
+                $playerData[] = str_getcsv($playerStat);
+            }
+
+            $account = Account::create([
+                'username' => request('username'),
+                'rank' => $playerData[0][0],
+                'level' => $playerData[0][1],
+                'xp' => $playerData[0][2]
+            ]);
+
+            $skills = self::listSkills();
+
+            foreach ($skills as $key => $skill) {
+                DB::table($skills[$key])->insert([
+                    'account_id' => $account->id,
+                    'rank' => $playerData[$key+1][0],
+                    'level' => $playerData[$key+1][1],
+                    'xp' => $playerData[$key+1][2],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
+
+            return $account;
+        } else {
+            return false;
+        }
+    }
+
+    public static function accountStats($accountId) {
+        $accountSkills = [];
+
+        $skills = self::listSkills();
+
+        foreach ($skills as $skillName) {
+            array_push($accountSkills, DB::table($skillName)->where('account_id', $accountId)->get());
+        }
+
+        return $accountSkills;
+    }
 }

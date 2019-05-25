@@ -1,22 +1,22 @@
-@extends('layouts.layout')
+@extends('layouts.admin')
 
 @section('title')
-	{{ __('title.create-newspost') }}
+	TITLE
 @endsection
 
 @section('content')
 	<h1>{{ __('title.create-newspost') }}</h1>
 
-	<form method="POST" action="{{ route('create-newspost') }}" enctype="multipart/form-data">
+	<form method="POST" action="{{ route('admin-create-newspost') }}" enctype="multipart/form-data">
 		@csrf
 
-        <div class="form-group row">
-            <label for="image" class="col-md-4 col-form-label text-md-right">Image file</label>
+		<div class="form-group row">
+			<label for="image" class="col-md-4 col-form-label text-md-right">Image file</label>
 
-            <div class="col-md-6">
-            	<input id="image" type="file" class="form-control-file border rounded bg-white p-1 @error('image') border-danger @enderror" name="image">
-            </div>
-        </div>
+			<div class="col-md-6">
+				<input id="image" type="file" class="form-control-file border rounded bg-white p-1 @error('image') border-danger @enderror" name="image" style="color: black;">
+			</div>
+		</div>
 
 		<div class="form-group row">
 			<label for="title" class="col-md-4 col-form-label text-md-right">Title</label>
@@ -54,7 +54,7 @@
 			<label for="shortstory" class="col-md-4 col-form-label text-md-right">Shortstory</label>
 
 			<div class="col-md-6">
-				<input id="shortstory" type="text" class="form-control @error('shortstory') is-invalid @enderror" name="shortstory" value="{{ old('shortstory') }}" required autofocus>
+				<input id="shortstory" type="text" class="form-control @error('shortstory') is-invalid @enderror" name="shortstory" value="{{ old('shortstory') }}" required>
 
 				@error('shortstory')
 					<span class="invalid-feedback" role="alert">

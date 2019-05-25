@@ -1,5 +1,22 @@
 @import url(https://fonts.googleapis.com/css?family=Nunito);
 
+.pixel {
+	image-rendering: pixelated;
+}
+
+.profile-icon {
+	background: #99855D;
+	border: solid #755B41 3px;
+	border-radius: 5px;
+	padding: 5px 5px 5px 15px;
+	text-align: center;
+	float: left;
+}
+
+.profile-icon span {
+	padding-right: 10px;
+}
+
 /*!
  * Bootstrap v4.1.3 (https://getbootstrap.com/)
  * Copyright 2011-2018 The Bootstrap Authors
