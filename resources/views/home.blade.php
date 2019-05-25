@@ -18,7 +18,7 @@
 	</div>
 
 	<div class="float-left ml-3">
-		<h1>Welcome, {{ Auth::user()->name }}</h1>
+		<h1>Welcome, {{ Auth::user()->name }} @role('admin') [Admin] @endrole</h1>
 
 		<p>RuneScape account: <strong>{{ $member->username }}</strong></p>
 		<p>Joined: <strong>{{ \Carbon\Carbon::parse($member->created_at)->format('d. M Y') }}</strong></p>

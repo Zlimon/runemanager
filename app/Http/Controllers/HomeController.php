@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use RuneManager\Account;
 use RuneManager\User;
 
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
 class HomeController extends Controller
 {
     /**
@@ -27,6 +30,11 @@ class HomeController extends Controller
      */
     public function index()
     {
+
+return auth()->user()->assignRole('admin');
+
+return $users = User::role('admin')->get();
+
         $member = Auth::user()->member->first();
 
         if ($member == null) {

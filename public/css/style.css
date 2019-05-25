@@ -95,14 +95,9 @@ img.middle-img-icon {
 
 .main-page {
 	background: url('/images/scroll_middle.gif') repeat-y top center;
-	padding: 50px 75px;
 	position: relative;
-}
-
-.main-page-body {
 	margin: 0 auto;
-	padding: 25px 50px 25px 50px;
-	width: 765px;
+	padding: 75px;
 }
 
 /* NEWS */
