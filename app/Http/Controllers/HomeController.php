@@ -28,12 +28,17 @@ class HomeController extends Controller
      *
      * @return \RuneManager\Account
      */
-    public function index()
+    public function index(User $user)
     {
 
-return auth()->user()->assignRole('admin');
+//return auth()->user()->getAllPermissions();
+//$role = Role::create(['guard_name' => 'admin', 'name' => 'superadmin']);
 
-return $users = User::role('admin')->get();
+ auth()->user()->assignRole('Super Admin');
+
+//return $users = User::role('admin')->get();
+dd (auth()->user()->hasRole('Super Admin'));
+//return $roles = $user->getRoleNames();
 
         $member = Auth::user()->member->first();
 
