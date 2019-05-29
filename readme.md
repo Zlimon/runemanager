@@ -71,18 +71,4 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 See also here for more detail on our licencing [here](https://github.com/Zlimon/RuneScape/blob/master/LICENSE)
 
-# RuneScape Clan Managment screenshot
 
-# Features
-The site Home screen offers an intuative overview of relevant information. Sections as news, highscores and members are redily avalable to survey on thir own pages. News is intended to give clan members relevant information. Highscores offers an overview of each members stats and scores. Members gives an interactable overview of all members of the clan. The site also offers a task overview to show would be events relevant to the clan members, but this function is not accesable by anyone other than the members. To become a member you need to register. 
-
-# Support
-
-# Future Development
-
-# Contributions
-
-# Authors
-Simon Konglevoll
-
-# Project Status
