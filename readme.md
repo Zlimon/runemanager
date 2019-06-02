@@ -1,28 +1,37 @@
 # RuneManager for Old School RuneScape
 **Welcome to RuneManager!**
 
-RuneManager is a CMS developed for clans in Old School RuneScape. With RuneManager will you as a clan have the possibility to communicate with eachother in a more engaging and interactive way. By providing different content for each clan members outside the game such as news posting, updates regarding events in-game (including a calender for you to organize), be social with your clan and much more!
+RuneManager is a CMS developed for clans in Old School RuneScape. With RuneManager will you as a member of a clan have the possibility to communicate with each other in a more engaging and interactive way. By offering different content for each clan members outside the game such as news posting, events in-game, competeties, socializing and much more will you with RuneManager have a more complete feeling of being a member of clan outside the game!
 
 **RuneManager is available to test on a [live demo](https://runemanager.habski.me)!**
 [![N|Solid](https://i.imgur.com/Y0TKY30.png)](https://runemanager.habski.me)
 
 ## What is the point of this?
-Why RuneManager? As a veteran of RuneScape I feel the social aspect of the game is important, and with that we have the in-game clans to gather a small community of your own. With a clan you have a structured way to have a group of people together in-game
-, and this is now even easier outside the game thanks to different medias such as Discord. However, there are not really any way to still have a communication with integrated elements in the game. By this I mean having a structured way to host events for your clan, notifiing your clan with important updates or even have a way to see eachothers statistics without having to manually look them up.
+Why RuneManager? As a veteran of RuneScape I feel the social aspect of the game is important, and with that we have the in-game clans to gather a small community for your own. With a clan you have a structured way to have a group of people together in-game, and this is now even easier outside the game thanks to different medias such as Discord. However, there are not really any way to still have a communication with integrated elements in the game. By this I mean having a structured way to host events for your clan, notifying your clan with important updates or even have a way to see each other’s statistics without having to manually look them up.
 
-RuneManager resolves this. With RuneManager will you as a clan owner have a structured way of providing content such as these to your clan. By having a list of different features you will be able to integrate your clan members even more with each other.
+RuneManager resolves this. With RuneManager will you as a clan owner have a structured way of providing content such as these to your clan. By having a list of different features you will be able to integrate your clan members even more with each other outside the game.
 
 # Main features
 ## Task system
-RuneManger delivers an unique way of completing different tasks in-game in a shape of a task system. The task system will bring a competetive aspect for the clan to compete against eachother in order to obtain different perks within the clan.
+RuneManger delivers a unique way of assigning different tasks in-game in a shape of a task system. The task system will bring a competitive aspect for the clan to compete against each other in order to obtain different perks within the clan where rewards are based on points. The points are differentiated after how difficult the task is, and  will have its own seperate hiscores for the clan members to compete against each other.
 
-## Calendar
+Examples on tasks are:
 
+"Get 1 Angler piece"
+
+"Get 5 uniques from medium clues"
+
+"Complete the Ardougne Hard Diary"
+
+For this to work clan members must install a RuneLite plugin created for this purpose. This plugin is another project related to RuneManager, and will be worked on when RuneManager is complete. Currently, the task system is purely individually so there are no hiscores yet and users of the application are free to assign and complete as many tasks as they wish.
+
+## Calendar & Events planning
+With the calendar, clan owners (and administrators) on RuneManager are able to provide clan members an easy way to inform and schedule when something clan related is about to happen. This calendar is synchronized with the clan events
 
 ### Completed and fully functional
  - User registration & OSRS account linking
  - News
- - Hiscores
+ - Hiscores (automatic scheduled updating)
  - (Simplified) Task system
 
 ### Planned and WIP features
@@ -50,9 +59,9 @@ RuneManger delivers an unique way of completing different tasks in-game in a sha
  - [ ] Integrate Ironman hiscores
     - [ ] Integration with Group Ironman when released
 
-# Installation
+# Quick Installation
 If you are already familiar with Laravel and setting up a Laravel application with Nginx or Apache, just follow these instructions.
-If not, visit our wiki for clear instructions on how to install everything you need!
+If not, visit our [wiki](https://github.com/Zlimon/RuneManager-OSRS/wiki/Installing-RuneManager-(Linux)-(MySQL)-(Nginx)) for clear instructions on how to install everything you need!
 
 ## Linux
 1. Create a folder and give your current user ownership of it.
@@ -71,7 +80,7 @@ composer install
 php artisan clear-compiled
 ```
 4. Copy the .env-example file into a file named .env, and edit the .env file with your favourite editor and set the environment variables.
-5. Generate an encryption key and link a storage syslink (this is where newspost images are stored).
+5. Generate an encryption key and create a symbolic link to the storage folder (this is where newspost images are stored).
 ```sh
 php artisan key:generate
 php artisan storage:link
@@ -86,16 +95,19 @@ sudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
 ```
 
-## Windows
+# Getting started
+The first thing to do when RuneManager is properly set up is to create a Super Administrator account. Before making the application public you should register your own account and assign it the Super Administrator role. Do this by registering the account you want to be "Super Admin". The first account that is registered on the website is automatically assigned the Super Administrator role. If you want to change that you can do it in the Admin panel.
+
+Then you should put a default image for newsposts. You can do it by placing a png image called default in the storage/image folder. This image is used for news post without any given image.
+
+That's it!
 
 ### Tech
 RuneManager uses two open source projects to work properly:
 * [spatie/laravel-permission](https://github.com/spatie/laravel-permission) - Associate users with roles and permissions
-* [unisharp/laravel-ckeditor](https://github.com/UniSharp/laravel-ckeditor) - This is a fork from the official CKEditor branch (standard edition), wrap it to laravel package.
-
-# Getting started
+* [unisharp/laravel-ckeditor](https://github.com/UniSharp/laravel-ckeditor) - This is a fork from the official CKEditor branch (standard edition), wrapped into the Laravel package.
 
 ### License
 RuneManager is licensed under the MIT License. See the license header in the respective file to be sure.
 
-Reason for this is the different dependencies RuneManager uses, including assets that are (C) by Jagex.
+Reason for this is the different dependencies RuneManager uses, including assets such as skill icons and images that are (C) by Jagex.
