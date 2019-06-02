@@ -1,10 +1,18 @@
 # RuneManager for Old School RuneScape
-RuneManager is a web application for managing your clan and clan members in RuneScape. The purpose of this application is to be able to have an overview of your clan, clan members and their statistics such as their levels and experience etc. Furthermore, you will be able to have a level of management on the website such as posting news, events or articles related to your clan. There will also be tracking of events in-game related to clan members such as achievements, rare drops and hiscores to make clan members able to compete with eachother via the web application. With this you will also be able to have an easy way to promote you clan both in-game and on the internet.
+**Welcome to RuneManager!**
 
-RuneManager is available to test on a [live demo](https://runemanager.habski.me)!
+RuneManager is a CMS developed for clans in Old School RuneScape. With RuneManager will you as a clan have the possibility to communicate with eachother in a more engaging and interactive way. By providing different content for each clan members outside the game such as news posting, updates regarding events in-game (including a calender for you to organize), be social with your clan and much more!
+
+**RuneManager is available to test on a [live demo](https://runemanager.habski.me)!**
 [![N|Solid](https://i.imgur.com/Y0TKY30.png)](https://runemanager.habski.me)
 
-# Features
+## What is the point of this?
+Why RuneManager? As a veteran of RuneScape I feel the social aspect of the game is important, and with that we have the in-game clans to gather a small community of your own. With a clan you have a structured way to have a group of people together in-game
+, and this is now even easier outside the game thanks to different medias such as Discord. However, there are not really any way to still have a communication with integrated elements in the game. By this I mean having a structured way to host events for your clan, notifiing your clan with important updates or even have a way to see eachothers statistics without having to manually look them up.
+
+RuneManager resolves this. With RuneManager will you as a clan owner have a structured way of providing content such as these to your clan. By having a list of different features you will be able to integrate your clan members even more with each other.
+
+# Main features
 ## Task system
 RuneManger delivers an unique way of completing different tasks in-game in a shape of a task system. The task system will bring a competetive aspect for the clan to compete against eachother in order to obtain different perks within the clan.
 
@@ -89,3 +97,5 @@ RuneManager uses two open source projects to work properly:
 
 ### License
 RuneManager is licensed under the MIT License. See the license header in the respective file to be sure.
+
+Reason for this is the different dependencies RuneManager uses, including assets that are (C) by Jagex.
