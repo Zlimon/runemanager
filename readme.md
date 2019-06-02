@@ -12,6 +12,9 @@ Why RuneManager? As a veteran of RuneScape I feel the social aspect of the game 
 RuneManager resolves this. With RuneManager will you as a clan owner have a structured way of providing content such as these to your clan. By having a list of different features you will be able to integrate your clan members even more with each other outside the game.
 
 # Main features
+## News posting
+Want to update your clan members on something? Do it by publishin a news post on your RuneManager application! This is an easy way for everyone to get the same update so there won't be any confusion. News posts also has a integrated comment system so 
+
 ## Task system
 RuneManger delivers a unique way of assigning different tasks in-game in a shape of a task system. The task system will bring a competitive aspect for the clan to compete against each other in order to obtain different perks within the clan where rewards are based on points. The points are differentiated after how difficult the task is, and  will have its own seperate hiscores for the clan members to compete against each other.
 
@@ -26,7 +29,10 @@ Examples on tasks are:
 For this to work clan members must install a RuneLite plugin created for this purpose. This plugin is another project related to RuneManager, and will be worked on when RuneManager is complete. Currently, the task system is purely individually so there are no hiscores yet and users of the application are free to assign and complete as many tasks as they wish.
 
 ## Calendar & Events planning
-With the calendar, clan owners (and administrators) on RuneManager are able to provide clan members an easy way to inform and schedule when something clan related is about to happen. This calendar is synchronized with the clan events
+With the calendar, clan owners (and administrators) on RuneManager are able to provide clan members an easy way to inform and schedule when something clan related is about to happen. This calendar is synchronized with the clan events and follows the in-game time.
+
+## Leaderboards
+RuneManager allows clan members to show off their accomplishments. With the RuneLite plugin, clan members are able to show off their rare drops, milestones and much more that will be added later.
 
 ### Completed and fully functional
  - User registration & OSRS account linking
