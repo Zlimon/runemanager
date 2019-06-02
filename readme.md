@@ -88,4 +88,4 @@ RuneManager uses two open source projects to work properly:
 # Getting started
 
 ### License
-RuneManager is licensed under the GNU General Public License v3.0. See the license header in the respective file to be sure.
+RuneManager is licensed under the MIT License. See the license header in the respective file to be sure.
