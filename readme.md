@@ -9,7 +9,7 @@ RuneManager is a CMS developed for clans in Old School RuneScape. With RuneManag
 ## What is the point of this?
 Why RuneManager? As a veteran of RuneScape I feel the social aspect of the game is important, and with that we have the in-game clans to gather a small community for your own. With a clan you have a structured way to have a group of people together in-game, and this is now even easier outside the game thanks to different medias such as Discord. However, there are not really any way to still have a communication with integrated elements in the game. By this I mean having a structured way to host events for your clan, notifying your clan with important updates or even have a way to see each other’s statistics without having to manually look them up.
 
-RuneManager resolves this. With RuneManager will you as a clan owner have a structured way of providing content such as these to your clan. By having a list of different features you will be able to integrate your clan members even more with each other outside the game.
+RuneManager resolves this. As there is a lack of open-source applications for clan owners in RuneScape, I want to fill this gap and bring the possibility for every clans in RuneScape to provide such content. With RuneManager will you as a clan owner have a structured way of providing content such as these to your clan. By having a list of different features you will be able to integrate your clan members even more with each other outside the game.
 
 # Main features
 ## News posting
@@ -119,6 +119,6 @@ RuneManager uses two open source projects to work properly:
 * [unisharp/laravel-ckeditor](https://github.com/UniSharp/laravel-ckeditor) - This is a fork from the official CKEditor branch (standard edition), wrapped into the Laravel package.
 
 ### License
-RuneManager is licensed under the MIT License. See the license header in the respective file to be sure.
+RuneManager is licensed under the MIT License. [See the license header in the respective file to be sure](https://github.com/Zlimon/RuneManager-OSRS/blob/master/LICENSE).
 
-Reason for this is the different dependencies RuneManager uses, including assets such as skill icons and images that are (C) by Jagex.
+Reason for this is the different dependencies RuneManager uses, also including assets such as skill icons and images that are intellectual property and copyrighted by Jagex. This means RuneManager will only provide content that are limited within this license, and always ensures these assets are owned by Jagex.
