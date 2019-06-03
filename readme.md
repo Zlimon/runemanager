@@ -13,7 +13,7 @@ RuneManager resolves this. With RuneManager will you as a clan owner have a stru
 
 # Main features
 ## News posting
-Want to update your clan members on something? Do it by publishin a news post on your RuneManager application! This is an easy way for everyone to get the same update so there won't be any confusion. News posts also has a integrated comment system so 
+Want to update your clan members on something? Do it by publishin a news post on your RuneManager application! This is an easy way for everyone to get the same update so there won't be any confusion. News posts also has a integrated comment system so people can discuss whatever that has been posted.
 
 ## Task system
 RuneManger delivers a unique way of assigning different tasks in-game in a shape of a task system. The task system will bring a competitive aspect for the clan to compete against each other in order to obtain different perks within the clan where rewards are based on points. The points are differentiated after how difficult the task is, and  will have its own seperate hiscores for the clan members to compete against each other.
@@ -95,7 +95,12 @@ php artisan storage:link
 ```sh
 php artisan migrate:fresh
 ```
-7. Change the group ownership of the storage and bootstrap/cache directories to www-data, and then recursively grant all permissions, including write and execute, to the group.
+7. Create a crontab job schedule so the hiscores on the website are regularly updated.
+```sh
+crontab -e
+* * * * * php /var/www/runemanager/artisan schedule:run
+```
+8. Change the group ownership of the storage and bootstrap/cache directories to www-data, and then recursively grant all permissions, including write and execute, to the group.
 ```sh
 sudo chgrp -R www-data storage bootstrap/cache
 sudo chmod -R ug+rwx storage bootstrap/cache
