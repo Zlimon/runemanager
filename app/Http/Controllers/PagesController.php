@@ -41,7 +41,7 @@ class PagesController extends Controller
         $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
 
         if ($skillname == "overall") {
-            $hiscores = Account::orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderByRaw('CAST(xp AS INT)', 'DESC')->get();
+            $hiscores = Account::orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
 
             $sumTotalXp = Account::sum('xp');
 
@@ -74,7 +74,7 @@ class PagesController extends Controller
                 ->join('accounts', $skillname.'.account_id', '=', 'accounts.id')
                 ->orderBy('rank', 'ASC')
                 ->orderBy('level', 'DESC')
-                ->orderByRaw('CAST('.$skillname.'.xp AS INT)', 'DESC')
+                ->orderBy('xp', 'DESC')
                 ->get();
         }
 
