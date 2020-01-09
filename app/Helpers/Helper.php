@@ -57,7 +57,7 @@ class Helper
 
         /* If the document has loaded successfully without any redirection or error */
         if ($httpCode >= 200 && $httpCode < 300) {
-            return true;
+            return file_get_contents($url);
         } else {
             return false;
         }
