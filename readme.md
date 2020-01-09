@@ -1,3 +1,5 @@
+**NOTICE!** This project remains inacitve until the clan update arrives to OSRS!**
+
 # RuneManager for Old School RuneScape
 **Welcome to RuneManager!**
 
