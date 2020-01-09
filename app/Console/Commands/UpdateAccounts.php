@@ -5,6 +5,7 @@ namespace RuneManager\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use RuneManager\Helpers\Helper;
 
 class UpdateAccounts extends Command
 {
@@ -46,36 +47,66 @@ class UpdateAccounts extends Command
         foreach ($getMembers as $member) {
             $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.$member->username;
 
-            /* Get the $playerDataUrl file content. */
-            $getPlayerData = file_get_contents($playerDataUrl);
+            $getPlayerData = Helper::verifyUrl($playerDataUrl);
 
-            /* Fetch the content from $playerDataUrl. */
-            $playerStats = explode("\n", $getPlayerData);
+            if ($getPlayerData) {
+                /* Get the $playerDataUrl file content. */
+                //$getPlayerData = file_get_contents($playerDataUrl);
 
-            /* Convert the CSV file of player stats into an array */
-            $playerData = array();
-            foreach ($playerStats as $playerStat) {
-                $playerData[] = str_getcsv($playerStat);
-            }
+                /* Fetch the content from $playerDataUrl. */
+                $playerStats = explode("\n", $getPlayerData);
 
-            if ($member->xp != $playerData[0][2]) {
-                print_r("Detected ".$member->username." in database with outdated data! Updating...\r\n");
-
-                $updatePlayerData = DB::table('accounts')->where('id', $member->id)
-                    ->update(
-                        ['rank' => $playerData[0][0], 'level' => $playerData[0][1], 'xp' => $playerData[0][2], 'updated_at' => Carbon::now()]
-                    );
-
-                for ($skillCounter = 0; $skillCounter < count($skills); $skillCounter++) {
-                    $updatePlayerSkill = DB::table($skills[$skillCounter])->where('account_id', $member->id)
-                        ->update(
-                            ['rank' => $playerData[$skillCounter+1][0], 'level' => $playerData[$skillCounter+1][1], 'xp' => $playerData[$skillCounter+1][2], 'updated_at' => Carbon::now()]
-                        );
+                /* Convert the CSV file of player stats into an array */
+                $playerData = array();
+                foreach ($playerStats as $playerStat) {
+                    $playerData[] = str_getcsv($playerStat);
                 }
 
-                print_r("Updated ".$member->username."!\r\n");
+                if ($member->xp != $playerData[0][2]) {
+                    if ($member->xp < $playerData[0][2]) {
+                        print_r("Detected ".$member->username." in database with outdated data! Updating...\r\n");
+
+                        $updatePlayerData = DB::table('accounts')->where('id', $member->id)
+                            ->update(
+                                ['rank' => $playerData[0][0], 'level' => $playerData[0][1], 'xp' => $playerData[0][2], 'updated_at' => Carbon::now()]
+                            );
+
+                        for ($skillCounter = 0; $skillCounter < count($skills); $skillCounter++) {
+                            $updatePlayerSkill = DB::table($skills[$skillCounter])->where('account_id', $member->id)
+                                ->update(
+                                    ['rank' => $playerData[$skillCounter+1][0], 'level' => $playerData[$skillCounter+1][1], 'xp' => $playerData[$skillCounter+1][2], 'updated_at' => Carbon::now()]
+                                );
+                        }
+
+                        print_r("Updated ".$member->username."!\r\n");
+                    } else {
+                        print_r("".$member->username." has changed owner! Deleting player...\r\n");
+
+                        for ($skillCounter = 0; $skillCounter < count($skills); $skillCounter++) {
+                            $deletePlayerSkill = DB::table($skills[$skillCounter])->where('account_id', $member->id)
+                                ->delete();
+                        }
+
+                        $deletePlayer = DB::table('accounts')->where('id', $member->id)
+                            ->delete();
+
+                        print_r("".$member->username." deleted!\r\n");
+                    }
+                } else {
+                    print_r("No outdated data for ". $member->username."! Not updating...\r\n");
+                }
             } else {
-                print_r("No outdated data for ". $member->username."! Not updating...\r\n");
+                print_r("".$member->username." does not exist!\r\n");
+
+                for ($skillCounter = 0; $skillCounter < count($skills); $skillCounter++) {
+                    $deletePlayerSkill = DB::table($skills[$skillCounter])->where('account_id', $member->id)
+                        ->delete();
+                }
+
+                $deletePlayer = DB::table('accounts')->where('id', $member->id)
+                    ->delete();
+
+                print_r("".$member->username." deleted!\r\n");
             }
         }
     }
