@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', false),
+    'debug' => (bool) env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'Europe/London',
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
@@ -169,13 +169,11 @@ return [
         /*
          * Application Service Providers...
          */
-        RuneManager\Providers\AppServiceProvider::class,
-        RuneManager\Providers\AuthServiceProvider::class,
-        // RuneManager\Providers\BroadcastServiceProvider::class,
-        RuneManager\Providers\EventServiceProvider::class,
-        RuneManager\Providers\RouteServiceProvider::class,
-
-        Unisharp\Ckeditor\ServiceProvider::class,
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\EventServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
 
     ],
 
@@ -209,6 +207,7 @@ return [
         'File' => Illuminate\Support\Facades\File::class,
         'Gate' => Illuminate\Support\Facades\Gate::class,
         'Hash' => Illuminate\Support\Facades\Hash::class,
+        'Http' => Illuminate\Support\Facades\Http::class,
         'Lang' => Illuminate\Support\Facades\Lang::class,
         'Log' => Illuminate\Support\Facades\Log::class,
         'Mail' => Illuminate\Support\Facades\Mail::class,
@@ -227,8 +226,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
-        'Helper' => RuneManager\Helpers\Helper::class,
 
     ],
 
