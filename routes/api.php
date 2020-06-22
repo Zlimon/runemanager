@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +16,12 @@ use Illuminate\Http\Request;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('/boss')->group(function () {
+	// Route::middleware('auth:api')->group(function () {
+		Route::get('/', 'CollectionController@index');
+		Route::get('/{boss}', 'CollectionController@show');
+		Route::put('/{boss}', 'CollectionController@update');
+	// });
 });
