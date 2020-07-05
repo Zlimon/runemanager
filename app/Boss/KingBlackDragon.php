@@ -9,10 +9,8 @@ class KingBlackDragon extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'kbd_heads',
-        'kill_count',
-        'obtained',
         'prince_black_dragon',
+        'kbd_heads',
         'dragon_pickaxe',
         'draconic_visage',
     ];

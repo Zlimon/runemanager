@@ -9,13 +9,11 @@ class Vorkath extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'vorkaths_head',
         'vorki',
-        'kill_count',
-        'skeletal_visage',
-        'obtained',
-        'jar_of_decay',
+        'vorkaths_head',
         'draconic_visage',
+        'skeletal_visage',
+        'jar_of_decay',
         'dragonbone_necklace',
     ];
 

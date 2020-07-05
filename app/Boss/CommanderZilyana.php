@@ -10,15 +10,13 @@ class CommanderZilyana extends Model
         'obtained',
         'kill_count',
         'pet_zilyana',
-        'saradomins_light',
-        'kill_count',
-        'obtained',
-        'saradomin_hilt',
-        'godsword_shard_3',
         'armadyl_crossbow',
-        'godsword_shard_2',
+        'saradomin_hilt',
         'saradomin_sword',
+        'saradomins_light',
         'godsword_shard_1',
+        'godsword_shard_2',
+        'godsword_shard_3',
     ];
 
     protected $hidden = ['user_id'];

@@ -9,13 +9,11 @@ class KalphiteQueen extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
+        'kalphite_princess',
         'kq_head',
+        'jar_of_sand',
         'dragon_2h_sword',
         'dragon_chainbody',
-        'kalphite_princess',
-        'kill_count',
-        'jar_of_sand',
-        'obtained',
     ];
 
     protected $hidden = ['user_id'];

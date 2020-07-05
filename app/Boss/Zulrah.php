@@ -9,17 +9,15 @@ class Zulrah extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'magic_fang',
-        'zulandra_teleport',
-        'uncut_onyx',
-        'tanzanite_mutagen',
-        'kill_count',
         'pet_snakeling',
-        'jar_of_swamp',
-        'obtained',
-        'tanzanite_fang',
+        'tanzanite_mutagen',
         'magma_mutagen',
+        'jar_of_swamp',
+        'magic_fang',
         'serpentine_visage',
+        'tanzanite_fang',
+        'zul-andra_teleport',
+        'uncut_onyx',
         'zulrahs_scales',
     ];
 

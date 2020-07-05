@@ -9,12 +9,10 @@ class Sarachnis extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'sarachnis_cudgel',
-        'giant_egg_sac(full)',
-        'kill_count',
-        'obtained',
         'sraracha',
         'jar_of_eyes',
+        'giant_egg_sac(full)',
+        'sarachnis_cudgel',
     ];
 
     protected $hidden = ['user_id'];

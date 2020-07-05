@@ -10,17 +10,15 @@ class TheNightmare extends Model
         'obtained',
         'kill_count',
         'little_nightmare',
+        'inquisitors_mace',
+        'inquisitors_great_helm',
         'inquisitors_hauberk',
         'inquisitors_plateskirt',
-        'inquisitors_mace',
-        'jar_of_dreams',
-        'inquisitors_great_helm',
-        'harmonised_orb',
         'nightmare_staff',
-        'kill_count',
-        'eldritch_orb',
-        'obtained',
         'volatile_orb',
+        'harmonised_orb',
+        'eldritch_orb',
+        'jar_of_dreams',
     ];
 
     protected $hidden = ['user_id'];

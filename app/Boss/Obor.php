@@ -10,8 +10,6 @@ class Obor extends Model
         'obtained',
         'kill_count',
         'hill_giant_club',
-        'kill_count',
-        'obtained',
     ];
 
     protected $hidden = ['user_id'];

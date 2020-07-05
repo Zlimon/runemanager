@@ -9,10 +9,8 @@ class TheFightCaves extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'tzrekjad',
+        'tzrek-jad',
         'fire_cape',
-        'kill_count',
-        'obtained',
     ];
 
     protected $hidden = ['user_id'];

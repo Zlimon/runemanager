@@ -9,11 +9,9 @@ class ChaosFanatic extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'kill_count',
-        'obtained',
+        'pet_chaos_elemental',
         'odium_shard_1',
         'malediction_shard_1',
-        'pet_chaos_elemental',
     ];
 
     protected $hidden = ['user_id'];

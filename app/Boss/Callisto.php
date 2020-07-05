@@ -9,12 +9,10 @@ class Callisto extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'dragon_2h_sword',
-        'kill_count',
-        'obtained',
-        'dragon_pickaxe',
         'callisto_cub',
         'tyrannical_ring',
+        'dragon_pickaxe',
+        'dragon_2h_sword',
     ];
 
     protected $hidden = ['user_id'];

@@ -9,16 +9,14 @@ class KrilTsutsaroth extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'zamorak_hilt',
-        'staff_of_the_dead',
         'pet_kril_tsutsaroth',
-        'kill_count',
-        'obtained',
-        'godsword_shard_3',
+        'staff_of_the_dead',
         'zamorakian_spear',
-        'godsword_shard_2',
-        'godsword_shard_1',
         'steam_battlestaff',
+        'zamorak_hilt',
+        'godsword_shard_1',
+        'godsword_shard_2',
+        'godsword_shard_3',
     ];
 
     protected $hidden = ['user_id'];

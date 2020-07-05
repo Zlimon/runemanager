@@ -9,14 +9,12 @@ class Skotizo extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'uncut_onyx',
         'skotos',
-        'ancient_shard',
-        'kill_count',
-        'dark_totem',
-        'obtained',
-        'dark_claw',
         'jar_of_darkness',
+        'dark_claw',
+        'dark_totem',
+        'uncut_onyx',
+        'ancient_shard',
     ];
 
     protected $hidden = ['user_id'];

@@ -9,12 +9,10 @@ class Kraken extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'jar_of_dirt',
-        'trident_of_the_seas_(full)',
-        'kraken_tentacle',
-        'kill_count',
-        'obtained',
         'pet_kraken',
+        'kraken_tentacle',
+        'trident_of_the_seas_(full)',
+        'jar_of_dirt',
     ];
 
     protected $hidden = ['user_id'];

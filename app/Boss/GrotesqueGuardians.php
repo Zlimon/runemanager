@@ -9,15 +9,13 @@ class GrotesqueGuardians extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'granite_hammer',
-        'granite_dust',
         'noon',
-        'jar_of_stone',
-        'kill_count',
-        'granite_ring',
-        'obtained',
-        'granite_gloves',
         'black_tourmaline_core',
+        'granite_gloves',
+        'granite_ring',
+        'granite_hammer',
+        'jar_of_stone',
+        'granite_dust',
     ];
 
     protected $hidden = ['user_id'];
