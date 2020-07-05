@@ -9,18 +9,16 @@ class Wintertodt extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'dragon_axe',
-        'burnt_page',
-        'warm_gloves',
-        'bruma_torch',
         'phoenix',
+        'tome_of_fire_(empty)',
+        'burnt_page',
+        'pyromancer_garb',
+        'pyromancer_hood',
         'pyromancer_robe',
         'pyromancer_boots',
-        'pyromancer_hood',
-        'pyromancer_garb',
-        'kill_count',
-        'obtained',
-        'tome_of_fire_(empty)',
+        'warm_gloves',
+        'bruma_torch',
+        'dragon_axe',
     ];
 
     protected $hidden = ['user_id'];

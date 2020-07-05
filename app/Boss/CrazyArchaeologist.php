@@ -9,11 +9,9 @@ class CrazyArchaeologist extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'fedora',
         'odium_shard_2',
-        'kill_count',
         'malediction_shard_2',
-        'obtained',
+        'fedora',
     ];
 
     protected $hidden = ['user_id'];

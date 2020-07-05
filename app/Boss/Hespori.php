@@ -9,12 +9,10 @@ class Hespori extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'iasor_seed',
         'bottomless_compost_bucket',
-        'attas_seed',
-        'kill_count',
-        'obtained',
+        'iasor_seed',
         'kronos_seed',
+        'attas_seed',
     ];
 
     protected $hidden = ['user_id'];

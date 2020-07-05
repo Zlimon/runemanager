@@ -9,15 +9,13 @@ class Cerberus extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
+        'hellpuppy',
+        'eternal_crystal',
         'pegasian_crystal',
         'primordial_crystal',
-        'eternal_crystal',
-        'smouldering_stone',
-        'hellpuppy',
-        'kill_count',
-        'key_master_teleport',
-        'obtained',
         'jar_of_souls',
+        'smouldering_stone',
+        'key_master_teleport',
     ];
 
     protected $hidden = ['user_id'];

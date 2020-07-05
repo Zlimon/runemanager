@@ -10,16 +10,14 @@ class AbyssalSire extends Model
         'obtained',
         'kill_count',
         'abyssal_orphan',
-        'jar_of_miasma',
-        'abyssal_whip',
         'unsired',
         'abyssal_head',
-        'kill_count',
-        'bludgeon_claw',
-        'abyssal_dagger',
-        'obtained',
         'bludgeon_spine',
+        'bludgeon_claw',
         'bludgeon_axon',
+        'jar_of_miasma',
+        'abyssal_dagger',
+        'abyssal_whip',
     ];
 
     protected $hidden = ['user_id'];

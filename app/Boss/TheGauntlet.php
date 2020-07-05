@@ -9,13 +9,11 @@ class TheGauntlet extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
+        'youngllef',
         'crystal_armour_seed',
+        'crystal_weapon_seed',
         'blade_of_saeldor_(inactive)',
         'gauntlet_cape',
-        'kill_count',
-        'obtained',
-        'crystal_weapon_seed',
-        'youngllef',
     ];
 
     protected $hidden = ['user_id'];

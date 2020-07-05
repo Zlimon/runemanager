@@ -9,12 +9,10 @@ class Zalcano extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'uncut_onyx',
+        'smolcano',
         'crystal_tool_seed',
         'zalcano_shard',
-        'kill_count',
-        'obtained',
-        'smolcano',
+        'uncut_onyx',
     ];
 
     protected $hidden = ['user_id'];

@@ -9,18 +9,16 @@ class DagannothKings extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'pet_dagannoth_rex',
-        'dragon_axe',
-        'mud_battlestaff',
-        'seers_ring',
-        'berserker_ring',
-        'kill_count',
         'pet_dagannoth_prime',
         'pet_dagannoth_supreme',
+        'pet_dagannoth_rex',
+        'berserker_ring',
         'archers_ring',
-        'seercull',
-        'obtained',
+        'seers_ring',
         'warrior_ring',
+        'dragon_axe',
+        'seercull',
+        'mud_battlestaff',
     ];
 
     protected $hidden = ['user_id'];

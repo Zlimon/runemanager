@@ -9,11 +9,9 @@ class GiantMole extends Model
     protected $fillable = [
         'obtained',
         'kill_count',
-        'mole_skin',
-        'kill_count',
-        'mole_claw',
-        'obtained',
         'baby_mole',
+        'mole_skin',
+        'mole_claw',
     ];
 
     protected $hidden = ['user_id'];
