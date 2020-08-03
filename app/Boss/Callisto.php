@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Callisto extends Model
 {
+    protected $table = 'callisto';
+
     protected $fillable = [
         'obtained',
         'kill_count',

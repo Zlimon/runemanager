@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kreearra extends Model
 {
+    protected $table = 'kreearra';
+
     protected $fillable = [
         'obtained',
         'kill_count',

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CorporealBeast extends Model
 {
+    protected $table = 'corporeal_beast';
+
     protected $fillable = [
         'obtained',
         'kill_count',

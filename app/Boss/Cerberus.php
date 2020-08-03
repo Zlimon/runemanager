@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cerberus extends Model
 {
+    protected $table = 'cerberus';
+
     protected $fillable = [
         'obtained',
         'kill_count',

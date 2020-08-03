@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vorkath extends Model
 {
+    protected $table = 'vorkath';
+
     protected $fillable = [
         'obtained',
         'kill_count',

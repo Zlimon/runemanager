@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class KalphiteQueen extends Model
 {
+    protected $table = 'kalphite_queen';
+
     protected $fillable = [
         'obtained',
         'kill_count',

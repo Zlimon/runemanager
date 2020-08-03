@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vetion extends Model
 {
+    protected $table = 'vetion';
+
     protected $fillable = [
         'obtained',
         'kill_count',

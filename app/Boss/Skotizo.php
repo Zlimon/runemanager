@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Skotizo extends Model
 {
+    protected $table = 'skotizo';
+
     protected $fillable = [
         'obtained',
         'kill_count',
