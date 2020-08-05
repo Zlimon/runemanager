@@ -62,14 +62,20 @@ class CollectionController extends Controller
 		if ($user) {
 			$collection = Collection::findByName($collectionName);
 
-			$collectionLog = $this->getUserCollectionLog($collection->collection_type, $user->id);
+			if ($collection) {
+				$collectionLog = $this->getUserCollectionLog($collection->collection_type, $user->id);
 
-			if ($collectionLog) {
-				return response()->json($collectionLog, 200);
+				if ($collectionLog) {
+					return response()->json($collectionLog, 200);
+				} else {
+					// return response()->json("This user does not have any registered loot for this collection", 404);
+					
+					$test = $this->store($collectionName, $user->id);
+
+					return response()->json($test, 201);
+				}
 			} else {
-				$test = $this->store($collectionName, $user->id);
-
-				return response()->json($test, 201);
+				return response()->json("This collection does not exist", 404);
 			}
 		} else {
 			return response()->json("This user could not be found", 404);
@@ -94,14 +100,18 @@ class CollectionController extends Controller
 		if ($user) {
 			$collection = Collection::findByName($collectionName);
 
-			$collectionLog = $this->getUserCollectionLog($collection->collection_type, $user->id);
+			if ($collection) {
+				$collectionLog = $this->getUserCollectionLog($collection->collection_type, $user->id);
 
-			if ($collectionLog) {
-				$collectionLog->update($request->all());
+				if ($collectionLog) {
+					$collectionLog->update($request->all());
 
-				return response()->json($collectionLog, 201);
+					return response()->json($collectionLog, 201);
+				} else {
+					return response()->json("This user does not have any registered loot for this collection", 404);
+				}
 			} else {
-				return response()->json("This user does not have any registered loot for this collection", 404);
+				return response()->json("This collection does not exist", 404);
 			}
 		} else {
 			return response()->json("This user could not be found", 404);
