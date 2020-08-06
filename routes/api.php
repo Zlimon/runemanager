@@ -25,3 +25,9 @@ Route::prefix('/boss')->group(function () {
 		Route::put('/{boss}', 'CollectionController@update');
 	// });
 });
+
+Route::prefix('/collection')->group(function () {
+	// Route::middleware('auth:api')->group(function () {
+		Route::get('/', 'CollectionController@bossList');
+	// });
+});

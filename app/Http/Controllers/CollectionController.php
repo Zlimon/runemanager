@@ -16,6 +16,11 @@ use Artisan;
 
 class CollectionController extends Controller
 {
+	public function bossList(Request $request) {
+		$allCollections = Collection::select('name')->get();
+		return response()->json($allCollections, 200);
+	}
+
 	public function index(Request $request) {
 		$user = $this->getUser($request->header('uuid'));
 
