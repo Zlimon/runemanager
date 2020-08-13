@@ -22,7 +22,7 @@ Route::prefix('/boss')->group(function () {
 	// Route::middleware('auth:api')->group(function () {
 		Route::get('/', 'CollectionController@index');
 		Route::get('/{boss}', 'CollectionController@show');
-		Route::put('/{boss}', 'CollectionController@update');
+		Route::put('/{boss}', 'BossController@update');
 	// });
 });
 
