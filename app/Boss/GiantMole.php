@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class GiantMole extends Model
 {
+    protected $table = 'giant_mole';
+
     protected $fillable = [
         'obtained',
         'kill_count',

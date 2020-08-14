@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class BarrowsChests extends Model
 {
+    protected $table = 'barrows_chests';
+
     protected $fillable = [
         'obtained',
         'kill_count',

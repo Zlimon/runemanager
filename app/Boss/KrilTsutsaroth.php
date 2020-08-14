@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class KrilTsutsaroth extends Model
 {
+    protected $table = 'kril_tsutsaroth';
+
     protected $fillable = [
         'obtained',
         'kill_count',

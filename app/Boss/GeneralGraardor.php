@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class GeneralGraardor extends Model
 {
+    protected $table = 'general_graardor';
+
     protected $fillable = [
         'obtained',
         'kill_count',

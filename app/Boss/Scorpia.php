@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Scorpia extends Model
 {
+    protected $table = 'scorpia';
+
     protected $fillable = [
         'obtained',
         'kill_count',

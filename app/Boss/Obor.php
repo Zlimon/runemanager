@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Obor extends Model
 {
+    protected $table = 'obor';
+
     protected $fillable = [
         'obtained',
         'kill_count',

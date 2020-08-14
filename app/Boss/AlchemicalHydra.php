@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AlchemicalHydra extends Model
 {
+    protected $table = 'alchemical_hydra';
+
     protected $fillable = [
         'obtained',
         'kill_count',

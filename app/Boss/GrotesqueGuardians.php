@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class GrotesqueGuardians extends Model
 {
+    protected $table = 'grotesque_guardians';
+
     protected $fillable = [
         'obtained',
         'kill_count',

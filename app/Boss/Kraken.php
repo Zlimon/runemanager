@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kraken extends Model
 {
+    protected $table = 'kraken';
+
     protected $fillable = [
         'obtained',
         'kill_count',

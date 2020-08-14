@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Zalcano extends Model
 {
+    protected $table = 'zalcano';
+
     protected $fillable = [
         'obtained',
         'kill_count',

@@ -48,6 +48,7 @@ class CollectionSeeder extends Seeder
 			["name" => "wintertodt", "collection_type" => "App\Boss\Wintertodt"],
 			["name" => "zalcano", "collection_type" => "App\Boss\Zalcano"],
 			["name" => "zulrah", "collection_type" => "App\Boss\Zulrah"],
+			["name" => "goblin", "collection_type" => "App\Boss\Goblin"], // TODO remove later
 		]);
     }
 }

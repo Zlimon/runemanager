@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hespori extends Model
 {
+    protected $table = 'hespori';
+
     protected $fillable = [
         'obtained',
         'kill_count',

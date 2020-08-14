@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ThermonuclearSmokeDevil extends Model
 {
+    protected $table = 'thermonuclear_smoke_devil';
+
     protected $fillable = [
         'obtained',
         'kill_count',

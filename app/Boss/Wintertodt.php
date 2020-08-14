@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Wintertodt extends Model
 {
+    protected $table = 'wintertodt';
+
     protected $fillable = [
         'obtained',
         'kill_count',

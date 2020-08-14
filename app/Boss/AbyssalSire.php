@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AbyssalSire extends Model
 {
+    protected $table = 'abyssal_sire';
+
     protected $fillable = [
         'obtained',
         'kill_count',
