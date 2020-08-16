@@ -1,0 +1,326 @@
+@font-face {
+	font-family: 'runescape';
+	src: url('fonts/runescape/runescape.eot');
+	src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
+	url('fonts/runescape/runescape.woff') format('woff'),
+	url('fonts/runescape/runescape.ttf') format('truetype'),
+	url('fonts/runescape/runescape.svg') format('svg');
+}
+
+body, html {
+	font-family: sans-serif;
+	background: url('/images/background_2.png') no-repeat;
+	background-position: center center;
+	background-attachment: fixed;
+}
+
+h1, h2, h3 {
+	font-family: "runescape", sans-serif;
+	text-align: center;
+	font-weight: bold;
+	color: #343a40;
+}
+
+h2, h3 {
+	text-align: left;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+table td, table th {
+	padding: 3px 5px;
+	border-bottom: 1px solid black;
+	min-width: 3rem;
+	height: 55px;
+}
+
+table th {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+}
+
+a:link {color: #1e6dae;}
+a:visited {color: #1e6dae;}
+a:hover {color: black;}
+a:active {color: black;}
+
+a:link {text-decoration: none;}
+a:visited {text-decoration: none;}
+a:hover {text-decoration: underline;}
+a:active {text-decoration: none;}
+
+@media (min-width: 1200px) {
+	.container {
+		max-width: 1250px;
+	}
+}
+
+.pixel {
+	image-rendering: pixelated;
+}
+
+.middle-icon {
+	display: inline-block;
+	max-width: 100%;
+	margin: -2px;
+	padding: -2px;
+}
+
+img.middle-img-icon {
+	width: 50px;
+	height: 50px;
+	object-fit: contain;
+}
+
+/* MAIN */
+.main-page:before, .main-page:after {
+	background: url('/images/scroll_top.gif') no-repeat center top;
+	content: '';
+	height: 50px;
+	left: 0;
+	position: absolute;
+	top: -11px;
+	width: 100%;
+}
+
+.main-page:after {
+	background: url('/images/scroll_bottom.gif') no-repeat center bottom;
+	bottom: -11px;
+	top: auto;
+}
+
+.main-page {
+	background: url('/images/scroll_middle.gif') repeat-y top center;
+	position: relative;
+	margin: 0 auto;
+	padding: 75px;
+}
+
+/* NEWS */
+.latest-news {
+	border-bottom: solid black 1px;
+	padding: 20px 0px 20px 0px;
+	transition: all .2s ease-in;
+	height: 175px;
+}
+
+.latest-news:hover {
+	background: rgba(0, 0, 0, 0.2);
+}
+
+.latest-news .content a:link {color: black;}
+.latest-news .content a:visited {color: black;}
+.latest-news .content a:hover {color: black;}
+.latest-news .content a:active {color: black;}
+
+.latest-news .content a:link {text-decoration: none;}
+.latest-news .content a:visited {text-decoration: none;}
+.latest-news .content a:hover {text-decoration: none;}
+.latest-news .content a:active {text-decoration: none;}
+
+.latest-news .image {
+	text-align: center;
+}
+
+.latest-news .image img {
+	max-height: 175px;
+	max-width: 175px;
+}
+
+.latest-news .title {
+	font-family: 'runescape', sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+	margin-top: -10px;
+}
+
+.latest-news .title:hover {
+	color: #666666;
+}
+
+.latest-news .meta {
+	padding-bottom: 5px;
+}
+
+.latest-news .title, .latest-news .meta, .latest-news .shortstory {
+	margin-left: -15px;
+}
+
+.latest-news .date {
+	text-align: center;
+	margin-top: -10px;
+	margin-left: -15px;
+}
+
+.latest-news .month {
+	font-family: 'runescape', sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+}
+
+.latest-news .day {
+	font-family: 'runescape', sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+}
+
+/* MEMBER */
+.member-body {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-around;
+}
+
+.member-box {
+	background: url('/images/button.gif') no-repeat;
+	background-position: center;
+	padding: 10px 5px 0px 5px;
+	width: 152px;
+	height: 126px;
+	margin-top: 10px;
+	color: white;
+	font-size: 1.5em;
+	font-weight: bold;
+	text-align: center;
+	transition: width .5s, height .5s, padding .5s;
+}
+
+.member-box:hover {
+	width: 172px;
+	height: 146px;
+	padding: 20px 5px 0px 5px;
+}
+
+/* PROFILE */
+.profile-icon {
+	background: #99855D;
+	border: solid #755B41 3px;
+	border-radius: 5px;
+	padding: 5px 5px 5px 15px;
+	text-align: center;
+	float: left;
+}
+
+.profile-icon span {
+	padding-right: 10px;
+}
+
+/* EDIT USER */
+.icon-radio [type=radio] { 
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.icon-radio [type=radio] + img {
+	cursor: pointer;
+	padding: 8px 8px 8px 8px;
+}
+
+.icon-radio [type=radio] + img:hover {
+	background: #99855D;
+	border-radius: 5px;
+}
+
+.icon-radio [type=radio]:checked + img {
+	background: #99855D;
+	border: solid #755B41 3px;
+	border-radius: 5px;
+	padding: 5px 5px 5px 5px;
+}
+
+/* TASK */
+.task-progress-body {
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+}
+
+.task-box {
+	background: #99855D;
+	border-width: 3px;
+}
+
+/* HISCORE */
+#highscore_top .highscore_selection {
+	margin-top: 1.7em;
+	text-align: center;
+}
+
+#highscore_top .highscore_selection a {
+	display: inline-block;
+	padding: 5px 7px;
+	position: relative;
+}
+
+#highscore_top .highscore_selection a img {
+	vertical-align: middle;
+	height: 30px;
+	width: 30px;
+}
+
+#highscore_top .highscore_selection a.active,
+#highscore_top .highscore_selection a:hover {
+	background: #2D2D2B;
+}
+
+a.selection-top, a.selection-bottom {
+	background: #373530;
+}
+
+#highscore_top .highscore_selection .selection-top a.active:after,
+#highscore_top .highscore_selection .selection-top a:hover:after {
+	border-left: solid transparent 14px;
+	border-right: solid transparent 14px;
+	border-top: solid #2D2D2B 14px;
+	bottom: -14px;
+	content: "";
+	height: 0;
+	left: 50%;
+	margin-left: -14px;
+	position: absolute;
+	width: 0;
+	z-index: 10;
+}
+
+#highscore_top .highscore_selection .selection-bot a.active:after,
+#highscore_top .highscore_selection .selection-bot a:hover:after {
+	border-left: solid transparent 14px;
+	border-right: solid transparent 14px;
+	border-bottom: solid #2D2D2B 14px;
+	top: -14px;
+	content: "";
+	height: 0;
+	left: 50%;
+	margin-left: -14px;
+	position: absolute;
+	width: 0;
+	z-index: 10;
+}
+
+#highscore_top .highscore_selection .mid-part > span {
+	display: none;
+	padding: 20px 40px;
+	text-align: center;
+	font-size: 1.7em;
+	font-weight: 300;
+	
+	border-radius: 15px;
+}
+
+#highscore_top .highscore_selection .mid-part > span img {
+	vertical-align: middle;
+	padding-right: 10px;
+}
+
+#highscore_top .highscore_selection .mid-part > span.active {
+	display: inline-block;
+}
