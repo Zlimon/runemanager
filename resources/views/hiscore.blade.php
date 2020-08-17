@@ -59,7 +59,7 @@
 	<table>
 		<tr>
 			<th>Rank</th>
-			<th>Member</th>
+			<th>Account</th>
 			<th>Total Level</th>
 			<th>Total XP</th>
 			<th>Hiscore Rank</th>
@@ -70,10 +70,10 @@
 		@foreach ($hiscores as $hiscore)
 			<tr>
 				<td>{{ $rankCounter }}</td>
-				<td><a href="{{ route('show-member', ($skillname == 'overall' ? $hiscore->id : $hiscore->account_id)) }}">{{ $hiscore->username }}</a></td>
+				<td><a href="{{ route('show-account', ($skillname == 'overall' ? $hiscore->id : $hiscore->account_id)) }}">{{ $hiscore->username }}</a></td>
 				<td>{{ $hiscore->level }}</td>
-				<td>{{ number_format($hiscore->xp) }}</td>
-				<td>{{ number_format($hiscore->rank) }}</td>
+				<td>{{ (number_format($hiscore->xp) >= 1 ? number_format($hiscore->xp) : "Unranked") }}</td>
+				<td>{{ (number_format($hiscore->rank) >= 1 ? number_format($hiscore->rank) : "Unranked") }}</td>
 			</tr>
 			@php
 				$rankCounter++;

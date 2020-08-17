@@ -17,9 +17,9 @@ class CreateAccountsTable extends Migration
             $table->id();
             $table->integer('user_id')->unsigned();
             $table->string('username', 13);
-            $table->integer('rank')->nullable();
-            $table->integer('level')->nullable();
-            $table->string('xp')->nullable();
+            $table->integer('rank')->default(0);
+            $table->integer('level')->default(32); // Minimum total level
+            $table->bigInteger('xp')->default(0);
             $table->timestamps();
         });
     }

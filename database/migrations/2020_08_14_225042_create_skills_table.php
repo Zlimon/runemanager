@@ -19,9 +19,9 @@ class CreateSkillsTable extends Migration
             Schema::create($skill, function (Blueprint $table) {
                 $table->id();
                 $table->integer('account_id')->unsigned()->unique();
-                $table->integer('rank')->nullable();
+                $table->integer('rank')->default(0);
                 $table->integer('level')->default(1);
-                $table->string('xp')->default(0);
+                $table->bigInteger('xp')->default(0);
                 $table->timestamps();
             });
         }

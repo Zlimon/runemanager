@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Helpers\Helper;
 use App\NewsPost;
 use App\Account;
 use App\Image;
@@ -19,7 +20,7 @@ class PageController extends Controller
     }
 
     /**
-     * Show the latest member updates.
+     * Show the latest account updates.
      *
      * @return
      */
@@ -35,14 +36,14 @@ class PageController extends Controller
      * @return
      */
     public function hiscore($skillname) {
-        $skillsTop = ["overall", "attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing"];
+        $skills = Helper::listSkills();
 
-        $skillsBottom = ["firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
+        array_push($skills, "overall");
 
-        $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
+        list($skillsTop, $skillsBottom) = array_chunk($skills, ceil(count($skills) / 2)); // Split skills array into two arrays for a top and bottom skill bar
 
         if ($skillname == "overall") {
-            $hiscores = Account::orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderByRaw('CAST(xp AS INT)', 'DESC')->get();
+            $hiscores = Account::orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
 
             $sumTotalXp = Account::sum('xp');
 
@@ -73,9 +74,10 @@ class PageController extends Controller
             $hiscores = DB::table($skillname)
                 ->select($skillname.'.account_id', $skillname.'.level', $skillname.'.xp', $skillname.'.rank', 'username')
                 ->join('accounts', $skillname.'.account_id', '=', 'accounts.id')
+                ->orderByRaw('CASE WHEN '.$skillname.'.rank > 0 THEN 1 ELSE 2 END')
                 ->orderBy('rank', 'ASC')
                 ->orderBy('level', 'DESC')
-                ->orderByRaw('CAST('.$skillname.'.xp AS INT)', 'DESC')
+                ->orderBy('xp', 'DESC')
                 ->get();
         }
 
