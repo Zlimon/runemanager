@@ -32,8 +32,8 @@
 						</div>
 						<div class="col-sm-1">
 							<div class="date text-dark">
-								<span class="month">May</span>
-								<span class="day"><?php // Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $post->created_at)->day }} TODO helper ?></span>
+								<span class="month">{{ \Carbon\Carbon::parse($post->created_at)->format('M') }}</span>
+								<span class="day">{{ \Carbon\Carbon::parse($post->created_at)->format('d') }}</span>
 							</div>
 						</div>
 					</div>
