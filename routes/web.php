@@ -27,8 +27,8 @@ Route::post('/account/create', 'AccountController@verifyAccount')->name('store-a
 Route::get('/account/{id}', 'AccountController@show')->name('show-account');
 
 /*==========User Controller=============*/
-Route::get('/user/edit', 'UsersController@edit')->name('edit-user');
-Route::patch('/user/edit', 'UsersController@update')->name('update-user');
+Route::get('/user/edit', 'UserController@edit')->name('edit-user');
+Route::patch('/user/edit', 'UserController@update')->name('update-user');
 
 /*==========Tasks Controller=============*/
 Route::get('/task', 'TasksController@index')->name('task');

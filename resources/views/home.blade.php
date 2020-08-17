@@ -24,6 +24,18 @@
 		<p>Joined: <strong>{{ \Carbon\Carbon::parse($user->created_at)->format('d. M Y') }}</strong></p>
 	</div>
 
+	<div class="float-right text-center">
+		@if ($user->private === 0)
+			<img class="align" src="{{ asset('images') }}/friend.png" alt="Friend icon" title="Currently not private">
+
+			<p>Current status: <strong>Not private</strong></p>
+		@else
+			<img class="align" src="{{ asset('images') }}/ignore.png" alt="Ignore icon" title="Currently private">
+
+			<p>Current status: <strong>Private</strong></p>
+		@endif
+	</div>
+
 	@foreach ($accounts as $account)
 		<h1 style="clear: both;">Personal scores for {{ $account->username }}</h1>
 		<table>
