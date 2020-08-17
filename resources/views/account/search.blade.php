@@ -1,13 +1,13 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ __('title.search-member') }} "{{ $query }}"
+	{{ __('title.search-account') }} "{{ $query }}"
 @endsection
 
 @section('content')
-	<h1>Search for members</h1>
+	<h1>Search for accounts</h1>
 
-	<form class="form-group row" method="POST" action="{{ route('search-member') }}">
+	<form class="form-group row" method="POST" action="{{ route('search-account') }}">
 		@csrf
 
 		<div class="col-md-3"></div>
@@ -28,10 +28,10 @@
 	@if (count($searchResults) >= 1)
 		<h1>Search results for "{{ $query }}"</h1>
 
-		<div class="member-body">
+		<div class="account-body">
 			@foreach($searchResults as $result)
-				<a href="{{ route('show-member', $result->id) }}">
-					<div class="member-box">
+				<a href="{{ route('show-account', $result->id) }}">
+					<div class="account-box">
 						<p>{{ $result->username }}</p>
 						@if ($result->user->icon_id)
 							<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $result->user->icon_id }}.png" width="54" alt="Profile icon">

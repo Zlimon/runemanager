@@ -1,16 +1,16 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ $member->username }}
+	{{ $account->username }}
 @endsection
 
 @section('content')
-	@if ($member->user->private === 0 || $member->user->id == Auth::user()->id)
-		@if ($member->user->icon_id != null)
+	@if ($account->user->private === 0 || $account->user->id == Auth::user()->id)
+		@if ($account->user->icon_id != null)
 			<div class="profile-icon">
-				<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $member->user->icon_id }}.png" width="150" alt="Profile icon">
+				<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="150" alt="Profile icon">
 			</div>
-		@elseif (Auth::check() && $member->user->icon_id == null && $member->user->id == Auth::user()->id)
+		@elseif (Auth::check() && $account->user->icon_id == null && $account->user->id == Auth::user()->id)
 			<div class="profile-icon">
 				<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Helper::randomItemId() }}.png" width="150" alt="Profile icon">
 				<p>Get your own profile icon <a href="{{ route('edit-user') }}">here</a>!</p>
@@ -18,15 +18,15 @@
 		@endif
 
 		<div class="float-left ml-3">
-			<h1 class="text-left">{{ $member->username }}</h1>
+			<h1 class="text-left">{{ $account->username }}</h1>
 
-			<span>Rank: <strong>{{ number_format($member->rank) }}</strong></span>
+			<span>Rank: <strong>{{ number_format($account->rank) }}</strong></span>
 			<br>
-			<span>Total XP: <strong>{{ number_format($member->xp) }}</strong></span>
+			<span>Total XP: <strong>{{ number_format($account->xp) }}</strong></span>
 			<br>
-			<span>Total Level: <strong>{{ $member->level }}</strong></span>
+			<span>Total Level: <strong>{{ $account->level }}</strong></span>
 			<br>
-			<span>Joined: <strong>{{ \Carbon\Carbon::parse($member->created_at)->format('d. M Y') }}</strong></span>
+			<span>Joined: <strong>{{ \Carbon\Carbon::parse($account->created_at)->format('d. M Y') }}</strong></span>
 		</div>
 
 		<table>

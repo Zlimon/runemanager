@@ -168,8 +168,8 @@ img.middle-img-icon {
 	font-size: 2em;
 }
 
-/* MEMBER */
-.member-body {
+/* ACCOUNT */
+.account-body {
 	padding: 0;
 	margin: 0;
 	list-style: none;
@@ -178,7 +178,7 @@ img.middle-img-icon {
 	justify-content: space-around;
 }
 
-.member-box {
+.account-box {
 	background: url('/images/button.gif') no-repeat;
 	background-position: center;
 	padding: 10px 5px 0px 5px;
@@ -192,7 +192,7 @@ img.middle-img-icon {
 	transition: width .5s, height .5s, padding .5s;
 }
 
-.member-box:hover {
+.account-box:hover {
 	width: 172px;
 	height: 146px;
 	padding: 20px 5px 0px 5px;

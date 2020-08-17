@@ -33,6 +33,7 @@ class AccountController extends Controller
         if (Auth::check()) {
             if (Auth::user()->account->first()) {
             	return view('account.create');
+                // TODO limit amount of account links setting
                 //return redirect(route('home'))->withErrors('This profile has already been linked to a Old School RuneScape account!');
             } else {
                 return view('account.create');
@@ -97,7 +98,7 @@ class AccountController extends Controller
                 'xp' => $playerData[0][2]
             ]);
 
-            $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
+            $skills = Helper::listSkills();
 
             for ($i = 0; $i < count($skills); $i++) {
                 DB::table($skills[$i])->insert([
@@ -125,7 +126,7 @@ class AccountController extends Controller
     public function show($account) {
         $account = Account::findOrFail($account);
 
-        $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
+        $skills = Helper::listSkills();
 
         $stats = [];
 
