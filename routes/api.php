@@ -18,6 +18,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::prefix('/hiscore')->group(function () {
+	Route::get('/{skill}', 'Api\HiscoreController@index')->name('show-skill');
+});
+
 Route::prefix('/boss')->group(function () {
 	// Route::middleware('auth:api')->group(function () {
 		Route::get('/', 'CollectionController@index');

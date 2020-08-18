@@ -35,52 +35,13 @@ class PageController extends Controller
      *
      * @return
      */
-    public function hiscore($skillname) {
+    public function hiscore($skillName) {
         $skills = Helper::listSkills();
 
         array_push($skills, "overall");
 
         list($skillsTop, $skillsBottom) = array_chunk($skills, ceil(count($skills) / 2)); // Split skills array into two arrays for a top and bottom skill bar
 
-        if ($skillname == "overall") {
-            $hiscores = Account::orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
-
-            $sumTotalXp = Account::sum('xp');
-
-            $averageTotalLevel = Account::sum('level') / Account::count();
-
-            $totalMaxLevel = Account::where('level', (99 * count($skills)))->count();
-        } else {
-            $sumTotalXp = DB::table($skillname)
-                ->selectRaw('SUM(xp) AS total_xp')
-                ->first();
-
-            $sumTotalXp = $sumTotalXp->total_xp;
-
-            $sumTotalLevel = DB::table($skillname)
-                ->selectRaw('SUM(level) AS total_level')
-                ->selectRaw('COUNT(*) AS total_hiscores')
-                ->first();
-
-            $averageTotalLevel = $sumTotalLevel->total_level / $sumTotalLevel->total_hiscores;
-
-            $totalMaxLevel = DB::table($skillname)
-                ->selectRaw('COUNT(*) AS amount_99')
-                ->where('level', 99)
-                ->first();
-
-            $totalMaxLevel = $totalMaxLevel->amount_99;
-
-            $hiscores = DB::table($skillname)
-                ->select($skillname.'.account_id', $skillname.'.level', $skillname.'.xp', $skillname.'.rank', 'username')
-                ->join('accounts', $skillname.'.account_id', '=', 'accounts.id')
-                ->orderByRaw('CASE WHEN '.$skillname.'.rank > 0 THEN 1 ELSE 2 END')
-                ->orderBy('rank', 'ASC')
-                ->orderBy('level', 'DESC')
-                ->orderBy('xp', 'DESC')
-                ->get();
-        }
-
-        return view('hiscore', compact('skillsTop', 'skillsBottom', 'skills', 'sumTotalXp', 'averageTotalLevel', 'totalMaxLevel', 'hiscores', 'skillname'));
+        return view('hiscore', compact('skillName', 'skills', 'skillsTop', 'skillsBottom'));
     }
 }
