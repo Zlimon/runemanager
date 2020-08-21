@@ -3,11 +3,10 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 use App\Helpers\Helper;
-use Illuminate\Support\Facades\DB;
-use App\Http\Resources\SkillResource;
-use App\Account;
+
 class AccountResource extends JsonResource
 {
     /**
@@ -26,6 +25,7 @@ class AccountResource extends JsonResource
             'level' => $this->level,
             'xp' => (number_format($this->xp) >= 1 ? number_format($this->xp) : "Unranked"),
             'joined' => date_format($this->created_at, "d. M Y"),
+            'user' => new UserResource($this->user),
         ];
     }
 

@@ -62,7 +62,7 @@
 				@foreach ($skill as $skillData)
 					<tr>
 						<td>
-							<a href="{{ route('show-skill', $skills[$i]) }}">
+							<a href="{{ route('show-hiscore', $skills[$i]) }}">
 								<img class="align" src="{{ asset('images/skills/') }}/{{ ucfirst($skills[$i]) }}.png" width="35px" alt="{{ ucfirst($skills[$i]) }} skill icon">
 								{{ ucfirst($skills[$i]) }}
 							</a>

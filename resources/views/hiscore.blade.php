@@ -9,7 +9,7 @@
 		<div class="highscore_selection">
 			<span class="selection-top">
 				@foreach ($skillsTop as $skill)
-					<a class="middle-icon" href="{{ route('show-skill', $skill) }}"><img class="middle-img-icon" src="{{ asset('images/skills/') }}/{{ ucfirst($skill) }}.png" alt="{{ ucfirst($skill) }} skill icon"></a>
+					<a class="middle-icon" href="{{ route('show-hiscore', $skill) }}"><img class="middle-img-icon" src="{{ asset('images/skills/') }}/{{ ucfirst($skill) }}.png" alt="{{ ucfirst($skill) }} skill icon"></a>
 				@endforeach
 			</span>
 			<div class="mid-part">
@@ -20,7 +20,7 @@
 			</div>
 			<span class="selection-bot">
 				@foreach ($skillsBottom as $skill)
-					<a class="middle-icon" href="{{ route('show-skill', $skill) }}"><img class="middle-img-icon" src="{{ asset('images/skills/') }}/{{ ucfirst($skill) }}.png" alt="{{ ucfirst($skill) }} skill icon"></a>
+					<a class="middle-icon" href="{{ route('show-hiscore', $skill) }}"><img class="middle-img-icon" src="{{ asset('images/skills/') }}/{{ ucfirst($skill) }}.png" alt="{{ ucfirst($skill) }} skill icon"></a>
 				@endforeach
 			</span>
 		</div>

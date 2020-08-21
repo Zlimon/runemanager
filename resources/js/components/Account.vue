@@ -48,13 +48,13 @@
 		},
 
 		mounted() {
-				axios
-				.get('/api/account/' + this.account)
-				.then((response) => {
-					this.account = response.data.data;
-					this.hiscores = response.data.meta.hiscores;
-				})
-				.catch(error => (console.log(error)))
+			axios
+			.get('/api/account/' + this.account)
+			.then((response) => {
+				this.account = response.data.data;
+				this.hiscores = response.data.meta.hiscores;
+			})
+			.catch(error => (console.log(error)))
 		},
 
 		filters: {

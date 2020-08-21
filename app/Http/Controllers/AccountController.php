@@ -21,7 +21,9 @@ class AccountController extends Controller
     public function index() {
         $accounts = Account::with('user')->inRandomOrder()->get();
 
-        return view('account.index', compact('accounts'));
+        $query = null;
+
+        return view('account.index', compact('accounts', 'query'));
     }
 
     /**
@@ -126,15 +128,7 @@ class AccountController extends Controller
     public function show($account) {
         $account = Account::findOrFail($account);
 
-        $skills = Helper::listSkills();
-
-        $stats = [];
-
-        foreach ($skills as $skillName) {
-            array_push($stats, DB::table($skillName)->where('account_id', $account->id)->get());
-        }
-
-        return view('account.show', compact('account', 'stats', 'skills'));
+        return view('account.show', compact('account'));
     }
 
     /**
@@ -149,12 +143,12 @@ class AccountController extends Controller
 
         $query = request('search');
 
-        $searchResults = Account::with('user')->where('username', 'LIKE', '%' . $query . '%')->paginate(10);
+        $accounts = Account::with('user')->where('username', 'LIKE', '%' . $query . '%')->paginate(10);
 
-        if (count($searchResults) === 0) {
+        if (count($accounts) === 0) {
             return redirect(route('account'))->withErrors(['No search results for "'.$query.'"!']);
         } else {
-            return view('account.search', compact('searchResults', 'query'));
+            return view('account.index', compact('accounts', 'query'));
         }
     }
 }
