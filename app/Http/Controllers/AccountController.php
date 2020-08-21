@@ -59,7 +59,7 @@ class AccountController extends Controller
             if (Account::where('username', request('username'))->first()) {
                 return redirect()->back()->withErrors('This account has already been linked to another profile!');
             } else {
-                $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.request('username');
+                $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
 
                 if (Helper::verifyUrl($playerDataUrl)) {
                     /* Get the $playerDataUrl file content. */
