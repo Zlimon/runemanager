@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use App\Helpers\Helper;
+
 class CreateSkillsTable extends Migration
 {
     /**
@@ -13,9 +15,7 @@ class CreateSkillsTable extends Migration
      */
     public function up()
     {
-        $skills = ["attack","defence","strength","hitpoints","ranged","prayer","magic","cooking","woodcutting","fletching","fishing","firemaking","crafting","smithing","mining","herblore","agility","thieving","slayer","farming","runecrafting","hunter","construction"];
-
-        foreach ($skills as $skill) {
+        foreach (Helper::listSkills() as $skill) {
             Schema::create($skill, function (Blueprint $table) {
                 $table->id();
                 $table->integer('account_id')->unsigned()->unique();
