@@ -43,13 +43,13 @@
 		},
 
 		mounted() {
-				axios
-				.get('/api/hiscore/' + this.skill)
-				.then((response) => {
-					this.hiscores = response.data.data;
-					this.meta = response.data.meta;
-				})
-				.catch(error => (console.log(error)))
+			axios
+			.get('/api/hiscore/' + this.skill)
+			.then((response) => {
+				this.hiscores = response.data.data;
+				this.meta = response.data.meta;
+			})
+			.catch(error => (console.log(error)))
 		},
 	}
 </script>

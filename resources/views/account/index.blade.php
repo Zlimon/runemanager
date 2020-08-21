@@ -25,18 +25,35 @@
 		<button type="submit" class="btn btn-primary mb-2"><i class="fas fa-search"></i></button>
 	</form>
 
-	<h1>{{ __('title.account') }}</h1>
+	@if ($query)
+		<h1>Search results for "{{ $query }}"</h1>
 
-	<div class="account-body">
-		@foreach($accounts as $account)
-			<a href="{{ route('show-account', $account->id) }}">
-				<div class="account-box">
-					<p>{{ $account->username }}</p>
-					@if ($account->user->icon_id)
-						<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="54" alt="Profile icon">
-					@endif
-				</div>
-			</a>
-		@endforeach
-	</div>
+		<div class="account-body">
+			@foreach($accounts as $result)
+				<a href="{{ route('show-account', $result->id) }}">
+					<div class="account-box">
+						<p>{{ $result->username }}</p>
+						@if ($result->user->icon_id)
+							<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $result->user->icon_id }}.png" width="54" alt="Profile icon">
+						@endif
+					</div>
+				</a>
+			@endforeach
+		</div>
+	@else
+		<h1>{{ __('title.account') }}</h1>
+
+		<div class="account-body">
+			@foreach($accounts as $account)
+				<a href="{{ route('show-account', $account->id) }}">
+					<div class="account-box">
+						<p>{{ $account->username }}</p>
+						@if ($account->user->icon_id)
+							<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="54" alt="Profile icon">
+						@endif
+					</div>
+				</a>
+			@endforeach
+		</div>
+	@endif
 @endsection
