@@ -12,6 +12,8 @@ use App\Helpers\Helper;
 use App\Account;
 use App\Collection;
 
+use App\Boss\DagannothKings;
+
 class AccountController extends Controller
 {
     /**
@@ -120,6 +122,8 @@ class AccountController extends Controller
 
             $bossCounter = 0;
 
+            $dksKillCount = 0;
+
             for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
                 $collection = Collection::findByName($bosses[$bossCounter]);
 
@@ -128,10 +132,27 @@ class AccountController extends Controller
                 $collectionLoot->user_id = $account->id;
                 $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
 
+                if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
+                    $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                }
+
                 $collectionLoot->save();
 
                 $bossCounter++;
             }
+
+            /**
+             * Since there are no total kill count hiscore for DKS
+             * and we are going to retrieve loot for them from the
+             * collection log, we have to manually create a row.
+             * This might also happen with other bosses in the future.
+             */
+            $collectionLoot = new \App\Boss\DagannothKings;
+
+            $collectionLoot->user_id = $account->id;
+            $collectionLoot->kill_count = $dksKillCount;
+
+            $collectionLoot->save();
 
             return redirect(route('home'))->with('message', 'Old School RuneScape account "'.request('username').'" linked!');
         } else {
