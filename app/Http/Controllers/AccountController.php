@@ -10,6 +10,7 @@ use Carbon\Carbon;
 
 use App\Helpers\Helper;
 use App\Account;
+use App\Collection;
 
 class AccountController extends Controller
 {
@@ -69,7 +70,7 @@ class AccountController extends Controller
                     $playerStats = explode("\n", $getPlayerData);
 
                     /* Convert the CSV file of player stats into an array */
-                    $playerData = array();
+                    $playerData = [];
                     foreach ($playerStats as $playerStat) {
                         $playerData[] = str_getcsv($playerStat);
                     }
@@ -111,6 +112,25 @@ class AccountController extends Controller
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);
+            }
+
+            $clueScrollAmount = count(Helper::listClueScrollTiers());
+
+            $bosses = Helper::listBosses();
+
+            $bossCounter = 0;
+
+            for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
+                $collection = Collection::findByName($bosses[$bossCounter]);
+
+                $collectionLoot = new $collection->collection_type;
+
+                $collectionLoot->user_id = $account->id;
+                $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+
+                $collectionLoot->save();
+
+                $bossCounter++;
             }
 
             return redirect(route('home'))->with('message', 'Old School RuneScape account "'.request('username').'" linked!');

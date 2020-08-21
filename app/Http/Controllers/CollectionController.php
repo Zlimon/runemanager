@@ -49,7 +49,9 @@ class CollectionController extends Controller
 				$collectionLog = $this->getUserCollectionLog($findCollection->collection_type, $user->id);
 
 				if (!$collectionLog) {
-					$collectionLog = $this->store($collection->name, $user->id);
+					// $collectionLog = $this->store($collection->name, $user->id);
+
+					return response()->json("This user does not have any registered loot for " . $collection->name, 404);
 				}
 
 				$allCollectionLoot[$key] = $collectionLog;
@@ -73,11 +75,11 @@ class CollectionController extends Controller
 				if ($collectionLog) {
 					return response()->json($collectionLog, 200);
 				} else {
-					// return response()->json("This user does not have any registered loot for this collection", 404);
-					
-					$test = $this->store($collectionName, $user->id);
+					// $test = $this->store($collectionName, $user->id);
 
-					return response()->json($test, 201);
+					// return response()->json($test, 201);
+
+					return response()->json("This user does not have any registered loot for " . $collection->name, 404);
 				}
 			} else {
 				return response()->json("This collection does not exist", 404);
