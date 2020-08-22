@@ -7,11 +7,11 @@
 @section('content')
 	@if ($account->user->private === 0 || (Auth::check() && $account->user->id == Auth::user()->id))
 		@if ($account->user->icon_id != null)
-			<div class="profile-icon">
+			<div class="profile-icon rounded p-1 text-center">
 				<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="150" alt="Profile icon">
 			</div>
 		@elseif ((Auth::check() && $account->user->id == Auth::user()->id) && $account->user->icon_id == null)
-			<div class="profile-icon">
+			<div class="profile-icon rounded p-1 text-center">
 				<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Helper::randomItemId() }}.png" width="150" alt="Profile icon">
 				<p>Get your own profile icon <a href="{{ route('edit-user') }}">here</a>!</p>
 			</div>

@@ -1,35 +1,43 @@
 <template>
 	<div>
-		<div class="float-left ml-3">
-			<h1 class="text-left">{{ account.username }}</h1>
+		<div class="row">
+			<div class="col-md-3 justify-content-center align-self-center">
+				<h1 class="text-center">{{ account.username }}</h1>
+			</div>
 
-			<span>Rank: <strong>{{ account.rank }}</strong></span>
-			<br>
-			<span>Total XP: <strong>{{ account.xp }}</strong></span>
-			<br>
-			<span>Total Level: <strong>{{ account.level }}</strong></span>
-			<br>
-			<span>Joined: <strong>{{ account.joined }}</strong></span>
+			<div class="col-md-6">
+				<span>Rank: <strong>{{ account.rank }}</strong></span>
+				<br>
+				<span>Total XP: <strong>{{ account.xp }}</strong></span>
+				<br>
+				<span>Total Level: <strong>{{ account.level }}</strong></span>
+				<br>
+				<span>Joined: <strong>{{ account.joined }}</strong></span>
+			</div>
 		</div>
 
-		<table>
-			<tr>
-				<th></th>
-				<th>Level</th>
-				<th>XP</th>
-				<th>Rank</th>
-			</tr>
-			<tr v-for="(hiscore, key) in hiscores">
-				<td>
-					<a :href="'/hiscore/' + key">
-						<img class="align" :src="'/images/skills/' + key + '.png'" width="35px" :alt="key + ' skill icon'"/>
-						{{ key | capitalize }}
-					</a>
-				</td>
-				<td>{{ hiscore.level }}</td>
-				<td>{{ hiscore.xp }}</td>
-				<td>{{ hiscore.rank }}</td>
-			</tr>
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th scope="col"></th>
+					<th scope="col">Level</th>
+					<th scope="col">XP</th>
+					<th scope="col">Rank</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(hiscore, key) in hiscores">
+					<th scope="row">
+						<a :href="'/hiscore/' + key">
+							<img class="align" :src="'/images/skills/' + key + '.png'" width="35px" :alt="key + ' skill icon'"/>
+							<!-- {{ key | capitalize }} -->
+						</a>
+					</th>
+					<td>{{ hiscore.level }}</td>
+					<td>{{ hiscore.xp }}</td>
+					<td>{{ hiscore.rank }}</td>
+				</tr>
+			</tbody>
 		</table>
 	</div>
 </template>

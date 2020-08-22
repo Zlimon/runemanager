@@ -53,9 +53,9 @@ a:visited {text-decoration: none;}
 a:hover {text-decoration: underline;}
 a:active {text-decoration: none;}
 
-@media (min-width: 1200px) {
+@media (min-width: 768px) {
 	.container {
-		max-width: 1250px;
+		max-width: 1200px;
 	}
 }
 
@@ -77,27 +77,36 @@ img.middle-img-icon {
 }
 
 /* MAIN */
-.main-page:before, .main-page:after {
-	background: url('/images/scroll_top.gif') no-repeat center top;
-	content: '';
-	height: 50px;
-	left: 0;
-	position: absolute;
-	top: -11px;
-	width: 100%;
+@media (min-width: 768px) {
+	.main-page:before, .main-page:after {
+		background: url('/images/scroll_top.gif') no-repeat center top;
+		content: '';
+		height: 50px;
+		left: 0;
+		position: absolute;
+		top: -11px;
+		width: 100%;
+	}
+
+	.main-page:after {
+		background: url('/images/scroll_bottom.gif') no-repeat center bottom;
+		bottom: -11px;
+		top: auto;
+	}
+
+	.main-page {
+		background: url('/images/scroll_middle.gif') repeat-y top center;
+		position: relative;
+		margin: 0 auto;
+		/*padding: 75px;*/
+	}
 }
 
-.main-page:after {
-	background: url('/images/scroll_bottom.gif') no-repeat center bottom;
-	bottom: -11px;
-	top: auto;
-}
-
-.main-page {
-	background: url('/images/scroll_middle.gif') repeat-y top center;
-	position: relative;
-	margin: 0 auto;
-	padding: 75px;
+@media (max-width: 768px) {
+	.main-page {
+		background-color: #B19664;
+		border: solid #755B41 3px;
+	}
 }
 
 /* NEWS */
@@ -202,10 +211,6 @@ img.middle-img-icon {
 .profile-icon {
 	background: #99855D;
 	border: solid #755B41 3px;
-	border-radius: 5px;
-	padding: 5px 5px 5px 15px;
-	text-align: center;
-	float: left;
 }
 
 .profile-icon span {

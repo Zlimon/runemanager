@@ -1944,6 +1944,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     accountId: {
@@ -37638,46 +37646,54 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "float-left ml-3" }, [
-      _c("h1", { staticClass: "text-left" }, [
-        _vm._v(_vm._s(_vm.account.username))
-      ]),
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-md-3 justify-content-center align-self-center" },
+        [
+          _c("h1", { staticClass: "text-center" }, [
+            _vm._v(_vm._s(_vm.account.username))
+          ])
+        ]
+      ),
       _vm._v(" "),
-      _c("span", [
-        _vm._v("Rank: "),
-        _c("strong", [_vm._v(_vm._s(_vm.account.rank))])
-      ]),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("span", [
-        _vm._v("Total XP: "),
-        _c("strong", [_vm._v(_vm._s(_vm.account.xp))])
-      ]),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("span", [
-        _vm._v("Total Level: "),
-        _c("strong", [_vm._v(_vm._s(_vm.account.level))])
-      ]),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("span", [
-        _vm._v("Joined: "),
-        _c("strong", [_vm._v(_vm._s(_vm.account.joined))])
+      _c("div", { staticClass: "col-md-6" }, [
+        _c("span", [
+          _vm._v("Rank: "),
+          _c("strong", [_vm._v(_vm._s(_vm.account.rank))])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("span", [
+          _vm._v("Total XP: "),
+          _c("strong", [_vm._v(_vm._s(_vm.account.xp))])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("span", [
+          _vm._v("Total Level: "),
+          _c("strong", [_vm._v(_vm._s(_vm.account.level))])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("span", [
+          _vm._v("Joined: "),
+          _c("strong", [_vm._v(_vm._s(_vm.account.joined))])
+        ])
       ])
     ]),
     _vm._v(" "),
-    _c(
-      "table",
-      [
-        _vm._m(0),
-        _vm._v(" "),
+    _c("table", { staticClass: "table table-hover" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "tbody",
         _vm._l(_vm.hiscores, function(hiscore, key) {
           return _c("tr", [
-            _c("td", [
+            _c("th", { attrs: { scope: "row" } }, [
               _c("a", { attrs: { href: "/hiscore/" + key } }, [
                 _c("img", {
                   staticClass: "align",
@@ -37686,12 +37702,7 @@ var render = function() {
                     width: "35px",
                     alt: key + " skill icon"
                   }
-                }),
-                _vm._v(
-                  "\n\t\t\t\t\t" +
-                    _vm._s(_vm._f("capitalize")(key)) +
-                    "\n\t\t\t\t"
-                )
+                })
               ])
             ]),
             _vm._v(" "),
@@ -37701,10 +37712,10 @@ var render = function() {
             _vm._v(" "),
             _c("td", [_vm._v(_vm._s(hiscore.rank))])
           ])
-        })
-      ],
-      2
-    )
+        }),
+        0
+      )
+    ])
   ])
 }
 var staticRenderFns = [
@@ -37712,14 +37723,16 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("tr", [
-      _c("th"),
-      _vm._v(" "),
-      _c("th", [_vm._v("Level")]),
-      _vm._v(" "),
-      _c("th", [_vm._v("XP")]),
-      _vm._v(" "),
-      _c("th", [_vm._v("Rank")])
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Level")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("XP")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Rank")])
+      ])
     ])
   }
 ]
