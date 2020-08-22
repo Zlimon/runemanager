@@ -20,7 +20,7 @@ class HiscoreController extends Controller
      */
     public function index($skillName) {
         if ($skillName == "overall") {
-            $hiscores = Account::orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
+            $hiscores = Account::orderByRaw('CASE WHEN rank > 0 THEN 1 ELSE 2 END')->orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
 
             $sumTotalXp = Account::sum('xp');
 

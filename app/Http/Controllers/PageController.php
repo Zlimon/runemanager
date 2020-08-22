@@ -42,6 +42,8 @@ class PageController extends Controller
 
         list($skillsTop, $skillsBottom) = array_chunk($skills, ceil(count($skills) / 2)); // Split skills array into two arrays for a top and bottom skill bar
 
-        return view('hiscore', compact('skillName', 'skills', 'skillsTop', 'skillsBottom'));
+        $accountCount = Account::count();
+
+        return view('hiscore', compact('skillName', 'skills', 'skillsTop', 'skillsBottom', 'accountCount'));
     }
 }

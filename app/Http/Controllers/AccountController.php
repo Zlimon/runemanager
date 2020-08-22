@@ -10,6 +10,9 @@ use Carbon\Carbon;
 
 use App\Helpers\Helper;
 use App\Account;
+use App\Collection;
+
+use App\Boss\DagannothKings;
 
 class AccountController extends Controller
 {
@@ -19,7 +22,7 @@ class AccountController extends Controller
      * @return
      */
     public function index() {
-        $accounts = Account::with('user')->inRandomOrder()->get();
+        $accounts = Account::inRandomOrder()->get();
 
         $query = null;
 
@@ -59,7 +62,7 @@ class AccountController extends Controller
             if (Account::where('username', request('username'))->first()) {
                 return redirect()->back()->withErrors('This account has already been linked to another profile!');
             } else {
-                $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.request('username');
+                $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
 
                 if (Helper::verifyUrl($playerDataUrl)) {
                     /* Get the $playerDataUrl file content. */
@@ -69,7 +72,7 @@ class AccountController extends Controller
                     $playerStats = explode("\n", $getPlayerData);
 
                     /* Convert the CSV file of player stats into an array */
-                    $playerData = array();
+                    $playerData = [];
                     foreach ($playerStats as $playerStat) {
                         $playerData[] = str_getcsv($playerStat);
                     }
@@ -112,6 +115,44 @@ class AccountController extends Controller
                     'updated_at' => Carbon::now()
                 ]);
             }
+
+            $clueScrollAmount = count(Helper::listClueScrollTiers());
+
+            $bosses = Helper::listBosses();
+
+            $bossCounter = 0;
+
+            $dksKillCount = 0;
+
+            for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
+                $collection = Collection::findByName($bosses[$bossCounter]);
+
+                $collectionLoot = new $collection->collection_type;
+
+                $collectionLoot->user_id = $account->id;
+                $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+
+                if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
+                    $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                }
+
+                $collectionLoot->save();
+
+                $bossCounter++;
+            }
+
+            /**
+             * Since there are no total kill count hiscore for DKS
+             * and we are going to retrieve loot for them from the
+             * collection log, we have to manually create a row.
+             * This might also happen with other bosses in the future.
+             */
+            $collectionLoot = new \App\Boss\DagannothKings;
+
+            $collectionLoot->user_id = $account->id;
+            $collectionLoot->kill_count = $dksKillCount;
+
+            $collectionLoot->save();
 
             return redirect(route('home'))->with('message', 'Old School RuneScape account "'.request('username').'" linked!');
         } else {

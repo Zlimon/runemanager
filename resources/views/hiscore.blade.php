@@ -26,11 +26,19 @@
 		</div>
 	</div>
 
-	<div class="float-left mt-3">
-		<span class="middle-icon">
-			<img class="pixel middle-img-icon" style="width: 150px; height: 150px;" src="{{ asset('images/skills/') }}/{{ ucfirst($skillName) }}.png" alt="{{ ucfirst($skillName) }} skill icon">
-		</span>
-	</div>
+	@if ($accountCount > 0)
+		<div class="float-left mt-3">
+			<span class="middle-icon">
+				<img class="pixel middle-img-icon" style="width: 150px; height: 150px;" src="{{ asset('images/skills/') }}/{{ ucfirst($skillName) }}.png" alt="{{ ucfirst($skillName) }} skill icon">
+			</span>
+		</div>
 
-	<hiscore skill="{{ $skillName }}"></hiscore>
+		<hiscore skill="{{ $skillName }}"></hiscore>
+	@else
+		<div class="text-center py-5">
+			<img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px" alt="Sad face">
+			<h1>No accounts, no hiscores...</h1>
+			<h2 class="text-center">Link an account <a href="{{ route('create-account') }}">here</a>!</h2>
+		</div>
+	@endif
 @endsection
