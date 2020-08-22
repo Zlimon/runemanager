@@ -22,7 +22,7 @@ class AccountController extends Controller
      * @return
      */
     public function index() {
-        $accounts = Account::with('user')->inRandomOrder()->get();
+        $accounts = Account::inRandomOrder()->get();
 
         $query = null;
 

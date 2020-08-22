@@ -24,9 +24,8 @@
 		@if ($loop->last) </div> @endif
 	@empty
 		<div class="text-center py-5">
-			<img src="{{ asset('images') }}/ignore.png" alt="Ignore icon" title="No news posts at the moment">
-
-			<h2 class="text-center">Nothing interesting is happening</h2>
+			<img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px" alt="Sad face">
+			<h1>Nothing interesting is happening</h1>
 		</div>
 	@endforelse
 @endsection
