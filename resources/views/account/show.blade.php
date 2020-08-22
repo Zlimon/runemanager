@@ -17,7 +17,7 @@
 			</div>
 		@endif
 
-		<account account="{{ $account->id }}"></account>
+		<account :account-id="{{ $account->id }}"></account>
 	@else
 		<div class="text-center py-5">
 			<img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px" alt="Sad face">

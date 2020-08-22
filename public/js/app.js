@@ -1946,8 +1946,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    account: {
-      type: String,
+    accountId: {
+      type: Number,
       required: true
     }
   },
@@ -1960,7 +1960,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    axios.get('/api/account/' + this.account).then(function (response) {
+    axios.get('/api/account/' + this.accountId).then(function (response) {
       _this.account = response.data.data;
       _this.hiscores = response.data.meta.hiscores;
     })["catch"](function (error) {

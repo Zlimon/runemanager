@@ -37,7 +37,7 @@
 <script>
 	export default {
 		props: {
-			account: { type: String, required: true }
+			accountId: { type: Number, required: true },
 		},
 
 		data () {
@@ -49,7 +49,7 @@
 
 		mounted() {
 			axios
-			.get('/api/account/' + this.account)
+			.get('/api/account/' + this.accountId)
 			.then((response) => {
 				this.account = response.data.data;
 				this.hiscores = response.data.meta.hiscores;
