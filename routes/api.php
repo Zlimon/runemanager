@@ -19,7 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::prefix('/hiscore')->group(function () {
-	Route::get('/{skill}', 'Api\HiscoreController@index')->name('show-hiscore');
+	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('show-skill-hiscore');
+	Route::get('/boss/{skill}', 'Api\HiscoreController@boss')->name('show-boss-hiscore');
 });
 
 Route::prefix('/account')->group(function () {

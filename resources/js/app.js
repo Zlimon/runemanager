@@ -19,7 +19,8 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('hiscore', require('./components/Hiscore.vue').default);
+Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
+Vue.component('bosshiscore', require('./components/BossHiscore.vue').default);
 Vue.component('account', require('./components/Account.vue').default);
 
 /**

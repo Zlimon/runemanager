@@ -44,7 +44,7 @@
 
 		mounted() {
 			axios
-			.get('/api/hiscore/' + this.skill)
+			.get('/api/hiscore/skill/' + this.skill)
 			.then((response) => {
 				this.hiscores = response.data.data;
 				this.meta = response.data.meta;

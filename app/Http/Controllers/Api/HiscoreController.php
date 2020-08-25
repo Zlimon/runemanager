@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 use App\Helpers\Helper;
 use App\Account;
+use App\Collection;
 
 use App\Http\Resources\HiscoreResource;
+use App\Http\Resources\BossHiscoreResource;
 
 class HiscoreController extends Controller
 {
@@ -18,7 +20,7 @@ class HiscoreController extends Controller
      *
      * @return
      */
-    public function index($skillName) {
+    public function skill($skillName) {
         if ($skillName == "overall") {
             $hiscores = Account::orderByRaw('CASE WHEN rank > 0 THEN 1 ELSE 2 END')->orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
 
@@ -67,5 +69,16 @@ class HiscoreController extends Controller
                 'average_total_level' => round($averageTotalLevel),
                 'total_max_level' => $totalMaxLevel,
             	]]);
+    }
+
+    public function boss($bossName) {
+        // TODO Check if there are registered accounts
+        $collection = Collection::findByName($bossName);
+
+        $boss = $collection->collection_type::with('account')->get();
+
+        $bosses = Helper::listBosses();
+
+        return BossHiscoreResource::collection($boss);
     }
 }

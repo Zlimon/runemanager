@@ -31,19 +31,23 @@ class PageController extends Controller
     }
 
     /**
-     * Show the application hiscores.
+     * Show the skill hiscores.
      *
      * @return
      */
-    public function hiscore($skillName) {
-        $skills = Helper::listSkills();
+    public function hiscore($hiscoreType, $hiscore) {
+        $hiscoreList = Helper::listSkills();
 
-        array_push($skills, "overall");
+        array_push($hiscoreList, "overall");
+        
+        if ($hiscoreType == "boss") {
+            $hiscoreList = Helper::listBosses();
+        }        
 
-        list($skillsTop, $skillsBottom) = array_chunk($skills, ceil(count($skills) / 2)); // Split skills array into two arrays for a top and bottom skill bar
+        list($hiscoreListTop, $hiscoreListBottom) = array_chunk($hiscoreList, ceil(count($hiscoreList) / 2)); // Split skills array into two arrays for a top and bottom skill bar
 
         $accountCount = Account::count();
 
-        return view('hiscore', compact('skillName', 'skills', 'skillsTop', 'skillsBottom', 'accountCount'));
+        return view('hiscore', compact('hiscoreType', 'hiscore', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom', 'accountCount'));
     }
 }
