@@ -15,7 +15,7 @@ class CreateCerberusTable extends Migration
     {
         Schema::create('cerberus', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->integer('hellpuppy')->default(0)->unsigned();

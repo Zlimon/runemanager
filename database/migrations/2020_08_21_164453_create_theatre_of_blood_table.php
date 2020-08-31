@@ -15,7 +15,7 @@ class CreateTheatreOfBloodTable extends Migration
     {
         Schema::create('theatre_of_blood', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->integer('lil_zik')->default(0)->unsigned();

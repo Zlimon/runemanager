@@ -15,7 +15,7 @@ class CreateTheNightmareTable extends Migration
     {
         Schema::create('the_nightmare', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->integer('little_nightmare')->default(0)->unsigned();

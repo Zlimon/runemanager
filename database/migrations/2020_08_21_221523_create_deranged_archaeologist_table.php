@@ -15,7 +15,7 @@ class CreateDerangedArchaeologistTable extends Migration
     {
         Schema::create('deranged_archaeologist', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->timestamps();
         });

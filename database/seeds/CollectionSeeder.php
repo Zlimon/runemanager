@@ -19,7 +19,7 @@ class CollectionSeeder extends Seeder
 			["name" => "callisto", "collection_type" => "App\Boss\Callisto"],
 			["name" => "cerberus", "collection_type" => "App\Boss\Cerberus"],
 			["name" => "chambers of xeric", "collection_type" => "App\Raid\ChambersOfXeric"],
-			["name" => "chambers of xeric: challenge mode", "collection_type" => "App\Raid\ChambersOfXericChallengeMode"],
+			["name" => "chambers of xeric challenge mode", "collection_type" => "App\Raid\ChambersOfXericChallengeMode"],
 			["name" => "chaos elemental", "collection_type" => "App\Boss\ChaosElemental"],
 			["name" => "chaos fanatic", "collection_type" => "App\Boss\ChaosFanatic"],
 			["name" => "commander zilyana", "collection_type" => "App\Boss\CommanderZilyana"],

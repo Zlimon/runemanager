@@ -15,7 +15,7 @@ class CreateTheFightCavesTable extends Migration
     {
         Schema::create('the_fight_caves', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->integer('tzrek-jad')->default(0)->unsigned();

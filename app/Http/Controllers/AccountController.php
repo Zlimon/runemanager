@@ -129,7 +129,7 @@ class AccountController extends Controller
 
                 $collectionLoot = new $collection->collection_type;
 
-                $collectionLoot->user_id = $account->id;
+                $collectionLoot->account_id = $account->id;
                 $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
 
                 if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
@@ -149,7 +149,7 @@ class AccountController extends Controller
              */
             $collectionLoot = new \App\Boss\DagannothKings;
 
-            $collectionLoot->user_id = $account->id;
+            $collectionLoot->account_id = $account->id;
             $collectionLoot->kill_count = $dksKillCount;
 
             $collectionLoot->save();
