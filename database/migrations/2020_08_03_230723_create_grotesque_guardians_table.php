@@ -16,8 +16,9 @@ class CreateGrotesqueGuardiansTable extends Migration
         Schema::create('grotesque_guardians', function (Blueprint $table) {
             $table->id();
             $table->integer('account_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('noon')->default(0)->unsigned();
             $table->integer('black_tourmaline_core')->default(0)->unsigned();
             $table->integer('granite_gloves')->default(0)->unsigned();

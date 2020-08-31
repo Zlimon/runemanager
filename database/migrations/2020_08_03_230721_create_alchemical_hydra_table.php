@@ -16,8 +16,9 @@ class CreateAlchemicalHydraTable extends Migration
         Schema::create('alchemical_hydra', function (Blueprint $table) {
             $table->id();
             $table->integer('account_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('ikkle_hydra')->default(0)->unsigned();
             $table->integer('hydras_claw')->default(0)->unsigned();
             $table->integer('hydra_tail')->default(0)->unsigned();

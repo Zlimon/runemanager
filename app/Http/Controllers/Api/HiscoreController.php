@@ -21,64 +21,71 @@ class HiscoreController extends Controller
      * @return
      */
     public function skill($skillName) {
-        if ($skillName == "overall") {
-            $hiscores = Account::orderByRaw('CASE WHEN rank > 0 THEN 1 ELSE 2 END')->orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
+        if (Account::count() > 0) {
+            if ($skillName == "overall") {
+                $hiscores = Account::orderByRaw('CASE WHEN rank > 0 THEN 1 ELSE 2 END')->orderBy('rank', 'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
 
-            $sumTotalXp = Account::sum('xp');
+                $sumTotalXp = Account::sum('xp');
 
-            $averageTotalLevel = Account::sum('level') / Account::count();
+                $averageTotalLevel = Account::sum('level') / Account::count();
 
-            $skills = Helper::listSkills();
+                $skills = Helper::listSkills();
 
-            $totalMaxLevel = Account::where('level', (99 * count($skills)))->count();
+                $totalMaxLevel = Account::where('level', (99 * count($skills)))->count();
+            } else {
+                $sumTotalXp = DB::table($skillName)
+                    ->selectRaw('SUM(xp) AS total_xp')
+                    ->first();
+
+                $sumTotalXp = $sumTotalXp->total_xp;
+
+                $sumTotalLevel = DB::table($skillName)
+                    ->selectRaw('SUM(level) AS total_level')
+                    ->selectRaw('COUNT(*) AS total_hiscores')
+                    ->first();
+
+                $averageTotalLevel = $sumTotalLevel->total_level / $sumTotalLevel->total_hiscores;
+
+                $totalMaxLevel = DB::table($skillName)
+                    ->selectRaw('COUNT(*) AS amount_99')
+                    ->where('level', 99)
+                    ->first();
+
+                $totalMaxLevel = $totalMaxLevel->amount_99;
+
+                $hiscores = DB::table($skillName)
+                    ->select($skillName.'.account_id', $skillName.'.level', $skillName.'.xp', $skillName.'.rank', 'username')
+                    ->join('accounts', $skillName.'.account_id', '=', 'accounts.id')
+                    ->orderByRaw('CASE WHEN '.$skillName.'.rank > 0 THEN 1 ELSE 2 END')
+                    ->orderBy('rank', 'ASC')
+                    ->orderBy('level', 'DESC')
+                    ->orderBy('xp', 'DESC')
+                    ->get();
+            }
+
+        	return HiscoreResource::collection($hiscores)
+            	->additional(['meta' => [
+            		'skill' => ucfirst($skillName),
+                    'total_xp' => number_format($sumTotalXp),
+                    'average_total_level' => round($averageTotalLevel),
+                    'total_max_level' => $totalMaxLevel,
+                	]]);
         } else {
-            $sumTotalXp = DB::table($skillName)
-                ->selectRaw('SUM(xp) AS total_xp')
-                ->first();
-
-            $sumTotalXp = $sumTotalXp->total_xp;
-
-            $sumTotalLevel = DB::table($skillName)
-                ->selectRaw('SUM(level) AS total_level')
-                ->selectRaw('COUNT(*) AS total_hiscores')
-                ->first();
-
-            $averageTotalLevel = $sumTotalLevel->total_level / $sumTotalLevel->total_hiscores;
-
-            $totalMaxLevel = DB::table($skillName)
-                ->selectRaw('COUNT(*) AS amount_99')
-                ->where('level', 99)
-                ->first();
-
-            $totalMaxLevel = $totalMaxLevel->amount_99;
-
-            $hiscores = DB::table($skillName)
-                ->select($skillName.'.account_id', $skillName.'.level', $skillName.'.xp', $skillName.'.rank', 'username')
-                ->join('accounts', $skillName.'.account_id', '=', 'accounts.id')
-                ->orderByRaw('CASE WHEN '.$skillName.'.rank > 0 THEN 1 ELSE 2 END')
-                ->orderBy('rank', 'ASC')
-                ->orderBy('level', 'DESC')
-                ->orderBy('xp', 'DESC')
-                ->get();
+            return response()->json("There are no linked accounts", 404);
         }
-
-    	return HiscoreResource::collection($hiscores)
-        	->additional(['meta' => [
-        		'skill' => ucfirst($skillName),
-                'total_xp' => number_format($sumTotalXp),
-                'average_total_level' => round($averageTotalLevel),
-                'total_max_level' => $totalMaxLevel,
-            	]]);
     }
 
     public function boss($bossName) {
-        // TODO Check if there are registered accounts
-        $collection = Collection::findByName($bossName);
+        if (Account::count() > 0) {
+            $collection = Collection::findByName($bossName);
 
-        $boss = $collection->collection_type::with('account')->get();
+            $boss = $collection->collection_type::with('account')->orderBy('kill_count', 'DESC')->get();
 
-        $bosses = Helper::listBosses();
+            $bosses = Helper::listBosses();
 
-        return BossHiscoreResource::collection($boss);
+            return BossHiscoreResource::collection($boss);
+        } else {
+            return response()->json("There are no linked accounts", 404);
+        }
     }
 }

@@ -16,8 +16,9 @@ class CreateZulrahTable extends Migration
         Schema::create('zulrah', function (Blueprint $table) {
             $table->id();
             $table->integer('account_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('pet_snakeling')->default(0)->unsigned();
             $table->integer('tanzanite_mutagen')->default(0)->unsigned();
             $table->integer('magma_mutagen')->default(0)->unsigned();

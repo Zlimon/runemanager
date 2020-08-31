@@ -16,8 +16,8 @@ class BossHiscoreResource extends JsonResource
     {
         return [
             'kill_count' => $this->kill_count,
+            'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
             'account' => new AccountResource($this->account),
-            //'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
         ];
     }
 }

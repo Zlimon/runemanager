@@ -11,7 +11,7 @@
 				<td>{{ index + 1 }}</td>
 				<td><a :href="'/account/' + hiscore.account.id">{{ hiscore.account.username }}</a></td>
 				<td>{{ hiscore.kill_count }}</td>
-				<td>rank</td>
+				<td>{{ hiscore.rank }}</td>
 			</tr>
 		</table>
 	</div>

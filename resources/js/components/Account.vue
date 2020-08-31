@@ -22,7 +22,7 @@
 			<tr v-for="(hiscore, key) in hiscores">
 				<td>
 					<a :href="'/hiscore/' + key">
-						<img class="align" :src="'/images/skills/' + key + '.png'" width="35px" :alt="key + ' skill icon'"/>
+						<img class="align" :src="'/images/skill/' + key + '.png'" width="35px" :alt="key + ' skill icon'"/>
 						{{ key | capitalize }}
 					</a>
 				</td>

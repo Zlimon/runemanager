@@ -16,8 +16,9 @@ class CreateSarachnisTable extends Migration
         Schema::create('sarachnis', function (Blueprint $table) {
             $table->id();
             $table->integer('account_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('sraracha')->default(0)->unsigned();
             $table->integer('jar_of_eyes')->default(0)->unsigned();
             $table->integer('giant_egg_sac(full)')->default(0)->unsigned();

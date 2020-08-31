@@ -6,15 +6,19 @@
 
 @section('content')
 	<div class="row justify-content-center">
-		<div class="account-box">
-			<p>Skills</p>
-			<img class="pixel" src="{{ asset('images/skill') }}/Overall.png" width="54" alt="Overall skill icon">
-		</div>
+		<a href="{{ route('show-hiscore', ['skill', 'overall']) }}">
+			<div class="account-box">
+				<p>Skills</p>
+				<img class="pixel" src="{{ asset('images/skill') }}/Overall.png" width="54" alt="Overall skill icon">
+			</div>
+		</a>
 
-		<div class="account-box">
-			<p>Bosses</p>
-			<img class="pixel" src="{{ asset('images/boss') }}/boss.png" width="54" alt="Overall skill icon">
-		</div>
+		<a href="{{ route('show-hiscore', ['boss', Helper::listBosses()[0]]) }}">
+			<div class="account-box">
+				<p>Bosses</p>
+				<img class="pixel" src="{{ asset('images/boss') }}/boss.png" width="54" alt="Overall skill icon">
+			</div>
+		</a>
 	</div>
 
 	<div class="wide" id="highscore_top">
@@ -41,7 +45,7 @@
 	@if ($accountCount > 0)
 		<div class="float-left mt-3">
 			<span class="middle-icon">
-				<img class="pixel middle-img-icon" style="width: 150px; height: 150px;" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ ucfirst($hiscore) }}.png" alt="{{ ucfirst($hiscore) }} skill icon">
+				<img class="pixel middle-img-icon" style="width: 150px; height: 150px;" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $hiscore }}.png" alt="{{ ucfirst($hiscore) }} skill icon">
 			</span>
 		</div>
 
