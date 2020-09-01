@@ -12,7 +12,7 @@ class Account extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'mode', 'username', 'rank', 'level', 'xp', 'private'
+        'user_id', 'type', 'username', 'rank', 'level', 'xp', 'private'
     ];
 
     public function user() {

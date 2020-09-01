@@ -26,6 +26,7 @@ Route::prefix('/hiscore')->group(function () {
 Route::prefix('/account')->group(function () {
 	Route::get('/', 'Api\AccountController@index')->name('account');
 	Route::get('/{account}', 'Api\AccountController@show')->name('show-account');
+	Route::post('/{account}', 'Api\AccountController@store')->name('authenticate-account');
 });
 
 Route::prefix('/boss')->group(function () {

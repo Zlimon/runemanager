@@ -23,7 +23,7 @@ Route::get('/hiscore/{hiscore}/{skill}', 'PageController@hiscore')->name('show-h
 Route::get('/account', 'AccountController@index')->name('account');
 Route::post('/account', 'AccountController@search')->name('search-account');
 Route::get('/account/create', 'AccountController@create')->name('create-account');
-Route::post('/account/create', 'AccountController@verifyAccount')->name('store-account');
+Route::post('/account/create', 'AccountController@createAccountAuthStatus')->name('store-account');
 Route::get('/account/{id}', 'AccountController@show')->name('show-account');
 
 /*==========User Controller=============*/

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccountsTable extends Migration
+class CreateAccountAuthStatusesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,12 @@ class CreateAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('accounts', function (Blueprint $table) {
+        Schema::create('account_auth_statuses', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->unsigned();
-            $table->enum('type', ['normal', 'ironman', 'hardcore', 'ultimate']);
             $table->string('username', 13);
-            $table->integer('rank')->default(0);
-            $table->integer('level')->default(32); // Minimum total level
-            $table->bigInteger('xp')->default(0);
+            $table->string('code', 8);
+            $table->enum('status', ['pending', 'success', 'failed', 'expired']);
             $table->timestamps();
         });
     }
@@ -32,6 +30,6 @@ class CreateAccountsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('accounts');
+        Schema::dropIfExists('account_auth_statuses');
     }
 }
