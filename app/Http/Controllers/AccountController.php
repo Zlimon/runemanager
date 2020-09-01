@@ -62,9 +62,18 @@ class AccountController extends Controller
             if (Account::where('username', request('username'))->first()) {
                 return redirect()->back()->withErrors('This account has already been linked to another profile!');
             } else {
-                $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
+                // Verify account mode
+                if (request('mode') == "normal") {
+                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
+                } elseif (request('mode') == "ironman" || request('mode') == "hardcore" || request('mode') == "ultimate") {
+                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool_'.request('mode').'/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
+                } else {
+                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
+                }
 
                 if (Helper::verifyUrl($playerDataUrl)) {
+                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
+
                     /* Get the $playerDataUrl file content. */
                     $getPlayerData = file_get_contents($playerDataUrl);
 
@@ -97,6 +106,7 @@ class AccountController extends Controller
         if (Auth::check()) {
             $account = Account::create([
                 'user_id' => Auth::user()->id,
+                'mode' => request('mode'),
                 'username' => request('username'),
                 'rank' => $playerData[0][0],
                 'level' => $playerData[0][1],

@@ -16,6 +16,7 @@ class CreateAccountsTable extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->unsigned();
+            $table->enum('mode', ['normal', 'ironman', 'hardcore', 'ultimate']);
             $table->string('username', 13);
             $table->integer('rank')->default(0);
             $table->integer('level')->default(32); // Minimum total level
