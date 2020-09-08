@@ -15,9 +15,10 @@ class CreateKrakenTable extends Migration
     {
         Schema::create('kraken', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('pet_kraken')->default(0)->unsigned();
             $table->integer('kraken_tentacle')->default(0)->unsigned();
             $table->integer('trident_of_the_seas_(full)')->default(0)->unsigned();

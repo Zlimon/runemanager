@@ -15,9 +15,9 @@ class CreateDagannothKingsTable extends Migration
     {
         Schema::create('dagannoth_kings', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('pet_dagannoth_prime')->default(0)->unsigned();
             $table->integer('pet_dagannoth_supreme')->default(0)->unsigned();
             $table->integer('pet_dagannoth_rex')->default(0)->unsigned();

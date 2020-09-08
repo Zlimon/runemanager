@@ -15,9 +15,10 @@ class CreateOborTable extends Migration
     {
         Schema::create('obor', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('hill_giant_club')->default(0)->unsigned();
             $table->timestamps();
         });

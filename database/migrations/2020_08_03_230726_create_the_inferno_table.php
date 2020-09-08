@@ -15,9 +15,10 @@ class CreateTheInfernoTable extends Migration
     {
         Schema::create('the_inferno', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('jal-nib-rek')->default(0)->unsigned();
             $table->integer('infernal_cape')->default(0)->unsigned();
             $table->timestamps();
