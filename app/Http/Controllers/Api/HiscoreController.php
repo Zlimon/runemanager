@@ -79,7 +79,7 @@ class HiscoreController extends Controller
         if (Account::count() > 0) {
             $collection = Collection::findByName($bossName);
 
-            $boss = $collection->collection_type::with('account')->orderBy('kill_count', 'DESC')->get();
+            $boss = $collection->model::with('account')->orderBy('kill_count', 'DESC')->get();
 
             $bosses = Helper::listBosses();
 

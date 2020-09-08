@@ -16,100 +16,51 @@ use Artisan;
 
 class CollectionController extends Controller
 {
-	public function bossList(Request $request) {
-		$allCollections = Collection::select('name')->get();
-		return response()->json($allCollections, 200);
-	}
+	public function list($collectionType) {
+		if (in_array($collectionType, ['all', 'boss', 'raid', 'clue', 'minigame', 'other'], true)) {
+			if ($collectionType === "all") {
+				$collectionList = Collection::select('name')->get();
 
-	public function index(Request $request) {
-		$user = $this->getUser($request->header('uuid'));
-
-		if ($user) {
-			$allCollections = Collection::get();
-
-			// TODO create function
-			// This method create a migration file for each collection model in the collections table
-			// $listOfS = [];
-			// foreach ($allCollections as $key => $collection) {
-			// 	$collectionName = $collection->name;
-			// 	if ($collectionName[strlen($collectionName) - 1] == "s") {
-			// 		$listOfS[$key] = $collectionName;
-			// 		$command = "make:migration create_".str_replace(" ", "_", $collectionName)."_table";
-			// 	} else {
-			// 		$command = "make:migration create_".str_replace(" ", "_", $collectionName)."s_table";
-			// 	}
-				
-			// 	$execute = Artisan::call($command);
-			// }
-
-			$allCollectionsLoot = [];
-			foreach ($allCollections as $key => $collection) {
-				$findCollection = Collection::findByName($collection->name);
-
-				$collectionLog = $this->getUserCollectionLog($findCollection->collection_type, $user->id);
-
-				if (!$collectionLog) {
-					// $collectionLog = $this->store($collection->name, $user->id);
-
-					return response()->json("This user does not have any registered loot for " . $collection->name, 404);
-				}
-
-				$allCollectionLoot[$key] = $collectionLog;
+				return response()->json($collectionList, 200);
 			}
 
-			return response()->json($allCollectionLoot, 200);
+			$collectionList = Collection::select('name')->where('type', $collectionType)->get();
+
+			return response()->json($collectionList, 200);
 		} else {
-			return response()->json("This user could not be found", 404);
+			return response()->json("This collection type could not be found", 404);
 		}
 	}
 
-	public function show($collectionName, Request $request) {
-		$user = $this->getUser($request->header('uuid'));
+	public function show($collectionName) {
+		// $collection = Collection::findByName($collectionName);
 
-		if ($user) {
-			$collection = Collection::findByName($collectionName);
+		// if ($collection) {
+		// 	$collectionLog = $collection->model::get();
 
-			if ($collection) {
-				$collectionLog = $this->getUserCollectionLog($collection->collection_type, $user->id);
-
-				if ($collectionLog) {
-					return response()->json($collectionLog, 200);
-				} else {
-					// $test = $this->store($collectionName, $user->id);
-
-					// return response()->json($test, 201);
-
-					return response()->json("This user does not have any registered loot for " . $collection->name, 404);
-				}
-			} else {
-				return response()->json("This collection does not exist", 404);
-			}
-		} else {
-			return response()->json("This user could not be found", 404);
-		}
+		// 	if ($collectionLog) {
+		// 		return response()->json($collectionLog, 200);
+		// 	} else {
+		// 		return response()->json("This account does not have any registered loot for " . $collection->name, 404);
+		// 	}
+		// } else {
+		// 	return response()->json("This collection could not be found", 404);
+		// }
 	}
 
 	private function store($collectionName, $userId) {
-		$collection = Collection::findByName($collectionName);
+		// $collection = Collection::findByName($collectionName);
 
-		$collectionLoot = new $collection->collection_type;
+		// $collectionLoot = new $collection->collection_type;
 
-		$collectionLoot->user_id = $userId;
+		// $collectionLoot->user_id = $userId;
 
-		$collectionLoot->save();
+		// $collectionLoot->save();
 
-		return $collectionLoot;
+		// return $collectionLoot;
 	}
 
 	public function update($collectionName, Request $request) {
 		// TODO collection log updater
-	}
-
-	private function getUser($uuid) {
-		return User::where('uuid', $uuid)->first();
-	}
-
-	private function getUserCollectionLog($collectionType, $userId) {
-		return $collectionType::where('user_id', $userId)->first();
 	}
 }

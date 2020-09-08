@@ -18,23 +18,13 @@ use App\Http\Resources\AccountResource;
 class AccountController extends Controller
 {
     /**
-     * Show all the application accounts.
-     *
-     * @return
-     */
-    public function index() {
-        return AccountResource::collection(Account::with('user')->inRandomOrder()->get());
-    }
-
-
-    /**
      * Show a specific account and skills data from a URL request.
      *
      * @param  string  $username
      * @return
      */
-    public function show($account) {
-        return (new AccountResource(Account::findOrFail($account)));
+    public function show($accountUsername) {
+        return new AccountResource(Account::where('username', $accountUsername)->firstOrFail());
     }
 
     /**
@@ -43,16 +33,16 @@ class AccountController extends Controller
      * @param  string  $authCode
      * @return
      */
-    public function store($authCode, Request $request) {
+    public function store($accountUsername) {
         $accountAuthStatus = AccountAuthStatus::where([
-            ['username', $request->header('player')],
+            ['username', $accountUsername],
             ['status', 'pending']
         ])->first();
 
         if ($accountAuthStatus) {
-            if ($request->header('type') == "NORMAL" || $request->header('type') == "IRONMAN" || $request->header('type') == "HARDCORE" || $request->header('type') == "ULTIMATE") {
-                if ($authCode === $accountAuthStatus->code) {
-                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', $request->header('player'));
+            if (in_array(request('type'), ['NORMAL', 'IRONMAN', 'HARDCORE', 'ULTIMATE'], true)) {
+                if (request('code') === $accountAuthStatus->code) {
+                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', $accountUsername);
 
                     /* Get the $playerDataUrl file content. */
                     $getPlayerData = file_get_contents($playerDataUrl);
@@ -68,8 +58,8 @@ class AccountController extends Controller
 
                     $account = Account::create([
                         'user_id' => $accountAuthStatus->user_id,
-                        'type' => strtolower($request->header('type')),
-                        'username' => $request->header('player'),
+                        'type' => strtolower(request('type')),
+                        'username' => $accountUsername,
                         'rank' => $playerData[0][0],
                         'level' => $playerData[0][1],
                         'xp' => $playerData[0][2]
@@ -99,7 +89,7 @@ class AccountController extends Controller
                     for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
                         $collection = Collection::findByName($bosses[$bossCounter]);
 
-                        $collectionLoot = new $collection->collection_type;
+                        $collectionLoot = new $collection->model;
 
                         $collectionLoot->account_id = $account->id;
                         $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);

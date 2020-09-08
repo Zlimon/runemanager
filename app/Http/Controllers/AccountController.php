@@ -60,19 +60,33 @@ class AccountController extends Controller
                 'username' => ['required', 'string', 'min:1', 'max:13'],
             ]);
 
-            if (Account::where('username', request('username'))->first()) {
-                return redirect()->back()->withErrors('This account has already been linked to another profile!');
+            if (AccountAuthStatus::where('username', request('username'))->count() == 0) {
+                if (Account::where('username', request('username'))->first()) {
+                    if (Account::where('user_id', Auth::user()->id)->first()) {
+                        return redirect()->back()->withErrors('You have already linked this account to your profile!');
+                    }
+
+                    return redirect()->back()->withErrors('This account has already been linked to another profile!');
+                } else {
+                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
+
+                    if (Helper::verifyUrl($playerDataUrl)) {
+                        $authStatus = new AccountAuthStatus;
+
+                        $authStatus->user_id = Auth::user()->id;
+                        $authStatus->username = request('username');
+                        $authStatus->code = substr(md5(uniqid(mt_rand(), true)), 0, 8);
+                        $authStatus->status = "pending";
+
+                        $authStatus->save();
+
+                        return view('account.auth', compact('authStatus'));
+                    } else {
+                        return redirect()->back()->withErrors('Could not find this Old School RuneScape account!');
+                    }
+                }
             } else {
-                $authStatus = new AccountAuthStatus;
-
-                $authStatus->user_id = Auth::user()->id;
-                $authStatus->username = request('username');
-                $authStatus->code = substr(md5(uniqid(mt_rand(), true)), 0, 8);
-                $authStatus->status = "pending";
-
-                $authStatus->save();
-
-                return view('account.auth', compact('authStatus'));
+                return redirect()->back()->withErrors('This account already has a pending status!');
             }
         } else {
             return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
