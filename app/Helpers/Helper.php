@@ -173,4 +173,16 @@ class Helper
 
         return $accountSkills;
     }
+
+    public static function listAccountTypes() {
+        return ["normal", "ironman", "hardcore_ironman", "ultimate_ironman"];
+    }
+
+    public static function formatAccountTypeName($accountType) {
+        return ucfirst(str_replace('_', ' ', $accountType));
+    }
+
+    public static function formatHiscoreUrl($accountType, $playerName) {
+        return 'https://secure.runescape.com/m=hiscore_oldschool'.($accountType === 'normal' ? '' : '_'.($accountType === 'ultimate_ironman' ? 'ultimate' : $accountType)).'/index_lite.ws?player='.str_replace(' ', '%20', $playerName);
+    }
 }

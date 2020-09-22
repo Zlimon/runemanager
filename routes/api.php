@@ -25,7 +25,7 @@ Route::prefix('/hiscore')->group(function () {
 
 Route::prefix('/account')->group(function () {
 	Route::get('/{account}', 'Api\AccountController@show')->name('show-account');
-	Route::post('/{account}', 'Api\AccountController@store')->name('authenticate-account');
+	Route::post('/{account}/authenticate', 'Api\AccountController@store')->name('authenticate-account');
 
 	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('show-account-collection');
 	Route::put('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@update')->name('update-account-collection');

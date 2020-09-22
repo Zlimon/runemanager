@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 use Carbon\Carbon;
 
@@ -34,103 +35,104 @@ class AccountController extends Controller
      * @return
      */
     public function store($accountUsername) {
-        $accountAuthStatus = AccountAuthStatus::where([
-            ['username', $accountUsername],
-            ['status', 'pending']
-        ])->first();
+        if (in_array(request('account_type'), Helper::listAccountTypes(), true)) {
+            $authStatus = AccountAuthStatus::where('username', $accountUsername)->where('status', 'pending')->first();
 
-        if ($accountAuthStatus) {
-            if (in_array(request('type'), ['NORMAL', 'IRONMAN', 'HARDCORE', 'ULTIMATE'], true)) {
-                if (request('code') === $accountAuthStatus->code) {
-                    $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', $accountUsername);
+            if ($authStatus) {
+                if (request('account_type') === $authStatus->account_type) {
+                    if (request('code') === $authStatus->code) {
+                        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', $accountUsername);
 
-                    /* Get the $playerDataUrl file content. */
-                    $getPlayerData = file_get_contents($playerDataUrl);
+                        /* Get the $playerDataUrl file content. */
+                        $getPlayerData = file_get_contents($playerDataUrl);
 
-                    /* Fetch the content from $playerDataUrl. */
-                    $playerStats = explode("\n", $getPlayerData);
+                        /* Fetch the content from $playerDataUrl. */
+                        $playerStats = explode("\n", $getPlayerData);
 
-                    /* Convert the CSV file of player stats into an array */
-                    $playerData = [];
-                    foreach ($playerStats as $playerStat) {
-                        $playerData[] = str_getcsv($playerStat);
-                    }
+                        /* Convert the CSV file of player stats into an array */
+                        $playerData = [];
+                        foreach ($playerStats as $playerStat) {
+                            $playerData[] = str_getcsv($playerStat);
+                        }
 
-                    $account = Account::create([
-                        'user_id' => $accountAuthStatus->user_id,
-                        'type' => strtolower(request('type')),
-                        'username' => $accountUsername,
-                        'rank' => $playerData[0][0],
-                        'level' => $playerData[0][1],
-                        'xp' => $playerData[0][2]
-                    ]);
-
-                    $skills = Helper::listSkills();
-
-                    for ($i = 0; $i < count($skills); $i++) {
-                        DB::table($skills[$i])->insert([
-                            'account_id' => $account->id,
-                            'rank' => ($playerData[$i+1][0] >= 1 ? $playerData[$i+1][0] : 0),
-                            'level' => $playerData[$i+1][1],
-                            'xp' => ($playerData[$i+1][2] >= 0 ? $playerData[$i+1][2] : 0),
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now()
+                        $account = Account::create([
+                            'user_id' => $authStatus->user_id,
+                            'account_type' => request('account_type'),
+                            'username' => $accountUsername,
+                            'rank' => $playerData[0][0],
+                            'level' => $playerData[0][1],
+                            'xp' => $playerData[0][2]
                         ]);
-                    }
 
-                    $clueScrollAmount = count(Helper::listClueScrollTiers());
+                        $skills = Helper::listSkills();
 
-                    $bosses = Helper::listBosses();
+                        for ($i = 0; $i < count($skills); $i++) {
+                            DB::table($skills[$i])->insert([
+                                'account_id' => $account->id,
+                                'rank' => ($playerData[$i+1][0] >= 1 ? $playerData[$i+1][0] : 0),
+                                'level' => $playerData[$i+1][1],
+                                'xp' => ($playerData[$i+1][2] >= 0 ? $playerData[$i+1][2] : 0),
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now()
+                            ]);
+                        }
 
-                    $bossCounter = 0;
+                        $clueScrollAmount = count(Helper::listClueScrollTiers());
 
-                    $dksKillCount = 0;
+                        $bosses = Helper::listBosses();
 
-                    for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
-                        $collection = Collection::findByName($bosses[$bossCounter]);
+                        $bossCounter = 0;
 
-                        $collectionLoot = new $collection->model;
+                        $dksKillCount = 0;
+
+                        for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
+                            $collection = Collection::findByName($bosses[$bossCounter]);
+
+                            $collectionLoot = new $collection->model;
+
+                            $collectionLoot->account_id = $account->id;
+                            $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                            $collectionLoot->rank = ($playerData[$i+1][0] >= 0 ? $playerData[$i+1][0] : 0);
+
+                            if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
+                                $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                            }
+
+                            $collectionLoot->save();
+
+                            $bossCounter++;
+                        }
+
+                        /**
+                         * Since there are no official total kill count hiscore for
+                         * DKS' and we are going to retrieve loot for them from the
+                         * collection log, we have to manually create a table.
+                         * This might also happen with other bosses in the future.
+                         */
+                        $collectionLoot = new \App\Boss\DagannothKings;
 
                         $collectionLoot->account_id = $account->id;
-                        $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
-                        $collectionLoot->rank = ($playerData[$i+1][0] >= 0 ? $playerData[$i+1][0] : 0);
-
-                        if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
-                            $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
-                        }
+                        $collectionLoot->kill_count = $dksKillCount;
 
                         $collectionLoot->save();
 
-                        $bossCounter++;
+                        $authStatus->status = "success";
+
+                        $authStatus->save();
+
+                        return response()->json("Account successfully linked!", 200);
+                        // return redirect(route('home'))->with('message', 'Old School RuneScape account "'.request('username').'" linked!');
+                    } else {
+                        return response()->json("Invalid code", 202);
                     }
-
-                    /**
-                     * Since there are no official total kill count hiscore for
-                     * DKS' and we are going to retrieve loot for them from the
-                     * collection log, we have to manually create a table.
-                     * This might also happen with other bosses in the future.
-                     */
-                    $collectionLoot = new \App\Boss\DagannothKings;
-
-                    $collectionLoot->account_id = $account->id;
-                    $collectionLoot->kill_count = $dksKillCount;
-
-                    $collectionLoot->save();
-
-                    $accountAuthStatus->status = "success";
-
-                    $accountAuthStatus->save();
-
-                    return response()->json("Success", 200);
-                    // return redirect(route('home'))->with('message', 'Old School RuneScape account "'.request('username').'" linked!');
                 } else {
-                    return response()->json("Invalid code", 401);
+                    return response()->json("This account is registered as ".Helper::formatAccountTypeName($authStatus->account_type)", not ".request('account_type'), 202);
                 }
             } else {
-                return response()->json("Not a supported account type", 202);
+                return response()->json("This account has no pending status", 202);
             }
         } else {
-            return response()->json("This account has no pending status", 202);
+            return response()->json("Not a supported account type. Valid account types: ".implode(", ", str_replace('_', ' ', Helper::listAccountTypes())), 202);
         }
     }
 }

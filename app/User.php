@@ -40,4 +40,8 @@ class User extends Authenticatable
     public function account() {
         return $this->hasMany(Account::class);
     }
+
+    public function authStatus() {
+        return $this->hasOne(AccountAuthStatus::class);
+    }
 }
