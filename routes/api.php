@@ -27,8 +27,11 @@ Route::prefix('/account')->group(function () {
 	Route::get('/{account}', 'Api\AccountController@show')->name('show-account');
 	Route::post('/{account}/authenticate', 'Api\AccountController@store')->name('authenticate-account');
 
+	// Route::get('/{accountUsername}/loot/{collectionName}', 'Api\AccountCollectionController@show')->name('show-account-collection');
+	Route::put('/{accountUsername}/loot/{collectionName}', 'Api\AccountLootController@update')->name('update-account-loot');
+
 	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('show-account-collection');
-	Route::put('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@update')->name('update-account-collection');
+	Route::post('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@update')->name('update-account-collection');
 });
 
 Route::prefix('/collection')->group(function () {

@@ -62,4 +62,44 @@
 			</div>
 		</div>
 	</form>
+
+	<h2 class="mt-2">How to authenticate:</h2>
+
+	<ol>
+		<li>Make sure you have the RuneManager plugin enabled</li>
+		<li>Enter your RuneManager user credentials in the RuneManager plugin configurations</li>
+		<li>Log in on your Old School RuneScape account</li>
+		<li>Type: !auth {{ $authStatus->code }}</li>
+		<li>You should get the response:<br>
+			<strong>Attempting to authenticate account {{ $authStatus->username }} to user {{ $authStatus->user->name }}</strong></li>
+		<li>And then:<br>
+			<strong>Account successfully authenticated!</strong></li>
+	</ol>
+
+	<h2>Other responses mean:</h2>
+
+	<ul>
+		<li>
+			<em>Not a supported account type. Valid account types: normal, ironman, hardcore ironman, ultimate ironman</em><br>
+			<span>This means you are attempting to authenticate the account on an unsupported game mode such as DMM, Leagues etc.</span><br>
+			<span>To fix this you have to log in to a normal world</span>
+		</li>
+		<li>
+			<em>This account has no pending status</em><br>
+			<span>This means this account has (or has not successfully) already been authenticated to RuneManager</span>
+		</li>
+		<li>
+			<em>This account is registered as &lt;account type&gt;, not &lt;account type&gt;</em><br>
+			<span>This means you are attempting to authenticate the account with a different account type than the registered account type</span><br>
+			<span>To fix this you can update the account type above</span>
+		</li>
+		<li>
+			<em>Invalid code</em><br>
+			<span>This means you have most likely written the code wrong. Try again</span>
+		</li>
+		<li>
+			<em>Could not fetch player data from hiscores</em><br>
+			<span>This means RuneManager was not able to fetch player hiscores from Old School RuneScape. This is most likely an error on the Old School hiscore server</span>
+		</li>
+	</ul>
 @endsection

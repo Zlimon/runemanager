@@ -15,7 +15,7 @@ class AccountAuthController extends Controller
 {
 	public function index() {
 		if (Auth::check()) {
-			$authStatus = AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
+			$authStatus = AccountAuthStatus::with('user')->where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
 
 			if ($authStatus) {
 				return view('account.auth', compact('authStatus'));
@@ -91,8 +91,6 @@ class AccountAuthController extends Controller
 		        } else {
 		            return redirect()->back()->withErrors('Could not find this Old School RuneScape account! Did you pick correct account type?');
 		        }
-
-		    	$authStatus->save();
 		    } else {
 		    	return redirect()->back()->withErrors('This account is already registered as '.Helper::formatAccountTypeName(request('account_type')).'!');
 		    }
