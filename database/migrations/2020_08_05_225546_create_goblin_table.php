@@ -15,9 +15,10 @@ class CreateGoblinTable extends Migration
     {
         Schema::create('goblin', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('bones')->default(0)->unsigned();
             $table->integer('water_rune')->default(0)->unsigned();
             $table->integer('coins')->default(0)->unsigned();

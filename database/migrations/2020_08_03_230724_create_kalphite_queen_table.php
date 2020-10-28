@@ -15,9 +15,10 @@ class CreateKalphiteQueenTable extends Migration
     {
         Schema::create('kalphite_queen', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('kalphite_princess')->default(0)->unsigned();
             $table->integer('kq_head')->default(0)->unsigned();
             $table->integer('jar_of_sand')->default(0)->unsigned();

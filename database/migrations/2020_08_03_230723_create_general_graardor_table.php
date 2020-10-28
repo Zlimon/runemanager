@@ -15,9 +15,10 @@ class CreateGeneralGraardorTable extends Migration
     {
         Schema::create('general_graardor', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned()->unique();
-            $table->integer('obtained')->default(0)->unsigned();
+            $table->integer('account_id')->unsigned()->unique();
             $table->integer('kill_count')->default(0)->unsigned();
+            $table->integer('rank')->default(0)->unsigned();
+            $table->integer('obtained')->default(0)->unsigned();
             $table->integer('pet_general_graardor')->default(0)->unsigned();
             $table->integer('bandos_chestplate')->default(0)->unsigned();
             $table->integer('bandos_tassets')->default(0)->unsigned();

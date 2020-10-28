@@ -1,25 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\User;
+use App\Account;
 use App\Collection;
 
-class BossController extends Controller
+class AccountLootController extends Controller
 {
-	public function update($bossName, Request $request) {
-		$user = $this->getUser($request->header('uuid'));
+	public function update($accountUsername, $collectionName, Request $request) {
+		$account = Account::where('username', $accountUsername)->first();
 
-		if ($user) {
-			$boss = Collection::findByName($bossName);
+		if ($account) {
+			$collection = Collection::findByName($collectionName);
 
-			if ($boss) {
-				$bossLog = $this->getUserBossLog($boss->collection_type, $user->id);
+			if ($collection) {
+				$collectionLog = $collection->model::where('account_id', $account->id)->first();
 
-				if ($bossLog) {
-					$oldValues = $bossLog->getAttributes(); // Get old data
+				if ($collectionLog) {
+					$oldValues = $collectionLog->getAttributes(); // Get old data
 					//array_splice($oldValues, count($oldValues) - 2, 2); // Remove created_at and updated_at
 
 					$newValues = $request->all();
@@ -44,25 +45,17 @@ class BossController extends Controller
 
 					$sums["obtained"] = $uniques;
 
-					$bossLog->update($sums);
+					$collectionLog->update($sums);
 
-					return response()->json($bossLog, 201);
+					return response()->json($collectionLog, 201);
 				} else {
-					return response()->json("This user does not have any registered loot for this boss", 404);
+					return response()->json("This account does not have any registered loot for " . $collection->name, 404);
 				}
 			} else {
-				return response()->json("This boss does not exist", 404);
+				return response()->json("This collection could not be found", 404);
 			}
 		} else {
-			return response()->json("This user could not be found", 404);
+			return response()->json("This account could not be found", 404);
 		}
-	}
-
-	private function getUser($uuid) {
-		return User::where('uuid', $uuid)->first();
-	}
-
-	private function getUserBossLog($boss, $userId) {
-		return $boss::where('user_id', $userId)->first();
 	}
 }

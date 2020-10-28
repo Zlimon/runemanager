@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -23,6 +24,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $user = Auth::user();
+
+        if ($user->account == null || count($user->account) <= 0) {
+            return redirect(route('create-account'))->withErrors(['You must link an Old School RuneScape account to access this feature!']);
+        } else {
+            return view('home', compact('user'));
+        }
     }
 }
