@@ -21,7 +21,7 @@
 		<label for="code" class="col-md-4 text-md-right">Code:</label>
 
 		<div class="col-md-6">
-			<span>{{ $authStatus->code }}</span>
+			<span style="font-family: monospace; font-size: 1.25rem;">{{ $authStatus->code }}</span>
 		</div>
 	</div>
 
@@ -69,11 +69,15 @@
 		<li>Make sure you have the RuneManager plugin enabled</li>
 		<li>Enter your RuneManager user credentials in the RuneManager plugin configurations</li>
 		<li>Log in on your Old School RuneScape account</li>
-		<li>Type: !auth {{ $authStatus->code }}</li>
+		<li>Type in chat:<br>
+			<span style="font-family: monospace; font-size: 1.25rem;">!auth {{ $authStatus->code }}</span>
+		</li>
 		<li>You should get the response:<br>
-			<strong>Attempting to authenticate account {{ $authStatus->username }} to user {{ $authStatus->user->name }}</strong></li>
+			<strong>Attempting to authenticate account {{ $authStatus->username }} to user {{ $authStatus->user->name }}</strong>
+		</li>
 		<li>And then:<br>
-			<strong>Account successfully authenticated!</strong></li>
+			<strong>Account successfully authenticated!</strong>
+		</li>
 	</ol>
 
 	<h2>Other responses mean:</h2>
