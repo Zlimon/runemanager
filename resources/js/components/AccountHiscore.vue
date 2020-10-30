@@ -1,15 +1,15 @@
 <template>
 	<div>
 		<div class="float-left ml-3">
-			<h1 class="text-left">{{ account.username }}</h1>
+			<h1 class="text-left">{{ data.username }}</h1>
 
-			<span>Rank: <strong>{{ account.rank }}</strong></span>
+			<span>Rank: <strong>{{ data.rank }}</strong></span>
 			<br>
-			<span>Total XP: <strong>{{ account.xp }}</strong></span>
+			<span>Total XP: <strong>{{ data.xp }}</strong></span>
 			<br>
-			<span>Total Level: <strong>{{ account.level }}</strong></span>
+			<span>Total Level: <strong>{{ data.level }}</strong></span>
 			<br>
-			<span>Joined: <strong>{{ account.joined }}</strong></span>
+			<span>Joined: <strong>{{ data.joined }}</strong></span>
 		</div>
 
 		<table>
@@ -37,21 +37,21 @@
 <script>
 	export default {
 		props: {
-			accountId: { type: Number, required: true },
+			account: { type: String, required: true },
 		},
 
 		data () {
 			return {
-				account: {},
+				data: {},
 				hiscores: {}
 			}
 		},
 
 		mounted() {
 			axios
-			.get('/api/account/' + this.accountId)
+			.get('/api/account/Vanskelig')
 			.then((response) => {
-				this.account = response.data.data;
+				this.data = response.data.data;
 				this.hiscores = response.data.meta.hiscores;
 			})
 			.catch(error => (console.log(error)))

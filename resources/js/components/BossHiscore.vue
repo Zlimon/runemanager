@@ -1,5 +1,12 @@
 <template>
 	<div>
+		<div class="float-left mt-3 ml-3">
+			<h1 class="text-left">{{ meta.boss }}</h1>
+
+			<span>Total Kills: <strong>{{ meta.total_kills }}</strong></span>
+			<br>
+			<span>Average Kills: <strong>{{ meta.average_total_kills }}</strong></span>
+		</div>
 		<table>
 			<tr>
 				<th>Rank</th>
@@ -9,7 +16,7 @@
 			</tr>
 			<tr v-for="(hiscore, index) in hiscores">
 				<td>{{ index + 1 }}</td>
-				<td><a :href="'/account/' + hiscore.account.id">{{ hiscore.account.username }}</a></td>
+				<td><a :href="'/account/' + hiscore.account.username">{{ hiscore.account.username }}</a></td>
 				<td>{{ hiscore.kill_count }}</td>
 				<td>{{ hiscore.rank }}</td>
 			</tr>
@@ -26,6 +33,7 @@
 		data () {
 			return {
 				hiscores: {},
+				meta: {}
 			}
 		},
 
@@ -34,6 +42,7 @@
 			.get('/api/hiscore/boss/' + this.boss)
 			.then((response) => {
 				this.hiscores = response.data.data;
+				this.meta = response.data.meta;
 			})
 			.catch(error => (console.log(error)))
 		},

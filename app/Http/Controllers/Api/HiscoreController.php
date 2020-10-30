@@ -69,7 +69,7 @@ class HiscoreController extends Controller
                     'total_xp' => number_format($sumTotalXp),
                     'average_total_level' => round($averageTotalLevel),
                     'total_max_level' => $totalMaxLevel,
-                	]]);
+            	]]);
         } else {
             return response()->json("There are no linked accounts", 404);
         }
@@ -81,9 +81,18 @@ class HiscoreController extends Controller
 
             $boss = $collection->model::with('account')->orderBy('kill_count', 'DESC')->get();
 
-            $bosses = Helper::listBosses();
+            $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
+                ->selectRaw('COUNT(*) AS total_kills')
+                ->first();
 
-            return BossHiscoreResource::collection($boss);
+            $averageTotalKills = $sumKills["total_kill_count"] / $sumKills["total_kills"];
+
+            return BossHiscoreResource::collection($boss)
+                ->additional(['meta' => [
+                    'boss' => ucfirst($bossName),
+                    'total_kills' => number_format($sumKills["total_kill_count"]),
+                    'average_total_kills' => round($averageTotalKills),
+                ]]);
         } else {
             return response()->json("There are no linked accounts", 404);
         }

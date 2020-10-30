@@ -21,7 +21,7 @@ window.Vue = require('vue');
 
 Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
 Vue.component('bosshiscore', require('./components/BossHiscore.vue').default);
-Vue.component('account', require('./components/Account.vue').default);
+Vue.component('accounthiscore', require('./components/AccountHiscore.vue').default);
 
 Vue.component(
     'passport-clients',

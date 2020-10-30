@@ -20,7 +20,7 @@
 			</tr>
 			<tr v-for="(hiscore, index) in hiscores">
 				<td>{{ index + 1 }}</td>
-				<td><a :href="'/account/' + hiscore.id">{{ hiscore.username }}</a></td>
+				<td><a :href="'/account/' + hiscore.username">{{ hiscore.username }}</a></td>
 				<td>{{ hiscore.level }}</td>
 				<td>{{ hiscore.xp }}</td>
 				<td>{{ hiscore.rank }}</td>

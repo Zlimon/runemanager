@@ -47,8 +47,8 @@ class AccountController extends Controller
      * @param  string  $username
      * @return
      */
-    public function show($account) {
-        $account = Account::findOrFail($account);
+    public function show($accountUsername) {
+        $account = Account::where('username', $accountUsername)->firstOrFail();
 
         return view('account.show', compact('account'));
     }
