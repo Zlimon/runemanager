@@ -15,6 +15,9 @@ use App\AccountAuthStatus;
 use App\Collection;
 
 use App\Http\Resources\AccountResource;
+use Illuminate\Support\Facades\Auth;
+
+use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
 {
@@ -34,14 +37,26 @@ class AccountController extends Controller
      * @param  string  $authCode
      * @return
      */
-    public function store($accountUsername) {
-        if (in_array(request('account_type'), Helper::listAccountTypes(), true)) {
-            $authStatus = AccountAuthStatus::where('username', $accountUsername)->where('status', 'pending')->first();
+    public function store(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'username' => ['required', 'string', 'min:1', 'max:13'],
+            'code' => ['required', 'string', 'min:1', 'max:8'],
+            'account_type' => ['required', Rule::in(Helper::listAccountTypes())],
+        ]);
 
-            if ($authStatus) {
+        if ($validator->fails()) {
+            foreach ($validator->messages()->all() as $value) {
+                return response($value, 202);
+            }
+        }
+
+        $authStatus = AccountAuthStatus::where('username', request('username'))->where('status', 'pending')->first();
+
+        if ($authStatus) {
+            if ($authStatus->user_id === auth()->user()->id) {
                 if (request('account_type') === $authStatus->account_type) {
                     if (request('code') === $authStatus->code) {
-                        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', $accountUsername);
+                        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
 
                         /* Get the $playerDataUrl file content. */
                         $getPlayerData = file_get_contents($playerDataUrl);
@@ -59,7 +74,7 @@ class AccountController extends Controller
                             $account = Account::create([
                                 'user_id' => $authStatus->user_id,
                                 'account_type' => request('account_type'),
-                                'username' => $accountUsername,
+                                'username' => request('username'),
                                 'rank' => $playerData[0][0],
                                 'level' => $playerData[0][1],
                                 'xp' => $playerData[0][2]
@@ -110,32 +125,32 @@ class AccountController extends Controller
                              * collection log, we have to manually create a table.
                              * This might also happen with other bosses in the future.
                              */
-                            $collectionLoot = new \App\Boss\DagannothKings;
+                            $dks = new \App\Boss\DagannothKings;
 
-                            $collectionLoot->account_id = $account->id;
-                            $collectionLoot->kill_count = $dksKillCount;
+                            $dks->account_id = $account->id;
+                            $dks->kill_count = $dksKillCount;
 
-                            $collectionLoot->save();
+                            $dks->save();
 
                             $authStatus->status = "success";
 
                             $authStatus->save();
 
-                            return response()->json("Account successfully authenticated!", 200);
+                            return response("Account successfully authenticated!", 201);
                         } else {
-                            return response()->json("Could not fetch player data from hiscores", 202);
+                            return response("Could not fetch player data from hiscores", 203);
                         }
                     } else {
-                        return response()->json("Invalid code", 202);
+                        return response("Invalid code", 202);
                     }
                 } else {
-                    return response()->json("This account is registered as ".Helper::formatAccountTypeName($authStatus->account_type).", not ".request('account_type'), 202);
+                    return response("This account is registered as ".lcfirst(Helper::formatAccountTypeName($authStatus->account_type)).", not ".request('account_type'), 202);
                 }
             } else {
-                return response()->json("This account has no pending status", 202);
+                return response("This account is not linked to your user", 401);
             }
         } else {
-            return response()->json("Not a supported account type. Valid account types: ".implode(", ", str_replace('_', ' ', Helper::listAccountTypes())), 202);
+            return response("This account has no pending status", 202);
         }
     }
 }

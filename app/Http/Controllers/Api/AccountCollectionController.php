@@ -70,18 +70,18 @@ class AccountCollectionController extends Controller
 				if ($collectionLog) {
 					return response()->json($collectionLog, 200);
 				} else {
-					return response()->json("This account does not have any registered loot for " . $collection->name, 404);
+					return response("This account does not have any registered loot for " . $collection->name, 404);
 				}
 			} else {
-				return response()->json("This collection could not be found", 404);
+				return response("This collection could not be found", 404);
 			}
 		} else {
-			return response()->json("This account could not be found", 404);
+			return response("This account is not authenticated with " . auth()->user()->name, 401);
 		}
 	}
 
 	public function update($accountUsername, $collectionName, Request $request) {
-		$account = Account::where('username', $accountUsername)->first();
+		$account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
 
 		if ($account) {
 			$collection = Collection::findByName($collectionName);
@@ -89,14 +89,18 @@ class AccountCollectionController extends Controller
 			if ($collection) {
 				$collectionLog = $collection->model::where('account_id', $account->id)->first();
 
-				$collectionLog->update($request->all());
+				if ($collectionLog) {
+					$collectionLog->update($request->all());
 
-				return response()->json($collectionLog, 201);
+					return response()->json($collectionLog, 200);
+				} else {
+					return response("This account does not have any registered loot for " . $collection->name, 404);
+				}
 			} else {
-				return response()->json("This collection could not be found", 404);
+				return response("This collection could not be found", 404);
 			}
 		} else {
-			return response()->json("This account could not be found", 404);
+			return response("This account is not authenticated with " . auth()->user()->name, 401);
 		}
 	}
 }
