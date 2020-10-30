@@ -11,7 +11,7 @@ use App\Collection;
 class AccountLootController extends Controller
 {
 	public function update($accountUsername, $collectionName, Request $request) {
-		$account = Account::where('username', $accountUsername)->first();
+		$account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
 
 		if ($account) {
 			$collection = Collection::findByName($collectionName);
@@ -23,7 +23,7 @@ class AccountLootController extends Controller
 					$oldValues = $collectionLog->getAttributes(); // Get old data
 					//array_splice($oldValues, count($oldValues) - 2, 2); // Remove created_at and updated_at
 
-					$newValues = $request->all();
+					$newValues = $request->except(['kill_count', 'rank', 'obtained']);
 
 					$sums = [];
 
@@ -47,15 +47,15 @@ class AccountLootController extends Controller
 
 					$collectionLog->update($sums);
 
-					return response()->json($collectionLog, 201);
+					return response()->json($collectionLog, 200);
 				} else {
-					return response()->json("This account does not have any registered loot for " . $collection->name, 404);
+					return response("This account does not have any registered loot for " . $collection->name, 404);
 				}
 			} else {
-				return response()->json("This collection could not be found", 404);
+				return response("This collection could not be found", 404);
 			}
 		} else {
-			return response()->json("This account could not be found", 404);
+			return response("This account is not authenticated with " . auth()->user()->name, 401);
 		}
 	}
 }
