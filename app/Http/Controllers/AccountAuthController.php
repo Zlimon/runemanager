@@ -95,15 +95,19 @@ class AccountAuthController extends Controller
 		    	return redirect()->back()->withErrors('This account is already registered as '.Helper::formatAccountTypeName(request('account_type')).'!');
 		    }
 		} else {
-			return redirect(route('create-account'))->withErrors(['You should register a Old School RuneScape account first!']);
+			return redirect(route('create-account'))->withErrors(['This account does not have a pending status anymore!']);
 		}
     }
 
     public function delete() {
     	$authStatus = AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
 
-    	$authStatus->delete();
+        if ($authStatus) {
+    	   $authStatus->delete();
 
-    	return redirect(route('create-account'))->with('message', 'Account authentication status deleted!');
+    	   return redirect(route('create-account'))->with('message', 'Account authentication status deleted!');
+        } else {
+            return redirect(route('create-account'))->withErrors(['This account does not have a pending status anymore!']);
+        }
     }
 }
