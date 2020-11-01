@@ -31,7 +31,7 @@
 
 			<div class="account-body">
 				@foreach($accounts as $result)
-					<a href="{{ route('show-account', $result->id) }}">
+					<a href="{{ route('show-account', $result->username) }}">
 						<div class="account-box">
 							<p>{{ $result->username }}</p>
 							@if ($result->user->icon_id)
@@ -46,7 +46,7 @@
 
 			<div class="account-body">
 				@foreach($accounts as $account)
-					<a href="{{ route('show-account', $account->id) }}">
+					<a href="{{ route('show-account', $account->username) }}">
 						<div class="account-box">
 							<p>{{ $account->username }}</p>
 							@if ($account->user->icon_id)

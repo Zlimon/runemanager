@@ -49,7 +49,7 @@
 
 		mounted() {
 			axios
-			.get('/api/account/Vanskelig')
+			.get('/api/account/' + this.account)
 			.then((response) => {
 				this.data = response.data.data;
 				this.hiscores = response.data.meta.hiscores;
