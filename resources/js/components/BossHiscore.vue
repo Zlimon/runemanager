@@ -28,14 +28,14 @@
 					</button>
 				</td>
 				<td>
-					<div v-if="hiscore.obtained === itemsCount">
-						<span class="rs-success">{{ hiscore.obtained }} / {{ itemsCount }}</span>
+					<div v-if="hiscore.obtained === total">
+						<span class="rs-success">{{ hiscore.obtained }} / {{ total }}</span>
 					</div>
 					<div v-else-if="hiscore.obtained > 0">
-						<span class="rs-progress">{{ hiscore.obtained }} / {{ itemsCount }}</span>
+						<span class="rs-progress">{{ hiscore.obtained }} / {{ total }}</span>
 					</div>
 					<div v-else>
-						<span class="rs-normal">{{ hiscore.obtained }} / {{ itemsCount }}</span>
+						<span class="rs-normal">{{ hiscore.obtained }} / {{ total }}</span>
 					</div>
 				</td>
 				<div :id="$id(index)" class="modal fade" role="dialog">
@@ -77,7 +77,7 @@
 			return {
 				hiscores: {},
 				meta: {},
-				itemsCount: 0
+				total: 0
 			}
 		},
 
@@ -87,7 +87,7 @@
 			.then((response) => {
 				this.hiscores = response.data.data;
 				this.meta = response.data.meta;
-				this.itemsCount = Object.keys(response.data.data[0].log).length
+				this.total = Object.keys(response.data.data[0].log).length
 			})
 			.catch(error => (console.log(error)))
 		},

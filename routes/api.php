@@ -23,20 +23,24 @@ Route::middleware('auth:api')->group(function() {
 	Route::get('/user', 'Api\UserController@user')->name('user-show');
 	Route::post('/authenticate', 'Api\AccountController@store')->name('authenticate'); // Authenticate user
 
-	Route::prefix('/account')->group(function () {
+	Route::prefix('/account')->group(function() {
 		Route::put('/{accountUsername}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
 		Route::post('/{accountUsername}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
 	});
 });
 
-Route::get('/account/{account}', 'Api\AccountController@show')->name('account-show');
-Route::get('/account/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
+Route::prefix('/account')->group(function() {
+	Route::get('/{account}', 'Api\AccountController@show')->name('account-show');
+	Route::get('/{account}/skill', 'Api\AccountController@skill')->name('account-show-skill');
+	Route::get('/{account}/boss', 'Api\AccountController@boss')->name('account-show-boss');
+	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
+});
 
-Route::prefix('/hiscore')->group(function () {
+Route::prefix('/hiscore')->group(function() {
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
 	Route::get('/boss/{skill}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
 });
 
-Route::prefix('/collection')->group(function () {
+Route::prefix('/collection')->group(function() {
 	Route::get('/{collectionType}', 'CollectionController@list');
 });

@@ -52,9 +52,9 @@
 		</div>
 
 		@if ($hiscoreType == "skill")
-			<skillhiscore skill="{{ $hiscore }}"></hiscore>
+			<skillhiscore skill="{{ $hiscore }}"></skillhiscore>
 		@elseif ($hiscoreType == "boss")
-			<bosshiscore boss="{{ $hiscore }}"></hiscore>
+			<bosshiscore boss="{{ $hiscore }}"></bosshiscore>
 		@endif
 	@else
 		<div class="text-center py-5">

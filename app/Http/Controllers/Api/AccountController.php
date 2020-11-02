@@ -15,6 +15,8 @@ use App\AccountAuthStatus;
 use App\Collection;
 
 use App\Http\Resources\AccountResource;
+use App\Http\Resources\AccountSkillResource;
+use App\Http\Resources\AccountBossResource;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Validator;
@@ -29,6 +31,14 @@ class AccountController extends Controller
      */
     public function show($accountUsername) {
         return new AccountResource(Account::where('username', $accountUsername)->firstOrFail());
+    }
+
+    public function skill($accountUsername) {
+        return new AccountSkillResource(Account::where('username', $accountUsername)->firstOrFail());
+    }
+
+    public function boss($accountUsername) {
+        return new AccountBossResource(Account::where('username', $accountUsername)->firstOrFail());
     }
 
     /**

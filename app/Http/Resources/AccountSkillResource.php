@@ -6,9 +6,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 
 use App\Helpers\Helper;
-use App\Collection;
 
-class AccountResource extends JsonResource
+class AccountSkillResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -40,20 +39,9 @@ class AccountResource extends JsonResource
             $skillHiscores[$skillName] =  DB::table($skillName)->where('account_id', $this->id)->first();
         }
 
-        $bosses = Helper::listBosses();
-
-        $bossHiscores = [];
-
-        foreach ($bosses as $bossName) {
-            $collection = Collection::findByName($bossName);
-
-            $bossHiscores[$bossName] = $collection->model::first();
-        }
-
         return [
             'meta' => [
                 'skillHiscores' => SkillResource::collection(collect($skillHiscores)),
-                'bossHiscores' => BossResource::collection(collect($bossHiscores)),
             ]
         ];
     }
