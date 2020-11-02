@@ -17,7 +17,7 @@
 				<th></th>
 				<th>Level</th>
 				<th>XP</th>
-				<th>Rank</th>
+				<th>Hiscore Rank</th>
 			</tr>
 			<tr v-for="(hiscore, key) in hiscores">
 				<td>

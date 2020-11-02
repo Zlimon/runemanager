@@ -14,8 +14,8 @@
 			<tr>
 				<th>Rank</th>
 				<th>Account</th>
-				<th>Total Level</th>
-				<th>Total XP</th>
+				<th>Level</th>
+				<th>XP</th>
 				<th>Hiscore Rank</th>
 			</tr>
 			<tr v-for="(hiscore, index) in hiscores">

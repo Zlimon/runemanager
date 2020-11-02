@@ -1960,7 +1960,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    axios.get('/api/account/Vanskelig').then(function (response) {
+    axios.get('/api/account/' + this.account).then(function (response) {
       _this.data = response.data.data;
       _this.hiscores = response.data.meta.hiscores;
     })["catch"](function (error) {
@@ -2013,6 +2013,49 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     boss: {
@@ -2023,7 +2066,8 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       hiscores: {},
-      meta: {}
+      meta: {},
+      itemsCount: 0
     };
   },
   mounted: function mounted() {
@@ -2032,9 +2076,17 @@ __webpack_require__.r(__webpack_exports__);
     axios.get('/api/hiscore/boss/' + this.boss).then(function (response) {
       _this.hiscores = response.data.data;
       _this.meta = response.data.meta;
+      _this.itemsCount = Object.keys(response.data.data[0].log).length;
     })["catch"](function (error) {
       return console.log(error);
     });
+  },
+  filters: {
+    capitalize: function capitalize(value) {
+      if (!value) return '';
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1).replace("_", " ");
+    }
   }
 });
 
@@ -39359,7 +39411,7 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("th", [_vm._v("XP")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Rank")])
+      _c("th", [_vm._v("Hiscore Rank")])
     ])
   }
 ]
@@ -39386,7 +39438,9 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "float-left mt-3 ml-3" }, [
-      _c("h1", { staticClass: "text-left" }, [_vm._v(_vm._s(_vm.meta.boss))]),
+      _c("h1", { staticClass: "text-left" }, [
+        _vm._v(_vm._s(_vm._f("capitalize")(_vm.meta.boss)))
+      ]),
       _vm._v(" "),
       _c("span", [
         _vm._v("Total Kills: "),
@@ -39420,7 +39474,146 @@ var render = function() {
             _vm._v(" "),
             _c("td", [_vm._v(_vm._s(hiscore.kill_count))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(hiscore.rank))])
+            _c("td", [_vm._v(_vm._s(hiscore.rank))]),
+            _vm._v(" "),
+            _c("td", [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-dark",
+                  attrs: {
+                    type: "button",
+                    "data-toggle": "modal",
+                    "data-target": _vm.$idRef(index)
+                  }
+                },
+                [
+                  _c("img", {
+                    attrs: {
+                      src:
+                        "https://www.osrsbox.com/osrsbox-db/items-icons/22711.png"
+                    }
+                  })
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("td", [
+              hiscore.obtained === _vm.itemsCount
+                ? _c("div", [
+                    _c("span", { staticClass: "rs-success" }, [
+                      _vm._v(
+                        _vm._s(hiscore.obtained) +
+                          " / " +
+                          _vm._s(_vm.itemsCount)
+                      )
+                    ])
+                  ])
+                : hiscore.obtained > 0
+                ? _c("div", [
+                    _c("span", { staticClass: "rs-progress" }, [
+                      _vm._v(
+                        _vm._s(hiscore.obtained) +
+                          " / " +
+                          _vm._s(_vm.itemsCount)
+                      )
+                    ])
+                  ])
+                : _c("div", [
+                    _c("span", { staticClass: "rs-normal" }, [
+                      _vm._v(
+                        _vm._s(hiscore.obtained) +
+                          " / " +
+                          _vm._s(_vm.itemsCount)
+                      )
+                    ])
+                  ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass: "modal fade",
+                attrs: { id: _vm.$id(index), role: "dialog" }
+              },
+              [
+                _c("div", { staticClass: "modal-dialog" }, [
+                  _c("div", { staticClass: "modal-content bg-dark" }, [
+                    _c(
+                      "div",
+                      { staticClass: "modal-body modal-custom text-light" },
+                      [
+                        _vm._m(1, true),
+                        _vm._v(" "),
+                        _c("h1", [_vm._v(_vm._s(hiscore.account.username))]),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "item-container" },
+                          _vm._l(hiscore.log, function(value, key) {
+                            return _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "item rounded border-secondary bg-dark p-4"
+                              },
+                              [
+                                value === 1
+                                  ? _c("div", [
+                                      _c("img", {
+                                        attrs: {
+                                          src:
+                                            "/images/boss/" +
+                                            _vm.meta.boss +
+                                            "/" +
+                                            key +
+                                            ".png"
+                                        }
+                                      })
+                                    ])
+                                  : value > 0
+                                  ? _c("div", [
+                                      _c("img", {
+                                        attrs: {
+                                          src:
+                                            "/images/boss/" +
+                                            _vm.meta.boss +
+                                            "/" +
+                                            key +
+                                            ".png"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c(
+                                        "span",
+                                        { staticClass: "item-counter rounded" },
+                                        [_vm._v(_vm._s(value))]
+                                      )
+                                    ])
+                                  : _c("div", [
+                                      _c("img", {
+                                        staticClass: "faded",
+                                        attrs: {
+                                          src:
+                                            "/images/boss/" +
+                                            _vm.meta.boss +
+                                            "/" +
+                                            key +
+                                            ".png"
+                                        }
+                                      })
+                                    ])
+                              ]
+                            )
+                          }),
+                          0
+                        )
+                      ]
+                    )
+                  ])
+                ])
+              ]
+            )
           ])
         })
       ],
@@ -39438,10 +39631,31 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("th", [_vm._v("Account")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Kill count")]),
+      _c("th", [_vm._v("Kill Count")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Hiscore Rank")])
+      _c("th", [_vm._v("Hiscore Rank")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Collection Log")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Obtained")])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: { type: "button", "data-dismiss": "modal" }
+      },
+      [
+        _c("img", {
+          attrs: { src: "/images/resource/bottom_line_mode_window_close.png" }
+        })
+      ]
+    )
   }
 ]
 render._withStripped = true
@@ -39526,9 +39740,9 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("th", [_vm._v("Account")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Total Level")]),
+      _c("th", [_vm._v("Level")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Total XP")]),
+      _c("th", [_vm._v("XP")]),
       _vm._v(" "),
       _c("th", [_vm._v("Hiscore Rank")])
     ])
@@ -40899,6 +41113,83 @@ function normalizeComponent (
     options: options
   }
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-unique-id/dist/vue-unique-id.esm.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/vue-unique-id/dist/vue-unique-id.esm.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/**
+ * vue-unique-id v3.1.4
+ * (c) 2020 Bertrand Guay-Paquet
+ * @license ISC
+ */
+var methods = {
+  /**
+   * Generate a component-scoped unique HTML identifier.
+   *
+   * Example: $id('my-id') => 'uid-42-my-id'
+   *
+   * @param {string} id id to scope
+   */
+  $idFactory: function $idFactory(uidProperty) {
+    return function $id(id) {
+      if ( id === void 0 ) id = '';
+
+      return ((this[uidProperty]) + "-" + id);
+    };
+  },
+
+  /**
+   * Generate a component-scoped unique HTML identifier reference. Prepends '#' to the id generated
+   * by the call $id(id).
+   *
+   * Example: $idRef('my-id') => '#uid-42-my-id'
+   *
+   * @param {string} id id to scope
+   */
+  $idRef: function $idRef(id) {
+    return ("#" + (this.$id(id)));
+  },
+};
+
+var DEFAULTS = {
+  // {string} Property name of the component's unique identifier. Change this if 'vm.uid' conflicts
+  // with another plugin or your own props.
+  uidProperty: 'uid',
+};
+
+function install(Vue, options) {
+  if ( options === void 0 ) options = {};
+
+  // Don't use object spread to merge the defaults because bublé transforms that to Object.assign
+  var uidProperty = options.uidProperty || DEFAULTS.uidProperty;
+
+  // Assign a unique id to each component
+  var uidCounter = 0;
+  Vue.mixin({
+    beforeCreate: function beforeCreate() {
+      var obj;
+
+      uidCounter += 1;
+      var uid = "uid-" + uidCounter;
+      Object.defineProperties(this, ( obj = {}, obj[uidProperty] = { get: function get() { return uid; } }, obj ));
+    },
+  });
+
+  // Don't use Object.assign() to match the Vue.js supported browsers (ECMAScript 5)
+  Vue.prototype.$id = methods.$idFactory(uidProperty);
+  Vue.prototype.$idRef = methods.$idRef;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (install);
 
 
 /***/ }),
@@ -52957,9 +53248,12 @@ module.exports = function(module) {
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
   \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue_unique_id__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-unique-id */ "./node_modules/vue-unique-id/dist/vue-unique-id.esm.js");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -52978,6 +53272,8 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
+
+Vue.use(vue_unique_id__WEBPACK_IMPORTED_MODULE_0__["default"]);
 Vue.component('skillhiscore', __webpack_require__(/*! ./components/SkillHiscore.vue */ "./resources/js/components/SkillHiscore.vue")["default"]);
 Vue.component('bosshiscore', __webpack_require__(/*! ./components/BossHiscore.vue */ "./resources/js/components/BossHiscore.vue")["default"]);
 Vue.component('accounthiscore', __webpack_require__(/*! ./components/AccountHiscore.vue */ "./resources/js/components/AccountHiscore.vue")["default"]);

@@ -89,7 +89,7 @@ class HiscoreController extends Controller
 
             return BossHiscoreResource::collection($boss)
                 ->additional(['meta' => [
-                    'boss' => ucfirst($bossName),
+                    'boss' => str_replace(" ", "_", $bossName),
                     'total_kills' => number_format($sumKills["total_kill_count"]),
                     'average_total_kills' => round($averageTotalKills),
                 ]]);

@@ -8,14 +8,14 @@
 
 
 	<div class="row justify-content-center">
-		<a href="{{ route('show-hiscore', ['skill', 'overall']) }}">
+		<a href="{{ route('show-hiscore', ['skill', 'overall']) }}" class="mr-2">
 			<div class="account-box">
 				<p>Skills</p>
 				<img class="pixel" src="{{ asset('images/skill') }}/Overall.png" width="54" alt="Overall skill icon">
 			</div>
 		</a>
 
-		<a href="{{ route('show-hiscore', ['boss', Helper::listBosses()[0]]) }}">
+		<a href="{{ route('show-hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
 			<div class="account-box">
 				<p>Bosses</p>
 				<img class="pixel" src="{{ asset('images/boss') }}/boss.png" width="54" alt="Overall skill icon">
