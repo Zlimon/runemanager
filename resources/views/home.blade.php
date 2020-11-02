@@ -23,8 +23,21 @@
 		<div class="col-md-5">
 			<h1 class="text-left">Welcome, {{ Auth::user()->name }}</h1>
 
-			<p>RuneScape account: <strong>{{ $user->account[0]->username }}</strong></p>
 			<p>Joined: <strong>{{ \Carbon\Carbon::parse($user->created_at)->format('d. M Y') }}</strong></p>
+
+			<p>Accounts:</p>
+
+			<div class="row align-items-center">
+				<div class="col-md-6">
+					@foreach ($user->account as $account)
+						<p><strong>{{ $account->username }}</strong></p>
+					@endforeach
+				</div>
+
+				<div class="col-md-6">
+					<a href="{{ route('create-account') }}" class="btn rs-button">Link account</a>
+				</div>
+			</div>
 		</div>
 
 		<div class="col-md-3">
@@ -44,6 +57,6 @@
 
 	@foreach ($user->account as $account)
 		<div class="py-2" style="clear: both;"></div>
-		<account :account-id="{{ $account->id }}"></account>
+		<accounthiscore account="{{ $account->username }}"></accounthiscore>
 	@endforeach
 @endsection

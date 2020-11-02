@@ -1,24 +1,38 @@
 @font-face {
-	font-family: 'runescape';
-	src: url('fonts/runescape/runescape.eot');
-	src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
-	url('fonts/runescape/runescape.woff') format('woff'),
-	url('fonts/runescape/runescape.ttf') format('truetype'),
-	url('fonts/runescape/runescape.svg') format('svg');
+    font-family: 'runescape';
+    src: url('fonts/runescape/runescape.eot');
+    src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape/runescape.woff') format('woff'),
+        url('fonts/runescape/runescape.ttf') format('truetype'),
+        url('fonts/runescape/runescape.svg#runescape') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'runescape-large';
+    src: url('fonts/runescape-large/runescape-large.eot');
+    src: url('fonts/runescape-large/runescape-large.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape-large/runescape-large.woff') format('woff'),
+        url('fonts/runescape-large/runescape-large.ttf') format('truetype'),
+        url('fonts/runescape-large/runescape-large.svg#runescape-large') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 body, html {
 	font-family: sans-serif;
-	background: url('/images/background_2.png') no-repeat;
+	background: url('/images/background_3.png') no-repeat;
 	background-position: center center;
 	background-attachment: fixed;
 }
 
 h1, h2, h3 {
-	font-family: "runescape", sans-serif;
+	font-family: "runescape-large", sans-serif;
+	font-size: 3rem;
 	text-align: center;
-	font-weight: bold;
-	color: #343a40;
 }
 
 h2, h3 {
@@ -323,4 +337,101 @@ a.selection-top, a.selection-bottom {
 
 #highscore_top .highscore_selection .mid-part > span.active {
 	display: inline-block;
+}
+
+.item-container {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	/*padding-left: 15px;*/
+}
+
+.item {
+	width: 80px;
+	height: 80px;
+	border: solid 2px;
+	white-space: nowrap;
+	position: relative;
+	margin: 5px;
+}
+
+.item-counter {
+	/*background: white;*/
+	padding: .1em;
+	/*border: solid black 1px;*/
+	color: #FFFF00;
+	top: 0;
+	right: 0;
+	position: absolute;
+	font-family: "runescape", sans-serif;
+	font-size: 1rem;
+	width: 1.75rem;
+	text-align: center;
+}
+
+.faded {
+	opacity: 0.25;
+}
+
+.rs-large-font {
+	font-family: "runescape-large", sans-serif;
+	font-size: 2rem;
+}
+
+.rs-success {
+	color: #00FF00;
+	font-family: "runescape", sans-serif;
+	font-size: 1rem;
+	font-weight: bold;
+	text-shadow: 2px 2px #343a40;
+}
+
+.rs-progress {
+	color: #FFFF00;
+	font-family: "runescape", sans-serif;
+	font-size: 1rem;
+	font-weight: bold;
+	text-shadow: 2px 2px #343a40;
+}
+
+.rs-normal {
+	color: #FF981F;
+	font-family: "runescape", sans-serif;
+	font-size: 1rem;
+	font-weight: bold;
+	text-shadow: 2px 2px #343a40;
+}
+
+.rs-button {
+	background: 
+		url('/images/resource/tile_half_left.png') no-repeat, /* top left */
+		url('/images/resource/tile_half_right.png') no-repeat, /* top right */
+		url('/images/resource/tile_middle.png') repeat-x; /* body */
+	background-position: 
+		top left, 
+		top right, 
+		center top;
+}
+
+.modal-custom {
+	background: 
+		url('/images/resource/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
+		url('/images/resource/bottom_line_mode_side_panel_corner_top_right.png') no-repeat, /* top right */
+		url('/images/resource/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat, /* bottom left */
+		url('/images/resource/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,  /* bottom right */
+		url('/images/resource/bottom_line_mode_side_panel_edge_top.png') repeat-x, /* top */
+		url('/images/resource/bottom_line_mode_side_panel_edge_left.png') repeat-y, /* left */
+		url('/images/resource/bottom_line_mode_side_panel_edge_right.png') repeat-y, /* right */
+		url('/images/resource/bottom_line_mode_side_panel_edge_bottom.png') repeat-x, /* bottom */
+		url('/images/resource/background.png'); /* body */
+	background-position: 
+		top left, 
+		top right, 
+		bottom left, 
+		bottom right, 
+		top -13px left, 
+		left -13px top 10px, 
+		right, 
+		bottom, 
+		center;
 }
