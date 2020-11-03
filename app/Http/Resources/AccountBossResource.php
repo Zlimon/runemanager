@@ -38,7 +38,7 @@ class AccountBossResource extends JsonResource
         foreach ($bosses as $bossName) {
             $collection = Collection::findByName($bossName);
 
-            $bossHiscores[$bossName] = $collection->model::first();
+            $bossHiscores[$bossName] = $collection->model::where('account_id', $this->id)->first();
         }
 
         return [
