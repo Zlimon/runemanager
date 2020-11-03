@@ -48,7 +48,7 @@
 	<div class="col-md-4 ml-auto">
 		<div class="text-light bg-dark p-4 mb-4" style="border-radius: 3px;">
 			<h1 class="text-light">Welcome to {{ config('app.name', 'RuneManager') }}</h1>
-			<p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+			<p><strong>URL:</strong> http://runemanager.habski.me</p>
 		</div>
 
 		<iframe src="https://discordapp.com/widget?id=351850127209660416&theme=dark" width="100%" height="500" allowtransparency="true" frameborder="0"></iframe>
