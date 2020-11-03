@@ -16,7 +16,7 @@ class BossHiscoreResource extends JsonResource
     {
         $collectionLog = $this->attributesToArray();
 
-        $obtained = $collectionLog["obtained"];
+        $obtained = isset($collectionLog["obtained"]) ? $collectionLog["obtained"] : 0;
 
         $collectionLog = array_diff_key($collectionLog, ["id" => 0, "account_id" => 0, "kill_count" => 0, "rank" => 0, "obtained" => 0, "created_at" => 0, "updated_at" => 0]);
 

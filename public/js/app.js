@@ -2269,7 +2269,7 @@ __webpack_require__.r(__webpack_exports__);
     capitalize: function capitalize(value) {
       if (!value) return '';
       value = value.toString();
-      return value.charAt(0).toUpperCase() + value.slice(1).replace("_", " ");
+      return value.charAt(0).toUpperCase() + value.slice(1);
     }
   }
 });
