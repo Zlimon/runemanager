@@ -112,21 +112,23 @@ class AccountController extends Controller
                             $dksKillCount = 0;
 
                             for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
-                                $collection = Collection::findByName($bosses[$bossCounter]);
+                                if ($bosses[$bossCounter] != "dagannoth kings") {
+                                    $collection = Collection::findByName($bosses[$bossCounter]);
 
-                                $collectionLoot = new $collection->model;
+                                    $collectionLoot = new $collection->model;
 
-                                $collectionLoot->account_id = $account->id;
-                                $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
-                                $collectionLoot->rank = ($playerData[$i+1][0] >= 0 ? $playerData[$i+1][0] : 0);
+                                    $collectionLoot->account_id = $account->id;
+                                    $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                                    $collectionLoot->rank = ($playerData[$i+1][0] >= 0 ? $playerData[$i+1][0] : 0);
 
-                                if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
-                                    $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                                    if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
+                                        $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                                    }
+
+                                    $collectionLoot->save();
+
+                                    $bossCounter++;
                                 }
-
-                                $collectionLoot->save();
-
-                                $bossCounter++;
                             }
 
                             /**
