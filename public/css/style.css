@@ -31,6 +31,9 @@ body, html {
 
 h1, h2, h3 {
 	font-family: "runescape-large", sans-serif;
+}
+
+h1 {
 	font-size: 3rem;
 	text-align: center;
 }
@@ -434,4 +437,8 @@ a.selection-top, a.selection-bottom {
 		right, 
 		bottom, 
 		center;
+}
+
+.notification-icon {
+	border-right: solid 2px;
 }
