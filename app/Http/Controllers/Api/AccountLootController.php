@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Account;
 use App\Collection;
 
+use App\Events\AccountNewUnique;
+use App\Events\AccountKill;
+
 class AccountLootController extends Controller
 {
 	public function update($accountUsername, $collectionName, Request $request) {
@@ -23,7 +26,7 @@ class AccountLootController extends Controller
 					$oldValues = $collectionLog->getAttributes(); // Get old data
 					//array_splice($oldValues, count($oldValues) - 2, 2); // Remove created_at and updated_at
 
-					$newValues = $request->except(['kill_count', 'rank', 'obtained']);
+					$newValues = $request->except(["id", "account_id", "kill_count", "rank", "obtained", "created_at", "updated_at"]);
 
 					$sums = [];
 
@@ -37,6 +40,15 @@ class AccountLootController extends Controller
 							// If unique loot is detected, increase the total amount of uniques obtained by 1
 							if ($oldValues[$lootType] == 0) {
 								$uniques++;
+
+								$notificationData = [
+									"category" => "boss",
+									"name" => $collectionName,
+									"loot" => [$lootType => 0],
+									"message" => $accountUsername." unlocked a new unique!"
+								];
+
+								AccountNewUnique::dispatch($notificationData);
 							}
 
 							$sums[$lootType] = (isset($newValues[$lootType]) ? $newValues[$lootType] : 0) + (isset($oldValues) ? $oldValues[$lootType] : 0);
@@ -46,6 +58,17 @@ class AccountLootController extends Controller
 					$sums["obtained"] = $uniques;
 
 					$collectionLog->update($sums);
+
+					$loot = array_diff_key($sums, ["id" => 0, "account_id" => 0, "kill_count" => 0, "rank" => 0, "obtained" => 0, "created_at" => 0, "updated_at" => 0]);
+
+					$notificationData = [
+						"category" => "boss",
+						"name" => $collectionName,
+						"loot" => $loot,
+						"message" => $accountUsername." defeated ".$collectionName.""
+					];
+
+					AccountKill::dispatch($notificationData);
 
 					return response()->json($collectionLog, 200);
 				} else {

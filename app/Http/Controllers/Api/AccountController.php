@@ -107,6 +107,8 @@ class AccountController extends Controller
 
                             $bosses = Helper::listBosses();
 
+                            array_splice($bosses, 13, 1);
+
                             $bossCounter = 0;
 
                             $dksKillCount = 0;

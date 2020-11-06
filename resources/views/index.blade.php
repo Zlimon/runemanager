@@ -51,6 +51,11 @@
 			<p><strong>URL:</strong> http://runemanager.habski.me</p>
 		</div>
 
+		<div class="text-light bg-dark p-4 mb-4" style="border-radius: 3px;">
+			<h1 class="text-light">Notification stream</h1>
+			<notification></notification>
+		</div>
+
 		<iframe src="https://discordapp.com/widget?id=351850127209660416&theme=dark" width="100%" height="500" allowtransparency="true" frameborder="0"></iframe>
 	</div>
 @endsection
