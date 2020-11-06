@@ -14,7 +14,7 @@ class AccountSkillController extends Controller
 	public function update($accountUsername, $skillName, Request $request) {
 		$account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
 
-		DB::table($skillName)->where('account_id', $account->id)->increment('level', 1, ["xp" => $request->xp]);
+		DB::table($skillName)->where('account_id', $account->id)->increment('level', 1/*, ["xp" => $request->xp]*/);
 
 		$skill = DB::table($skillName)->where('account_id', $account->id)->first();
 
