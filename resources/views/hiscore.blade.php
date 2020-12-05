@@ -8,14 +8,14 @@
 
 
 	<div class="row justify-content-center">
-		<a href="{{ route('show-hiscore', ['skill', 'overall']) }}" class="mr-2">
+		<a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
 			<div class="account-box">
 				<p>Skills</p>
 				<img class="pixel" src="{{ asset('images/skill') }}/Overall.png" width="54" alt="Overall skill icon">
 			</div>
 		</a>
 
-		<a href="{{ route('show-hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
+		<a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
 			<div class="account-box">
 				<p>Bosses</p>
 				<img class="pixel" src="{{ asset('images/boss') }}/boss.png" width="54" alt="Overall skill icon">
@@ -27,7 +27,7 @@
 		<div class="highscore_selection">
 			<span class="selection-top">
 				@foreach ($hiscoreListTop as $skill)
-					<a class="middle-icon" href="{{ route('show-hiscore', [$hiscoreType, $skill]) }}"><img class="middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"></a>
+					<a class="middle-icon" href="{{ route('hiscore', [$hiscoreType, $skill]) }}"><img class="middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"></a>
 				@endforeach
 			</span>
 			<div class="mid-part">
@@ -38,7 +38,7 @@
 			</div>
 			<span class="selection-bot">
 				@foreach ($hiscoreListBottom as $skill)
-					<a class="middle-icon" href="{{ route('show-hiscore', [$hiscoreType, $skill]) }}"><img class="middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"></a>
+					<a class="middle-icon" href="{{ route('hiscore', [$hiscoreType, $skill]) }}"><img class="middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"></a>
 				@endforeach
 			</span>
 		</div>

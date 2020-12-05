@@ -1,0 +1,23 @@
+/* MAIN */
+.news-post:before, .news-post:after {
+	background: url('/images/scroll_top.gif') no-repeat center top;
+	content: '';
+	height: 50px;
+	left: 0;
+	position: absolute;
+	top: -11px;
+	width: 100%;
+}
+
+.news-post:after {
+	background: url('/images/scroll_bottom.gif') no-repeat center bottom;
+	bottom: -11px;
+	top: auto;
+}
+
+.news-post {
+	background: url('/images/scroll_middle.gif') repeat-y top center;
+	position: relative;
+	margin: 0 auto;
+	padding: 75px;
+}

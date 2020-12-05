@@ -17,31 +17,31 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'PageController@index')->name('index');
 Route::get('/update-log', 'PageController@updateLog')->name('update-log');
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/hiscore/{hiscore}/{skill}', 'PageController@hiscore')->name('show-hiscore');
+Route::get('/hiscore/{hiscore}/{skill}', 'PageController@hiscore')->name('hiscore');
 
 /*==========Member Controller=============*/
 Route::get('/account', 'AccountController@index')->name('account');
-Route::post('/account', 'AccountController@search')->name('search-account');
-Route::get('/account/create', 'AccountController@create')->name('create-account');
-Route::get('/account/{accountUsername}', 'AccountController@show')->name('show-account');
+Route::post('/account', 'AccountController@search')->name('account-search');
+Route::get('/account/create', 'AccountController@create')->name('account-create');
+Route::get('/account/{accountUsername}', 'AccountController@show')->name('account-show');
 
-Route::get('/authenticate', 'AccountAuthController@index')->name('show-account-auth');
-Route::post('/authenticate', 'AccountAuthController@create')->name('create-account-auth');
-Route::patch('/authenticate', 'AccountAuthController@updateAccountType')->name('update-account-auth');
-Route::delete('/authenticate', 'AccountAuthController@delete')->name('delete-account-auth');
+Route::get('/authenticate', 'AccountAuthController@index')->name('account-auth-show');
+Route::post('/authenticate', 'AccountAuthController@create')->name('account-auth-create');
+Route::patch('/authenticate', 'AccountAuthController@updateAccountType')->name('account-auth-update');
+Route::delete('/authenticate', 'AccountAuthController@delete')->name('account-auth-delete');
 
 /*==========User Controller=============*/
-Route::get('/user/edit', 'UserController@edit')->name('edit-user');
-Route::patch('/user/edit', 'UserController@update')->name('update-user');
+Route::get('/user/edit', 'UserController@edit')->name('user-edit');
+Route::patch('/user/edit', 'UserController@update')->name('user-update');
 
 /*==========Tasks Controller=============*/
-Route::get('/task', 'TasksController@index')->name('task');
-Route::post('/task', 'TasksController@store')->name('store-task');
-Route::patch('/task', 'TasksController@update')->name('update-task');
+// Route::get('/task', 'TasksController@index')->name('task');
+// Route::post('/task', 'TasksController@store')->name('store-task');
+// Route::patch('/task', 'TasksController@update')->name('update-task');
 
 /*==========News Controller=============*/
 Route::get('/news', 'NewsController@index')->name('news');
-Route::get('/news/{id}', 'NewsController@show')->name('show-newspost');
+Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 
 /*==========Admin Controller=============*/
 	Route::group(['middleware' => ['permission:access admin']], function () {

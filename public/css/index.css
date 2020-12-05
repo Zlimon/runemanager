@@ -1,0 +1,113 @@
+.hiscore-button-parent {
+	width: 15rem;
+	height: 15rem;
+	overflow: hidden;
+	position: relative;
+	float: left;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.hiscore-button {
+	height: 100%;
+	width: 100%;
+	background-size: cover;
+	background-repeat: no-repeat;
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	-o-transition: all .5s;
+	transition: all .5s;
+}
+
+.bg-one {background-image: url(/images/scenery_1.png);}
+.bg-two {background-image: url(/images/scenery_2.png);}
+.bg-three {background-image: url(/images/scenery_6.png);}
+
+.hiscore-button a {
+	display: none;
+	font-size: 35px;
+	color: #ffffff !important;
+	font-family: sans-serif;
+	text-align: center;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	height: 50px;
+	cursor: pointer;
+}
+
+.hiscore-button-parent:hover .hiscore-button, .hiscore-button-parent:focus .hiscore-button {
+	-ms-transform: scale(1.2);
+	-moz-transform: scale(1.2);
+	-webkit-transform: scale(1.2);
+	-o-transform: scale(1.2);
+	transform: scale(1.2);
+}
+
+.hiscore-button-parent:hover .hiscore-button:before, .hiscore-button-parent:focus .hiscore-button:before {
+	display: block;
+}
+
+.hiscore-button-parent:hover a, .hiscore-button-parent:focus a {
+	display: block;
+}
+
+.hiscore-button:before {
+	content: "";
+	display: none;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(52,73,94,0.75);
+}
+
+@media screen and (max-width: 960px) {
+	.hiscore-button-parent {width: 100%; margin: 20px 0px}
+}
+
+/* NEWS */
+.latest-news {
+	height: 15rem;
+	transition: all .2s ease-in;
+}
+
+.latest-news .image {
+	text-align: center;
+}
+
+.latest-news .image img {
+	max-height: 175px;
+	max-width: 175px;
+}
+
+.latest-news .title {
+	font-family: 'runescape', sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+	margin-top: -10px;
+}
+
+.latest-news .title, .latest-news .meta, .latest-news .shortstory {
+	margin-left: -15px;
+}
+
+.latest-news .date {
+	text-align: center;
+	margin-top: -10px;
+}
+
+.latest-news .month {
+	font-family: 'runescape-large', sans-serif;
+	font-size: 3em;
+}
+
+.latest-news .day {
+	font-family: 'runescape-large', sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+}
