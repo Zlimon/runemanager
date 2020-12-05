@@ -4,7 +4,7 @@ namespace App\Boss;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Kreearra extends Model
+class KreeArra extends Model
 {
     protected $table = 'kreearra';
 
