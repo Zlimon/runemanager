@@ -13,3 +13,4 @@ yarn-error.log
 .vagrant
 /ssl/BaltimoreCyberTrustRoot.crt.pem
 /public/resource-packs/*
+/public/js/*
