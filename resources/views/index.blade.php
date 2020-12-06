@@ -7,7 +7,7 @@
 @section('content')
 	<link href="{{ asset('css/index.css') }}" rel="stylesheet">
 
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
 		<div class="row">
 			<div class="col-md-10 align-self-center">
 				<h1>Welcome to {{ config('app.name', 'RuneManager') }}</h1>
@@ -16,13 +16,13 @@
 
 			<div class="col-md-2 align-self-center">
 				<a href="{{ route('login') }}">
-					<div class="btn btn-block button-narrow-texture">
+					<div class="btn btn-block button-combat-style-narrow">
 						<span>Log in</span>
 					</div>
 				</a>
 
 				<a href="{{ route('register') }}">
-					<div class="btn btn-block button-narrow-texture">
+					<div class="btn btn-block button-combat-style-narrow">
 						<span>Register</span>
 					</div>
 				</a>
@@ -30,12 +30,12 @@
 		</div>
 	</div>
 
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3 mt-4">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mt-4">
 		<div class="col-md-12">
 			<div class="row justify-content-between">
 				<div class="col-md-3">
 					<a href="{{ route('hiscore', ['skill', 'overall']) }}">
-						<div class="btn btn-block button-thin-texture">
+						<div class="btn btn-block button-combat-style-thin">
 							<span>Hiscores</span>
 						</div>
 					</a>
@@ -43,7 +43,7 @@
 
 				<div class="col-md-3">
 					<a href="#">
-						<div class="btn btn-block button-thin-texture">
+						<div class="btn btn-block button-combat-style-thin">
 							<span>Calendar</span>
 						</div>
 					</a>
@@ -51,7 +51,7 @@
 
 				<div class="col-md-3">
 					<a href="{{ route('account') }}">
-						<div class="btn btn-block button-thin-texture">
+						<div class="btn btn-block button-combat-style-thin">
 							<span>Account</span>
 						</div>
 					</a>
@@ -82,11 +82,11 @@
 		</div>
 	</div>
 
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3 mt-4">
-		<h2 class="text-center header-sword-texture">Latest news and updates</h2>
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mt-4">
+		<h2 class="text-center header-chatbox-sword">Latest news and updates</h2>
 
 		@forelse ($recentPosts as $post)
-			<article class="col-md-12 latest-news mt-4 pt-4 background-rivets-texture">
+			<article class="col-md-12 latest-news mt-4 pt-4 background-dialog-iron-rivets">
 				<div class="row">
 					<div class="col-4">
 						<div class="image">
@@ -121,7 +121,7 @@
 		@endforelse
 
 		@if (count($recentPosts) > 0)
-			<a class="btn button-narrow-texture mt-3" href="{{ route('news') }}">Read more <i class="fas fa-long-arrow-alt-right"></i></a>
+			<a class="btn button-combat-style-narrow mt-3" href="{{ route('news') }}">Read more <i class="fas fa-long-arrow-alt-right"></i></a>
 		@endif
 	</div>
 @endsection

@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
 		@if ($account->user->private === 0 || (Auth::check() && $account->user->id == Auth::user()->id))
 			@if ($account->user->icon_id != null)
 				<div class="profile-icon">

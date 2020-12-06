@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
 		@if (count($accounts) > 0)
 			<h1>Search for accounts</h1>
 

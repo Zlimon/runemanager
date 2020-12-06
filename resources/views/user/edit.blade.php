@@ -16,7 +16,7 @@
 		}
 	</script>
 
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
 		<h1>{{ __('title.edit-member') }}: {{ $user->name }}</h1>
 
 		<form method="POST" action="{{ route('user-update') }}">

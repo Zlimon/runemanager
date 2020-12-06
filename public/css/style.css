@@ -46,6 +46,24 @@ h3 {
 	font-size: 2rem;
 }
 
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+table td, table th {
+	padding: 3px 5px;
+	border-bottom: 1px solid black;
+	min-width: 3rem;
+	height: 55px;
+}
+
+table th {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+}
+
 .runescape {
 	font-family: "runescape-large", sans-serif;
 }
@@ -69,7 +87,7 @@ h3 {
 	image-rendering: pixelated;
 }
 
-.dropdown-arrow-texture {
+.dropdown-bank-tag-down-arrow {
 	background: url('/resource-packs/pack-osrs-dark/bank/tag_down_arrow.png') no-repeat;
 	background-position: center center;
 	background-size: contain !important;
@@ -78,7 +96,7 @@ h3 {
 	height: 2.5rem;
 }
 
-.header-sword-texture:after {
+.header-chatbox-sword:after {
 	content: "";
 	display: block;
 	height: 1rem;
@@ -94,7 +112,7 @@ h3 {
 	margin: auto;
 }
 
-.button-thin-texture {
+.button-combat-style-thin {
 	background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin.png') no-repeat;
 	background-position: center center;
 	background-size: contain !important;
@@ -107,13 +125,13 @@ h3 {
 	transition: all .2s ease-in;
 }
 
-.button-thin-texture:hover {
+.button-combat-style-thin:hover {
 	background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin_selected.png') no-repeat;
 	background-position: center center;
 	transition: all .2s ease-in;
 }
 
-.button-narrow-texture {
+.button-combat-style-narrow {
 	background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow.png') no-repeat;
 	background-position: center center;
 	background-size: contain !important;
@@ -126,13 +144,13 @@ h3 {
 	transition: all .2s ease-in;
 }
 
-.button-narrow-texture:hover {
+.button-combat-style-narrow:hover {
 	background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow_selected.png') no-repeat;
 	background-position: center center;
 	transition: all .2s ease-in;
 }
 
-.background-panel-texture {
+.background-dialog-panel {
 	background: 
 		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
 		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat, /* top right */
@@ -155,7 +173,7 @@ h3 {
 		center;
 }
 
-.background-rivets-texture {
+.background-dialog-iron-rivets {
 	background: 
 		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_top_left.png') no-repeat, /* top left */
 		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_top_right.png') no-repeat, /* top right */

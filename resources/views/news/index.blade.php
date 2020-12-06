@@ -6,12 +6,12 @@
 
 @section('content')
 	<div class="container">
-		<div class="col-md-12 bg-dark text-light background-panel-texture py-3">
-			<h2 class="text-center header-sword-texture">Latest news and updates</h2>
+		<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
+			<h2 class="text-center header-chatbox-sword">Latest news and updates</h2>
 			
 			@forelse ($newsPosts as $post)
 				@if ($loop->first) <div class="card-columns"> @endif
-					<div class="card text-white bg-dark background-rivets-texture">
+					<div class="card text-white bg-dark background-dialog-iron-rivets">
 						<a href="{{ route('news-show', $post->id) }}">
 							<img class="card-img-top" src="{{ asset('storage') }}/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}" alt="'{{ $post->title }}' news post image">
 						</a>

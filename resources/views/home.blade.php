@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
 		<div class="row">
 			<div class="col-md-4">
 				<div class="profile-icon rounded p-1 text-center">

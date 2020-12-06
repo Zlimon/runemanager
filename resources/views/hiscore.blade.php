@@ -7,7 +7,7 @@
 @section('content')
 	<link href="{{ asset('css/hiscore.css') }}" rel="stylesheet">
 
-	<div class="col-md-12 bg-dark text-light background-panel-texture py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
 		<div class="row justify-content-center">
 			<a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
 				<div class="account-box">

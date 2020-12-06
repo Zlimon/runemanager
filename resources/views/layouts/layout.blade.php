@@ -20,10 +20,10 @@
 		<div class="container my-4">
 			<div class="row flex-column-reverse flex-md-row">
 				<div class="col-md-3">
-					<nav class="navbar navbar-dark bg-dark background-panel-texture">
+					<nav class="navbar navbar-dark bg-dark background-dialog-panel">
 						<a class="navbar-brand runescape-large" href="#">@yield('title')</a>
 
-						<button class="navbar-toggler dropdown-arrow-texture" type="button" data-toggle="collapse" data-target="#navbarDropdown"
+						<button class="navbar-toggler dropdown-bank-tag-down-arrow" type="button" data-toggle="collapse" data-target="#navbarDropdown"
 						aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation" style="border: 0;"></button>
 
 						<div class="collapse navbar-collapse" id="navbarDropdown">
@@ -45,7 +45,7 @@
 								</li>
 							</ul>
 
-							<div class="mb-2 header-sword-texture"></div>
+							<div class="mb-2 header-chatbox-sword"></div>
 
 							<p class="text-light text-center"><img class="pixel mr-1" src="{{ asset('images') }}/watch.png" style="width: 20px;" alt="Watch icon">Next update: {{ Helper::roundToNextHour() }}<img class="pixel ml-1" src="{{ asset('images') }}/watch.png" style="width: 20px;" alt="Watch icon"></p>
 						</div>
@@ -53,12 +53,12 @@
 
 					@yield('additional-content')
 
-					<div class="col-md-12 bg-dark text-light background-panel-texture py-3 mt-4">
-						<h2 class="text-center header-sword-texture">Notifications</h2>
+					<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mt-4">
+						<h2 class="text-center header-chatbox-sword">Notifications</h2>
 						<notification></notification>
 					</div>
 
-					<div class="mt-4 p-2 background-panel-texture">
+					<div class="mt-4 p-2 background-dialog-panel">
 						<iframe src="https://discordapp.com/widget?id=351850127209660416&theme=dark" width="100%" height="500" allowtransparency="true" frameborder="0"></iframe>
 					</div>
 				</div>

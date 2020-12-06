@@ -41,10 +41,10 @@
 				<div :id="$id(index)" class="modal fade" role="dialog">
 					<div class="modal-dialog">
 						<div class="modal-content bg-dark">
-							<div class="modal-body modal-custom text-light">
+							<div class="modal-body background-dialog-iron-rivets text-light">
 								<button type="button" class="close" data-dismiss="modal"><img src="/images/resource/bottom_line_mode_window_close.png"></button>
 								<h1>{{ hiscore.account.username }}</h1>
-								<div class="item-container">
+								<div class="justify-content-center">
 									<div v-for="(value, key) in hiscore.log" class="item rounded border-secondary bg-dark p-4">
 										<div v-if="value === 1">
 											<img :src="'/images/boss/' + meta.boss + '/' + key + '.png'">
