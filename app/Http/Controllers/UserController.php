@@ -59,6 +59,8 @@ class UserController extends Controller
             ]));
 
             return redirect(route('home'))->with('message', 'Profile updated!');
+        } else {
+            return redirect()->back()->withErrors('Invalid icon ID!');
         }
     }
 }

@@ -1,0 +1,74 @@
+#highscore_top .highscore_selection {
+	margin-top: 1.7em;
+	text-align: center;
+}
+
+#highscore_top .highscore_selection a {
+	display: inline-block;
+	padding: 5px 7px;
+	position: relative;
+}
+
+#highscore_top .highscore_selection a img {
+	vertical-align: middle;
+	height: 30px;
+	width: 30px;
+}
+
+#highscore_top .highscore_selection a.active,
+#highscore_top .highscore_selection a:hover {
+	background: #2D2D2B;
+}
+
+a.selection-top, a.selection-bottom {
+	background: #373530;
+}
+
+#highscore_top .highscore_selection .selection-top a.active:after,
+#highscore_top .highscore_selection .selection-top a:hover:after {
+	border-left: solid transparent 14px;
+	border-right: solid transparent 14px;
+	border-top: solid #2D2D2B 14px;
+	bottom: -14px;
+	content: "";
+	height: 0;
+	left: 50%;
+	margin-left: -14px;
+	position: absolute;
+	width: 0;
+	z-index: 10;
+}
+
+#highscore_top .highscore_selection .selection-bot a.active:after,
+#highscore_top .highscore_selection .selection-bot a:hover:after {
+	border-left: solid transparent 14px;
+	border-right: solid transparent 14px;
+	border-bottom: solid #2D2D2B 14px;
+	top: -14px;
+	content: "";
+	height: 0;
+	left: 50%;
+	margin-left: -14px;
+	position: absolute;
+	width: 0;
+	z-index: 10;
+}
+
+#highscore_top .highscore_selection .mid-part > span {
+	display: none;
+	padding: 20px 40px;
+	text-align: center;
+	font-size: 1.7em;
+	font-weight: 300;
+	
+	border-radius: 15px;
+}
+
+#highscore_top .highscore_selection .mid-part > span img {
+	vertical-align: middle;
+	padding-right: 10px;
+}
+
+#highscore_top .highscore_selection .mid-part > span.active {
+	display: inline-block;
+}

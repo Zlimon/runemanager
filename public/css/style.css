@@ -24,8 +24,8 @@
 
 body, html {
 	font-family: sans-serif;
-	background-color: gray;
 	background: url('/images/background_3.png') no-repeat;
+	background-color: gray;
 	background-position: center center;
 	background-attachment: fixed;
 }
@@ -61,12 +61,16 @@ h3 {
 
 .nav-link:hover {
 	padding-left: 1rem;
-	background-color: rgb(52, 58, 64);
+	background-color: rgb(0, 0, 0, 0.25);
 	transition: all .2s ease-in;
 }
 
+.pixel {
+	image-rendering: pixelated;
+}
+
 .dropdown-arrow-texture {
-	background: url('/images/resource-packs/pack-2010-legacy/bank/tag_down_arrow.png') no-repeat;
+	background: url('/resource-packs/pack-osrs-dark/bank/tag_down_arrow.png') no-repeat;
 	background-position: center center;
 	background-size: contain !important;
 	transition: all .2s ease-in;
@@ -79,9 +83,9 @@ h3 {
 	display: block;
 	height: 1rem;
 	background: 
-		url('/images/resource-packs/pack-2010-legacy/chatbox/sword_pointed_left.png') no-repeat,
-		url('/images/resource-packs/pack-2010-legacy/options/round_check_box.png') no-repeat,
-		url('/images/resource-packs/pack-2010-legacy/chatbox/sword_pointed_right.png') no-repeat;
+		url('/resource-packs/pack-osrs-dark/chatbox/sword_pointed_left.png') no-repeat,
+		url('/resource-packs/pack-osrs-dark/options/round_check_box.png') no-repeat,
+		url('/resource-packs/pack-osrs-dark/chatbox/sword_pointed_right.png') no-repeat;
 	background-position: 
 		left, 
 		center, 
@@ -91,7 +95,7 @@ h3 {
 }
 
 .button-thin-texture {
-	background: url('/images/resource-packs/pack-2010-legacy/button/combat_style_thin.png') no-repeat;
+	background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin.png') no-repeat;
 	background-position: center center;
 	background-size: contain !important;
 	image-rendering: pixelated;
@@ -104,13 +108,13 @@ h3 {
 }
 
 .button-thin-texture:hover {
-	background: url('/images/resource-packs/pack-2010-legacy/button/combat_style_thin_selected.png') no-repeat;
+	background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin_selected.png') no-repeat;
 	background-position: center center;
 	transition: all .2s ease-in;
 }
 
 .button-narrow-texture {
-	background: url('/images/resource-packs/pack-2010-legacy/button/combat_style_narrow.png') no-repeat;
+	background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow.png') no-repeat;
 	background-position: center center;
 	background-size: contain !important;
 	image-rendering: pixelated;
@@ -123,22 +127,22 @@ h3 {
 }
 
 .button-narrow-texture:hover {
-	background: url('/images/resource-packs/pack-2010-legacy/button/combat_style_narrow_selected.png') no-repeat;
+	background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow_selected.png') no-repeat;
 	background-position: center center;
 	transition: all .2s ease-in;
 }
 
 .background-panel-texture {
 	background: 
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat, /* top right */
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat, /* bottom left */
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,  /* bottom right */
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_edge_top.png') repeat-x, /* top */
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y, /* left */
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y, /* right */
-		url('/images/resource-packs/pack-2010-legacy/dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x, /* bottom */
-		url('/images/resource-packs/pack-2010-legacy/dialog/background.png'); /* body */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat, /* top right */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat, /* bottom left */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,  /* bottom right */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_top.png') repeat-x, /* top */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y, /* left */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y, /* right */
+		url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x, /* bottom */
+		url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
 	background-position: 
 		top left, 
 		top right, 
@@ -153,15 +157,15 @@ h3 {
 
 .background-rivets-texture {
 	background: 
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_corner_top_left.png') no-repeat, /* top left */
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_corner_top_right.png') no-repeat, /* top right */
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_corner_bottom_left.png') no-repeat, /* bottom left */
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_corner_bottom_right.png') no-repeat,  /* bottom right */
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_edge_top.png') repeat-x, /* top */
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_vertical.png') repeat-y, /* left */
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_edge_right.png') repeat-y, /* right */
-		url('/images/resource-packs/pack-2010-legacy/dialog/iron_rivets_bottom.png') repeat-x, /* bottom */
-		url('/images/resource-packs/pack-2010-legacy/dialog/background.png'); /* body */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_top_left.png') no-repeat, /* top left */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_top_right.png') no-repeat, /* top right */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_bottom_left.png') no-repeat, /* bottom left */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_bottom_right.png') no-repeat,  /* bottom right */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_edge_top.png') repeat-x, /* top */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_vertical.png') repeat-y, /* left */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_edge_right.png') repeat-y, /* right */
+		url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_bottom.png') repeat-x, /* bottom */
+		url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
 	background-position: 
 		top left, 
 		top right, 
@@ -172,4 +176,23 @@ h3 {
 		right, 
 		bottom -15px left, 
 		center;
+}
+
+.button-enter-wilderness-teleport-texture {
+	background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport.png') no-repeat;
+	background-position: center center;
+	background-size: contain !important;
+	image-rendering: pixelated;
+	font-family: 'runescape', sans-serif;
+	font-weight: bold;
+	font-size: 1.5em;
+	color: white;
+	line-height: 4rem;
+	transition: all .2s ease-in;
+}
+
+.button-enter-wilderness-teleport-texture:hover {
+	background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport_hovered.png') no-repeat;
+	background-position: center center;
+	transition: all .2s ease-in;
 }

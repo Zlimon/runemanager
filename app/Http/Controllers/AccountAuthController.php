@@ -20,7 +20,7 @@ class AccountAuthController extends Controller
 			if ($authStatus) {
 				return view('account.auth', compact('authStatus'));
 			} else {
-				return redirect(route('create-account'))->withErrors(['You should register a Old School RuneScape account first!']);
+				return redirect(route('account-create'))->withErrors(['You should register a Old School RuneScape account first!']);
 			}
 		} else {
 			return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
@@ -87,7 +87,7 @@ class AccountAuthController extends Controller
 
 			    	$authStatus->save();
 
-			    	return redirect(route('show-account-auth'))->with('message', 'Account authentication status deleted!');
+			    	return redirect(route('account-auth-show'))->with('message', 'Account type updated!');
 		        } else {
 		            return redirect()->back()->withErrors('Could not find this Old School RuneScape account! Did you pick correct account type?');
 		        }
@@ -95,7 +95,7 @@ class AccountAuthController extends Controller
 		    	return redirect()->back()->withErrors('This account is already registered as '.Helper::formatAccountTypeName(request('account_type')).'!');
 		    }
 		} else {
-			return redirect(route('create-account'))->withErrors(['This account does not have a pending status anymore!']);
+			return redirect(route('account-create'))->withErrors(['This account does not have a pending status anymore!']);
 		}
     }
 
@@ -105,9 +105,9 @@ class AccountAuthController extends Controller
         if ($authStatus) {
     	   $authStatus->delete();
 
-    	   return redirect(route('create-account'))->with('message', 'Account authentication status deleted!');
+    	   return redirect(route('account-create'))->with('message', 'Account authentication status deleted!');
         } else {
-            return redirect(route('create-account'))->withErrors(['This account does not have a pending status anymore!']);
+            return redirect(route('account-create'))->withErrors(['This account does not have a pending status anymore!']);
         }
     }
 }

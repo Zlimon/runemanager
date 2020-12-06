@@ -27,7 +27,7 @@ class HomeController extends Controller
         $user = Auth::user();
 
         if ($user->account == null || count($user->account) <= 0) {
-            return redirect(route('create-account'))->withErrors(['You must link an Old School RuneScape account to access this feature!']);
+            return redirect(route('account-create'))->withErrors(['You must link an Old School RuneScape account to access this feature!']);
         } else {
             return view('home', compact('user'));
         }

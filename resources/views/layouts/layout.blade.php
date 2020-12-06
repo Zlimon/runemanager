@@ -20,7 +20,7 @@
 		<div class="container my-4">
 			<div class="row flex-column-reverse flex-md-row">
 				<div class="col-md-3">
-					<nav class="navbar navbar-dark background-panel-texture">
+					<nav class="navbar navbar-dark bg-dark background-panel-texture">
 						<a class="navbar-brand runescape-large" href="#">@yield('title')</a>
 
 						<button class="navbar-toggler dropdown-arrow-texture" type="button" data-toggle="collapse" data-target="#navbarDropdown"

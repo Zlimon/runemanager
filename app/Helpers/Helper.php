@@ -30,13 +30,15 @@ class Helper
      * @return
      */
     public static function randomItemId() {
-        $randomItemId = rand(0,15000);
+        $randomItemId = rand(10000,25000);
 
-        if (self::verifyItem($randomItemId)) {
-            return $randomItemId;
-        } else {
-            return self::randomItemId();
-        }
+        return $randomItemId;
+
+        // if (self::verifyItem($randomItemId)) {
+        //     return $randomItemId;
+        // } else {
+        //     return self::randomItemId();
+        // }
     }
 
     /**

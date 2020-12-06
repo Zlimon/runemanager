@@ -85,7 +85,7 @@
 	<div class="col-md-12 bg-dark text-light background-panel-texture py-3 mt-4">
 		<h2 class="text-center header-sword-texture">Latest news and updates</h2>
 
-		@foreach ($recentPosts as $post)
+		@forelse ($recentPosts as $post)
 			<article class="col-md-12 latest-news mt-4 pt-4 background-rivets-texture">
 				<div class="row">
 					<div class="col-4">
@@ -116,8 +116,12 @@
 					</div>
 				</div>
 			</article>
-		@endforeach
+		@empty
+			<p>test</p>
+		@endforelse
 
-		<a class="btn button-narrow-texture mt-3" href="{{ route('news') }}">Read more <i class="fas fa-long-arrow-alt-right"></i></a>
+		@if (count($recentPosts) > 0)
+			<a class="btn button-narrow-texture mt-3" href="{{ route('news') }}">Read more <i class="fas fa-long-arrow-alt-right"></i></a>
+		@endif
 	</div>
 @endsection
