@@ -1,12 +1,12 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ __('title.create-member') }}
+	Link account
 @endsection
 
 @section('content')
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
-		<h1>{{ __('title.create-member') }}</h1>
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
+		<h1 class="text-center header-chatbox-sword">Link account</h1>
 
 		<form method="POST" action="{{ route('account-auth-create') }}">
 			@csrf

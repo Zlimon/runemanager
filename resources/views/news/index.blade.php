@@ -6,7 +6,7 @@
 
 @section('content')
 	<div class="container">
-		<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
+		<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
 			<h2 class="text-center header-chatbox-sword">Latest news and updates</h2>
 			
 			@forelse ($newsPosts as $post)

@@ -36,29 +36,29 @@
 				</td>
 				<td>
 					<div v-if="hiscore.obtained === hiscore.total">
-						<span class="rs-success">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
+						<span class="runescape-success">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
 					</div>
 					<div v-else-if="hiscore.obtained > 0">
-						<span class="rs-progress">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
+						<span class="runescape-progress">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
 					</div>
 					<div v-else>
-						<span class="rs-normal">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
+						<span class="runescape-danger">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
 					</div>
 				</td>
 				<div :id="$id(index.replace(/ /g, '_'))" class="modal fade" role="dialog">
 					<div class="modal-dialog">
 						<div class="modal-content bg-dark">
-							<div class="modal-body modal-custom text-light">
-								<button type="button" class="close" data-dismiss="modal"><img src="/images/resource/bottom_line_mode_window_close.png"></button>
+							<div class="modal-body background-dialog-iron-rivets text-light">
+								<button class="btn btn-lg button-window-close float-right" data-dismiss="modal"></button>
 								<h1>{{ data.username }}</h1>
-								<div class="item-container">
-									<div v-for="(value, key) in hiscore.log" class="item rounded border-secondary bg-dark p-4">
+								<div class="d-flex flex-row flex-wrap justify-content-center">
+									<div v-for="(value, key) in hiscore.log" class="collection-log-item rounded border-secondary bg-dark p-4">
 										<div v-if="value === 1">
 											<img :src="'/images/boss/' + index.replace(/ /g, '_') + '/' + key + '.png'">
 										</div>
 										<div v-else-if="value > 0">
 											<img :src="'/images/boss/' + index.replace(/ /g, '_') + '/' + key + '.png'">
-											<span class="item-counter rounded">{{ value }}</span>
+											<span class="collection-log-item-counter runescape-progress rounded">{{ value }}</span>
 										</div>
 										<div v-else>
 											<img :src="'/images/boss/' + index.replace(/ /g, '_') + '/' + key + '.png'" class="faded">

@@ -1,14 +1,14 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ __('title.create-member') }}
+	Authentication
 @endsection
 
 @section('content')
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
-		<h2>Account authentication status for:</h2>
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
+		<h3>Account authentication status for:</h3>
 
-		<h1>{{ $authStatus->username }}</h1>
+		<h1 class="text-center header-chatbox-sword">{{ $authStatus->username }}</h1>
 
 		<div class="form-group row">
 			<label for="status" class="col-md-4 text-md-right">Status:</label>

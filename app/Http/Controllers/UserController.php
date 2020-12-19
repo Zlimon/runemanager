@@ -32,7 +32,7 @@ class UserController extends Controller
 
         $randomIcons = [];
 
-        for ($i=0; count($randomIcons) < 10; $i++) {
+        for ($i=0; count($randomIcons) < 12; $i++) {
             if ($icon_id = Helper::randomItemId()) {
                 array_push($randomIcons, $icon_id);
             }
@@ -48,19 +48,19 @@ class UserController extends Controller
      * @return
      */
     public function update(User $user) {
-        if (request('icon_id') == null || request('icon_id') == 0 || Helper::verifyItem(request('icon_id'))) {
+        if ((int)request('icon_id') > 0 && Helper::verifyItem(request('icon_id'))) {
             Auth::user()->update(request()->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 
                     Rule::unique('users')->ignore(Auth::user()->id),
                 ],
                 'private' => ['boolean'],
-                'icon_id' => ['nullable', 'integer']
+                'icon_id' => ['integer']
             ]));
 
             return redirect(route('home'))->with('message', 'Profile updated!');
         } else {
-            return redirect()->back()->withErrors('Invalid icon ID!');
+            return redirect()->back()->withErrors('Invalid icon ID! Try an unnoted item.');
         }
     }
 }

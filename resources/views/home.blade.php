@@ -5,19 +5,13 @@
 @endsection
 
 @section('content')
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
 		<div class="row">
 			<div class="col-md-4">
 				<div class="profile-icon rounded p-1 text-center">
-					@if ($user->icon_id)
-						<img class="pixel" style="margin-right: -15px;" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png" width="150" alt="Profile icon">
-						<br>
-						<span><a href="{{ route('user-edit') }}">Edit profile</a></span>
-					@else
-						<img class="pixel" style="margin-right: -15px;" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Helper::randomItemId() }}.png" width="150" alt="Profile icon">
-						<br>
-						<span>Get your own profile icon <a href="{{ route('user-edit') }}">here</a>!</span>
-					@endif
+					<img class="pixel" style="margin-right: -15px;" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png" width="150" alt="Profile icon">
+					<br>
+					<span><a href="{{ route('user-edit') }}">Edit profile</a></span>
 				</div>
 			</div>
 
@@ -26,18 +20,30 @@
 
 				<p>Joined: <strong>{{ \Carbon\Carbon::parse($user->created_at)->format('d. M Y') }}</strong></p>
 
-				<p>Accounts:</p>
+				<div class="background-dialog-iron-rivets px-4 pt-1">
+					<h3 class="text-center">Accounts</h3>
 
-				<div class="row align-items-center">
-					<div class="col-md-6">
-						@foreach ($user->account as $account)
-							<p><strong>{{ $account->username }}</strong></p>
-						@endforeach
-					</div>
+					@foreach ($user->account as $account)
+						<div class="row align-items-center">
+							<div class="col-md-8">
+								<p>@if ($account->account_type != "normal")<img class="pixel mr-1" src="{{ asset('images') }}/{{ $account->account_type }}.png" style="width: 20px;" alt="Account type icon">@endif<strong>{{ $account->username }}</strong></p>
+							</div>
 
-					<div class="col-md-6">
-						<a href="{{ route('account-create') }}" class="btn rs-button">Link account</a>
-					</div>
+							<div class="col-md-4">
+								<span>Total level:</span>
+								<br>
+								<span><strong>{{ $account->level }}</strong></span>
+							</div>
+						</div>
+
+						<hr>
+					@endforeach
+
+					<a href="{{ route('account-create') }}">
+						<div class="btn btn-block button-combat-style-thin">
+							<span>Link account</span>
+						</div>
+					</a>
 				</div>
 			</div>
 

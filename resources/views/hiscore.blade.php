@@ -1,25 +1,27 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ ucfirst($hiscore) }} {{ __('title.hiscore') }}
+	{{ ucfirst($hiscore) }}
 @endsection
 
 @section('content')
 	<link href="{{ asset('css/hiscore.css') }}" rel="stylesheet">
 
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
 		<div class="row justify-content-center">
 			<a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
-				<div class="account-box">
-					<p>Skills</p>
+				<div class="btn btn-lg background-world-map" style="width: 7rem; height: 6rem;">
 					<img class="pixel" src="{{ asset('images/skill') }}/Overall.png" width="54" alt="Overall skill icon">
+					<br>
+					<span>Skills</span>
 				</div>
 			</a>
 
 			<a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
-				<div class="account-box">
-					<p>Bosses</p>
+				<div class="btn btn-lg background-world-map" style="width: 7rem; height: 6rem;">
 					<img class="pixel" src="{{ asset('images/boss') }}/boss.png" width="54" alt="Overall skill icon">
+					<br>
+					<span>Bosses</span>
 				</div>
 			</a>
 		</div>

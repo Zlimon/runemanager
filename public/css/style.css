@@ -86,13 +86,7 @@ table th
 
 .runescape
 {
-    font-family: 'runescape-large', sans-serif;
-}
-
-.runescape-large
-{
-    font-family: 'runescape-large', sans-serif;
-    font-size: 2rem;
+    font-family: 'runescape', sans-serif;
 }
 
 .runescape-normal
@@ -101,17 +95,7 @@ table th
     font-size: 1rem;
     font-weight: bold;
 
-    color: #ff981f;
-    text-shadow: 2px 2px #343a40;
-}
-
-.runescape-success
-{
-    font-family: 'runescape', sans-serif;
-    font-size: 1rem;
-    font-weight: bold;
-
-    color: #0f0;
+    color: #b47224;
     text-shadow: 2px 2px #343a40;
 }
 
@@ -121,8 +105,34 @@ table th
     font-size: 1rem;
     font-weight: bold;
 
-    color: #ff0;
+    color: #efef00;
     text-shadow: 2px 2px #343a40;
+}
+
+.runescape-success
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+
+    color: #08b108;
+    text-shadow: 2px 2px #343a40;
+}
+
+.runescape-danger
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+
+    color: #d30202;
+    text-shadow: 2px 2px #343a40;
+}
+
+.runescape-large
+{
+    font-family: 'runescape-large', sans-serif;
+    font-size: 2rem;
 }
 
 .nav-link
@@ -183,7 +193,7 @@ table th
 
     transition: all .2s ease-in;
 
-    color: white;
+    color: #cbcbcb;
     background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin.png') no-repeat;
     background-position: center center;
     background-size: contain !important;
@@ -208,7 +218,7 @@ table th
 
     transition: all .2s ease-in;
 
-    color: white;
+    color: #cbcbcb;
     background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow.png') no-repeat;
     background-position: center center;
     background-size: contain !important;
@@ -268,7 +278,7 @@ table th
     center;
 }
 
-.button-enter-wilderness-teleport-texture
+.button-enter-wilderness-teleport
 {
     font-family: 'runescape', sans-serif;
     font-size: 1.5em;
@@ -277,7 +287,7 @@ table th
 
     transition: all .2s ease-in;
 
-    color: white;
+    color: #cbcbcb;
     background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport.png') no-repeat;
     background-position: center center;
     background-size: contain !important;
@@ -285,7 +295,7 @@ table th
     image-rendering: pixelated;
 }
 
-.button-enter-wilderness-teleport-texture:hover
+.button-enter-wilderness-teleport:hover
 {
     transition: all .2s ease-in;
 
@@ -295,14 +305,6 @@ table th
 
 .button-window-close
 {
-    font-family: 'runescape', sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-    line-height: 4rem;
-
-    transition: all .2s ease-in;
-
-    color: white;
     background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close.png') no-repeat;
     background-position: center center;
     background-size: contain !important;
@@ -312,10 +314,69 @@ table th
 
 .button-window-close:hover
 {
-    transition: all .2s ease-in;
-
     background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close_hovered.png') no-repeat;
     background-position: center center;
+}
+
+.background-world-map
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+
+    image-rendering: pixelated;
+}
+
+.background-world-map:hover
+{
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background_brighter.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+}
+
+.button-static
+{
+    width: 12rem;
+    height: 4rem;
 }
 
 .collection-log-item
@@ -331,7 +392,56 @@ table th
     border: solid 2px;
 }
 
+.collection-log-item-counter
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    width: 1.75rem;
+    padding: .1em;
+
+    text-align: center;
+}
+
 .faded
 {
     opacity: .25;
+}
+
+.notification-icon
+{
+    border-right: solid 2px;
+}
+
+.icon-radio [type=radio]
+{
+    position: absolute;
+
+    width: 0;
+    height: 0;
+
+    opacity: 0;
+}
+
+.icon-radio [type=radio] + img
+{
+    padding: 8px 8px 8px 8px;
+
+    cursor: pointer;
+}
+
+.icon-radio [type=radio] + img:hover
+{
+    border-radius: 5px;
+    background: #99855d;
+}
+
+.icon-radio [type=radio]:checked + img
+{
+    padding: 5px 5px 5px 5px;
+
+    border: solid #755b41 3px;
+    border-radius: 5px;
+    background: #99855d;
 }

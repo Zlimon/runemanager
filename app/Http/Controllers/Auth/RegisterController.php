@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\Helper;
 
 class RegisterController extends Controller
 {
@@ -29,7 +30,13 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    //protected $redirectTo = RouteServiceProvider::HOME;
+
+    protected function redirectTo()
+    {
+        session()->flash('message', 'To use RuneManager, you have to link your Old School RuneScape account!'); 
+        return '/account/create';
+    }
 
     /**
      * Create a new controller instance.
@@ -68,6 +75,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'icon_id' => Helper::randomItemId(true),
         ]);
     }
 }

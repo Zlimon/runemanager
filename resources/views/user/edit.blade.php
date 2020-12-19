@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ __('title.edit-member') }}: {{ $user->name }}
+	Edit user
 @endsection
 
 @section('content')
@@ -16,8 +16,8 @@
 		}
 	</script>
 
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
-		<h1>{{ __('title.edit-member') }}: {{ $user->name }}</h1>
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
+		<h1 class="text-center header-chatbox-sword">{{ $user->name }}</h1>
 
 		<form method="POST" action="{{ route('user-update') }}">
 			@method('PATCH')

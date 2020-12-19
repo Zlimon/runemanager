@@ -5,18 +5,11 @@
 @endsection
 
 @section('content')
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
 		@if ($account->user->private === 0 || (Auth::check() && $account->user->id == Auth::user()->id))
-			@if ($account->user->icon_id != null)
-				<div class="profile-icon">
-					<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="150" alt="Profile icon">
-				</div>
-			@elseif ((Auth::check() && $account->user->id == Auth::user()->id) && $account->user->icon_id == null))
-				<div class="profile-icon">
-					<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Helper::randomItemId() }}.png" width="150" alt="Profile icon">
-					<p>Get your own profile icon <a href="{{ route('user-edit') }}">here</a>!</p>
-				</div>
-			@endif
+			<div class="profile-icon">
+				<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="150" alt="Profile icon">
+			</div>
 
 			<accounthiscore account="{{ $account->username }}"></accounthiscore>
 		@else

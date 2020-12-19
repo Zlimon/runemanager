@@ -7,30 +7,47 @@
 @section('content')
 	<link href="{{ asset('css/index.css') }}" rel="stylesheet">
 
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3">
-		<div class="row">
-			<div class="col-md-10 align-self-center">
+	<div class="row">
+		<div class="col-md-9 mb-3">
+			<div class="col-md-12 p-4 align-self-center bg-dark text-light background-dialog-panel">
 				<h1>Welcome to {{ config('app.name', 'RuneManager') }}</h1>
 				<span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
 			</div>
+		</div>
 
-			<div class="col-md-2 align-self-center">
-				<a href="{{ route('login') }}">
-					<div class="btn btn-block button-combat-style-narrow">
-						<span>Log in</span>
-					</div>
-				</a>
+		<div class="col-md-3 mb-3">
+			<div class="col-md-12 p-4 bg-dark text-light background-dialog-panel">
+				@guest
+					<div class="align-self-center">
+						<a href="{{ route('login') }}">
+							<div class="btn btn-block button-combat-style-narrow">
+								<span>Log in</span>
+							</div>
+						</a>
 
-				<a href="{{ route('register') }}">
-					<div class="btn btn-block button-combat-style-narrow">
-						<span>Register</span>
+						<a href="{{ route('register') }}">
+							<div class="btn btn-block button-combat-style-narrow">
+								<span>Register</span>
+							</div>
+						</a>
 					</div>
-				</a>
+				@else
+					<a href="{{ route('account-show', Auth::user()->name) }}">
+						<div class="btn btn-block background-world-map">
+							@if (Auth::user()->icon_id)
+								<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png" width="60" alt="Profile icon">
+							@endif
+							<span>{{ Auth::user()->name }}</span>
+						</div>
+					</a>
+
+					<p><a href="{{ route('home') }}">Home</a></p>
+				@endif
 			</div>
 		</div>
 	</div>
 
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mt-4">
+	<div class="bg-dark text-light background-dialog-panel p-4 mb-3">
 		<div class="col-md-12">
 			<div class="row justify-content-between">
 				<div class="col-md-3">
@@ -82,7 +99,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mt-4">
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
 		<h2 class="text-center header-chatbox-sword">Latest news and updates</h2>
 
 		@forelse ($recentPosts as $post)
@@ -120,7 +137,7 @@
 			<p>test</p>
 		@endforelse
 
-		@if (count($recentPosts) > 0)
+		@if (!empty($recentPosts))
 			<a class="btn button-combat-style-narrow mt-3" href="{{ route('news') }}">Read more <i class="fas fa-long-arrow-alt-right"></i></a>
 		@endif
 	</div>

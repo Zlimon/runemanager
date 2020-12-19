@@ -1,15 +1,18 @@
 <template>
 	<div>
-		<!-- <div class="account-box">
-			<p>Skills</p>
-			<img class="pixel" src="/images/skill/overall.png" width="54" alt="Overall skill icon">
-		</div> -->
-
 		<div v-if="skills">
-			<button type="button" class="btn float-right account-box" v-on:click="toggle"><img class="pixel" src="/images/boss/boss.png" width="54" alt="Overall skill icon"></button>
+			<div class="btn btn-lg float-right background-world-map" style="width: 7rem; height: 6rem;" v-on:click="toggle">
+				<img class="pixel" src="/images/boss/boss.png" width="54" alt="Overall skill icon">
+				<br>
+				<span>Bosses</span>
+			</div>
 		</div>
 		<div v-else>
-			<button type="button" class="btn float-right account-box" v-on:click="toggle"><img class="pixel" src="/images/skill/overall.png" width="54" alt="Overall skill icon"></button>
+			<div class="btn btn-lg float-right background-world-map" style="width: 7rem; height: 6rem;" v-on:click="toggle">
+				<img class="pixel" src="/images/skill/overall.png" width="54" alt="Overall skill icon">
+				<br>
+				<span>Skills</span>
+			</div>
 		</div>
 
 		<keep-alive>

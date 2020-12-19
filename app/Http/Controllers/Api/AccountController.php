@@ -84,7 +84,7 @@ class AccountController extends Controller
                             $account = Account::create([
                                 'user_id' => $authStatus->user_id,
                                 'account_type' => request('account_type'),
-                                'username' => request('username'),
+                                'username' => ucfirst(request('username')),
                                 'rank' => $playerData[0][0],
                                 'level' => $playerData[0][1],
                                 'xp' => $playerData[0][2]
@@ -135,7 +135,8 @@ class AccountController extends Controller
                              * Since there are no official total kill count hiscore for
                              * DKS' and we are going to retrieve loot for them from the
                              * collection log, we have to manually create a table.
-                             * This might also happen with other bosses in the future.
+                             * This might also happen with other bosses in the future
+                             * that share collection log entry, but have seperate hiscores.
                              */
                             $dks = new \App\Boss\DagannothKings;
 

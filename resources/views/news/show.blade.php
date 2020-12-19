@@ -1,13 +1,13 @@
 @extends('layouts.layout')
 
 @section('title')
-	"{{ $post->title }}"
+	{{ $post->title }}
 @endsection
 
 @section('content')
 	<link href="{{ asset('css/news.css') }}" rel="stylesheet">
 
-	<div class="news-post">
+	<div class="news-post mb-3">
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><a href="{{ route('news') }}">News</a></li>
