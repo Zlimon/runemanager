@@ -34,7 +34,7 @@ class RegisterController extends Controller
 
     protected function redirectTo()
     {
-        session()->flash('message', 'To use RuneManager, you have to link your Old School RuneScape account!'); 
+        session()->flash('message', 'Welcome to RuneManager! To use RuneManager, you have to link your Old School RuneScape account!'); 
         return '/account/create';
     }
 
