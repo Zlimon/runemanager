@@ -102,20 +102,18 @@
 
 				<div class="col-md-9">
 					@if ($errors->any())
-						<div class="alert alert-danger col-md-4 background-dialog-iron-rivets mb-1" style="margin: auto; border: 0;">
+						<div class="alert alert-danger bg-dark col-md-8 background-dialog-iron-rivets mb-1" style="margin: auto; border: 0;">
 							@foreach ($errors->all() as $errorMessage)
-								<h3 class="runescape-danger">Error!</h3>
-								<p style="font-size: 1.25rem;">{{ $errorMessage }}</p>
+								<h1 class="runescape-danger font-medium">Error!</h1>
+								<p>{{ $errorMessage }}</p>
 							@endforeach
 						</div>
 					@endif
 
 					@if (Session::has('message'))
-						<div class="alert alert-success col-md-4 background-dialog-iron-rivets mb-1" style="margin: auto; border: 0;">
-							<div class="runescape-success">
-								<h3>Success!</h3>
-							</div>
-							<p style="font-size: 1.25rem;">{{ Session::get('message') }}</p>
+						<div class="alert alert-success bg-dark col-md-8 background-dialog-iron-rivets mb-1" style="margin: auto; border: 0;">
+							<h1 class="runescape-success font-medium">Success!</h1>
+							<p>{{ Session::get('message') }}</p>
 						</div>
 					@endif
 

@@ -92,7 +92,6 @@ table th
 .runescape-normal
 {
     font-family: 'runescape', sans-serif;
-    font-size: 1rem;
     font-weight: bold;
 
     color: #b47224;
@@ -102,7 +101,6 @@ table th
 .runescape-progress
 {
     font-family: 'runescape', sans-serif;
-    font-size: 1rem;
     font-weight: bold;
 
     color: #efef00;
@@ -112,7 +110,6 @@ table th
 .runescape-success
 {
     font-family: 'runescape', sans-serif;
-    font-size: 1rem;
     font-weight: bold;
 
     color: #08b108;
@@ -122,17 +119,25 @@ table th
 .runescape-danger
 {
     font-family: 'runescape', sans-serif;
-    font-size: 1rem;
     font-weight: bold;
 
     color: #d30202;
     text-shadow: 2px 2px #343a40;
 }
 
-.runescape-large
+.font-small
 {
-    font-family: 'runescape-large', sans-serif;
+    font-size: 1rem;
+}
+
+.font-medium
+{
     font-size: 2rem;
+}
+
+.font-big
+{
+    font-size: 3rem;
 }
 
 .nav-link
