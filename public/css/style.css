@@ -46,17 +46,17 @@ h3
 
 h1
 {
-    font-size: 4rem;
+    font-size: 4rem !important;
 }
 
 h2
 {
-    font-size: 3rem;
+    font-size: 3rem !important;
 }
 
 h3
 {
-    font-size: 2rem;
+    font-size: 2rem !important;
 }
 
 table
@@ -125,19 +125,24 @@ table th
     text-shadow: 2px 2px #343a40;
 }
 
+.runescape-large
+{
+    font-family: 'runescape-large', sans-serif;
+}
+
 .font-small
 {
-    font-size: 1rem;
+    font-size: 1rem !important;
 }
 
 .font-medium
 {
-    font-size: 2rem;
+    font-size: 2rem !important;
 }
 
 .font-big
 {
-    font-size: 3rem;
+    font-size: 3rem !important;
 }
 
 .nav-link

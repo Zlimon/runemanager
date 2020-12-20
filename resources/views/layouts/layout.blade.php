@@ -22,8 +22,8 @@
 				<div class="col-md-3">
 					<div class="col-md-12 bg-dark background-dialog-panel mb-3">
 						<nav class="col-md-12 navbar navbar-dark">
-							<a class="navbar-brand runescape-large" href="#" data-toggle="collapse" data-target="#navbarDropdown"
-							aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation">@yield('title')</a>
+							<h3 class="navbar-brand" href="#" data-toggle="collapse" data-target="#navbarDropdown"
+							aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation">@yield('title')</h3>
 
 							<button class="navbar-toggler dropdown-bank-tag-down-arrow" type="button" data-toggle="collapse" data-target="#navbarDropdown"
 							aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation" style="border: 0;"></button>
