@@ -23,7 +23,7 @@
 				<td>{{ hiscore.kill_count }}</td>
 				<td>{{ hiscore.rank }}</td>
 				<td>
-					<button type="button" class="btn btn-dark" data-toggle="modal" :data-target="$idRef(index)">
+					<button type="button" class="btn btn-dark background-world-map" data-toggle="modal" :data-target="$idRef(index)">
 						<img src="https://www.osrsbox.com/osrsbox-db/items-icons/22711.png">
 					</button>
 				</td>
