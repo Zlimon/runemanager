@@ -30,9 +30,6 @@
 
 							<div class="collapse navbar-collapse" id="navbarDropdown">
 								<ul class="navbar-nav mr-auto">
-									<li class="nav-item active">
-										<a class="nav-link" href="{{ route('index') }}"><img class="pixel mr-1" src="{{ asset('images') }}/home.png" style="width: 20px;" alt="Overall skill icon">Home <span class="sr-only">(current)</span></a>
-									</li>
 									<li class="nav-item">
 										<a class="nav-link" href="{{ route('news') }}"><img class="pixel mr-1" src="{{ asset('images') }}/newspaper.png" style="width: 20px;" alt="News icon">News</a>
 									</li>
@@ -51,37 +48,37 @@
 
 						<div class="mb-2 header-chatbox-sword"></div>
 
-						<ul class="col-md-12 navbar-nav mr-auto">
-							<div class="col-md-12">
-							<li class="nav-item active">
-								<a class="nav-link" href="{{ route('index') }}"><img class="pixel mr-1" src="{{ asset('images') }}/home.png" style="width: 20px;" alt="Overall skill icon">Home <span class="sr-only">(current)</span></a>
-							</li>
-							@guest
-	                            <li class="nav-item">
-	                            	<a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-	                            </li>
-	                            @if (Route::has('register'))
-	                                <li class="nav-item">
-	                                	<a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-	                                </li>
-	                            @endif
-	                        @else
-	                        	<li class="nav-item">
-	                        		<a class="nav-link" href="{{ route('home') }}"><img class="pixel mr-1" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png" alt="Profile icon" style="width: 20px;">{{ Auth::user()->name }}</a>
-	                        	</li>
-								<li class="nav-item">
-									<a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-		                             	<img class="pixel mr-1" src="{{ asset('images') }}/logout_small.png" style="width: 20px;" alt="Accounts icon">
-		                                {{ __('Log out') }}
-		                            </a>
-		                        </li>
+						<nav class="col-md-12 navbar-dark">
+							<ul class="navbar-nav mr-auto">
+								<li class="nav-item active">
+									<a class="nav-link" href="{{ route('index') }}"><img class="pixel mr-1" src="{{ asset('images') }}/home.png" style="width: 20px;" alt="Overall skill icon">Home <span class="sr-only">(current)</span></a>
+								</li>
+								@guest
+		                            <li class="nav-item">
+		                            	<a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+		                            </li>
+		                            @if (Route::has('register'))
+		                                <li class="nav-item">
+		                                	<a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+		                                </li>
+		                            @endif
+		                        @else
+		                        	<li class="nav-item">
+		                        		<a class="nav-link" href="{{ route('home') }}"><img class="pixel mr-1" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png" alt="Profile icon" style="width: 20px;">{{ Auth::user()->name }}</a>
+		                        	</li>
+									<li class="nav-item">
+										<a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+			                             	<img class="pixel mr-1" src="{{ asset('images') }}/logout_small.png" style="width: 20px;" alt="Accounts icon">
+			                                {{ __('Log out') }}
+			                            </a>
+			                        </li>
 
-	                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-	                                @csrf
-	                            </form>
-	                        @endguest
-	                    </div>
-	                    </ul>
+		                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+		                                @csrf
+		                            </form>
+		                        @endguest
+		                    </ul>
+			            </nav>
 
 						<div class="mb-2 header-chatbox-sword"></div>
 
