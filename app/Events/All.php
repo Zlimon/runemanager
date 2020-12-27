@@ -10,10 +10,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-use App\Account;
 use App\Notification;
 
-class AccountLevelUp implements ShouldBroadcast
+class All implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -24,9 +23,9 @@ class AccountLevelUp implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(Account $account, Notification $notification)
+    public function __construct(Notification $notification)
     {
-        $this->notification = $notification::with('category')->where('account_id', $account->id)->orderBy('id', 'DESC')->first();
+        $this->notification = $notification::with('category')->orderBy('id', 'DESC')->first();
     }
 
     /**
@@ -36,6 +35,6 @@ class AccountLevelUp implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('account');
+        return new Channel('all');
     }
 }

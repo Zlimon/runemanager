@@ -10,6 +10,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
+use App\Account;
+use App\Notification;
+
 class AccountNewUnique implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
@@ -21,9 +24,9 @@ class AccountNewUnique implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($notification)
+    public function __construct(Account $account, Notification $notification)
     {
-        $this->notification = $notification;
+        $this->notification = $notification::with('category')->where('account_id', $account->id)->orderBy('id', 'DESC')->first();
     }
 
     /**

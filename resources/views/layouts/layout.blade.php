@@ -89,7 +89,7 @@
 
 					<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
 						<h2 class="text-center header-chatbox-sword">Notifications</h2>
-						<notification></notification>
+						<allnotification></allnotification>
 					</div>
 
 					<div class="col-md-12 p-2 background-dialog-panel mb-3">

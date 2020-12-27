@@ -15,10 +15,12 @@ class CreateNotificationsTable extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id')->unsigned();
             $table->integer('account_id')->unsigned();
-            $table->enum('category', ['boss', 'skill']);
-            $table->json('data');
+            $table->integer('category_id')->unsigned();
+            $table->string('icon');
             $table->string('message');
+            $table->text('data')->nullable();
             $table->timestamps();
         });
     }

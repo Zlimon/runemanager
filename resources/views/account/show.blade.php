@@ -11,7 +11,15 @@
 				<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="150" alt="Profile icon">
 			</div>
 
-			<accounthiscore account="{{ $account->username }}"></accounthiscore>
+			<div class="row">
+				<div class="col-md-8">
+					<accounthiscore account="{{ $account->username }}"></accounthiscore>
+				</div>
+
+				<div class="col-md-4">
+					<accountnotification :account="{{ $account }}"></accountnotification>
+				</div>
+			</div>
 		@else
 			<div class="text-center py-5">
 				<img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px" alt="Sad face">

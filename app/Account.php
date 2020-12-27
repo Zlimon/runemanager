@@ -18,4 +18,8 @@ class Account extends Model
     public function user() {
         return $this->belongsTo(User::class);
     }
+
+    public function notification() {
+        return $this->hasMany(Notification::class);
+    }
 }

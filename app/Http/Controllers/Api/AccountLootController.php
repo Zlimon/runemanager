@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 
 use App\Account;
 use App\Collection;
+use App\Notification;
 
+use App\Events\All;
 use App\Events\AccountNewUnique;
 use App\Events\AccountKill;
 
@@ -41,14 +43,24 @@ class AccountLootController extends Controller
 							if ($oldValues[$lootType] == 0) {
 								$uniques++;
 
+								$dataJson = '{"loot":'.json_encode([$lootType => 0]).'}';
+
+								$data = json_decode($dataJson, true);
+
 								$notificationData = [
-									"category" => "boss",
-									"name" => $collectionName,
-									"loot" => [$lootType => 0],
-									"message" => $accountUsername." unlocked a new unique!"
+									"user_id" => auth()->user()->id,
+									"account_id" => $account->id,
+									"category_id" => 2,
+									"icon" => $collectionName,
+									"message" => $accountUsername." unlocked a new unique!",
+									"data" => $data
 								];
 
-								AccountNewUnique::dispatch($notificationData);
+								$notification = Notification::create($notificationData);
+
+								All::dispatch($notification);
+
+								AccountNewUnique::dispatch($account, $notification);
 							}
 
 							$sums[$lootType] = (isset($newValues[$lootType]) ? $newValues[$lootType] : 0) + (isset($oldValues) ? $oldValues[$lootType] : 0);
@@ -61,14 +73,24 @@ class AccountLootController extends Controller
 
 					$loot = array_diff_key($sums, ["id" => 0, "account_id" => 0, "kill_count" => 0, "rank" => 0, "obtained" => 0, "created_at" => 0, "updated_at" => 0]);
 
+					$dataJson = '{"loot":'.json_encode($loot).'}';
+
+					$data = json_decode($dataJson, true);
+
 					$notificationData = [
-						"category" => "boss",
-						"name" => $collectionName,
-						"loot" => $loot,
-						"message" => $accountUsername." defeated ".$collectionName.""
+						"user_id" => auth()->user()->id,
+						"account_id" => $account->id,
+						"category_id" => 2,
+						"icon" => $collectionName,
+						"message" => $accountUsername." defeated ".$collection->alias."",
+						"data" => $data
 					];
 
-					AccountKill::dispatch($notificationData);
+					$notification = Notification::create($notificationData);
+
+					All::dispatch($notification);
+
+					AccountKill::dispatch($account, $notification);
 
 					return response()->json($collectionLog, 200);
 				} else {

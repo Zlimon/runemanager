@@ -45,3 +45,8 @@ Route::prefix('/hiscore')->group(function() {
 Route::prefix('/collection')->group(function() {
 	Route::get('/{collectionType}', 'CollectionController@list');
 });
+
+Route::prefix('/notification')->group(function() {
+	Route::get('/all', 'Api\NotificationController@index')->name('notification-show-all');
+	Route::get('/account/{accountUsername}', 'Api\NotificationController@show')->name('notification-account-show');
+});
