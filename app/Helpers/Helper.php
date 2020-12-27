@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Account;
 use Carbon\Carbon;
+use App\Collection;
 
 class Helper
 {
@@ -121,7 +122,12 @@ class Helper
     }
 
     public static function listBosses() {
-        return ["abyssal sire", "alchemical hydra", "barrows chests", "bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric challenge mode", "chaos elemental", "chaos fanatic", "commander zilyana", "corporeal beast", "crazy archaeologist", "dagannoth kings", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist", "general graardor", "giant mole","grotesque guardians", "hespori", "kalphite queen", "king black dragon", "kraken", "kreearra", "kril tsutsaroth", "mimic", "the nightmare", "obor", "sarachnis", "scorpia", "skotizo", "the gauntlet", "the corrupted gauntlet", "theatre of blood", "thermonuclear smoke devil", "tzkal zuk", "tztok jad", "venenatis", "vetion", "vorkath", "wintertodt", "zalcano", "zulrah"];
+        return Collection::pluck('name')->toArray();
+        // return ["abyssal sire", "alchemical hydra", "barrows chests", "bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric challenge mode", "chaos elemental", "chaos fanatic", "commander zilyana", "corporeal beast", "crazy archaeologist", "dagannoth kings", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist", "general graardor", "giant mole","grotesque guardians", "hespori", "kalphite queen", "king black dragon", "kraken", "kreearra", "kril tsutsaroth", "mimic", "the nightmare", "obor", "sarachnis", "scorpia", "skotizo", "the gauntlet", "the corrupted gauntlet", "theatre of blood", "thermonuclear smoke devil", "tzkal zuk", "tztok jad", "venenatis", "vetion", "vorkath", "wintertodt", "zalcano", "zulrah"];
+    }
+
+    public static function collectionAttribute($collection, $attribute) {
+        return Collection::where('name', $collection)->value($attribute);
     }
 
     public static function registerAccount($accountName) {
