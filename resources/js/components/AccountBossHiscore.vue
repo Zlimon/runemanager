@@ -35,8 +35,8 @@
 					</button>
 				</td>
 				<td>
-					<div v-if="hiscore.obtained === hiscore.total">
-						<span class="runescape-success">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
+					<div v-if="(hiscore.obtained !== null ? hiscore.obtained : 0) === hiscore.total">
+						<span class="runescape-success">{{ (hiscore.obtained !== null ? hiscore.obtained : 0) }} / {{ hiscore.total }}</span>
 					</div>
 					<div v-else-if="hiscore.obtained > 0">
 						<span class="runescape-progress">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
