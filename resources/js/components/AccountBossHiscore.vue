@@ -42,7 +42,7 @@
 						<span class="runescape-progress">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
 					</div>
 					<div v-else>
-						<span class="runescape-danger">{{ hiscore.obtained }} / {{ hiscore.total }}</span>
+						<span class="runescape-danger">{{ (hiscore.obtained !== null ? hiscore.obtained : 0) }} / {{ hiscore.total }}</span>
 					</div>
 				</td>
 				<div :id="$id(index.replace(/ /g, '_'))" class="modal fade" role="dialog">
