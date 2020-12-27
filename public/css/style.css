@@ -1,326 +1,457 @@
-@font-face {
-	font-family: 'runescape';
-	src: url('fonts/runescape/runescape.eot');
-	src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
-	url('fonts/runescape/runescape.woff') format('woff'),
-	url('fonts/runescape/runescape.ttf') format('truetype'),
-	url('fonts/runescape/runescape.svg') format('svg');
+@font-face
+{
+    font-family: 'runescape';
+    font-weight: normal;
+    font-style: normal;
+
+    src: url('fonts/runescape/runescape.eot');
+    src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
+    url('fonts/runescape/runescape.woff') format('woff'),
+    url('fonts/runescape/runescape.ttf') format('truetype'),
+    url('fonts/runescape/runescape.svg#runescape') format('svg');
+    font-display: swap;
 }
 
-body, html {
-	font-family: sans-serif;
-	background: url('/images/background_2.png') no-repeat;
-	background-position: center center;
-	background-attachment: fixed;
+@font-face
+{
+    font-family: 'runescape-large';
+    font-weight: normal;
+    font-style: normal;
+
+    src: url('fonts/runescape-large/runescape-large.eot');
+    src: url('fonts/runescape-large/runescape-large.eot?#iefix') format('embedded-opentype'),
+    url('fonts/runescape-large/runescape-large.woff') format('woff'),
+    url('fonts/runescape-large/runescape-large.ttf') format('truetype'),
+    url('fonts/runescape-large/runescape-large.svg#runescape-large') format('svg');
+    font-display: swap;
 }
 
-h1, h2, h3 {
-	font-family: "runescape", sans-serif;
-	text-align: center;
-	font-weight: bold;
-	color: #343a40;
+body,
+html
+{
+    font-family: sans-serif;
+
+    background: url('/images/background_3.png') no-repeat;
+    background-color: gray;
+    background-attachment: fixed;
+    background-position: center center;
 }
 
-h2, h3 {
-	text-align: left;
+h1,
+h2,
+h3
+{
+    font-family: 'runescape-large', sans-serif;
 }
 
-table {
-	border-collapse: collapse;
-	width: 100%;
+h1
+{
+    font-size: 4rem !important;
 }
 
-table td, table th {
-	padding: 3px 5px;
-	border-bottom: 1px solid black;
-	min-width: 3rem;
-	height: 55px;
+h2
+{
+    font-size: 3rem !important;
 }
 
-table th {
-	padding-top: 12px;
-	padding-bottom: 12px;
-	text-align: left;
+h3
+{
+    font-size: 2rem !important;
 }
 
-a:link {color: #1e6dae;}
-a:visited {color: #1e6dae;}
-a:hover {color: black;}
-a:active {color: black;}
+table
+{
+    width: 100%;
 
-a:link {text-decoration: none;}
-a:visited {text-decoration: none;}
-a:hover {text-decoration: underline;}
-a:active {text-decoration: none;}
-
-@media (min-width: 1200px) {
-	.container {
-		max-width: 1250px;
-	}
+    border-collapse: collapse;
 }
 
-.pixel {
-	image-rendering: pixelated;
+table td,
+table th
+{
+    min-width: 3rem;
+    height: 55px;
+    padding: 3px 5px;
+
+    border-bottom: 1px solid black;
 }
 
-.middle-icon {
-	display: inline-block;
-	max-width: 100%;
-	margin: -2px;
-	padding: -2px;
+table th
+{
+    padding-top: 12px;
+    padding-bottom: 12px;
+
+    text-align: left;
 }
 
-img.middle-img-icon {
-	width: 50px;
-	height: 50px;
-	object-fit: contain;
+.runescape
+{
+    font-family: 'runescape', sans-serif;
 }
 
-/* MAIN */
-.main-page:before, .main-page:after {
-	background: url('/images/scroll_top.gif') no-repeat center top;
-	content: '';
-	height: 50px;
-	left: 0;
-	position: absolute;
-	top: -11px;
-	width: 100%;
+.runescape-normal
+{
+    font-family: 'runescape', sans-serif;
+    font-weight: bold;
+
+    color: #b47224;
+    text-shadow: 2px 2px #343a40;
 }
 
-.main-page:after {
-	background: url('/images/scroll_bottom.gif') no-repeat center bottom;
-	bottom: -11px;
-	top: auto;
+.runescape-progress
+{
+    font-family: 'runescape', sans-serif;
+    font-weight: bold;
+
+    color: #efef00;
+    text-shadow: 2px 2px #343a40;
 }
 
-.main-page {
-	background: url('/images/scroll_middle.gif') repeat-y top center;
-	position: relative;
-	margin: 0 auto;
-	padding: 75px;
+.runescape-success
+{
+    font-family: 'runescape', sans-serif;
+    font-weight: bold;
+
+    color: #08b108;
+    text-shadow: 2px 2px #343a40;
 }
 
-/* NEWS */
-.latest-news {
-	border-bottom: solid black 1px;
-	padding: 20px 0px 20px 0px;
-	transition: all .2s ease-in;
-	height: 175px;
+.runescape-danger
+{
+    font-family: 'runescape', sans-serif;
+    font-weight: bold;
+
+    color: #d30202;
+    text-shadow: 2px 2px #343a40;
 }
 
-.latest-news:hover {
-	background: rgba(0, 0, 0, 0.2);
+.runescape-large
+{
+    font-family: 'runescape-large', sans-serif;
 }
 
-.latest-news .content a:link {color: black;}
-.latest-news .content a:visited {color: black;}
-.latest-news .content a:hover {color: black;}
-.latest-news .content a:active {color: black;}
-
-.latest-news .content a:link {text-decoration: none;}
-.latest-news .content a:visited {text-decoration: none;}
-.latest-news .content a:hover {text-decoration: none;}
-.latest-news .content a:active {text-decoration: none;}
-
-.latest-news .image {
-	text-align: center;
+.font-small
+{
+    font-size: 1rem !important;
 }
 
-.latest-news .image img {
-	max-height: 175px;
-	max-width: 175px;
+.font-medium
+{
+    font-size: 2rem !important;
 }
 
-.latest-news .title {
-	font-family: 'runescape', sans-serif;
-	font-weight: bold;
-	font-size: 2em;
-	margin-top: -10px;
+.font-big
+{
+    font-size: 3rem !important;
 }
 
-.latest-news .title:hover {
-	color: #666666;
+.nav-link
+{
+    transition: all .2s ease-in;
 }
 
-.latest-news .meta {
-	padding-bottom: 5px;
+.nav-link:hover
+{
+    padding-left: 1rem;
+
+    transition: all .2s ease-in;
+
+    background-color: rgb(0, 0, 0, .25);
 }
 
-.latest-news .title, .latest-news .meta, .latest-news .shortstory {
-	margin-left: -15px;
+.pixel
+{
+    image-rendering: pixelated;
 }
 
-.latest-news .date {
-	text-align: center;
-	margin-top: -10px;
-	margin-left: -15px;
+.dropdown-bank-tag-down-arrow
+{
+    width: 2.5rem;
+    height: 2.5rem;
+
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/bank/tag_down_arrow.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
 }
 
-.latest-news .month {
-	font-family: 'runescape', sans-serif;
-	font-weight: bold;
-	font-size: 2em;
+.header-chatbox-sword:after
+{
+    display: block;
+
+    max-width: 10rem;
+    height: 1rem;
+    margin: auto;
+
+    content: '';
+
+    background: url('/resource-packs/pack-osrs-dark/chatbox/sword_pointed_left.png') no-repeat,
+    url('/resource-packs/pack-osrs-dark/options/round_check_box.png') no-repeat,
+    url('/resource-packs/pack-osrs-dark/chatbox/sword_pointed_right.png') no-repeat;
+    background-position: left,
+    center,
+    right;
 }
 
-.latest-news .day {
-	font-family: 'runescape', sans-serif;
-	font-weight: bold;
-	font-size: 2em;
+.button-combat-style-thin
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 4rem;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
 }
 
-/* MEMBER */
-.member-body {
-	padding: 0;
-	margin: 0;
-	list-style: none;
-	display: flex;
-	flex-flow: row wrap;
-	justify-content: space-around;
+.button-combat-style-thin:hover
+{
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin_selected.png') no-repeat;
+    background-position: center center;
 }
 
-.member-box {
-	background: url('/images/button.gif') no-repeat;
-	background-position: center;
-	padding: 10px 5px 0px 5px;
-	width: 152px;
-	height: 126px;
-	margin-top: 10px;
-	color: white;
-	font-size: 1.5em;
-	font-weight: bold;
-	text-align: center;
-	transition: width .5s, height .5s, padding .5s;
+.button-combat-style-narrow
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 4rem;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
 }
 
-.member-box:hover {
-	width: 172px;
-	height: 146px;
-	padding: 20px 5px 0px 5px;
+.button-combat-style-narrow:hover
+{
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow_selected.png') no-repeat;
+    background-position: center center;
 }
 
-/* PROFILE */
-.profile-icon {
-	background: #99855D;
-	border: solid #755B41 3px;
-	border-radius: 5px;
-	padding: 5px 5px 5px 15px;
-	text-align: center;
-	float: left;
+.background-dialog-panel
+{
+    background: url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top -13px left,
+    left -13px top 10px,
+    right,
+    bottom,
+    center;
 }
 
-.profile-icon span {
-	padding-right: 10px;
+.background-dialog-iron-rivets
+{
+    background: url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_vertical.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/dialog/iron_rivets_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top -15px left,
+    left -15px top 10px,
+    right,
+    bottom -15px left,
+    center;
 }
 
-/* EDIT USER */
-.icon-radio [type=radio] { 
-	position: absolute;
-	opacity: 0;
-	width: 0;
-	height: 0;
+.button-enter-wilderness-teleport
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 4rem;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
 }
 
-.icon-radio [type=radio] + img {
-	cursor: pointer;
-	padding: 8px 8px 8px 8px;
+.button-enter-wilderness-teleport:hover
+{
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport_hovered.png') no-repeat;
+    background-position: center center;
 }
 
-.icon-radio [type=radio] + img:hover {
-	background: #99855D;
-	border-radius: 5px;
+.button-window-close
+{
+    background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
 }
 
-.icon-radio [type=radio]:checked + img {
-	background: #99855D;
-	border: solid #755B41 3px;
-	border-radius: 5px;
-	padding: 5px 5px 5px 5px;
+.button-window-close:hover
+{
+    background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close_hovered.png') no-repeat;
+    background-position: center center;
 }
 
-/* TASK */
-.task-progress-body {
-	display: flex;
-	flex-flow: row;
-	justify-content: space-between;
+.background-world-map
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+
+    image-rendering: pixelated;
 }
 
-.task-box {
-	background: #99855D;
-	border-width: 3px;
+.background-world-map:hover
+{
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background_brighter.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
 }
 
-/* HISCORE */
-#highscore_top .highscore_selection {
-	margin-top: 1.7em;
-	text-align: center;
+.button-static
+{
+    width: 12rem;
+    height: 4rem;
 }
 
-#highscore_top .highscore_selection a {
-	display: inline-block;
-	padding: 5px 7px;
-	position: relative;
+.collection-log-item
+{
+    position: relative;
+
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+
+    white-space: nowrap;
+
+    border: solid 2px;
 }
 
-#highscore_top .highscore_selection a img {
-	vertical-align: middle;
-	height: 30px;
-	width: 30px;
+.collection-log-item-counter
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    width: 1.75rem;
+    padding: .1em;
+
+    text-align: center;
 }
 
-#highscore_top .highscore_selection a.active,
-#highscore_top .highscore_selection a:hover {
-	background: #2D2D2B;
+.faded
+{
+    opacity: .25;
 }
 
-a.selection-top, a.selection-bottom {
-	background: #373530;
+.notification-icon
+{
+    border-right: solid 2px;
 }
 
-#highscore_top .highscore_selection .selection-top a.active:after,
-#highscore_top .highscore_selection .selection-top a:hover:after {
-	border-left: solid transparent 14px;
-	border-right: solid transparent 14px;
-	border-top: solid #2D2D2B 14px;
-	bottom: -14px;
-	content: "";
-	height: 0;
-	left: 50%;
-	margin-left: -14px;
-	position: absolute;
-	width: 0;
-	z-index: 10;
+.icon-radio [type=radio]
+{
+    position: absolute;
+
+    width: 0;
+    height: 0;
+
+    opacity: 0;
 }
 
-#highscore_top .highscore_selection .selection-bot a.active:after,
-#highscore_top .highscore_selection .selection-bot a:hover:after {
-	border-left: solid transparent 14px;
-	border-right: solid transparent 14px;
-	border-bottom: solid #2D2D2B 14px;
-	top: -14px;
-	content: "";
-	height: 0;
-	left: 50%;
-	margin-left: -14px;
-	position: absolute;
-	width: 0;
-	z-index: 10;
+.icon-radio [type=radio] + img
+{
+    padding: 8px 8px 8px 8px;
+
+    cursor: pointer;
 }
 
-#highscore_top .highscore_selection .mid-part > span {
-	display: none;
-	padding: 20px 40px;
-	text-align: center;
-	font-size: 1.7em;
-	font-weight: 300;
-	
-	border-radius: 15px;
+.icon-radio [type=radio] + img:hover
+{
+    border-radius: 5px;
+    background: #99855d;
 }
 
-#highscore_top .highscore_selection .mid-part > span img {
-	vertical-align: middle;
-	padding-right: 10px;
-}
+.icon-radio [type=radio]:checked + img
+{
+    padding: 5px 5px 5px 5px;
 
-#highscore_top .highscore_selection .mid-part > span.active {
-	display: inline-block;
+    border: solid #755b41 3px;
+    border-radius: 5px;
+    background: #99855d;
 }

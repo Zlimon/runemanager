@@ -1,0 +1,99 @@
+#highscore_top .highscore_selection
+{
+    margin-top: 1.7em;
+
+    text-align: center;
+}
+
+#highscore_top .highscore_selection a
+{
+    position: relative;
+
+    display: inline-block;
+
+    padding: 5px 7px;
+}
+
+#highscore_top .highscore_selection a img
+{
+    width: 30px;
+    height: 30px;
+
+    vertical-align: middle;
+}
+
+#highscore_top .highscore_selection a.active,
+#highscore_top .highscore_selection a:hover
+{
+    background: #2d2d2b;
+}
+
+a.selection-top,
+a.selection-bottom
+{
+    background: #373530;
+}
+
+#highscore_top .highscore_selection .selection-top a.active:after,
+#highscore_top .highscore_selection .selection-top a:hover:after
+{
+    position: absolute;
+    z-index: 10;
+    bottom: -14px;
+    left: 50%;
+
+    width: 0;
+    height: 0;
+    margin-left: -14px;
+
+    content: '';
+
+    border-top: solid #2d2d2b 14px;
+    border-right: solid transparent 14px;
+    border-left: solid transparent 14px;
+}
+
+#highscore_top .highscore_selection .selection-bot a.active:after,
+#highscore_top .highscore_selection .selection-bot a:hover:after
+{
+    position: absolute;
+    z-index: 10;
+    top: -14px;
+    left: 50%;
+
+    width: 0;
+    height: 0;
+    margin-left: -14px;
+
+    content: '';
+
+    border-right: solid transparent 14px;
+    border-bottom: solid #2d2d2b 14px;
+    border-left: solid transparent 14px;
+}
+
+#highscore_top .highscore_selection .mid-part > span
+{
+    font-size: 1.7em;
+    font-weight: 300;
+
+    display: none;
+
+    padding: 20px 40px;
+
+    text-align: center;
+
+    border-radius: 15px;
+}
+
+#highscore_top .highscore_selection .mid-part > span img
+{
+    padding-right: 10px;
+
+    vertical-align: middle;
+}
+
+#highscore_top .highscore_selection .mid-part > span.active
+{
+    display: inline-block;
+}

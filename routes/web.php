@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,30 +14,34 @@
 */
 
 /*==========Pages Controller=============*/
-Route::get('/', 'PagesController@index')->name('index');
-Route::get('/update-log', 'PagesController@updateLog')->name('update-log');
-Route::get('/hiscore/{skill}', 'PagesController@hiscore')->name('show-skill');
+Route::get('/', 'PageController@index')->name('index');
+Route::get('/update-log', 'PageController@updateLog')->name('update-log');
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/hiscore/{hiscore}/{skill}', 'PageController@hiscore')->name('hiscore');
 
 /*==========Member Controller=============*/
-Route::get('/member', 'AccountsController@index')->name('member');
-Route::post('/member', 'AccountsController@search')->name('search-member');
-Route::get('/member/create', 'AccountsController@create')->name('create-member');
-Route::post('/member/create', 'AccountsController@verifyAccount')->name('store-member');
-Route::get('/member/{id}', 'AccountsController@show')->name('show-member');
+Route::get('/account', 'AccountController@index')->name('account');
+Route::post('/account', 'AccountController@search')->name('account-search');
+Route::get('/account/create', 'AccountController@create')->name('account-create');
+Route::get('/account/{accountUsername}', 'AccountController@show')->name('account-show');
+
+Route::get('/authenticate', 'AccountAuthController@index')->name('account-auth-show');
+Route::post('/authenticate', 'AccountAuthController@create')->name('account-auth-create');
+Route::patch('/authenticate', 'AccountAuthController@updateAccountType')->name('account-auth-update');
+Route::delete('/authenticate', 'AccountAuthController@delete')->name('account-auth-delete');
 
 /*==========User Controller=============*/
-Route::get('/user/edit', 'UsersController@edit')->name('edit-user');
-Route::patch('/user/edit', 'UsersController@update')->name('update-user');
+Route::get('/user/edit', 'UserController@edit')->name('user-edit');
+Route::patch('/user/edit', 'UserController@update')->name('user-update');
 
 /*==========Tasks Controller=============*/
-Route::get('/task', 'TasksController@index')->name('task');
-Route::post('/task', 'TasksController@store')->name('store-task');
-Route::patch('/task', 'TasksController@update')->name('update-task');
+// Route::get('/task', 'TasksController@index')->name('task');
+// Route::post('/task', 'TasksController@store')->name('store-task');
+// Route::patch('/task', 'TasksController@update')->name('update-task');
 
 /*==========News Controller=============*/
 Route::get('/news', 'NewsController@index')->name('news');
-Route::get('/news/{id}', 'NewsController@show')->name('show-newspost');
+Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 
 /*==========Admin Controller=============*/
 	Route::group(['middleware' => ['permission:access admin']], function () {

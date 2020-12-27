@@ -5,63 +5,77 @@
 @endsection
 
 @section('content')
-	<div class="profile-icon">
-		@if ($member->user->icon_id)
-			<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $member->user->icon_id }}.png" width="150" alt="Profile icon">
-			<br>
-			<span><a href="{{ route('edit-user') }}">Edit profile</a></span>
-		@else
-			<img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Helper::randomItemId() }}.png" width="150" alt="Profile icon">
-			<br>
-			<span>Get your own profile icon <a href="{{ route('edit-user') }}">here</a>!</span>
-		@endif
-	</div>
+	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
+		<div class="row mb-3">
+			<div class="col-md-9">
+				<img class="pixel float-left" style="margin-right: -15px;" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png" width="150" alt="Profile icon">
+				<h1 class="text-left">Welcome, {{ Auth::user()->name }}</h1>
 
-	<div class="float-left ml-3">
-		<h1>Welcome, {{ Auth::user()->name }} @role('admin') [Admin] @endrole</h1>
+				<p>Joined: <strong>{{ \Carbon\Carbon::parse($user->created_at)->format('d. M Y') }}</strong></p>
+			</div>
 
-		<p>RuneScape account: <strong>{{ $member->username }}</strong></p>
-		<p>Joined: <strong>{{ \Carbon\Carbon::parse($member->created_at)->format('d. M Y') }}</strong></p>
-	</div>
+			<div class="col-md-3">
+				@if ($user->private === 0)
+					<span>Current status:</span>
+					<br>
+					<img class="align" src="{{ asset('images') }}/friend.png" alt="Friend icon" title="Currently not private">
+					<span><strong>Not private</strong></span>
+				@else
+					<span>Current status:</span>
+					<br>
+					<img class="align" src="{{ asset('images') }}/ignore.png" alt="Ignore icon" title="Currently private">
+					<span><strong>Private</strong></span>
+				@endif
 
-	<h1 style="clear: both;">Your personal scores</h1>
-	<table>
-		<tr>
-			<th></th>
-			<th>Level</th>
-			<th>XP</th>
-			<th>Rank</th>
-		</tr>
-		<tr>
-			<td>
-				<img class="align" src="{{ asset('images/skills/') }}/Overall.png" width="35px" alt="Overall skill icon">
-				Overall
-			</td>
-			<td>{{ $member->level }}</td>
-			<td>{{ number_format($member->xp) }}</td>
-			<td>{{ number_format($member->rank) }}</td>
-		</tr>
+				<p><a href="{{ route('user-edit') }}">Edit profile</a></p>
+			</div>
+		</div>
 
-		@php
-			$i = 0;
-		@endphp
-		@foreach ($stats as $skill)
-			@foreach ($skill as $skillData)
-				<tr>
-					<td>
-						<a href="{{ route('show-skill', $skills[$i]) }}">
-							<img class="align" src="{{ asset('images/skills/') }}/{{ ucfirst($skills[$i]) }}.png" width="35px" alt="{{ ucfirst($skills[$i]) }} skill icon">
-							{{ ucfirst($skills[$i]) }}
+		<div class="row mb-3">
+			<div class="col-md-6">
+				<div class="background-dialog-iron-rivets px-4 pt-1">
+					<h3 class="text-center">Accounts</h3>
+
+					<hr>
+
+					@foreach ($user->account as $account)
+						<div class="row align-items-center">
+							<div class="col-md-8">
+								<p>@if ($account->account_type != "normal")<img class="pixel mr-1" src="{{ asset('images') }}/{{ $account->account_type }}.png" style="width: 20px;" alt="Account type icon">@endif<strong>{{ $account->username }}</strong></p>
+							</div>
+
+							<div class="col-md-4">
+								<span>Total level:</span>
+								<br>
+								<span><strong>{{ $account->level }}</strong></span>
+							</div>
+						</div>
+
+						<hr>
+					@endforeach
+
+					<div class="text-center">
+						<a href="{{ route('account-create') }}">
+							<div class="btn btn-lg button-combat-style-thin">
+								<span>Link account</span>
+							</div>
 						</a>
-					</td>
-					<td>{{ $skillData->level }}</td>
-					<td>{{ number_format($skillData->xp) }}</td>
-					<td>{{ number_format($skillData->rank) }}</td>
-				</tr>
-			@endforeach
-			@php
-				$i++;
-			@endphp
+					</div>
+				</div>
+			</div>
+		</div>
+
+		@foreach ($user->account as $account)
+			<div class="py-2" style="clear: both;"></div>
+			<div class="row">
+				<div class="col-md-8">
+					<accounthiscore account="{{ $account->username }}"></accounthiscore>
+				</div>
+
+				<div class="col-md-4">
+					<accountnotification :account="{{ $account }}"></accountnotification>
+				</div>
+			</div>
 		@endforeach
-	</table>
+	</div>
 @endsection

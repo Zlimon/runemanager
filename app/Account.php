@@ -1,6 +1,6 @@
 <?php
 
-namespace RuneManager;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,14 +12,14 @@ class Account extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'username', 'rank', 'level', 'xp', 'private'
+        'user_id', 'account_type', 'username', 'rank', 'level', 'xp'
     ];
 
     public function user() {
         return $this->belongsTo(User::class);
     }
 
-    public function accountTask() {
-        return $this->hasMany(AccountTask::class);
+    public function notification() {
+        return $this->hasMany(Notification::class);
     }
 }

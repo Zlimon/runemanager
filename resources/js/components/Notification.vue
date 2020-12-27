@@ -1,0 +1,43 @@
+<template>
+	<div>
+		<div v-if="notifications.length > 0">
+			<div v-for="(notification, index) in notifications">
+				<div class="background-dialog-iron-rivets p-2 mb-2">
+					<div class="row align-items-center mb-2">
+						<div class="col-md-3 notification-icon border-dark ">
+							<img class="pixel align" :src="'/images/' + notification.category.category + '/' + notification.icon + '.png'" width="35px" :alt="notification.boss + ' ' + notification.category + ' icon'"/>
+						</div>
+
+						<div class="col-md-9 ">
+							<p>{{ notification.message }}</p>
+						</div>
+					</div>
+
+					<div v-if="notification.data !== null">
+						<div v-if="Object.keys(notification.data.loot).length > 0">
+							<h3 class="text-center">Received loot:</h3>
+							<div class="d-flex flex-row flex-wrap justify-content-center pb-2">
+								<div v-for="(loot, index) in notification.data.loot" class="background-world-map mx-2 p-1">
+									<img :src="'/images/' + notification.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<div class="text-center">
+				<h3 class="text-center">Nothing interesting happens.</h3>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	export default {
+		props: {
+			notifications: { required: true },
+		},
+	}
+</script>

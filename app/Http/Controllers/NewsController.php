@@ -1,9 +1,10 @@
 <?php
 
-namespace RuneManager\Http\Controllers;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use RuneManager\NewsPost;
+
+use App\NewsPost;
 
 class NewsController extends Controller
 {

@@ -1,12 +1,14 @@
 <?php
 
-namespace RuneManager\Http\Controllers\Auth;
+namespace App\Http\Controllers\Auth;
 
-use RuneManager\User;
-use RuneManager\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
+use App\Providers\RouteServiceProvider;
+use App\User;
+use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Helpers\Helper;
 
 class RegisterController extends Controller
 {
@@ -28,7 +30,13 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    //protected $redirectTo = RouteServiceProvider::HOME;
+
+    protected function redirectTo()
+    {
+        session()->flash('message', 'Welcome to RuneManager! To use RuneManager, you have to link your Old School RuneScape account!'); 
+        return '/account/create';
+    }
 
     /**
      * Create a new controller instance.
@@ -49,7 +57,7 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -59,7 +67,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \RuneManager\User
+     * @return \App\User
      */
     protected function create(array $data)
     {
@@ -67,6 +75,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'icon_id' => Helper::randomItemId(true),
         ]);
     }
 }
