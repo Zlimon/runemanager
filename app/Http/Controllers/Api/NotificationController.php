@@ -20,7 +20,7 @@ class NotificationController extends Controller
 	}
 
 	public function show($accountUsername) {
-		$account = Account::where('username', $accountUsername)->pluck('user_id')->first();
+		$account = Account::where('username', $accountUsername)->pluck('id')->first();
 
 		$notifications = Notification::with('category')->where('account_id', $account)->orderBy('id', 'DESC')->paginate(10);
 

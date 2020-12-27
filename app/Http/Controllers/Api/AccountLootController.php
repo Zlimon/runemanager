@@ -10,6 +10,7 @@ use App\Collection;
 use App\Notification;
 
 use App\Events\All;
+use App\Events\AccountAll;
 use App\Events\AccountNewUnique;
 use App\Events\AccountKill;
 
@@ -60,6 +61,8 @@ class AccountLootController extends Controller
 
 								All::dispatch($notification);
 
+								AccountAll::dispatch($account, $notification);
+
 								AccountNewUnique::dispatch($account, $notification);
 							}
 
@@ -89,6 +92,8 @@ class AccountLootController extends Controller
 					$notification = Notification::create($notificationData);
 
 					All::dispatch($notification);
+
+					AccountAll::dispatch($account, $notification);
 
 					AccountKill::dispatch($account, $notification);
 

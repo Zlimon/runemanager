@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Account;
 use App\Notification;
 use App\Events\All;
+use App\Events\AccountAll;
 use App\Events\AccountLevelUp;
 
 class AccountSkillController extends Controller
@@ -33,6 +34,8 @@ class AccountSkillController extends Controller
 			$notification = Notification::create($notificationData);
 
 			All::dispatch($notification);
+
+			AccountAll::dispatch($account, $notification);
 
 			AccountLevelUp::dispatch($account, $notification);
 

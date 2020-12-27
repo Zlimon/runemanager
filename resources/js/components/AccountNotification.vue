@@ -38,18 +38,8 @@
 		},
 
 		created() {
-			window.Echo.channel('account')
-				.listen('AccountKill', (e) => {
-					if (this.checkAccount(e.notification.account_id)) {
-						this.notificationsData.unshift(e.notification);
-					}
-				})
-				.listen('AccountNewUnique', (e) => {
-					if (this.checkAccount(e.notification.account_id)) {
-						this.notificationsData.unshift(e.notification);
-					}
-				})
-				.listen('AccountLevelUp', (e) => {
+			window.Echo.channel('account-all')
+				.listen('AccountAll', (e) => {
 					if (this.checkAccount(e.notification.account_id)) {
 						this.notificationsData.unshift(e.notification);
 					}
