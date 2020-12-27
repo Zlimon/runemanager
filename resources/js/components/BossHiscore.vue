@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="float-left mt-3 ml-3">
-			<h1 class="text-left">{{ meta.boss | capitalize }}</h1>
+			<h1 class="text-left">{{ meta.alias | capitalize }}</h1>
 
 			<span>Total Kills: <strong>{{ meta.total_kills }}</strong></span>
 			<br>

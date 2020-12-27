@@ -42,6 +42,7 @@ class PageController extends Controller
         
         if ($hiscoreType == "boss") {
             $hiscoreList = Helper::listBosses();
+            $hiscoreList = array_values($hiscoreList);
         }        
 
         list($hiscoreListTop, $hiscoreListBottom) = array_chunk($hiscoreList, ceil(count($hiscoreList) / 2)); // Split skills array into two arrays for a top and bottom skill bar

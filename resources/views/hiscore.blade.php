@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ ucfirst($hiscore) }}
+	{{ ucfirst(Helper::collectionAttribute($hiscore, "alias")) }}
 @endsection
 
 @section('content')
@@ -34,7 +34,7 @@
 					@endforeach
 				</span>
 				<div class="mid-part">
-					<span class="active middle-icon" style="display: inline-block;"><img class="pixel middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $hiscore }}.png" alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"><h1>{{ ucfirst($hiscore) }}</h1></span>
+					<span class="active middle-icon" style="display: inline-block;"><img class="pixel middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $hiscore }}.png" alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"><h1>{{ ucfirst(Helper::collectionAttribute($hiscore, "alias")) }}</h1></span>
 					@foreach ($hiscoreList as $skill)
 						<span class="middle-icon"><img class="pixel middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"><h1>{{ ucfirst($skill) }}</h1></span>
 					@endforeach

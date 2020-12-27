@@ -64,7 +64,7 @@
 		                            @endif
 		                        @else
 		                        	<li class="nav-item">
-		                        		<a class="nav-link" href="{{ route('home') }}"><img class="pixel mr-1" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png" alt="Profile icon" style="width: 20px;">{{ Auth::user()->name }}</a>
+		                        		<a class="nav-link" href="{{ route('home') }}"><img class="pixel mr-1" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png" alt="Profile icon" style="width: 20px;">Profile</a>
 		                        	</li>
 									<li class="nav-item">
 										<a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
