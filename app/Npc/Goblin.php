@@ -1,6 +1,6 @@
 <?php
 // TODO remove later
-namespace App\Boss;
+namespace App\Npc;
 
 use Illuminate\Database\Eloquent\Model;
 

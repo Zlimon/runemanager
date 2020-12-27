@@ -44,7 +44,7 @@ class AccountLootController extends Controller
 							if ($oldValues[$lootType] == 0) {
 								$uniques++;
 
-								$dataJson = '{"loot":'.json_encode([$lootType => 0]).'}';
+								$dataJson = '{"collection":'.json_encode([$lootType => 0]).',"loot":'.json_encode($newValues).'}';
 
 								$data = json_decode($dataJson, true);
 
@@ -76,7 +76,7 @@ class AccountLootController extends Controller
 
 					$loot = array_diff_key($sums, ["id" => 0, "account_id" => 0, "kill_count" => 0, "rank" => 0, "obtained" => 0, "created_at" => 0, "updated_at" => 0]);
 
-					$dataJson = '{"loot":'.json_encode($loot).'}';
+					$dataJson = '{"collection":'.json_encode($loot).',"loot":'.json_encode($newValues).'}';
 
 					$data = json_decode($dataJson, true);
 

@@ -14,10 +14,10 @@
 					</div>
 
 					<div v-if="notification.data !== null">
-						<div v-if="Object.keys(notification.data.loot).length > 0">
+						<div v-if="Object.keys(notification.data.collection).length > 0">
 							<h3 class="text-center">Received loot:</h3>
 							<div class="d-flex flex-row flex-wrap justify-content-center pb-2">
-								<div v-for="(loot, index) in notification.data.loot" class="background-world-map mx-2 p-1">
+								<div v-for="(collection, index) in notification.data.collection" class="background-world-map mx-2 p-1">
 									<img :src="'/images/' + notification.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'">
 								</div>
 							</div>
