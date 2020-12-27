@@ -20,11 +20,11 @@
 				<th>Collection Log</th>
 				<th>Obtained</th>
 			</tr>
-			<tr v-for="(hiscore, index) in hiscores">
+			<tr v-for="(hiscore, index) in meta.bossHiscores">
 				<td>
 					<a :href="'/hiscore/boss/' + index">
 						<img class="align" :src="'/images/boss/' + index + '.png'" width="35px" :alt="index + ' boss icon'"/>
-						{{ index | capitalize }}
+						{{ hiscore.alias | capitalize }}
 					</a>
 				</td>
 				<td>{{ hiscore.kill_count }}</td>
@@ -83,7 +83,7 @@
 		data () {
 			return {
 				data: {},
-				hiscores: {}
+				meta: {}
 			}
 		},
 
@@ -92,7 +92,7 @@
 			.get('/api/account/' + this.account + '/boss')
 			.then((response) => {
 				this.data = response.data.data;
-				this.hiscores = response.data.meta.bossHiscores;
+				this.meta = response.data.meta;
 			})
 			.catch(error => (console.log(error)))
 		},
