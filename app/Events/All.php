@@ -22,7 +22,7 @@ class All implements ShouldBroadcast
      */
     public function __construct(Notification $notification)
     {
-        $this->notification = $notification::with('category')->orderBy('id', 'DESC')->first();
+        $this->notification = $notification::with('category')->orderByDesc('id')->first();
     }
 
     /**

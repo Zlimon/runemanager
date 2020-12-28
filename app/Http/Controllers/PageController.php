@@ -10,9 +10,7 @@ class PageController extends Controller
 {
     public function index()
     {
-        //$recentMembers = Account::orderBy('created_at', 'DESC')->limit(5)->get();
-        $recentPosts = NewsPost::with('user')->with('category')->with('image')->limit(5)->orderBy('created_at',
-            'DESC')->get();
+        $recentPosts = NewsPost::with('user')->with('category')->with('image')->limit(5)->orderByDesc('created_at')->get();
 
         return view('index', compact('recentPosts'));
     }
@@ -24,7 +22,7 @@ class PageController extends Controller
      */
     public function updateLog()
     {
-        $updates = Account::orderBy('updated_at', 'DESC')->whereColumn('updated_at', '>', 'created_at')->get();
+        $updates = Account::orderByDesc('updated_at')->whereColumn('updated_at', '>', 'created_at')->get();
 
         return view('update-log', compact('updates'));
     }
