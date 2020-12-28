@@ -9,7 +9,7 @@ class BossHiscoreResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
@@ -18,7 +18,15 @@ class BossHiscoreResource extends JsonResource
 
         $obtained = isset($collectionLog["obtained"]) ? $collectionLog["obtained"] : 0;
 
-        $collectionLog = array_diff_key($collectionLog, ["id" => 0, "account_id" => 0, "kill_count" => 0, "rank" => 0, "obtained" => 0, "created_at" => 0, "updated_at" => 0]);
+        $collectionLog = array_diff_key($collectionLog, [
+            "id" => 0,
+            "account_id" => 0,
+            "kill_count" => 0,
+            "rank" => 0,
+            "obtained" => 0,
+            "created_at" => 0,
+            "updated_at" => 0
+        ]);
 
         return [
             'kill_count' => $this->kill_count,

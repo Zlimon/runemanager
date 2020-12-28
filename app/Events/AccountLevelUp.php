@@ -2,16 +2,13 @@
 
 namespace App\Events;
 
+use App\Account;
+use App\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-
-use App\Account;
-use App\Notification;
 
 class AccountLevelUp implements ShouldBroadcast
 {
@@ -26,7 +23,8 @@ class AccountLevelUp implements ShouldBroadcast
      */
     public function __construct(Account $account, Notification $notification)
     {
-        $this->notification = $notification::with('category')->where('account_id', $account->id)->orderBy('id', 'DESC')->first();
+        $this->notification = $notification::with('category')->where('account_id', $account->id)->orderBy('id',
+            'DESC')->first();
     }
 
     /**

@@ -2,37 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Account;
+use App\AccountAuthStatus;
+use App\Helpers\Helper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-use App\Helpers\Helper;
-
-use App\Account;
-use App\AccountAuthStatus;
-
 class AccountAuthController extends Controller
 {
-	public function index() {
-		if (Auth::check()) {
-			$authStatus = AccountAuthStatus::with('user')->where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
+    public function index()
+    {
+        if (Auth::check()) {
+            $authStatus = AccountAuthStatus::with('user')->where('user_id', Auth::user()->id)->where('status', '!=',
+                'success')->first();
 
-			if ($authStatus) {
-				return view('account.auth', compact('authStatus'));
-			} else {
-				return redirect(route('account-create'))->withErrors(['You should register a Old School RuneScape account first!']);
-			}
-		} else {
-			return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
-		}
-	}
+            if ($authStatus) {
+                return view('account.auth', compact('authStatus'));
+            } else {
+                return redirect(route('account-create'))->withErrors(['You should register a Old School RuneScape account first!']);
+            }
+        } else {
+            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
+        }
+    }
 
     /**
      * Verifies incoming account registration request.
      *
      * @return
      */
-    public function create() {
+    public function create()
+    {
         if (Auth::check()) {
             request()->validate([
                 'username' => ['required', 'string', 'min:1', 'max:13'],
@@ -47,7 +47,7 @@ class AccountAuthController extends Controller
                         return view('account.auth', compact('authStatus'));
                     }
 
-                    return redirect()->back()->withErrors('This account has already been linked to another profile with status: '.$authStatus->status.'!');
+                    return redirect()->back()->withErrors('This account has already been linked to another profile with status: ' . $authStatus->status . '!');
                 } else {
                     $playerDataUrl = Helper::formatHiscoreUrl(request('account_type'), request('username'));
 
@@ -75,37 +75,39 @@ class AccountAuthController extends Controller
         }
     }
 
-    public function updateAccountType() {
-    	$authStatus = AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
-
-    	if ($authStatus) {
-	    	if ($authStatus->account_type != request('account_type')) {
-		        $playerDataUrl = Helper::formatHiscoreUrl(request('account_type'), $authStatus->username);
-
-		        if (Helper::verifyUrl($playerDataUrl)) {
-			    	$authStatus->account_type = request('account_type');
-
-			    	$authStatus->save();
-
-			    	return redirect(route('account-auth-show'))->with('message', 'Account type updated!');
-		        } else {
-		            return redirect()->back()->withErrors('Could not find this Old School RuneScape account! Did you pick correct account type?');
-		        }
-		    } else {
-		    	return redirect()->back()->withErrors('This account is already registered as '.Helper::formatAccountTypeName(request('account_type')).'!');
-		    }
-		} else {
-			return redirect(route('account-create'))->withErrors(['This account does not have a pending status anymore!']);
-		}
-    }
-
-    public function delete() {
-    	$authStatus = AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
+    public function updateAccountType()
+    {
+        $authStatus = AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
 
         if ($authStatus) {
-    	   $authStatus->delete();
+            if ($authStatus->account_type != request('account_type')) {
+                $playerDataUrl = Helper::formatHiscoreUrl(request('account_type'), $authStatus->username);
 
-    	   return redirect(route('account-create'))->with('message', 'Account authentication status deleted!');
+                if (Helper::verifyUrl($playerDataUrl)) {
+                    $authStatus->account_type = request('account_type');
+
+                    $authStatus->save();
+
+                    return redirect(route('account-auth-show'))->with('message', 'Account type updated!');
+                } else {
+                    return redirect()->back()->withErrors('Could not find this Old School RuneScape account! Did you pick correct account type?');
+                }
+            } else {
+                return redirect()->back()->withErrors('This account is already registered as ' . Helper::formatAccountTypeName(request('account_type')) . '!');
+            }
+        } else {
+            return redirect(route('account-create'))->withErrors(['This account does not have a pending status anymore!']);
+        }
+    }
+
+    public function delete()
+    {
+        $authStatus = AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first();
+
+        if ($authStatus) {
+            $authStatus->delete();
+
+            return redirect(route('account-create'))->with('message', 'Account authentication status deleted!');
         } else {
             return redirect(route('account-create'))->withErrors(['This account does not have a pending status anymore!']);
         }

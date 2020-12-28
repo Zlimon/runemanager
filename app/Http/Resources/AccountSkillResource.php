@@ -2,17 +2,16 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\Helper;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
-
-use App\Helpers\Helper;
 
 class AccountSkillResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
@@ -36,7 +35,7 @@ class AccountSkillResource extends JsonResource
         $skillHiscores = [];
 
         foreach ($skills as $skillName) {
-            $skillHiscores[$skillName] =  DB::table($skillName)->where('account_id', $this->id)->first();
+            $skillHiscores[$skillName] = DB::table($skillName)->where('account_id', $this->id)->first();
         }
 
         return [

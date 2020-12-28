@@ -14,3 +14,4 @@ yarn-error.log
 /ssl/BaltimoreCyberTrustRoot.crt.pem
 /public/resource-packs/*
 /public/js/*
+/.idea/*

@@ -2,16 +2,15 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-
 use App\Helpers\Helper;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class BossResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
@@ -20,7 +19,16 @@ class BossResource extends JsonResource
 
         $name = $collectionLog["boss_name"];
 
-        $collectionLog = array_diff_key($collectionLog, ["id" => 0, "account_id" => 0, "kill_count" => 0, "rank" => 0, "obtained" => 0, "created_at" => 0, "updated_at" => 0, "boss_name" => 0]);
+        $collectionLog = array_diff_key($collectionLog, [
+            "id" => 0,
+            "account_id" => 0,
+            "kill_count" => 0,
+            "rank" => 0,
+            "obtained" => 0,
+            "created_at" => 0,
+            "updated_at" => 0,
+            "boss_name" => 0
+        ]);
 
         return [
             'alias' => Helper::collectionAttribute($name, 'alias'),
