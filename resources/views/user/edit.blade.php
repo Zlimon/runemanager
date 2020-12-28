@@ -63,23 +63,26 @@
                         <div class="icon-radio">
                             <label class="icon-radio">
                                 <input type="radio" name="private" id="privateFalse" value="0">
-                                <img class="align" src="{{ asset('images/friend.png') }}" alt="Friend icon"
-                                     title="Click here to show your account">
+                                <img src="{{ asset('images/friend.png') }}"
+                                     alt="Happy face"
+                                     title="Click here to show your account to everyone">
                             </label>
 
                             <label class="icon-radio">
                                 <input type="radio" name="private" id="privateTrue" value="1">
-                                <img class="align" src="{{ asset('images/ignore.png') }}" alt="Ignore icon"
-                                     title="Click here to hide your account">
-
+                                <img src="{{ asset('images/ignore.png') }}"
+                                     alt="Sad face"
+                                     title="Click here to hide your account for everyone">
                                 <span>
 									Currently:
 
 									@if ($user->private === 0)
-                                        <img class="align" src="{{ asset('images/friend.png') }}" alt="Friend icon"
-                                             title="Currently not private">
+                                        <img src="{{ asset('images/friend.png') }}"
+                                             alt="Happy face"
+                                             title="Currently NOT private">
                                     @else
-                                        <img class="align" src="{{ asset('images/ignore.png') }}" alt="Ignore icon"
+                                        <img src="{{ asset('images/ignore.png') }}"
+                                             alt="Sad face"
                                              title="Currently private">
                                     @endif
 								</span>

@@ -46,7 +46,7 @@
                                     <input id="{{ $accountType }}" type="radio"
                                            class="form-check-input @error('account_type') is-invalid @enderror"
                                            name="account_type" value="{{ $accountType }}">
-                                    <img class="align" src="{{ asset('images/'.$accountType.'.png') }}"
+                                    <img src="{{ asset('images/'.$accountType.'.png') }}"
                                          alt="{{ Helper::formatAccountTypeName($accountType) }} icon"
                                          title="Click here to select {{ Helper::formatAccountTypeName($accountType) }} account type for your account">
                                     {{ Helper::formatAccountTypeName($accountType) }}

@@ -39,7 +39,7 @@
                 @foreach($accounts as $account)
                     <a href="{{ route('account-show', $account->username) }}">
                         <div class="btn button-static background-world-map">
-                            <div class="row align-items-center ">
+                            <div class="row align-items-center mb-2">
                                 <div class="col-4">
                                     <img class="pixel icon"
                                          src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
@@ -53,7 +53,7 @@
                                         <span class="font-small">
                                             <img class="pixel"
                                                  src="{{ asset('images/skill/overall.png') }}"
-                                                 alt="skill icon">
+                                                 alt="Total level icon">
                                             {{ $account->level }}
                                         </span>
                                     </div>
@@ -65,7 +65,9 @@
             </div>
         @else
             <div class="text-center py-5">
-                <img class="pixel" src="{{ asset('images/ignore.png') }}" style="width: 75px;" alt="Sad face">
+                <img src="{{ asset('images/ignore.png') }}"
+                     class="pixel icon"
+                     alt="Sad face">
                 <h1>There are no linked accounts...</h1>
                 <h2 class="text-center">Link an account <a href="{{ route('account-create') }}">here</a>!</h2>
             </div>

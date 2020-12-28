@@ -46,11 +46,9 @@
 				</span>
                 <div class="mid-part">
                     <h1 class="active middle-icon" style="display: inline-block;">
-                        <img
-                            src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
+                        <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
                             class="pixel icon"
-                            alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon"
-                            style="object-fit: contain;">
+                            alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
                         <br>
                         <span>{{ ucfirst(($hiscoreType === "boss" ? Helper::collectionAttribute($hiscoreName, "alias") : $hiscoreName)) }}</span>
                     </h1>
@@ -84,7 +82,7 @@
         @else
             <div class="text-center py-5">
                 <img src="{{ asset('images/ignore.png') }}"
-                     class="pixel"
+                     class="pixel icon"
                      alt="Sad face">
                 <h1>No accounts, no hiscores...</h1>
                 <h2 class="text-center">Link an account <a href="{{ route('account-create') }}">here</a>!</h2>
