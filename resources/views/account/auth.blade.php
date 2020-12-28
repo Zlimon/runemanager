@@ -34,7 +34,7 @@
                 <label for="account_type" class="col-md-4 text-md-right">Account type:</label>
 
                 <div class="col-md-8">
-                    <span><img class="align" src="{{ asset('images') }}/{{ $authStatus->account_type }}.png"
+                    <span><img class="align" src="{{ asset('images/'.$authStatus->account_type.'.png') }}"
                                alt="{{ Helper::formatAccountTypeName($authStatus->account_type) }} icon"
                                title="You have currently picked {{ Helper::formatAccountTypeName($authStatus->account_type) }} as account type for your account"> {{ Helper::formatAccountTypeName($authStatus->account_type) }}</span>
 

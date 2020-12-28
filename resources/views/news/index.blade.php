@@ -31,7 +31,7 @@
                         @if ($loop->last) </div> @endif
             @empty
                 <div class="text-center py-5">
-                    <img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px" alt="Sad face">
+                    <img class="pixel" src="{{ asset('images/ignore.png') }}" width="75px" alt="Sad face">
                     <h1>Nothing interesting is happening</h1>
                 </div>
             @endforelse

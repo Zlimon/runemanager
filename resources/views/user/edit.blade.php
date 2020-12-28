@@ -63,23 +63,23 @@
                         <div class="icon-radio">
                             <label class="icon-radio">
                                 <input type="radio" name="private" id="privateFalse" value="0">
-                                <img class="align" src="{{ asset('images') }}/friend.png" alt="Friend icon"
+                                <img class="align" src="{{ asset('images/friend.png') }}" alt="Friend icon"
                                      title="Click here to show your account">
                             </label>
 
                             <label class="icon-radio">
                                 <input type="radio" name="private" id="privateTrue" value="1">
-                                <img class="align" src="{{ asset('images') }}/ignore.png" alt="Ignore icon"
+                                <img class="align" src="{{ asset('images/ignore.png') }}" alt="Ignore icon"
                                      title="Click here to hide your account">
 
                                 <span>
 									Currently:
 
 									@if ($user->private === 0)
-                                        <img class="align" src="{{ asset('images') }}/friend.png" alt="Friend icon"
+                                        <img class="align" src="{{ asset('images/friend.png') }}" alt="Friend icon"
                                              title="Currently not private">
                                     @else
-                                        <img class="align" src="{{ asset('images') }}/ignore.png" alt="Ignore icon"
+                                        <img class="align" src="{{ asset('images/ignore.png') }}" alt="Ignore icon"
                                              title="Currently private">
                                     @endif
 								</span>

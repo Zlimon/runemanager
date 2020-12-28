@@ -36,23 +36,23 @@
                             <ul class="navbar-nav mr-auto">
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('news') }}"><img class="pixel mr-1"
-                                                                                        src="{{ asset('images') }}/newspaper.png"
+                                                                                        src="{{ asset('images/newspaper.png') }}"
                                                                                         style="width: 20px;"
                                                                                         alt="News icon">News</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('hiscore', ['skill', 'overall']) }}"><img
-                                            class="pixel mr-1" src="{{ asset('images') }}/hiscore.png"
+                                            class="pixel mr-1" src="{{ asset('images/hiscore.png') }}"
                                             style="width: 20px;" alt="Hiscores icon">Hiscores</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="#"><img class="pixel mr-1"
-                                                                      src="{{ asset('images') }}/calendar.png"
+                                                                      src="{{ asset('images/calendar.png') }}"
                                                                       style="width: 20px;" alt="Calendar icon">Calendar</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('account') }}"><img class="pixel mr-1"
-                                                                                           src="{{ asset('images') }}/account.png"
+                                                                                           src="{{ asset('images/account.png') }}"
                                                                                            style="width: 20px;"
                                                                                            alt="Accounts icon">Accounts</a>
                                 </li>
@@ -66,7 +66,7 @@
                         <ul class="navbar-nav mr-auto">
                             <li class="nav-item active">
                                 <a class="nav-link" href="{{ route('index') }}"><img class="pixel mr-1"
-                                                                                     src="{{ asset('images') }}/home.png"
+                                                                                     src="{{ asset('images/home.png') }}"
                                                                                      style="width: 20px;"
                                                                                      alt="Overall skill icon">Home <span
                                         class="sr-only">(current)</span></a>
@@ -90,7 +90,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('logout') }}"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <img class="pixel mr-1" src="{{ asset('images') }}/logout_small.png"
+                                        <img class="pixel mr-1" src="{{ asset('images/logout_small.png') }}"
                                              style="width: 20px;" alt="Accounts icon">
                                         {{ __('Log out') }}
                                     </a>
@@ -106,10 +106,10 @@
 
                     <div class="mb-2 header-chatbox-sword"></div>
 
-                    <p class="text-light text-center pb-4"><img class="pixel mr-1" src="{{ asset('images') }}/watch.png"
+                    <p class="text-light text-center pb-4"><img class="pixel mr-1" src="{{ asset('images/watch.png') }}"
                                                                 style="width: 20px;" alt="Watch icon">Next
                         update: {{ Helper::roundToNextHour() }}<img class="pixel ml-1"
-                                                                    src="{{ asset('images') }}/watch.png"
+                                                                    src="{{ asset('images/watch.png') }}"
                                                                     style="width: 20px;" alt="Watch icon"></p>
                 </div>
 

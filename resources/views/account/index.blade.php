@@ -65,7 +65,7 @@
             </div>
         @else
             <div class="text-center py-5">
-                <img class="pixel" src="{{ asset('images') }}/ignore.png" style="width: 75px;" alt="Sad face">
+                <img class="pixel" src="{{ asset('images/ignore.png') }}" style="width: 75px;" alt="Sad face">
                 <h1>There are no linked accounts...</h1>
                 <h2 class="text-center">Link an account <a href="{{ route('account-create') }}">here</a>!</h2>
             </div>

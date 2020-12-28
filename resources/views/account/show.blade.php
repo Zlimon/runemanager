@@ -24,7 +24,7 @@
             </div>
         @else
             <div class="text-center py-5">
-                <img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px" alt="Sad face">
+                <img class="pixel" src="{{ asset('images/ignore.png') }}" width="75px" alt="Sad face">
                 <h1>This user is private</h1>
             </div>
         @endif
