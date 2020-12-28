@@ -15,3 +15,4 @@ yarn-error.log
 /public/resource-packs/*
 /public/js/*
 /.idea/*
+_ide_helper.php
