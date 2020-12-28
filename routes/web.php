@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'PageController@index')->name('index');
 Route::get('/update-log', 'PageController@updateLog')->name('update-log');
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/hiscore/{hiscore}/{skill}', 'PageController@hiscore')->name('hiscore');
+Route::get('/hiscore/{hiscoreType}/{hiscore}', 'PageController@hiscore')->name('hiscore');
 
 /*==========Member Controller=============*/
 Route::get('/account', 'AccountController@index')->name('account');

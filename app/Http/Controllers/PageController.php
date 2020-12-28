@@ -32,7 +32,7 @@ class PageController extends Controller
      *
      * @return
      */
-    public function hiscore($hiscoreType, $hiscore)
+    public function hiscore($hiscoreType, $hiscoreName)
     {
         $hiscoreList = Helper::listSkills();
 
@@ -49,6 +49,6 @@ class PageController extends Controller
         $accountCount = Account::count();
 
         return view('hiscore',
-            compact('hiscoreType', 'hiscore', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom', 'accountCount'));
+            compact('hiscoreType', 'hiscoreName', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom', 'accountCount'));
     }
 }
