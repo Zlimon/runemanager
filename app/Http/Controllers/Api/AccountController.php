@@ -2,52 +2,51 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-
-use Carbon\Carbon;
-
-use App\Helpers\Helper;
 use App\Account;
 use App\AccountAuthStatus;
 use App\Collection;
-
+use App\Helpers\Helper;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
-use App\Http\Resources\AccountBossResource;
-use Illuminate\Support\Facades\Auth;
-
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AccountController extends Controller
 {
     /**
      * Show a specific account and skills data from a URL request.
      *
-     * @param  string  $username
+     * @param string $username
      * @return
      */
-    public function show($accountUsername) {
+    public function show($accountUsername)
+    {
         return new AccountResource(Account::where('username', $accountUsername)->firstOrFail());
     }
 
-    public function skill($accountUsername) {
+    public function skill($accountUsername)
+    {
         return new AccountSkillResource(Account::where('username', $accountUsername)->firstOrFail());
     }
 
-    public function boss($accountUsername) {
+    public function boss($accountUsername)
+    {
         return new AccountBossResource(Account::where('username', $accountUsername)->firstOrFail());
     }
 
     /**
      * Create a new account instance after a valid registration.
      *
-     * @param  string  $authCode
+     * @param string $authCode
      * @return
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:1', 'max:13'],
             'code' => ['required', 'string', 'min:1', 'max:8'],
@@ -66,7 +65,8 @@ class AccountController extends Controller
             if ($authStatus->user_id === auth()->user()->id) {
                 if (request('account_type') === $authStatus->account_type) {
                     if (request('code') === $authStatus->code) {
-                        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', request('username'));
+                        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(' ',
+                                '%20', request('username'));
 
                         /* Get the $playerDataUrl file content. */
                         $getPlayerData = file_get_contents($playerDataUrl);
@@ -95,9 +95,9 @@ class AccountController extends Controller
                             for ($i = 0; $i < count($skills); $i++) {
                                 DB::table($skills[$i])->insert([
                                     'account_id' => $account->id,
-                                    'rank' => ($playerData[$i+1][0] >= 1 ? $playerData[$i+1][0] : 0),
-                                    'level' => $playerData[$i+1][1],
-                                    'xp' => ($playerData[$i+1][2] >= 0 ? $playerData[$i+1][2] : 0),
+                                    'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
+                                    'level' => $playerData[$i + 1][1],
+                                    'xp' => ($playerData[$i + 1][2] >= 0 ? $playerData[$i + 1][2] : 0),
                                     'created_at' => Carbon::now(),
                                     'updated_at' => Carbon::now()
                                 ]);
@@ -119,11 +119,12 @@ class AccountController extends Controller
                                 $collectionLoot = new $collection->model;
 
                                 $collectionLoot->account_id = $account->id;
-                                $collectionLoot->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
-                                $collectionLoot->rank = ($playerData[$i+1][0] >= 0 ? $playerData[$i+1][0] : 0);
+                                $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+                                $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-                                if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
-                                    $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                                if (in_array($bosses[$bossCounter],
+                                    ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
+                                    $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                                 }
 
                                 $collectionLoot->save();
@@ -157,7 +158,8 @@ class AccountController extends Controller
                         return response("Invalid code", 202);
                     }
                 } else {
-                    return response("This account is registered as ".lcfirst(Helper::formatAccountTypeName($authStatus->account_type)).", not ".request('account_type'), 202);
+                    return response("This account is registered as " . lcfirst(Helper::formatAccountTypeName($authStatus->account_type)) . ", not " . request('account_type'),
+                        202);
                 }
             } else {
                 return response("This account is not linked to your user", 401);
