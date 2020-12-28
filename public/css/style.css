@@ -386,7 +386,7 @@ table th
 .button-static
 {
     width: 12rem;
-    height: 4rem;
+    height: 5rem;
 }
 
 .collection-log-item
@@ -419,8 +419,14 @@ table th
     opacity: .25;
 }
 
-.notification-icon
-{
+.button-with-icon {
+    width: 12.5rem;
+    height: 5rem;
+}
+
+.icon {
+    width: 3.25rem;
+    height: 3rem;
     border-right: solid 2px;
 }
 

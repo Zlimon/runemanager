@@ -15,7 +15,7 @@ class AccountController extends Controller
      */
     public function index()
     {
-        $accounts = Account::inRandomOrder()->get();
+        $accounts = Account::orderByDesc('level')->orderByDesc('xp')->get();
 
         $query = null;
 
