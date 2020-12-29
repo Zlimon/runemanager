@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
-        @if (count($accounts) > 0)
+        @if ($accounts->isNotEmpty())
             <h1 class="text-center header-chatbox-sword">Search for accounts</h1>
 
             <form class="form-group row" method="POST" action="{{ route('account-search') }}">
@@ -50,7 +50,14 @@
 
                                 <div class="col">
                                     <div class="text-left">
-                                        <span>{{ $account->username }}</span>
+                                        <span>
+                                            @if ($account->account_type !== "normal")
+                                                <img src="{{ asset('images/'.$account->account_type.'.png') }}"
+                                                     alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon"
+                                                     title="You have currently picked {{ Helper::formatAccountTypeName($account->account_type) }} as account type for your account">
+                                            @endif
+                                            {{ $account->username }}
+                                        </span>
                                         <br>
                                         <span class="font-small">
                                             <img class="pixel"
