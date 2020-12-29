@@ -3,7 +3,7 @@
         <div v-if="skills">
             <div class="btn button-square float-right background-world-map" v-on:click="toggle">
                 <img alt="Bosses icon"
-                     class="icon"
+                     class="pixel icon"
                      src="/images/boss/boss.png"
                      title="Click here to see the boss hiscores">
                 <br>
@@ -13,7 +13,7 @@
         <div v-else>
             <div class="btn button-square float-right background-world-map" v-on:click="toggle">
                 <img alt="Skills icon"
-                     class="icon"
+                     class="pixel icon"
                      src="/images/skill/overall.png"
                      title="Click here to see the skills hiscores">
                 <br>

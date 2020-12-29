@@ -33,7 +33,7 @@
                     </div>
                 @else
                     <a href="{{ route('home') }}">
-                        <div class="btn btn-block background-world-map">
+                        <div class="background-world-map">
                             <img
                                 src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png"
                                 class="pixel icon"

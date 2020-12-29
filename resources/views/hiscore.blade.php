@@ -12,7 +12,7 @@
             <a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
                 <div class="btn button-square background-world-map">
                     <img src="{{ asset('images/skill/overall.png') }}"
-                         class="icon"
+                         class="pixel icon"
                          alt="Skills icon"
                          title="Click here to see the skills hiscores">
                     <br>
@@ -23,7 +23,7 @@
             <a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
                 <div class="btn button-square background-world-map">
                     <img src="{{ asset('images/boss/boss.png') }}"
-                         class="icon"
+                         class="pixel icon"
                          alt="Bosses icon"
                          title="Click here to see the boss hiscores">
                     <br>

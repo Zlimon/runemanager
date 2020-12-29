@@ -64,7 +64,7 @@
                                 <h1>{{ data.username }}</h1>
                                 <div class="d-flex flex-row flex-wrap justify-content-center">
                                     <div v-for="(count, item) in hiscore.log"
-                                         class="collection-log-item rounded background-world-map bg-dark p-4">
+                                         class="collection-log-item background-world-map bg-dark p-4">
                                         <div v-if="count === 1">
                                             <img :alt="item + ' item icon'"
                                                  :src="'/images/boss/' + name.replace(/ /g, '_') + '/' + item + '.png'"
