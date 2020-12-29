@@ -56,7 +56,12 @@ class Helper
     {
         $itemData = 'https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json';
 
-        $itemData = file_get_contents($itemData);
+        $itemData = @file_get_contents($itemData);
+
+        if ($itemData === false) {
+            return false;
+        }
+
         $itemData = json_decode($itemData, true);
 
         if (!$itemData['noted']) {
