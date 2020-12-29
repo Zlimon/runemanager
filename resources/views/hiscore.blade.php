@@ -69,7 +69,7 @@
         @if ($accountCount > 0)
             <div class="float-left mt-3">
                 <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
-                     class="pixel"
+                     class="pixel icon"
                      alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon"
                      style="width: 7.5rem; height: 7.5rem;">
             </div>

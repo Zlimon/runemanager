@@ -38,12 +38,14 @@
             <div class="d-flex flex-row flex-wrap justify-content-around">
                 @foreach($accounts as $account)
                     <a href="{{ route('account-show', $account->username) }}">
-                        <div class="btn button-static background-world-map">
+                        <div class="btn button-rectangle background-world-map">
                             <div class="row align-items-center mb-2">
                                 <div class="col-4">
-                                    <img class="pixel icon"
-                                         src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
-                                         alt="Profile icon">
+                                    <img
+                                        src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
+                                        class="pixel icon"
+                                        alt="Profile icon"
+                                        title="Click here to visit this account">
                                 </div>
 
                                 <div class="col">

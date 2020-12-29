@@ -8,9 +8,10 @@
     <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
         <div class="row mb-3">
             <div class="col-md-9">
-                <img class="pixel float-left" style="margin-right: -15px;"
-                     src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png" width="150"
-                     alt="Profile icon">
+                <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
+                     class="pixel icon float-left"
+                     alt="Profile icon"
+                     style="width: 7.5rem; height: 7.5rem;">
                 <h1 class="text-left">Welcome, {{ Auth::user()->name }}</h1>
 
                 <p>Joined: <strong>{{ \Carbon\Carbon::parse($user->created_at)->format('d. M Y') }}</strong></p>

@@ -32,18 +32,30 @@
                         </a>
                     </div>
                 @else
-                    <a href="{{ route('account-show', Auth::user()->name) }}">
+                    <a href="{{ route('home') }}">
                         <div class="btn btn-block background-world-map">
                             @if (Auth::user()->icon_id)
-                                <img class="pixel"
-                                     src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png"
-                                     width="60" alt="Profile icon">
+                                <img
+                                    src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png"
+                                    class="pixel icon"
+                                    alt="Profile icon"
+                                    title="Click here to visit your profile">
                             @endif
                             <span>{{ Auth::user()->name }}</span>
                         </div>
                     </a>
 
-                    <p><a href="{{ route('home') }}">Home</a></p>
+                    <a href="{{ route('home') }}">
+                        <div class="btn btn-block button-combat-style-thin">
+                            <span>Profile</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('user-edit') }}">
+                        <div class="btn btn-block button-combat-style-thin">
+                            <span>Edit profile</span>
+                        </div>
+                    </a>
                 @endif
             </div>
         </div>
@@ -88,7 +100,7 @@
 
                 <div class="hiscore-button-parent right">
                     <div class="hiscore-button bg-two">
-                        <a href="{{ route('hiscore', ['boss', 'vorkath']) }}">Bosses</a>
+                        <a href="{{ route('hiscore', ['boss', 'abyssal sire']) }}">Bosses</a>
                     </div>
                 </div>
 

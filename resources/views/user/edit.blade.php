@@ -98,22 +98,20 @@
                 </div>
             </div>
 
-            @if ($user->icon_id != null)
-                <div class="form-group row">
-                    <label class="col-md-4 col-form-label text-md-right">Current profile icon</label>
+            <div class="form-group row">
+                <label class="col-md-4 col-form-label text-md-right">Current profile icon</label>
 
-                    <div class="col-md-6">
-                        <label class="icon-radio">
-                            <input type="radio" name="icon_id" id="icon_id" value="{{ $user->icon_id }}"
-                                   onclick="fillText()" checked>
-                            <img class="align"
-                                 src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
-                                 alt="Current profile icon">
-                            ID: {{ $user->icon_id }}
-                        </label>
-                    </div>
+                <div class="col-md-6">
+                    <label class="icon-radio">
+                        <input type="radio" name="icon_id" id="icon_id" value="{{ $user->icon_id }}"
+                               onclick="fillText()" checked>
+                        <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
+                             alt="Current profile icon"
+                             title="Click here to keep using your current profile icon">
+                        <span>ID: {{ $user->icon_id }}</span>
+                    </label>
                 </div>
-            @endif
+            </div>
 
             <div class="form-group row">
                 <label for="icon_id" class="col-md-4 col-form-label text-md-right">Profile icon ID</label>
@@ -128,9 +126,10 @@
                            class="icon-text form-control @error('icon_id') is-invalid @enderror" name="icon_id"
                            value="{{ old('icon_id', $user->icon_id) }}" aria-describedby="icon_idTip"
                            onfocus="checkRadio()">
-                    <small id="icon_idTip" class="form-text text-muted">Type in the ID of an icon you wish to display as
-                        your profile icon. Search icons <a target="_blank" rel="noopener noreferrer"
-                                                           href="https://www.osrsbox.com/tools/item-search/">here</a></small>
+                    <small id="icon_idTip" class="form-text text-muted">
+                        Type in the ID of an icon you wish to display as your profile icon. Search icons
+                        <a target="_blank" rel="noopener noreferrer" href="https://www.osrsbox.com/tools/item-search/">here</a>
+                    </small>
 
                     @error('icon_id')
                     <span class="invalid-feedback" role="alert">
@@ -147,7 +146,9 @@
                     @foreach ($randomIcons as $icon)
                         <label class="icon-radio">
                             <input type="radio" name="icon_id" id="icon_id" value="{{ $icon }}" onclick="fillText()">
-                            <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $icon }}.png" alt="Random icon">
+                            <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $icon }}.png"
+                                 alt="Random icon"
+                                 title="Click here to use this as your profile icon">
                         </label>
                     @endforeach
 
