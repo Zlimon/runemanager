@@ -56,15 +56,11 @@ class Helper
     {
         $itemData = 'https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json';
 
-        if (self::verifyUrl($itemData)) {
-            $itemData = file_get_contents($itemData);
-            $itemData = json_decode($itemData, true);
+        $itemData = file_get_contents($itemData);
+        $itemData = json_decode($itemData, true);
 
-            if (!$itemData['noted']) {
-                return true;
-            } else {
-                return false;
-            }
+        if (!$itemData['noted']) {
+            return true;
         } else {
             return false;
         }
@@ -75,7 +71,7 @@ class Helper
      *
      * @return
      */
-    public static function verifyUrl($url)
+    public static function getPlayerData($url)
     {
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
@@ -89,7 +85,23 @@ class Helper
 
         /* If the document has loaded successfully without any redirection or error */
         if ($httpCode >= 200 && $httpCode < 300) {
-            return $response;
+            $playerStats = explode("\n", $response);
+
+            if (count($playerStats) > 1) {
+                /* Convert the CSV file of player stats into an array */
+                $playerData = [];
+                foreach ($playerStats as $playerStat) {
+                    $playerData[] = str_getcsv($playerStat);
+                }
+
+                if ($playerData[0][0]) {
+                    return $playerData;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         } else {
             return false;
         }

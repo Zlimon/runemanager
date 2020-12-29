@@ -69,18 +69,9 @@ class AccountController extends Controller
                                 '%20', request('username'));
 
                         /* Get the $playerDataUrl file content. */
-                        $getPlayerData = file_get_contents($playerDataUrl);
+                        $playerData = Helper::getPlayerData($playerDataUrl);
 
-                        /* Fetch the content from $playerDataUrl. */
-                        $playerStats = explode("\n", $getPlayerData);
-
-                        /* Convert the CSV file of player stats into an array */
-                        $playerData = [];
-                        foreach ($playerStats as $playerStat) {
-                            $playerData[] = str_getcsv($playerStat);
-                        }
-
-                        if ($playerData[0][0]) {
+                        if ($playerData) {
                             $account = Account::create([
                                 'user_id' => $authStatus->user_id,
                                 'account_type' => request('account_type'),
