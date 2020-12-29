@@ -167,8 +167,17 @@
                     <div class="alert alert-danger bg-dark col-md-8 background-dialog-iron-rivets mb-1"
                          style="margin: auto; border: 0;">
                         @foreach ($errors->all() as $errorMessage)
-                            <h1 class="runescape-danger font-medium">Error!</h1>
-                            <p>{{ $errorMessage }}</p>
+                            <div class="row align-items-center">
+                                <div class="col-3 col-sm-2 col-md-2">
+                                    <img src="{{ asset('images/ignore.png') }}"
+                                         class="pixel icon"
+                                         alt="Sad face">
+                                </div>
+                                <div class="col">
+                                    <h1 class="runescape-danger font-medium">Error!</h1>
+                                    <p>{{ $errorMessage }}</p>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 @endif
@@ -176,8 +185,17 @@
                 @if (Session::has('message'))
                     <div class="alert alert-success bg-dark col-md-8 background-dialog-iron-rivets mb-1"
                          style="margin: auto; border: 0;">
-                        <h1 class="runescape-success font-medium">Success!</h1>
-                        <p>{{ Session::get('message') }}</p>
+                        <div class="row align-items-center">
+                            <div class="col-3 col-sm-2 col-md-2">
+                                <img src="{{ asset('images/friend.png') }}"
+                                     class="pixel icon"
+                                     alt="Happy face">
+                            </div>
+                            <div class="col">
+                                <h1 class="runescape-success font-medium">Success!</h1>
+                                <p>{{ Session::get('message') }}</p>
+                            </div>
+                        </div>
                     </div>
                 @endif
 
