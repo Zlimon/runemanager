@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-
 use App\Helpers\Helper;
 use App\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -24,15 +22,16 @@ class UserController extends Controller
     /**
      * Show the user edit page.
      *
-     * @param  User  $user
+     * @param User $user
      * @return
      */
-    public function edit(User $user) {
+    public function edit(User $user)
+    {
         $user = Auth::user();
 
         $randomIcons = [];
 
-        for ($i=0; count($randomIcons) < 10; $i++) {
+        for ($i = 0; count($randomIcons) < 12; $i++) {
             if ($icon_id = Helper::randomItemId()) {
                 array_push($randomIcons, $icon_id);
             }
@@ -44,21 +43,28 @@ class UserController extends Controller
     /**
      * Updates user after a valid request.
      *
-     * @param  User  $user
+     * @param User $user
      * @return
      */
-    public function update(User $user) {
-        if (request('icon_id') == null || request('icon_id') == 0 || Helper::verifyItem(request('icon_id'))) {
+    public function update(User $user)
+    {
+        if ((int)request('icon_id') > 0 && Helper::verifyItem(request('icon_id'))) {
             Auth::user()->update(request()->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
                     Rule::unique('users')->ignore(Auth::user()->id),
                 ],
                 'private' => ['boolean'],
-                'icon_id' => ['nullable', 'integer']
+                'icon_id' => ['integer']
             ]));
 
             return redirect(route('home'))->with('message', 'Profile updated!');
+        } else {
+            return redirect()->back()->withErrors('Invalid icon ID! Try an unnoted item.');
         }
     }
 }

@@ -20,7 +20,7 @@ class CreateTheatreOfBloodTable extends Migration
             $table->integer('rank')->default(0)->unsigned();
             $table->integer('obtained')->default(0)->unsigned();
             $table->integer('lil_zik')->default(0)->unsigned();
-            $table->integer('scythhe_of_vitour_(uncharged)')->default(0)->unsigned();
+            $table->integer('scythe_of_vitur_(uncharged)')->default(0)->unsigned();
             $table->integer('ghrazi_rapier')->default(0)->unsigned();
             $table->integer('sanguinesti_staff_(uncharged)')->default(0)->unsigned();
             $table->integer('justiciar_faceguard')->default(0)->unsigned();

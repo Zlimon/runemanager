@@ -15,7 +15,8 @@ class CreateCollectionsTable extends Migration
     {
         Schema::create('collections', function (Blueprint $table) {
             $table->string('name')->unique();
-            $table->enum('type', ['boss', 'raid', 'clue', 'minigame', 'other']);
+            $table->string('alias');
+            $table->enum('type', ['boss', 'raid', 'npc', 'clue', 'minigame', 'other']);
             $table->string('model');
         });
     }

@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         App\Providers\HelperServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
 
     ],
 
@@ -229,7 +230,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Helper' => App\Helpers\Helper::class,
-
+        'Pusher' => Pusher\Pusher::class,
     ],
 
 ];

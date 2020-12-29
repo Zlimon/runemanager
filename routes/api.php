@@ -14,25 +14,39 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::prefix('/user')->group(function() {
+	Route::post('/register', 'Api\UserController@register')->name('user-register');
+	Route::post('/login', 'Api\UserController@login')->name('user-login');
 });
 
-Route::prefix('/hiscore')->group(function () {
-	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('show-skill-hiscore');
-	Route::get('/boss/{skill}', 'Api\HiscoreController@boss')->name('show-boss-hiscore');
+Route::middleware('auth:api')->group(function() {
+	Route::get('/user', 'Api\UserController@user')->name('user-show');
+	Route::post('/authenticate', 'Api\AccountController@store')->name('authenticate'); // Authenticate user
+
+	Route::prefix('/account')->group(function() {
+		Route::put('/{accountUsername}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
+		Route::post('/{accountUsername}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
+		Route::post('/{accountUsername}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
+	});
 });
 
-Route::prefix('/account')->group(function () {
-	Route::get('/{account}', 'Api\AccountController@show')->name('show-account');
-	Route::post('/{account}', 'Api\AccountController@store')->name('authenticate-account');
-
-	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('show-account-collection');
-	Route::put('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@update')->name('update-account-collection');
+Route::prefix('/account')->group(function() {
+	Route::get('/{account}', 'Api\AccountController@show')->name('account-show');
+	Route::get('/{account}/skill', 'Api\AccountController@skill')->name('account-show-skill');
+	Route::get('/{account}/boss', 'Api\AccountController@boss')->name('account-show-boss');
+	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
 });
 
-Route::prefix('/collection')->group(function () {
-	// Route::middleware('auth:api')->group(function () {
-		Route::get('/{collectionType}', 'CollectionController@list');
-	// });
+Route::prefix('/hiscore')->group(function() {
+	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
+	Route::get('/boss/{skill}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
+});
+
+Route::prefix('/collection')->group(function() {
+	Route::get('/{collectionType}', 'CollectionController@list');
+});
+
+Route::prefix('/notification')->group(function() {
+	Route::get('/all', 'Api\NotificationController@index')->name('notification-show-all');
+	Route::get('/account/{accountUsername}', 'Api\NotificationController@show')->name('notification-account-show');
 });

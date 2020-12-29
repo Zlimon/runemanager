@@ -2,17 +2,17 @@
 
 namespace App\Http\Resources;
 
+use App\Collection;
+use App\Helpers\Helper;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
-
-use App\Helpers\Helper;
 
 class AccountResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
@@ -33,15 +33,26 @@ class AccountResource extends JsonResource
     {
         $skills = Helper::listSkills();
 
-        $stats = [];
+        $skillHiscores = [];
 
         foreach ($skills as $skillName) {
-            $stats[$skillName] =  DB::table($skillName)->where('account_id', $this->id)->first();
+            $skillHiscores[$skillName] = DB::table($skillName)->where('account_id', $this->id)->first();
+        }
+
+        $bosses = Helper::listBosses();
+
+        $bossHiscores = [];
+
+        foreach ($bosses as $bossName) {
+            $collection = Collection::findByName($bossName);
+
+            $bossHiscores[$bossName] = $collection->model::first();
         }
 
         return [
             'meta' => [
-                'hiscores' => SkillResource::collection(collect($stats)),
+                'skillHiscores' => SkillResource::collection(collect($skillHiscores)),
+                'bossHiscores' => BossResource::collection(collect($bossHiscores)),
             ]
         ];
     }

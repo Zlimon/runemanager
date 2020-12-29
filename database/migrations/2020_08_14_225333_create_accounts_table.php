@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use App\Helpers\Helper;
+
 class CreateAccountsTable extends Migration
 {
     /**
@@ -16,7 +18,7 @@ class CreateAccountsTable extends Migration
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->unsigned();
-            $table->enum('type', ['normal', 'ironman', 'hardcore', 'ultimate']);
+            $table->enum('account_type', Helper::listAccountTypes());
             $table->string('username', 13);
             $table->integer('rank')->default(0);
             $table->integer('level')->default(32); // Minimum total level

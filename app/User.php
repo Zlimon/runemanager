@@ -2,13 +2,52 @@
 
 namespace App;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
+/**
+ * App\User
+ *
+ * @property int $id
+ * @property string $uuid
+ * @property string $name
+ * @property string $email
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string $password
+ * @property string|null $remember_token
+ * @property int|null $icon_id
+ * @property int $private
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Account[] $account
+ * @property-read int|null $account_count
+ * @property-read \App\AccountAuthStatus|null $authStatus
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Client[] $clients
+ * @property-read int|null $clients_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
+ * @property-read int|null $tokens_count
+ * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereIconId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePrivate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUuid($value)
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +55,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'private', 'icon_id',
+        'name',
+        'email',
+        'password',
+        'private',
+        'icon_id',
     ];
 
     /**
@@ -25,7 +68,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -37,7 +81,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function account() {
+    public function account()
+    {
         return $this->hasMany(Account::class);
+    }
+
+    public function authStatus()
+    {
+        return $this->hasOne(AccountAuthStatus::class);
     }
 }

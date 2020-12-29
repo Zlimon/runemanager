@@ -12,3 +12,8 @@ npm-debug.log
 yarn-error.log
 .vagrant
 /ssl/BaltimoreCyberTrustRoot.crt.pem
+/public/resource-packs/*
+/public/js/*
+/.idea/*
+_ide_helper.php
+.phpstorm.meta.php
