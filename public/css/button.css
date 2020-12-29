@@ -1,0 +1,96 @@
+.button-combat-style-thin {
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 4rem;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
+}
+
+.button-combat-style-thin:hover {
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin_selected.png') no-repeat;
+    background-position: center center;
+}
+
+.button-combat-style-narrow {
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 4rem;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
+}
+
+.button-combat-style-narrow:hover {
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow_selected.png') no-repeat;
+    background-position: center center;
+}
+
+.button-enter-wilderness-teleport {
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 4rem;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
+}
+
+.button-enter-wilderness-teleport:hover {
+    transition: all .2s ease-in;
+
+    background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport_hovered.png') no-repeat;
+    background-position: center center;
+}
+
+.button-window-close {
+    background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+
+    image-rendering: pixelated;
+}
+
+.button-window-close:hover {
+    background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close_hovered.png') no-repeat;
+    background-position: center center;
+}
+
+.button-rectangle {
+    width: 12rem;
+    height: 5rem;
+}
+
+.button-square {
+    width: 6.5rem;
+    height: 6.5rem;
+}
+
+.button-with-icon {
+    width: 12.5rem;
+    height: 5rem;
+}
