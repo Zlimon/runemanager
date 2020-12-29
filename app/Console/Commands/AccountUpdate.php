@@ -2,15 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-
-use Carbon\Carbon;
-
-use App\Helpers\Helper;
-
 use App\Account;
 use App\Collection;
+use App\Helpers\Helper;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class AccountUpdate extends Command
 {
@@ -46,9 +42,10 @@ class AccountUpdate extends Command
     public function handle()
     {
         $accounts = Account::get();
-        
+
         foreach ($accounts as $account) {
-            $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player='.str_replace(' ', '%20', $account->username);
+            $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(' ',
+                    '%20', $account->username);
 
             /* Get the $playerDataUrl file content. */
             $getPlayerData = file_get_contents($playerDataUrl);
@@ -77,7 +74,11 @@ class AccountUpdate extends Command
                     for ($i = 0; $i < count($skills); $i++) {
                         DB::table($skills[$i])
                             ->where('account_id', $account->id)
-                            ->update(['rank' => ($playerData[$i+1][0] >= 1 ? $playerData[$i+1][0] : 0), 'level' => $playerData[$i+1][1], 'xp' => ($playerData[$i+1][2] >= 0 ? $playerData[$i+1][2] : 0)]);
+                            ->update([
+                                'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
+                                'level' => $playerData[$i + 1][1],
+                                'xp' => ($playerData[$i + 1][2] >= 0 ? $playerData[$i + 1][2] : 0)
+                            ]);
                     }
 
                     $clueScrollAmount = count(Helper::listClueScrollTiers());
@@ -95,13 +96,14 @@ class AccountUpdate extends Command
 
                         $collection = $collection->model::where('account_id', $account->id)->first();
 
-                        $collection->kill_count = ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
-                        $collection->rank = ($playerData[$i+1][0] >= 0 ? $playerData[$i+1][0] : 0);
+                        $collection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+                        $collection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
                         $collection->update();
 
-                        if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
-                            $dksKillCount += ($playerData[$i+1][1] >= 0 ? $playerData[$i+1][1] : 0);
+                        if (in_array($bosses[$bossCounter], ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'],
+                            true)) {
+                            $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                         }
 
                         $bossCounter++;

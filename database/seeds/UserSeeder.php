@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
         	'name' => 'Simon',
         	'email' => 'simon@runemanager.com',
         	'password' => bcrypt('runemanager1234'),
+            'icon_id' => Helper::randomItemId(true),
         ]);
     }
 }

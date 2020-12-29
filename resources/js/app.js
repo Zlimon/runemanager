@@ -28,6 +28,8 @@ Vue.component('bosshiscore', require('./components/BossHiscore.vue').default);
 Vue.component('accounthiscore', require('./components/AccountHiscore.vue').default);
 Vue.component('accountskillhiscore', require('./components/AccountSkillHiscore.vue').default);
 Vue.component('accountbosshiscore', require('./components/AccountBossHiscore.vue').default);
+Vue.component('allnotification', require('./components/AllNotification.vue').default);
+Vue.component('accountnotification', require('./components/AccountNotification.vue').default);
 Vue.component('notification', require('./components/Notification.vue').default);
 
 Vue.component(

@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-
+use App\Account;
 use App\Helpers\Helper;
 use App\NewsPost;
-use App\Account;
-use App\Image;
 
 class PageController extends Controller
 {
-    public function index() {
-        //$recentMembers = Account::orderBy('created_at', 'DESC')->limit(5)->get();
-        $recentPosts = NewsPost::with('user')->with('category')->with('image')->limit(5)->orderBy('created_at', 'DESC')->get();
+    public function index()
+    {
+        $recentPosts = NewsPost::with('user')->with('category')->with('image')->limit(5)->orderByDesc('created_at')->get();
 
         return view('index', compact('recentPosts'));
     }
@@ -24,8 +20,9 @@ class PageController extends Controller
      *
      * @return
      */
-    public function updateLog() {
-        $updates = Account::orderBy('updated_at', 'DESC')->whereColumn('updated_at', '>', 'created_at')->get();
+    public function updateLog()
+    {
+        $updates = Account::orderByDesc('updated_at')->whereColumn('updated_at', '>', 'created_at')->get();
 
         return view('update-log', compact('updates'));
     }
@@ -35,19 +32,23 @@ class PageController extends Controller
      *
      * @return
      */
-    public function hiscore($hiscoreType, $hiscore) {
+    public function hiscore($hiscoreType, $hiscoreName)
+    {
         $hiscoreList = Helper::listSkills();
 
         array_push($hiscoreList, "overall");
-        
+
         if ($hiscoreType == "boss") {
             $hiscoreList = Helper::listBosses();
-        }        
+            $hiscoreList = array_values($hiscoreList);
+        }
 
-        list($hiscoreListTop, $hiscoreListBottom) = array_chunk($hiscoreList, ceil(count($hiscoreList) / 2)); // Split skills array into two arrays for a top and bottom skill bar
+        list($hiscoreListTop, $hiscoreListBottom) = array_chunk($hiscoreList,
+            ceil(count($hiscoreList) / 2)); // Split skills array into two arrays for a top and bottom skill bar
 
         $accountCount = Account::count();
 
-        return view('hiscore', compact('hiscoreType', 'hiscore', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom', 'accountCount'));
+        return view('hiscore',
+            compact('hiscoreType', 'hiscoreName', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom', 'accountCount'));
     }
 }

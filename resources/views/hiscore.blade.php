@@ -1,70 +1,92 @@
 @extends('layouts.layout')
 
 @section('title')
-	{{ ucfirst($hiscore) }}
+    {{ ucfirst(Helper::collectionAttribute($hiscoreName, "alias")) }}
 @endsection
 
 @section('content')
-	<link href="{{ asset('css/hiscore.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/hiscore.css') }}" rel="stylesheet">
 
-	<div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
-		<div class="row justify-content-center">
-			<a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
-				<div class="btn btn-lg background-world-map" style="width: 7rem; height: 6rem;">
-					<img class="pixel" src="{{ asset('images/skill') }}/Overall.png" width="54" alt="Overall skill icon">
-					<br>
-					<span>Skills</span>
-				</div>
-			</a>
+    <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
+        <div class="row justify-content-center">
+            <a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
+                <div class="btn button-square background-world-map">
+                    <img src="{{ asset('images/skill/overall.png') }}"
+                         class="pixel icon"
+                         alt="Skills icon"
+                         title="Click here to see the skills hiscores">
+                    <br>
+                    <span>Skills</span>
+                </div>
+            </a>
 
-			<a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
-				<div class="btn btn-lg background-world-map" style="width: 7rem; height: 6rem;">
-					<img class="pixel" src="{{ asset('images/boss') }}/boss.png" width="54" alt="Overall skill icon">
-					<br>
-					<span>Bosses</span>
-				</div>
-			</a>
-		</div>
+            <a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
+                <div class="btn button-square background-world-map">
+                    <img src="{{ asset('images/boss/boss.png') }}"
+                         class="pixel icon"
+                         alt="Bosses icon"
+                         title="Click here to see the boss hiscores">
+                    <br>
+                    <span>Bosses</span>
+                </div>
+            </a>
+        </div>
 
-		<div class="wide" id="highscore_top">
-			<div class="highscore_selection">
+        <div id="highscore_top">
+            <div class="highscore_selection">
 				<span class="selection-top">
-					@foreach ($hiscoreListTop as $skill)
-						<a class="middle-icon" href="{{ route('hiscore', [$hiscoreType, $skill]) }}"><img class="middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"></a>
-					@endforeach
+					@foreach ($hiscoreListTop as $hiscore)
+                        <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
+                            <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscore.'.png') }}"
+                                 class="icon"
+                                 alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
+                                 title="Click here to see {{ ucfirst($hiscore) }} hiscores">
+                        </a>
+                    @endforeach
 				</span>
-				<div class="mid-part">
-					<span class="active middle-icon" style="display: inline-block;"><img class="pixel middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $hiscore }}.png" alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"><h1>{{ ucfirst($hiscore) }}</h1></span>
-					@foreach ($hiscoreList as $skill)
-						<span class="middle-icon"><img class="pixel middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"><h1>{{ ucfirst($skill) }}</h1></span>
-					@endforeach
-				</div>
-				<span class="selection-bot">
-					@foreach ($hiscoreListBottom as $skill)
-						<a class="middle-icon" href="{{ route('hiscore', [$hiscoreType, $skill]) }}"><img class="middle-img-icon" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $skill }}.png" alt="{{ ucfirst($skill) }} {{ $hiscoreType }} icon"></a>
-					@endforeach
+                <div class="mid-part">
+                    <h1 class="active middle-icon" style="display: inline-block;">
+                        <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
+                            class="pixel icon"
+                            alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
+                        <br>
+                        <span>{{ ucfirst(($hiscoreType === "boss" ? Helper::collectionAttribute($hiscoreName, "alias") : $hiscoreName)) }}</span>
+                    </h1>
+                </div>
+                <span class="selection-bot">
+					@foreach ($hiscoreListBottom as $hiscore)
+                        <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
+                            <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscore.'.png') }}"
+                                 class="icon"
+                                 alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
+                                 title="Click here to see {{ ucfirst($hiscore) }} hiscores">
+                        </a>
+                    @endforeach
 				</span>
-			</div>
-		</div>
+            </div>
+        </div>
 
-		@if ($accountCount > 0)
-			<div class="float-left mt-3">
-				<span class="middle-icon">
-					<img class="pixel middle-img-icon" style="width: 150px; height: 150px;" src="{{ asset('images/'.$hiscoreType.'/') }}/{{ $hiscore }}.png" alt="{{ ucfirst($hiscore) }} skill icon">
-				</span>
-			</div>
+        @if ($accountCount > 0)
+            <div class="float-left mt-3">
+                <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
+                     class="pixel icon"
+                     alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon"
+                     style="width: 7.5rem; height: 7.5rem;">
+            </div>
 
-			@if ($hiscoreType == "skill")
-				<skillhiscore skill="{{ $hiscore }}"></skillhiscore>
-			@elseif ($hiscoreType == "boss")
-				<bosshiscore boss="{{ $hiscore }}"></bosshiscore>
-			@endif
-		@else
-			<div class="text-center py-5">
-				<img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px" alt="Sad face">
-				<h1>No accounts, no hiscores...</h1>
-				<h2 class="text-center">Link an account <a href="{{ route('account-create') }}">here</a>!</h2>
-			</div>
-		@endif
-	</div>
+            @if ($hiscoreType == "skill")
+                <skillhiscore skill="{{ $hiscoreName }}"></skillhiscore>
+            @elseif ($hiscoreType == "boss")
+                <bosshiscore boss="{{ $hiscoreName }}"></bosshiscore>
+            @endif
+        @else
+            <div class="text-center py-5">
+                <img src="{{ asset('images/ignore.png') }}"
+                     class="pixel icon"
+                     alt="Sad face">
+                <h1>No accounts, no hiscores...</h1>
+                <h2 class="text-center">Link an account <a href="{{ route('account-create') }}">here</a>!</h2>
+            </div>
+        @endif
+    </div>
 @endsection

@@ -60,7 +60,7 @@ class CollectionSeeder extends Seeder
 			// ["name" => "the fight caves", "alias" => "The Fight caves", "type" => "boss", "model" => "App\Boss\TheFightCaves"],
 			// ["name" => "the inferno", "alias" => "something", "type" => "boss", "model" => "App\Boss\TheInferno"],
 			["name" => "the nightmare", "alias" => "The Nightmare", "type" => "boss", "model" => "App\Boss\TheNightmare"],
-			["name" => "goblin", "alias" => "something", "type" => "boss", "model" => "App\Boss\Goblin"], // TODO remove later
+			["name" => "goblin", "alias" => "Goblin", "type" => "npc", "model" => "App\Npc\Goblin"], // TODO remove later
 		]);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Events;
 
+use App\Account;
+use App\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -21,9 +21,9 @@ class AccountKill implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($notification)
+    public function __construct(Account $account, Notification $notification)
     {
-        $this->notification = $notification;
+        $this->notification = $notification::with('category')->where('account_id', $account->id)->orderByDesc('id')->first();
     }
 
     /**
