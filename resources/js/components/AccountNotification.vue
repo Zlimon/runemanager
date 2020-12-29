@@ -1,49 +1,49 @@
 <template>
-	<div>
-		<notifications :notifications="notificationsData"></notifications>
-	</div>
+    <div>
+        <notifications :notifications="notificationsData"></notifications>
+    </div>
 </template>
 
 <script>
-	import notifications from './Notification.vue'
+import notifications from './Notification.vue'
 
-	export default {
-		props: {
-			account: { required: true },
-		},
+export default {
+    props: {
+        account: {required: true},
+    },
 
-		methods: {
-			checkAccount (accountUsername) {
-				return this.account.id === accountUsername;
-			},
-		},
+    methods: {
+        checkAccount(accountUsername) {
+            return this.account.id === accountUsername;
+        },
+    },
 
-		components: {
-			'notifications': notifications,
-		},
+    components: {
+        'notifications': notifications,
+    },
 
-		data() {
-			return {
-				notificationsData: []
-			}
-		},
+    data() {
+        return {
+            notificationsData: []
+        }
+    },
 
-		mounted() {
-			axios
-			.get('/api/notification/account/' + this.account.username)
-			.then((response) => {
-				this.notificationsData = response.data.data;
-			})
-			.catch(error => (console.log(error)))
-		},
+    mounted() {
+        axios
+            .get('/api/notification/account/' + this.account.username)
+            .then((response) => {
+                this.notificationsData = response.data.data;
+            })
+            .catch(error => (console.log(error)))
+    },
 
-		created() {
-			window.Echo.channel('account-all')
-				.listen('AccountAll', (e) => {
-					if (this.checkAccount(e.notification.account_id)) {
-						this.notificationsData.unshift(e.notification);
-					}
-				});
-		},
-	}
+    created() {
+        window.Echo.channel('account-all')
+            .listen('AccountAll', (e) => {
+                if (this.checkAccount(e.notification.account_id)) {
+                    this.notificationsData.unshift(e.notification);
+                }
+            });
+    },
+}
 </script>

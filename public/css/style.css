@@ -302,8 +302,6 @@ table th
     margin: 5px;
 
     white-space: nowrap;
-
-    border: solid 2px;
 }
 
 .collection-log-item-counter
@@ -334,6 +332,12 @@ table th
     height: 60px;
     object-fit: contain;
     border-right: solid 2px;
+}
+
+.hiscore-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .icon-radio [type=radio]

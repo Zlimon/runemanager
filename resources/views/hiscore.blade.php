@@ -14,7 +14,7 @@
                     <img src="{{ asset('images/skill/overall.png') }}"
                          class="icon"
                          alt="Skills icon"
-                         title="Click here to see skills hiscores">
+                         title="Click here to see the skills hiscores">
                     <br>
                     <span>Skills</span>
                 </div>
@@ -25,7 +25,7 @@
                     <img src="{{ asset('images/boss/boss.png') }}"
                          class="icon"
                          alt="Bosses icon"
-                         title="Click here to see boss hiscores">
+                         title="Click here to see the boss hiscores">
                     <br>
                     <span>Bosses</span>
                 </div>
