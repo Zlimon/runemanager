@@ -51,7 +51,7 @@ class AccountAuthController extends Controller
                 } else {
                     $playerDataUrl = Helper::formatHiscoreUrl(request('account_type'), request('username'));
 
-                    if (Helper::verifyUrl($playerDataUrl)) {
+                    if (Helper::getPlayerData($playerDataUrl)) {
                         $authStatus = new AccountAuthStatus;
 
                         $authStatus->user_id = Auth::user()->id;
@@ -83,7 +83,7 @@ class AccountAuthController extends Controller
             if ($authStatus->account_type != request('account_type')) {
                 $playerDataUrl = Helper::formatHiscoreUrl(request('account_type'), $authStatus->username);
 
-                if (Helper::verifyUrl($playerDataUrl)) {
+                if (Helper::getPlayerData($playerDataUrl)) {
                     $authStatus->account_type = request('account_type');
 
                     $authStatus->save();

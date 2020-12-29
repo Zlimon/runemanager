@@ -83,7 +83,7 @@
                                 @else
                                     <div class="text-center">
                                         <h3 class="text-danger text-center">Currently no tasks to do!</h3>
-                                        <img class="pixel" src="{{ asset('images') }}/ignore.png" width="75px"
+                                        <img class="pixel" src="{{ asset('images/ignore.png') }}" width="75px"
                                              alt="Sad face">
                                     </div>
                                 @endif

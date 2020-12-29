@@ -8,26 +8,27 @@
     <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
         <div class="row mb-3">
             <div class="col-md-9">
-                <img class="pixel float-left" style="margin-right: -15px;"
-                     src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png" width="150"
-                     alt="Profile icon">
+                <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
+                     class="pixel icon float-left"
+                     alt="Profile icon"
+                     style="width: 7.5rem; height: 7.5rem;">
                 <h1 class="text-left">Welcome, {{ Auth::user()->name }}</h1>
 
                 <p>Joined: <strong>{{ \Carbon\Carbon::parse($user->created_at)->format('d. M Y') }}</strong></p>
             </div>
 
             <div class="col-md-3">
+                <span>Current status:</span>
+                <br>
                 @if ($user->private === 0)
-                    <span>Current status:</span>
-                    <br>
-                    <img class="align" src="{{ asset('images') }}/friend.png" alt="Friend icon"
-                         title="Currently not private">
+                    <img src="{{ asset('images/friend.png') }}"
+                         alt="Happy face"
+                         title="Your profile is currently NOT private">
                     <span><strong>Not private</strong></span>
                 @else
-                    <span>Current status:</span>
-                    <br>
-                    <img class="align" src="{{ asset('images') }}/ignore.png" alt="Ignore icon"
-                         title="Currently private">
+                    <img src="{{ asset('images/ignore.png') }}"
+                         alt="Sad face"
+                         title="Your profile is currently private">
                     <span><strong>Private</strong></span>
                 @endif
 
@@ -45,11 +46,15 @@
                     @foreach ($user->account as $account)
                         <div class="row align-items-center">
                             <div class="col-md-8">
-                                <p>@if ($account->account_type != "normal")<img class="pixel mr-1"
-                                                                                src="{{ asset('images') }}/{{ $account->account_type }}.png"
-                                                                                style="width: 20px;"
-                                                                                alt="Account type icon">@endif
-                                    <strong>{{ $account->username }}</strong></p>
+                                <p>
+                                    @if ($account->account_type !== "normal")
+                                        <img src="{{ asset('images/'.$account->account_type.'.png') }}"
+                                             class="pixel"
+                                             alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon"
+                                             style="width: 1rem;">
+                                    @endif
+                                    <strong>{{ $account->username }}</strong>
+                                </p>
                             </div>
 
                             <div class="col-md-4">

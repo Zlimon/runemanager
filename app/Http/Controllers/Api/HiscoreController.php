@@ -21,8 +21,7 @@ class HiscoreController extends Controller
     {
         if (Account::count() > 0) {
             if ($skillName == "overall") {
-                $hiscores = Account::orderByRaw('CASE WHEN rank > 0 THEN 1 ELSE 2 END')->orderBy('rank',
-                    'ASC')->orderBy('level', 'DESC')->orderBy('xp', 'DESC')->get();
+                $hiscores = Account::orderByRaw('CASE WHEN rank > 0 THEN 1 ELSE 2 END')->orderBy('rank')->orderByDesc('level')->orderByDesc('xp')->get();
 
                 $sumTotalXp = Account::sum('xp');
 
@@ -57,9 +56,9 @@ class HiscoreController extends Controller
                         $skillName . '.rank', 'username')
                     ->join('accounts', $skillName . '.account_id', '=', 'accounts.id')
                     ->orderByRaw('CASE WHEN ' . $skillName . '.rank > 0 THEN 1 ELSE 2 END')
-                    ->orderBy('rank', 'ASC')
-                    ->orderBy('level', 'DESC')
-                    ->orderBy('xp', 'DESC')
+                    ->orderBy('rank')
+                    ->orderByDesc('level')
+                    ->orderByDesc('xp')
                     ->get();
             }
 
@@ -82,7 +81,7 @@ class HiscoreController extends Controller
         if (Account::count() > 0) {
             $collection = Collection::findByName($bossName);
 
-            $boss = $collection->model::with('account')->orderBy('kill_count', 'DESC')->get();
+            $boss = $collection->model::with('account')->orderByDesc('kill_count')->get();
 
             $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
                 ->selectRaw('COUNT(*) AS total_kills')

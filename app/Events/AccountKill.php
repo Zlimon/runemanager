@@ -23,8 +23,7 @@ class AccountKill implements ShouldBroadcast
      */
     public function __construct(Account $account, Notification $notification)
     {
-        $this->notification = $notification::with('category')->where('account_id', $account->id)->orderBy('id',
-            'DESC')->first();
+        $this->notification = $notification::with('category')->where('account_id', $account->id)->orderByDesc('id')->first();
     }
 
     /**

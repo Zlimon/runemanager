@@ -32,12 +32,12 @@
                 <div class="col-md-6" style="margin-top: .5rem;">
                     @foreach (Helper::listAccountTypes() as $accountType)
                         @if ($accountType === 'normal')
-                            <div class="form-check" style="margin-left: .45rem;">
+                            <div class="form-check" style="margin-left: .4rem;">
                                 <label class="form-check-label" for="normal">
                                     <input id="{{ $accountType }}" type="radio"
                                            class="form-check-input @error('account_type') is-invalid @enderror"
                                            name="account_type" value="{{ $accountType }}" checked>
-                                    Normal
+                                    <span>Normal</span>
                                 </label>
                             </div>
                         @else
@@ -46,10 +46,10 @@
                                     <input id="{{ $accountType }}" type="radio"
                                            class="form-check-input @error('account_type') is-invalid @enderror"
                                            name="account_type" value="{{ $accountType }}">
-                                    <img class="align" src="{{ asset('images') }}/{{ $accountType }}.png"
+                                    <img src="{{ asset('images/'.$accountType.'.png') }}"
                                          alt="{{ Helper::formatAccountTypeName($accountType) }} icon"
                                          title="Click here to select {{ Helper::formatAccountTypeName($accountType) }} account type for your account">
-                                    {{ Helper::formatAccountTypeName($accountType) }}
+                                    <span>{{ Helper::formatAccountTypeName($accountType) }}</span>
                                 </label>
                             </div>
                         @endif

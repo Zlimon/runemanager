@@ -1,7 +1,7 @@
 <style scoped>
-    .action-link {
-        cursor: pointer;
-    }
+.action-link {
+    cursor: pointer;
+}
 </style>
 
 <template>
@@ -14,34 +14,34 @@
                     <!-- Authorized Tokens -->
                     <table class="table table-responsive table-borderless mb-0">
                         <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Scopes</th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <th>Name</th>
+                            <th>Scopes</th>
+                            <th></th>
+                        </tr>
                         </thead>
 
                         <tbody>
-                            <tr v-for="token in tokens">
-                                <!-- Client Name -->
-                                <td style="vertical-align: middle;">
-                                    {{ token.client.name }}
-                                </td>
+                        <tr v-for="token in tokens">
+                            <!-- Client Name -->
+                            <td style="vertical-align: middle;">
+                                {{ token.client.name }}
+                            </td>
 
-                                <!-- Scopes -->
-                                <td style="vertical-align: middle;">
+                            <!-- Scopes -->
+                            <td style="vertical-align: middle;">
                                     <span v-if="token.scopes.length > 0">
                                         {{ token.scopes.join(', ') }}
                                     </span>
-                                </td>
+                            </td>
 
-                                <!-- Revoke Button -->
-                                <td style="vertical-align: middle;">
-                                    <a class="action-link text-danger" @click="revoke(token)">
-                                        Revoke
-                                    </a>
-                                </td>
-                            </tr>
+                            <!-- Revoke Button -->
+                            <td style="vertical-align: middle;">
+                                <a class="action-link text-danger" @click="revoke(token)">
+                                    Revoke
+                                </a>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -51,57 +51,57 @@
 </template>
 
 <script>
-    export default {
-        /*
-         * The component's data.
-         */
-        data() {
-            return {
-                tokens: []
-            };
-        },
+export default {
+    /*
+     * The component's data.
+     */
+    data() {
+        return {
+            tokens: []
+        };
+    },
 
-        /**
-         * Prepare the component (Vue 1.x).
-         */
-        ready() {
-            this.prepareComponent();
-        },
+    /**
+     * Prepare the component (Vue 1.x).
+     */
+    ready() {
+        this.prepareComponent();
+    },
 
+    /**
+     * Prepare the component (Vue 2.x).
+     */
+    mounted() {
+        this.prepareComponent();
+    },
+
+    methods: {
         /**
          * Prepare the component (Vue 2.x).
          */
-        mounted() {
-            this.prepareComponent();
+        prepareComponent() {
+            this.getTokens();
         },
 
-        methods: {
-            /**
-             * Prepare the component (Vue 2.x).
-             */
-            prepareComponent() {
-                this.getTokens();
-            },
+        /**
+         * Get all of the authorized tokens for the user.
+         */
+        getTokens() {
+            axios.get('/oauth/tokens')
+                .then(response => {
+                    this.tokens = response.data;
+                });
+        },
 
-            /**
-             * Get all of the authorized tokens for the user.
-             */
-            getTokens() {
-                axios.get('/oauth/tokens')
-                        .then(response => {
-                            this.tokens = response.data;
-                        });
-            },
-
-            /**
-             * Revoke the given token.
-             */
-            revoke(token) {
-                axios.delete('/oauth/tokens/' + token.id)
-                        .then(response => {
-                            this.getTokens();
-                        });
-            }
+        /**
+         * Revoke the given token.
+         */
+        revoke(token) {
+            axios.delete('/oauth/tokens/' + token.id)
+                .then(response => {
+                    this.getTokens();
+                });
         }
     }
+}
 </script>

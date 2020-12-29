@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
-        @if (count($accounts) > 0)
+        @if ($accounts->isNotEmpty())
             <h1 class="text-center header-chatbox-sword">Search for accounts</h1>
 
             <form class="form-group row" method="POST" action="{{ route('account-search') }}">
@@ -38,22 +38,31 @@
             <div class="d-flex flex-row flex-wrap justify-content-around">
                 @foreach($accounts as $account)
                     <a href="{{ route('account-show', $account->username) }}">
-                        <div class="btn button-static background-world-map">
-                            <div class="row align-items-center ">
+                        <div class="btn button-rectangle background-world-map">
+                            <div class="row align-items-center mb-2">
                                 <div class="col-4">
-                                    <img class="pixel icon"
-                                         src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
-                                         alt="Profile icon">
+                                    <img
+                                        src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
+                                        class="pixel icon"
+                                        alt="Profile icon"
+                                        title="Click here to visit this account">
                                 </div>
 
                                 <div class="col">
                                     <div class="text-left">
-                                        <span>{{ $account->username }}</span>
+                                        <span>
+                                            @if ($account->account_type !== "normal")
+                                                <img src="{{ asset('images/'.$account->account_type.'.png') }}"
+                                                     alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon"
+                                                     title="You have currently picked {{ Helper::formatAccountTypeName($account->account_type) }} as account type for your account">
+                                            @endif
+                                            {{ $account->username }}
+                                        </span>
                                         <br>
                                         <span class="font-small">
                                             <img class="pixel"
                                                  src="{{ asset('images/skill/overall.png') }}"
-                                                 alt="skill icon">
+                                                 alt="Total level icon">
                                             {{ $account->level }}
                                         </span>
                                     </div>
@@ -65,8 +74,10 @@
             </div>
         @else
             <div class="text-center py-5">
-                <img class="pixel" src="{{ asset('images') }}/ignore.png" style="width: 75px;" alt="Sad face">
-                <h1>There are no linked accounts...</h1>
+                <img src="{{ asset('images/ignore.png') }}"
+                     class="pixel icon"
+                     alt="Sad face">
+                <h1>There are no linked accounts</h1>
                 <h2 class="text-center">Link an account <a href="{{ route('account-create') }}">here</a>!</h2>
             </div>
         @endif

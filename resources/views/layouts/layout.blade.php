@@ -12,6 +12,7 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/button.css') }}" rel="stylesheet">
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
           integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
@@ -35,26 +36,44 @@
                         <div class="collapse navbar-collapse" id="navbarDropdown">
                             <ul class="navbar-nav mr-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('news') }}"><img class="pixel mr-1"
-                                                                                        src="{{ asset('images') }}/newspaper.png"
-                                                                                        style="width: 20px;"
-                                                                                        alt="News icon">News</a>
+                                    <a class="nav-link" href="{{ route('news') }}">
+                                        <img src="{{ asset('images/newspaper.png') }}"
+                                             class="pixel mr-1"
+                                             alt="Newspost page icon"
+                                             title="Click here to read the newsposts"
+                                             style="width: 1.5rem;">
+                                        <span>News</span>
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('hiscore', ['skill', 'overall']) }}"><img
-                                            class="pixel mr-1" src="{{ asset('images') }}/hiscore.png"
-                                            style="width: 20px;" alt="Hiscores icon">Hiscores</a>
+                                    <a class="nav-link" href="{{ route('hiscore', ['skill', 'overall']) }}">
+                                        <img src="{{ asset('images/hiscore.png') }}"
+                                             class="pixel mr-1"
+                                             alt="Hiscores page icon"
+                                             title="Click here to watch the hiscores"
+                                             style="width: 1.5rem;">
+                                        <span>Hiscores</span>
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#"><img class="pixel mr-1"
-                                                                      src="{{ asset('images') }}/calendar.png"
-                                                                      style="width: 20px;" alt="Calendar icon">Calendar</a>
+                                    <a class="nav-link" href="#">
+                                        <img src="{{ asset('images/calendar.png') }}"
+                                             class="pixel mr-1"
+                                             alt="Calendar page icon"
+                                             title="Click here to visit the calendar"
+                                             style="width: 1.5rem;">
+                                        <span>Calendar</span>
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('account') }}"><img class="pixel mr-1"
-                                                                                           src="{{ asset('images') }}/account.png"
-                                                                                           style="width: 20px;"
-                                                                                           alt="Accounts icon">Accounts</a>
+                                    <a class="nav-link" href="{{ route('account') }}">
+                                        <img src="{{ asset('images/account.png') }}"
+                                             class="pixel mr-1"
+                                             alt="Account page icon"
+                                             title="Click here to browse through the registered accounts"
+                                             style="width: 1.5rem;">
+                                        <span>Accounts</span>
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -65,11 +84,14 @@
                     <nav class="col-md-12 navbar-dark">
                         <ul class="navbar-nav mr-auto">
                             <li class="nav-item active">
-                                <a class="nav-link" href="{{ route('index') }}"><img class="pixel mr-1"
-                                                                                     src="{{ asset('images') }}/home.png"
-                                                                                     style="width: 20px;"
-                                                                                     alt="Overall skill icon">Home <span
-                                        class="sr-only">(current)</span></a>
+                                <a class="nav-link" href="{{ route('index') }}">
+                                    <img src="{{ asset('images/home.png') }}"
+                                         class="pixel mr-1"
+                                         alt="Home icon"
+                                         title="Click here to go to the main page"
+                                         style="width: 1.5rem;">
+                                    <span>Home <span class="sr-only">(current)</span></span>
+                                </a>
                             </li>
                             @guest
                                 <li class="nav-item">
@@ -82,16 +104,24 @@
                                 @endif
                             @else
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('home') }}"><img class="pixel mr-1"
-                                                                                        src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png"
-                                                                                        alt="Profile icon"
-                                                                                        style="width: 20px;">Profile</a>
+                                    <a class="nav-link" href="{{ route('home') }}">
+                                        <img
+                                            src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ Auth::user()->icon_id }}.png"
+                                            class="pixel mr-1"
+                                            alt="Profile icon"
+                                            title="Click here to visit your profile"
+                                            style="width: 1.5rem;">
+                                        <span>Profile</span>
+                                    </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('logout') }}"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <img class="pixel mr-1" src="{{ asset('images') }}/logout_small.png"
-                                             style="width: 20px;" alt="Accounts icon">
+                                        <img src="{{ asset('images/logout_small.png') }}"
+                                             class="pixel mr-1"
+                                             alt="Log out icon"
+                                             title="Click here to log out"
+                                             style="width: 1.5rem;">
                                         {{ __('Log out') }}
                                     </a>
                                 </li>
@@ -106,11 +136,17 @@
 
                     <div class="mb-2 header-chatbox-sword"></div>
 
-                    <p class="text-light text-center pb-4"><img class="pixel mr-1" src="{{ asset('images') }}/watch.png"
-                                                                style="width: 20px;" alt="Watch icon">Next
-                        update: {{ Helper::roundToNextHour() }}<img class="pixel ml-1"
-                                                                    src="{{ asset('images') }}/watch.png"
-                                                                    style="width: 20px;" alt="Watch icon"></p>
+                    <p class="text-light text-center pb-4">
+                        <img src="{{ asset('images/watch.png') }}"
+                             class="pixel mr-1"
+                             alt="Watch icon"
+                             style="width: 1.5rem;">
+                        <span>Next update: {{ Helper::roundToNextHour() }}</span>
+                        <img src="{{ asset('images/watch.png') }}"
+                             class="pixel mr-1"
+                             alt="Watch icon"
+                             style="width: 1.5rem;">
+                    </p>
                 </div>
 
                 @yield('additional-content')
@@ -131,8 +167,17 @@
                     <div class="alert alert-danger bg-dark col-md-8 background-dialog-iron-rivets mb-1"
                          style="margin: auto; border: 0;">
                         @foreach ($errors->all() as $errorMessage)
-                            <h1 class="runescape-danger font-medium">Error!</h1>
-                            <p>{{ $errorMessage }}</p>
+                            <div class="row align-items-center">
+                                <div class="col-3 col-sm-2 col-md-2">
+                                    <img src="{{ asset('images/ignore.png') }}"
+                                         class="pixel icon"
+                                         alt="Sad face">
+                                </div>
+                                <div class="col">
+                                    <h1 class="runescape-danger font-medium">Error!</h1>
+                                    <p>{{ $errorMessage }}</p>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 @endif
@@ -140,8 +185,17 @@
                 @if (Session::has('message'))
                     <div class="alert alert-success bg-dark col-md-8 background-dialog-iron-rivets mb-1"
                          style="margin: auto; border: 0;">
-                        <h1 class="runescape-success font-medium">Success!</h1>
-                        <p>{{ Session::get('message') }}</p>
+                        <div class="row align-items-center">
+                            <div class="col-3 col-sm-2 col-md-2">
+                                <img src="{{ asset('images/friend.png') }}"
+                                     class="pixel icon"
+                                     alt="Happy face">
+                            </div>
+                            <div class="col">
+                                <h1 class="runescape-success font-medium">Success!</h1>
+                                <p>{{ Session::get('message') }}</p>
+                            </div>
+                        </div>
                     </div>
                 @endif
 

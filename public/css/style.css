@@ -194,56 +194,6 @@ table th
     right;
 }
 
-.button-combat-style-thin
-{
-    font-family: 'runescape', sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-    line-height: 4rem;
-
-    transition: all .2s ease-in;
-
-    color: #cbcbcb;
-    background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin.png') no-repeat;
-    background-position: center center;
-    background-size: contain !important;
-
-    image-rendering: pixelated;
-}
-
-.button-combat-style-thin:hover
-{
-    transition: all .2s ease-in;
-
-    background: url('/resource-packs/pack-osrs-dark/button/combat_style_thin_selected.png') no-repeat;
-    background-position: center center;
-}
-
-.button-combat-style-narrow
-{
-    font-family: 'runescape', sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-    line-height: 4rem;
-
-    transition: all .2s ease-in;
-
-    color: #cbcbcb;
-    background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow.png') no-repeat;
-    background-position: center center;
-    background-size: contain !important;
-
-    image-rendering: pixelated;
-}
-
-.button-combat-style-narrow:hover
-{
-    transition: all .2s ease-in;
-
-    background: url('/resource-packs/pack-osrs-dark/button/combat_style_narrow_selected.png') no-repeat;
-    background-position: center center;
-}
-
 .background-dialog-panel
 {
     background: url('/resource-packs/pack-osrs-dark/dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
@@ -288,46 +238,6 @@ table th
     center;
 }
 
-.button-enter-wilderness-teleport
-{
-    font-family: 'runescape', sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-    line-height: 4rem;
-
-    transition: all .2s ease-in;
-
-    color: #cbcbcb;
-    background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport.png') no-repeat;
-    background-position: center center;
-    background-size: contain !important;
-
-    image-rendering: pixelated;
-}
-
-.button-enter-wilderness-teleport:hover
-{
-    transition: all .2s ease-in;
-
-    background: url('/resource-packs/pack-osrs-dark/button/enter_wilderness_teleport_hovered.png') no-repeat;
-    background-position: center center;
-}
-
-.button-window-close
-{
-    background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close.png') no-repeat;
-    background-position: center center;
-    background-size: contain !important;
-
-    image-rendering: pixelated;
-}
-
-.button-window-close:hover
-{
-    background: url('/resource-packs/pack-osrs-dark/button/bottom_line_mode_window_close_hovered.png') no-repeat;
-    background-position: center center;
-}
-
 .background-world-map
 {
     font-family: 'runescape', sans-serif;
@@ -355,8 +265,6 @@ table th
     right,
     bottom,
     center;
-
-    image-rendering: pixelated;
 }
 
 .background-world-map:hover
@@ -383,12 +291,6 @@ table th
     center;
 }
 
-.button-static
-{
-    width: 12rem;
-    height: 5rem;
-}
-
 .collection-log-item
 {
     position: relative;
@@ -398,8 +300,6 @@ table th
     margin: 5px;
 
     white-space: nowrap;
-
-    border: solid 2px;
 }
 
 .collection-log-item-counter
@@ -419,15 +319,23 @@ table th
     opacity: .25;
 }
 
-.button-with-icon {
-    width: 12.5rem;
-    height: 5rem;
+.icon {
+    width: 72px;
+    height: 64px;
+    object-fit: contain;
 }
 
-.icon {
-    width: 3.25rem;
-    height: 3rem;
+.notification-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
     border-right: solid 2px;
+}
+
+.hiscore-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .icon-radio [type=radio]
@@ -449,15 +357,69 @@ table th
 
 .icon-radio [type=radio] + img:hover
 {
-    border-radius: 5px;
-    background: #99855d;
+    background: url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
 }
 
 .icon-radio [type=radio]:checked + img
 {
-    padding: 5px 5px 5px 5px;
+    background: url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background_brighter.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+}
 
-    border: solid #755b41 3px;
-    border-radius: 5px;
-    background: #99855d;
+.alert-danger {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%, 60% {
+        transform: translate3d(4px, 0, 0);
+    }
 }
