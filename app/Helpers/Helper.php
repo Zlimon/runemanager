@@ -2,12 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Account;
 use App\Collection;
-use Carbon\Carbon;
 use DateTime;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class Helper
 {
@@ -26,6 +22,11 @@ class Helper
         return $nextHour;
     }
 
+    public static function collectionAttribute($collection, $attribute)
+    {
+        return Collection::where('name', $collection)->value($attribute);
+    }
+
     /**
      * Generates a valid random item ID.
      *
@@ -33,7 +34,7 @@ class Helper
      */
     public static function randomItemId($verify = false)
     {
-        $randomItemId = rand(0, 25000);
+        $randomItemId = rand(0, 25317);
 
         if ($verify) {
             if (self::verifyItem($randomItemId)) {
@@ -88,7 +89,7 @@ class Helper
 
         /* If the document has loaded successfully without any redirection or error */
         if ($httpCode >= 200 && $httpCode < 300) {
-            return true;
+            return $response;
         } else {
             return false;
         }
@@ -108,75 +109,6 @@ class Helper
             json_decode(file_get_contents('https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json'), true));
 
         return $itemData[0][$attribute];
-    }
-
-    /**
-     * Returns the account ID for currently logged in user.
-     *
-     * @return
-     */
-    public static function sessionAccountId()
-    {
-        return Auth::user()->member->first()->user_id;
-    }
-
-    public static function listClueScrollTiers()
-    {
-        return ["all", "beginner", "easy", "medium", "hard", "elite", "master"];
-    }
-
-    public static function listBosses()
-    {
-        return Collection::pluck('name')->toArray();
-        // return ["abyssal sire", "alchemical hydra", "barrows chests", "bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric challenge mode", "chaos elemental", "chaos fanatic", "commander zilyana", "corporeal beast", "crazy archaeologist", "dagannoth kings", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist", "general graardor", "giant mole","grotesque guardians", "hespori", "kalphite queen", "king black dragon", "kraken", "kreearra", "kril tsutsaroth", "mimic", "the nightmare", "obor", "sarachnis", "scorpia", "skotizo", "the gauntlet", "the corrupted gauntlet", "theatre of blood", "thermonuclear smoke devil", "tzkal zuk", "tztok jad", "venenatis", "vetion", "vorkath", "wintertodt", "zalcano", "zulrah"];
-    }
-
-    public static function collectionAttribute($collection, $attribute)
-    {
-        return Collection::where('name', $collection)->value($attribute);
-    }
-
-    public static function registerAccount($accountName)
-    {
-        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . $accountName;
-
-        if (self::verifyUrl($playerDataUrl)) {
-            // Get the $playerDataUrl file content.
-            $getPlayerData = file_get_contents($playerDataUrl);
-
-            // Fetch the content from $playerDataUrl.
-            $playerStats = explode("\n", $getPlayerData);
-
-            // Convert the CSV file of player stats into an array.
-            $playerData = [];
-            foreach ($playerStats as $playerStat) {
-                $playerData[] = str_getcsv($playerStat);
-            }
-
-            $account = Account::create([
-                'username' => request('username'),
-                'rank' => $playerData[0][0],
-                'level' => $playerData[0][1],
-                'xp' => $playerData[0][2]
-            ]);
-
-            $skills = self::listSkills();
-
-            foreach ($skills as $key => $skill) {
-                DB::table($skills[$key])->insert([
-                    'account_id' => $account->id,
-                    'rank' => $playerData[$key + 1][0],
-                    'level' => $playerData[$key + 1][1],
-                    'xp' => $playerData[$key + 1][2],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]);
-            }
-
-            return $account;
-        } else {
-            return false;
-        }
     }
 
     public static function listSkills()
@@ -208,17 +140,15 @@ class Helper
         ];
     }
 
-    public static function accountStats($accountId)
+    public static function listClueScrollTiers()
     {
-        $accountSkills = [];
+        return ["all", "beginner", "easy", "medium", "hard", "elite", "master"];
+    }
 
-        $skills = self::listSkills();
-
-        foreach ($skills as $skillName) {
-            array_push($accountSkills, DB::table($skillName)->where('account_id', $accountId)->get());
-        }
-
-        return $accountSkills;
+    public static function listBosses()
+    {
+        return Collection::where('type', 'boss')->orWhere('type', 'raid')->pluck('name')->toArray();
+//         return dd(["abyssal sire", "alchemical hydra", "barrows chests", "bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric challenge mode", "chaos elemental", "chaos fanatic", "commander zilyana", "corporeal beast", "crazy archaeologist", "dagannoth kings", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist", "general graardor", "giant mole","grotesque guardians", "hespori", "kalphite queen", "king black dragon", "kraken", "kreearra", "kril tsutsaroth", "mimic", "the nightmare", "obor", "sarachnis", "scorpia", "skotizo", "the gauntlet", "the corrupted gauntlet", "theatre of blood", "thermonuclear smoke devil", "tzkal zuk", "tztok jad", "venenatis", "vetion", "vorkath", "wintertodt", "zalcano", "zulrah"]);
     }
 
     public static function listAccountTypes()
