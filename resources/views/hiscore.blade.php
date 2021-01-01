@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('title')
-    {{ ucfirst(Helper::collectionAttribute($hiscoreName, "alias")) }}
+    {{ ucfirst((Helper::collectionAttribute($hiscoreName, "alias") ?: $hiscoreName)) }}
 @endsection
 
 @section('content')
