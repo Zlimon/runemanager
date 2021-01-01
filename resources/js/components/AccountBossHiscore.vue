@@ -27,7 +27,7 @@
                              :src="'/images/boss/' + name + '.png'"
                              :title="'Click here to visit ' + hiscore.alias + ' hiscores'"
                              class="pixel hiscore-icon">
-                        <span>{{ hiscore.alias }}</span>
+                        <span class="d-none d-md-inline">{{ hiscore.alias }}</span>
                     </a>
                 </td>
                 <td>{{ hiscore.kill_count }}</td>

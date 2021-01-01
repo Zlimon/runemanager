@@ -26,7 +26,7 @@
                              :src="'/images/skill/' + name + '.png'"
                              :title="'Click here to visit ' + name + ' hiscores'"
                              class="pixel hiscore-icon">
-                        <span>{{ name | capitalize }}</span>
+                        <span class="d-none d-md-inline">{{ name | capitalize }}</span>
                     </a>
                 </td>
                 <td>{{ hiscore.level }}</td>
