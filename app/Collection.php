@@ -23,11 +23,18 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Collection extends Model
 {
-	public static function findByName($name) {
-		return self::where('name', $name)->first();
-	}
+    public static function findByNameAndCategory($name, $category_id)
+    {
+        return self::where([['name', $name], ['category_id', $category_id]])->firstOrFail();
+    }
 
-	public function collection() {
-		return $this->morphTo();
-	}
+    public function category()
+    {
+        return $this->hasOne(Category::class);
+    }
+
+    public function collection()
+    {
+        return $this->morphTo();
+    }
 }

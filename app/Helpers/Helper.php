@@ -164,8 +164,12 @@ class Helper
 
     public static function listBosses()
     {
-        return Collection::where('type', 'boss')->orWhere('type', 'raid')->pluck('name')->toArray();
-//         return dd(["abyssal sire", "alchemical hydra", "barrows chests", "bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric challenge mode", "chaos elemental", "chaos fanatic", "commander zilyana", "corporeal beast", "crazy archaeologist", "dagannoth kings", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist", "general graardor", "giant mole","grotesque guardians", "hespori", "kalphite queen", "king black dragon", "kraken", "kreearra", "kril tsutsaroth", "mimic", "the nightmare", "obor", "sarachnis", "scorpia", "skotizo", "the gauntlet", "the corrupted gauntlet", "theatre of blood", "thermonuclear smoke devil", "tzkal zuk", "tztok jad", "venenatis", "vetion", "vorkath", "wintertodt", "zalcano", "zulrah"]);
+        return Collection::where('category_id', 2)->orWhere('category_id', 3)->pluck('name')->toArray();
+    }
+
+    public static function listNpcs()
+    {
+        return Collection::where('category_id', 4)->pluck('name')->toArray();
     }
 
     public static function listAccountTypes()

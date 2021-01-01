@@ -9,7 +9,7 @@
 
     <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
         <div class="row justify-content-center">
-            <a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
+            <a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mx-2">
                 <div class="btn button-square background-world-map">
                     <img src="{{ asset('images/skill/overall.png') }}"
                          class="pixel icon"
@@ -20,7 +20,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
+            <a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="mx-2">
                 <div class="btn button-square background-world-map">
                     <img src="{{ asset('images/boss/boss.png') }}"
                          class="pixel icon"
@@ -30,6 +30,19 @@
                     <span>Bosses</span>
                 </div>
             </a>
+
+            @if (count(Helper::listNpcs()) > 0)
+                <a href="{{ route('hiscore', ['npc', Helper::listNpcs()[0]]) }}" class="mx-2">
+                    <div class="btn button-square background-world-map">
+                        <img src="{{ asset('images/boss/boss.png') }}"
+                             class="pixel icon"
+                             alt="Monsters icon"
+                             title="Click here to see the monster hiscores">
+                        <br>
+                        <span>Monsters</span>
+                    </div>
+                </a>
+            @endif
         </div>
 
         <div id="highscore_top">
@@ -78,6 +91,8 @@
                 <skillhiscore skill="{{ $hiscoreName }}"></skillhiscore>
             @elseif ($hiscoreType == "boss")
                 <bosshiscore boss="{{ $hiscoreName }}"></bosshiscore>
+            @elseif ($hiscoreType == "npc")
+                <npchiscore npc="{{ $hiscoreName }}"></npchiscore>
             @endif
         @else
             <div class="text-center py-5">

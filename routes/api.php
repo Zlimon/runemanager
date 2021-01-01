@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,7 +38,8 @@ Route::prefix('/account')->group(function() {
 
 Route::prefix('/hiscore')->group(function() {
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
-	Route::get('/boss/{skill}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
+	Route::get('/boss/{boss}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
+    Route::get('/npc/{npc}', 'Api\HiscoreController@npc')->name('hiscore-npc-show');
 });
 
 Route::prefix('/collection')->group(function() {

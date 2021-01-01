@@ -35,23 +35,31 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Notification extends Model
 {
-	protected $fillable = [
-		'user_id', 'account_id', 'category_id', 'icon', 'message', 'data'
-	];
+    protected $fillable = [
+        'user_id',
+        'account_id',
+        'category_id',
+        'icon',
+        'message',
+        'data'
+    ];
 
-	protected $casts = [
-		'data' => 'array'
-	];
+    protected $casts = [
+        'data' => 'array'
+    ];
 
-	public function user() {
-		return $this->belongsTo(User::class);
-	}
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
-	public function account() {
-		return $this->belongsTo(Account::class);
-	}
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
 
-	public function category() {
-		return $this->belongsTo(NotificationCategory::class);
-	}
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

@@ -100,12 +100,12 @@ class AccountController extends Controller
 
                             array_splice($bosses, 13, 1);
 
-                            $bossCounter = 0;
+                            $bossIndex = 0;
 
                             $dksKillCount = 0;
 
                             for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
-                                $collection = Collection::findByName($bosses[$bossCounter]);
+                                $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
                                 $collectionLoot = new $collection->model;
 
@@ -113,14 +113,14 @@ class AccountController extends Controller
                                 $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                                 $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-                                if (in_array($bosses[$bossCounter],
+                                if (in_array($bosses[$bossIndex],
                                     ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
                                     $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                                 }
 
                                 $collectionLoot->save();
 
-                                $bossCounter++;
+                                $bossIndex++;
                             }
 
                             /**
@@ -128,7 +128,7 @@ class AccountController extends Controller
                              * DKS' and we are going to retrieve loot for them from the
                              * collection log, we have to manually create a table.
                              * This might also happen with other bosses in the future
-                             * that share collection log entry, but have seperate hiscores.
+                             * that share collection log entry, but have separate hiscores.
                              */
                             $dks = new \App\Boss\DagannothKings;
 
@@ -136,6 +136,18 @@ class AccountController extends Controller
                             $dks->kill_count = $dksKillCount;
 
                             $dks->save();
+
+                            $npcs = Helper::listNpcs();
+
+                            foreach ($npcs as $npc) {
+                                $collection = Collection::findByNameAndCategory($npc, 4);
+
+                                $collectionLoot = new $collection->model;
+
+                                $collectionLoot->account_id = $account->id;
+
+                                $collectionLoot->save();
+                            }
 
                             $authStatus->status = "success";
 
