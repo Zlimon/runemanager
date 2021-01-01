@@ -53,7 +53,9 @@
                                              alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon"
                                              style="width: 1rem;">
                                     @endif
-                                    <strong>{{ $account->username }}</strong>
+                                    <strong>
+                                        <a href="{{ route('account-show', $account->username) }}">{{ $account->username }}</a>
+                                    </strong>
                                 </p>
                             </div>
 
