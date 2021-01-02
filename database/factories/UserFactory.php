@@ -19,10 +19,12 @@ use Illuminate\Support\Str;
 
 $factory->define(User::class, function (Faker $faker) {
     return [
+        'uuid' => 'd7d865c5-e37f-4228-a1c1-a5190f0f34cb',
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),
-        'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+        'password' => bcrypt('runemanager1234'), // password
         'remember_token' => Str::random(10),
+        'icon_id' => Helper::randomItemId(true),
     ];
 });
