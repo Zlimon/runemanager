@@ -175,7 +175,7 @@
                                 </div>
                                 <div class="col">
                                     <h1 class="runescape-danger font-medium">Error!</h1>
-                                    <p>{{ $errorMessage }}</p>
+                                    <p class="text-light">{{ $errorMessage }}</p>
                                 </div>
                             </div>
                         @endforeach
@@ -193,7 +193,7 @@
                             </div>
                             <div class="col">
                                 <h1 class="runescape-success font-medium">Success!</h1>
-                                <p>{{ Session::get('message') }}</p>
+                                <p class="text-light">{{ Session::get('message') }}</p>
                             </div>
                         </div>
                     </div>
