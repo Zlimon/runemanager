@@ -9,6 +9,7 @@ use App\Events\AccountKill;
 use App\Events\AccountNewUnique;
 use App\Events\All;
 use App\Http\Controllers\Controller;
+use App\Log;
 use App\Notification;
 use Illuminate\Http\Request;
 
@@ -54,13 +55,19 @@ class AccountLootController extends Controller
 
                             $data = json_decode($dataJson, true);
 
-                            $notificationData = [
+                            $logData = [
                                 "user_id" => auth()->user()->id,
                                 "account_id" => $account->id,
                                 "category_id" => $collection->category_id,
+                                "data" => $data
+                            ];
+
+                            $log = Log::create($logData);
+
+                            $notificationData = [
+                                "log_id" => $log->id,
                                 "icon" => $collectionName,
                                 "message" => $accountUsername . " unlocked a new unique!",
-                                "data" => $data
                             ];
 
                             $notification = Notification::create($notificationData);
@@ -94,13 +101,19 @@ class AccountLootController extends Controller
 
                 $data = json_decode($dataJson, true);
 
-                $notificationData = [
+                $logData = [
                     "user_id" => auth()->user()->id,
                     "account_id" => $account->id,
                     "category_id" => $collection->category_id,
+                    "data" => $data
+                ];
+
+                $log = Log::create($logData);
+
+                $notificationData = [
+                    "log_id" => $log->id,
                     "icon" => $collectionName,
                     "message" => $accountUsername . " defeated " . $collection->alias . "!",
-                    "data" => $data
                 ];
 
                 $notification = Notification::create($notificationData);

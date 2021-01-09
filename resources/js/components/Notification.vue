@@ -6,7 +6,7 @@
                     <div class="row align-items-center mb-2">
                         <div class="col-3 col-sm-4 icon-border">
                             <img :alt="notification.icon + ' icon'"
-                                 :src="'/images/' + notification.category.category + '/' + notification.icon + '.png'"
+                                 :src="'/images/' + notification.log.category.category + '/' + notification.icon + '.png'"
                                  class="pixel notification-icon">
                         </div>
 
@@ -15,14 +15,14 @@
                         </div>
                     </div>
 
-                    <div v-if="notification.data !== null && Object.keys(notification.data.collection).length > 0">
+                    <div v-if="notification.data !== null && Object.keys(notification.log.data.collection).length > 0">
                         <h3 class="text-center">Received loot:</h3>
                         <div class="d-flex flex-row flex-wrap justify-content-center pb-2">
-                            <div v-for="(count, index) in notification.data.collection"
+                            <div v-for="(count, index) in notification.log.data.collection"
                                  class="background-world-map mx-2 p-1">
                                 <img
                                     :alt="index + ' item icon'"
-                                    :src="'/images/' + notification.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'"
+                                    :src="'/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'"
                                     class="pixel hiscore-icon">
                             </div>
                         </div>
