@@ -24,6 +24,15 @@ class AccountLootController extends Controller
 
             $collectionLog = $collection->model::where('account_id', $account->id)->first();
 
+            // If account has no collection entry, create it
+            if (is_null($collectionLog)) {
+                $collectionLog = new $collection->model;
+
+                $collectionLog->account_id = $account->id;
+
+                $collectionLog->save();
+            }
+
             if ($collectionLog) {
                 $oldValues = $collectionLog->getAttributes(); // Get old data
                 //array_splice($oldValues, count($oldValues) - 2, 2); // Remove created_at and updated_at
