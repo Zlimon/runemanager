@@ -7,7 +7,7 @@
                         <div class="col-3 col-sm-4" style="padding: 0; margin: 0;">
                             <div v-if="isNaN(notification.icon)">
                                 <img :alt="notification.icon + ' icon'"
-                                     :src="'/images/' + notification.log.category.category + '/' + notification.icon + '.png'"
+                                     :src="'/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '.png'"
                                      class="pixel notification-icon">
                             </div>
                             <div v-else>

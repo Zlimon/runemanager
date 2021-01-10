@@ -79,25 +79,32 @@ class HiscoreController extends Controller
     public function boss($bossName)
     {
         if (Account::count() > 0) {
-            $collection = Collection::where('name', $bossName)->firstOrFail();
+            $collection = Collection::where('name', $bossName)->where(function ($query) {
+                $query->where('category_id', 2)
+                    ->orWhere('category_id', 3);
+            })->firstOrFail();
 
-            $boss = $collection->model::with('account')->orderByDesc('kill_count')->get();
+            $bossHiscore = $collection->model::with('account')->orderByDesc('kill_count')->get();
 
-            $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
-                ->selectRaw('COUNT(*) AS total_kills')
-                ->first();
+            if (sizeof($bossHiscore) > 0) {
+                $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
+                    ->selectRaw('COUNT(*) AS total_kills')
+                    ->first();
 
-            $averageTotalKills = $sumKills["total_kill_count"] / $sumKills["total_kills"];
+                $averageTotalKills = $sumKills["total_kill_count"] / $sumKills["total_kills"];
 
-            return BossHiscoreResource::collection($boss)
-                ->additional([
-                    'meta' => [
-                        'boss' => str_replace(" ", "_", $bossName),
-                        'alias' => $collection->alias,
-                        'total_kills' => number_format($sumKills["total_kill_count"]),
-                        'average_total_kills' => round($averageTotalKills),
-                    ]
-                ]);
+                return BossHiscoreResource::collection($bossHiscore)
+                    ->additional([
+                        'meta' => [
+                            'boss' => str_replace(" ", "_", $bossName),
+                            'alias' => $collection->alias,
+                            'total_kills' => number_format($sumKills["total_kill_count"]),
+                            'average_total_kills' => round($averageTotalKills),
+                        ]
+                    ]);
+            } else {
+                return response()->json("There are no registered collections for " . $bossName, 404);
+            }
         } else {
             return response()->json("There are no linked accounts", 404);
         }
@@ -106,25 +113,29 @@ class HiscoreController extends Controller
     public function npc($npcName)
     {
         if (Account::count() > 0) {
-            $collection = Collection::where('name', $npcName)->firstOrFail();
+            $collection = Collection::where('name', $npcName)->where('category_id', 4)->firstOrFail();
 
-            $npc = $collection->model::with('account')->orderByDesc('kill_count')->get();
+            $npcHiscore = $collection->model::with('account')->orderByDesc('kill_count')->get();
 
-            $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
-                ->selectRaw('COUNT(*) AS total_kills')
-                ->first();
+            if (sizeof($npcHiscore) > 0) {
+                $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
+                    ->selectRaw('COUNT(*) AS total_kills')
+                    ->first();
 
-            $averageTotalKills = $sumKills["total_kill_count"] / $sumKills["total_kills"];
+                $averageTotalKills = $sumKills["total_kill_count"] / $sumKills["total_kills"];
 
-            return BossHiscoreResource::collection($npc)
-                ->additional([
-                    'meta' => [
-                        'npc' => str_replace(" ", "_", $npcName),
-                        'alias' => $collection->alias,
-                        'total_kills' => number_format($sumKills["total_kill_count"]),
-                        'average_total_kills' => round($averageTotalKills),
-                    ]
-                ]);
+                return BossHiscoreResource::collection($npcHiscore)
+                    ->additional([
+                        'meta' => [
+                            'npc' => str_replace(" ", "_", $npcName),
+                            'alias' => $collection->alias,
+                            'total_kills' => number_format($sumKills["total_kill_count"]),
+                            'average_total_kills' => round($averageTotalKills),
+                        ]
+                    ]);
+            } else {
+                return response()->json("There are no registered collections for " . $npcName, 404);
+            }
         } else {
             return response()->json("There are no linked accounts", 404);
         }

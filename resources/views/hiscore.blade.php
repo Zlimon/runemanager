@@ -50,7 +50,7 @@
 				<span class="selection-top">
 					@foreach ($hiscoreListTop as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscore.'.png') }}"
+                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">
@@ -59,7 +59,7 @@
 				</span>
                 <div class="mid-part">
                     <h1 class="active middle-icon" style="display: inline-block;">
-                        <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
+                        <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscoreName).'.png') }}"
                             class="pixel icon"
                             alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
                         <br>
@@ -69,7 +69,7 @@
                 <span class="selection-bot">
 					@foreach ($hiscoreListBottom as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscore.'.png') }}"
+                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">
@@ -80,13 +80,6 @@
         </div>
 
         @if ($accountCount > 0)
-            <div class="float-left mt-3">
-                <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
-                     class="pixel icon"
-                     alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon"
-                     style="width: 7.5rem; height: 7.5rem;">
-            </div>
-
             @if ($hiscoreType == "skill")
                 <skillhiscore skill="{{ $hiscoreName }}"></skillhiscore>
             @elseif ($hiscoreType == "boss")
