@@ -23,6 +23,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Collection extends Model
 {
+    protected $fillable = ['category_id', 'name', 'alias', 'model'];
+
+    public $timestamps = false;
+
     public static function findByNameAndCategory($name, $category_id)
     {
         return self::where([['name', $name], ['category_id', $category_id]])->firstOrFail();
