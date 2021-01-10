@@ -22,6 +22,7 @@ class CreateAccountsTable extends Migration
             $table->integer('rank')->default(0);
             $table->integer('level')->default(32); // Minimum total level
             $table->bigInteger('xp')->default(0);
+            $table->boolean('online')->default(false);
             $table->timestamps();
         });
     }
