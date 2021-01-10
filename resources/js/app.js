@@ -22,6 +22,7 @@ window.Vue = require('vue');
 import UniqueId from 'vue-unique-id';
 
 Vue.use(UniqueId);
+Vue.use(require('vue-moment'));
 
 Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
 Vue.component('bosshiscore', require('./components/BossHiscore.vue').default);
