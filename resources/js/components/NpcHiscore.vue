@@ -18,8 +18,8 @@
 
             <div v-else>
                 <div class="d-flex flex-row">
-                    <img :alt="meta.boss + ' icon'"
-                         :src="'/images/boss/' + meta.boss + '.png'"
+                    <img :alt="meta.npc + ' icon'"
+                         :src="'/images/npc/' + meta.npc + '.png'"
                          class="d-none d-md-inline pixel icon"
                          style="width: 7.5rem; height: 7.5rem;">
 
@@ -37,15 +37,14 @@
                         <th>Rank</th>
                         <th>Account</th>
                         <th>Kill Count</th>
-                        <th>Hiscore Rank</th>
                         <th>Collection Log</th>
                         <th>Obtained</th>
                     </tr>
                     <tr v-for="(hiscore, index) in hiscores">
                         <td>{{ index + 1 }}</td>
-                        <td><a :href="'/account/' + hiscore.account.username">{{ hiscore.account.username }}</a></td>
+                        <td><a :href="'/account/' + hiscore.account.username">{{ hiscore.account.username }}</a>
+                        </td>
                         <td>{{ hiscore.kill_count }}</td>
-                        <td>{{ hiscore.rank }}</td>
                         <td>
                             <a :data-target="$idRef(index)" class="btn background-world-map" data-toggle="modal">
                                 <img :title="'Click here to see collection log for ' + meta.alias"
@@ -80,13 +79,13 @@
                                                  class="collection-log-item rounded background-world-map bg-dark p-4">
                                                 <div v-if="count === 1">
                                                     <img :alt="item + ' item icon'"
-                                                         :src="'/images/boss/' + meta.boss + '/' + item + '.png'"
+                                                         :src="'/images/npc/' + meta.npc + '/' + item + '.png'"
                                                          :title="item.replaceAll('_', ' ') | capitalize"
                                                          class="pixel hiscore-icon">
                                                 </div>
                                                 <div v-else-if="count > 0">
                                                     <img :alt="item + ' item icon'"
-                                                         :src="'/images/boss/' + meta.boss + '/' + item + '.png'"
+                                                         :src="'/images/npc/' + meta.npc + '/' + item + '.png'"
                                                          :title="item.replaceAll('_', ' ') | capitalize"
                                                          class="pixel hiscore-icon">
                                                     <span class="collection-log-item-counter runescape-progress">
@@ -95,7 +94,7 @@
                                                 </div>
                                                 <div v-else>
                                                     <img :alt="item + ' item icon'"
-                                                         :src="'/images/boss/' + meta.boss + '/' + item + '.png'"
+                                                         :src="'/images/npc/' + meta.npc + '/' + item + '.png'"
                                                          :title="item.replaceAll('_', ' ') | capitalize"
                                                          class="pixel hiscore-icon faded">
                                                 </div>
@@ -115,7 +114,7 @@
 <script>
 export default {
     props: {
-        boss: {type: String, required: true}
+        npc: {type: String, required: true}
     },
 
     data() {
@@ -130,7 +129,7 @@ export default {
 
     mounted() {
         axios
-            .get('/api/hiscore/boss/' + this.boss)
+            .get('/api/hiscore/npc/' + this.npc)
             .then((response) => {
                 this.hiscores = response.data.data;
                 this.meta = response.data.meta;

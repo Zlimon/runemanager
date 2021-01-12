@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +23,9 @@ Route::middleware('auth:api')->group(function() {
 	Route::post('/authenticate', 'Api\AccountController@store')->name('authenticate'); // Authenticate user
 
 	Route::prefix('/account')->group(function() {
+        Route::put('/{accountUsername}/login', 'Api\AccountController@login')->name('account-login'); // Make account online
+        Route::put('/{accountUsername}/logout', 'Api\AccountController@logout')->name('account-logout'); // Make account offline
+
 		Route::put('/{accountUsername}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
 		Route::post('/{accountUsername}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
 		Route::post('/{accountUsername}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
@@ -39,7 +41,8 @@ Route::prefix('/account')->group(function() {
 
 Route::prefix('/hiscore')->group(function() {
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
-	Route::get('/boss/{skill}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
+	Route::get('/boss/{boss}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
+    Route::get('/npc/{npc}', 'Api\HiscoreController@npc')->name('hiscore-npc-show');
 });
 
 Route::prefix('/collection')->group(function() {

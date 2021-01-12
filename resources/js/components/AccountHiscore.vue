@@ -7,7 +7,7 @@
                      src="/images/boss/boss.png"
                      title="Click here to see the boss hiscores">
                 <br>
-                <span>Skills</span>
+                <span>Bosses</span>
             </div>
         </div>
         <div v-else>

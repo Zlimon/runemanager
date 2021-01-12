@@ -13,8 +13,8 @@ export default {
     },
 
     methods: {
-        checkAccount(accountUsername) {
-            return this.account.id === accountUsername;
+        checkAccount(accountId) {
+            return this.account.id === accountId;
         },
     },
 
@@ -40,7 +40,7 @@ export default {
     created() {
         window.Echo.channel('account-all')
             .listen('AccountAll', (e) => {
-                if (this.checkAccount(e.notification.account_id)) {
+                if (this.checkAccount(e.notification.log.account_id)) {
                     this.notificationsData.unshift(e.notification);
                 }
             });
