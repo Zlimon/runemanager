@@ -28,6 +28,12 @@ class AccountLootController extends Controller
             if (is_null($collectionLog)) {
                 $collectionLog = new $collection->model;
 
+                $collectionLog->getAttributes();
+
+                foreach ($collectionLog->getFillable() as $fillable) {
+                    $collectionLog->$fillable = 0;
+                }
+
                 $collectionLog->account_id = $account->id;
 
                 $collectionLog->save();
@@ -49,9 +55,9 @@ class AccountLootController extends Controller
 
                 $sums = [];
 
-                $sums["kill_count"] = $oldValues["kill_count"] + 1;
+                @$sums["kill_count"] = $oldValues["kill_count"] + 1;
 
-                $uniques = $oldValues["obtained"];
+                $uniques = @$oldValues["obtained"] ?: 0;
 
                 // Merge old data and new data and sum the total of common keys
                 foreach (array_keys($newValues + $oldValues) as $lootType) {
