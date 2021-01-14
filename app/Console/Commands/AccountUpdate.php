@@ -86,18 +86,33 @@ class AccountUpdate extends Command
                         for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
                             $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
-                            $collectionLoot = $collection->model::where('account_id', $account->id)->firstOrFail();
+                            $collectionLoot = $collection->model::where('account_id', $account->id)->first();
 
-                            $collectionLoot->account_id = $account->id;
-                            $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-                            $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+                            // If account has no collection entry, create it
+                            if (is_null($collectionLoot)) {
+                                $collectionLoot = new $collection->model;
+
+                                $collectionLoot->getAttributes();
+
+                                foreach ($collectionLoot->getFillable() as $fillable) {
+                                    $collectionLoot->$fillable = 0;
+                                }
+
+                                $collectionLoot->account_id = $account->id;
+
+                                $collectionLoot->save();
+                            } else {
+                                $collectionLoot->account_id = $account->id;
+                                $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+                                $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+
+                                $collectionLoot->update();
+                            }
 
                             if (in_array($bosses[$bossIndex],
                                 ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
                                 $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                             }
-
-                            $collectionLoot->update();
 
                             $bossIndex++;
                         }
@@ -109,11 +124,20 @@ class AccountUpdate extends Command
                          * This might also happen with other bosses in the future
                          * that share collection log entry, but have separate hiscores.
                          */
-                        $dks = \App\Boss\DagannothKings::where('account_id', $account->id)->firstOrFail();
+                        $dks = \App\Boss\DagannothKings::where('account_id', $account->id)->first();
 
-                        $dks->kill_count = $dksKillCount;
+                        if (is_null($dks)) {
+                            $dks = new \App\Boss\DagannothKings;
 
-                        $dks->update();
+                            $dks->account_id = $account->id;
+                            $dks->kill_count = $dksKillCount;
+
+                            $dks->save();
+                        } else {
+                            $dks->kill_count = $dksKillCount;
+
+                            $dks->update();
+                        }
 
                         $this->info(sprintf("Updated %s!", $account->username));
                     } else {

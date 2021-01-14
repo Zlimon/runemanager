@@ -118,7 +118,7 @@ class UserSeeder extends Seeder
 
                 $dksKillCount = 0;
 
-                for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
+                for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
                     $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
                     $collectionLoot = new $collection->model;

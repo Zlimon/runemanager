@@ -63,7 +63,7 @@ class TheatreOfBlood extends Model
         'obtained',
         'kill_count',
         'lil_zik',
-        'scythhe_of_vitour_(uncharged)',
+        'scythe_of_vitur_(uncharged)',
         'ghrazi_rapier',
         'sanguinesti_staff_(uncharged)',
         'justiciar_faceguard',
