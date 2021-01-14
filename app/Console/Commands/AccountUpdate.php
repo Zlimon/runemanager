@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Account;
 use App\Collection;
 use App\Helpers\Helper;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -65,12 +66,15 @@ class AccountUpdate extends Command
 
                         for ($i = 0; $i < count($skills); $i++) {
                             DB::table($skills[$i])
-                                ->where('account_id', $account->id)
-                                ->update([
-                                    'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
-                                    'level' => $playerData[$i + 1][1],
-                                    'xp' => ($playerData[$i + 1][2] >= 0 ? $playerData[$i + 1][2] : 0)
-                                ]);
+                                ->updateOrInsert(
+                                    ['account_id' => $account->id],
+                                    [
+                                        'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
+                                        'level' => $playerData[$i + 1][1],
+                                        'xp' => ($playerData[$i + 1][2] >= 0 ? $playerData[$i + 1][2] : 0),
+                                        'created_at' => Carbon::now(),
+                                        'updated_at' => Carbon::now()
+                                    ]);
                         }
 
                         $clueScrollAmount = count(Helper::listClueScrollTiers());
