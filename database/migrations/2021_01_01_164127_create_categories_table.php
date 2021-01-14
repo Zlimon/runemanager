@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNotificationCategoriesTable extends Migration
+class CreateCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,20 @@ class CreateNotificationCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('notification_categories', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('category');
         });
 
-        DB::table('notification_categories')->insert(
+        DB::table('categories')->insert(
             [
                 ["category" => "skill"],
                 ["category" => "boss"],
                 ["category" => "raid"],
+                ["category" => "npc"],
+                ["category" => 'clue'],
+                ["category" => 'minigame'],
+                ["category" => 'other'],
                 ["category" => "account"],
             ]
         );
@@ -35,6 +39,6 @@ class CreateNotificationCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notification_categories');
+        Schema::dropIfExists('categories');
     }
 }

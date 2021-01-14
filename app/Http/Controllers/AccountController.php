@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Account;
 use App\AccountAuthStatus;
+use App\Helpers\Helper;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AccountController extends Controller
 {
@@ -62,12 +64,25 @@ class AccountController extends Controller
     public function search()
     {
         request()->validate([
-            'search' => ['required', 'string', 'min:1', 'max:13'],
+            'search' => ['nullable', 'string', 'max:13'],
+            'account_type' => ['nullable', Rule::in(Helper::listAccountTypes())],
+            'order_by' => [Rule::in(['level', 'xp', 'rank', 'account_type', 'user_id'])],
+            'order_by_order' => [Rule::in(['asc', 'desc'])],
+            'total_level_between_from' => ['integer'],
+            'total_level_between_to' => ['integer'],
         ]);
 
         $query = request('search');
 
-        $accounts = Account::with('user')->where('username', 'LIKE', '%' . $query . '%')->paginate(10);
+        $accounts = Account::with('user')
+            ->where('username', 'LIKE', '%' . $query . '%')
+            ->when(in_array(request('account_type'),
+                Helper::listAccountTypes()), function ($query, $accountType) {
+                return $query->where('account_type', request('account_type'));
+            })
+            ->whereBetween('level', [request('total_level_between_from'), request('total_level_between_to')])//
+            ->orderBy(request('order_by'), request('order_by_order'))
+            ->get();
 
         if (count($accounts) === 0) {
             return redirect(route('account'))->withErrors(['No search results for "' . $query . '"!']);

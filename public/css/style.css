@@ -329,7 +329,6 @@ table th
     width: 60px;
     height: 60px;
     object-fit: contain;
-    border-right: solid 2px;
 }
 
 .hiscore-icon {

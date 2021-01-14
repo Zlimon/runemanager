@@ -38,7 +38,7 @@ class AccountCollectionController extends Controller
 
                 $allCollectionLoot = [];
                 foreach ($allCollections as $key => $collection) {
-                    $findCollection = Collection::findByName($collection->name);
+                    $findCollection = Collection::where('name', $collection->name)->firstOrFail();
 
                     $collectionLog = $findCollection->model::where('account_id', $account->id)->first();
 
@@ -64,7 +64,7 @@ class AccountCollectionController extends Controller
         $account = Account::where('username', $accountUsername)->first();
 
         if ($account) {
-            $collection = Collection::findByName($collectionName);
+            $collection = Collection::where('name', $collectionName)->firstOrFail();
 
             if ($collection) {
                 $collectionLog = $collection->model::where('account_id', $account->id)->first();
@@ -87,7 +87,7 @@ class AccountCollectionController extends Controller
         $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
 
         if ($account) {
-            $collection = Collection::findByName($collectionName);
+            $collection = Collection::where('name', $collectionName)->firstOrFail();
 
             if ($collection) {
                 $collectionLog = $collection->model::where('account_id', $account->id)->first();

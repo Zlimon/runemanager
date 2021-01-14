@@ -10,7 +10,7 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = Notification::with('category')->orderByDesc('id')->limit(5)->get();
+        $notifications = Notification::with('log')->with('log.category')->orderByDesc('id')->limit(5)->get();
 
         return response()->json($notifications, 200);
     }
@@ -19,8 +19,12 @@ class NotificationController extends Controller
     {
         $account = Account::where('username', $accountUsername)->pluck('id')->first();
 
-        $notifications = Notification::with('category')->where('account_id', $account)->orderByDesc('id')->paginate(10);
+        if ($account) {
+            $notifications = Notification::with('log')->with('log.category')->whereHas('log', function ($query) use($account) {
+                return $query->where('account_id', '=', $account);
+            })->orderByDesc('id')->paginate(10);
 
-        return response()->json($notifications, 200);
+            return response()->json($notifications, 200);
+        }
     }
 }

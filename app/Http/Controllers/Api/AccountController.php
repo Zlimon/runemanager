@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Account;
 use App\AccountAuthStatus;
 use App\Collection;
+use App\Events\AccountAll;
+use App\Events\All;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
+use App\Log;
+use App\Notification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,14 +63,16 @@ class AccountController extends Controller
             }
         }
 
-        $authStatus = AccountAuthStatus::where('username', request('username'))->where('status', 'pending')->first();
+        $accountUsername = request('username');
+
+        $authStatus = AccountAuthStatus::where('username', $accountUsername)->where('status', 'pending')->first();
 
         if ($authStatus) {
             if ($authStatus->user_id === auth()->user()->id) {
                 if (request('account_type') === $authStatus->account_type) {
                     if (request('code') === $authStatus->code) {
                         $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(' ',
-                                '%20', request('username'));
+                                '%20', $accountUsername);
 
                         /* Get the $playerDataUrl file content. */
                         $playerData = Helper::getPlayerData($playerDataUrl);
@@ -75,7 +81,7 @@ class AccountController extends Controller
                             $account = Account::create([
                                 'user_id' => $authStatus->user_id,
                                 'account_type' => request('account_type'),
-                                'username' => ucfirst(request('username')),
+                                'username' => ucfirst($accountUsername),
                                 'rank' => $playerData[0][0],
                                 'level' => $playerData[0][1],
                                 'xp' => $playerData[0][2]
@@ -100,12 +106,12 @@ class AccountController extends Controller
 
                             array_splice($bosses, 13, 1);
 
-                            $bossCounter = 0;
+                            $bossIndex = 0;
 
                             $dksKillCount = 0;
 
-                            for ($i = (count($skills) + $clueScrollAmount + 4); $i < (count($skills) + $clueScrollAmount + 4 + count($bosses)); $i++) {
-                                $collection = Collection::findByName($bosses[$bossCounter]);
+                            for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
+                                $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
                                 $collectionLoot = new $collection->model;
 
@@ -113,14 +119,14 @@ class AccountController extends Controller
                                 $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                                 $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-                                if (in_array($bosses[$bossCounter],
+                                if (in_array($bosses[$bossIndex],
                                     ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
                                     $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                                 }
 
                                 $collectionLoot->save();
 
-                                $bossCounter++;
+                                $bossIndex++;
                             }
 
                             /**
@@ -128,7 +134,7 @@ class AccountController extends Controller
                              * DKS' and we are going to retrieve loot for them from the
                              * collection log, we have to manually create a table.
                              * This might also happen with other bosses in the future
-                             * that share collection log entry, but have seperate hiscores.
+                             * that share collection log entry, but have separate hiscores.
                              */
                             $dks = new \App\Boss\DagannothKings;
 
@@ -136,6 +142,18 @@ class AccountController extends Controller
                             $dks->kill_count = $dksKillCount;
 
                             $dks->save();
+
+                            $npcs = Helper::listNpcs();
+
+                            foreach ($npcs as $npc) {
+                                $collection = Collection::findByNameAndCategory($npc, 4);
+
+                                $collectionLoot = new $collection->model;
+
+                                $collectionLoot->account_id = $account->id;
+
+                                $collectionLoot->save();
+                            }
 
                             $authStatus->status = "success";
 
@@ -153,10 +171,90 @@ class AccountController extends Controller
                         202);
                 }
             } else {
-                return response("This account is not linked to your user", 401);
+                return response($accountUsername . " is not linked to your user", 403);
             }
         } else {
-            return response("This account has no pending status", 202);
+            return response($accountUsername . " has no pending status");
+        }
+    }
+
+    public function login($accountUsername)
+    {
+        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
+
+        if ($account) {
+            if ($account->online === 1) {
+                return response($accountUsername . " is already online");
+            }
+
+            $account->online = 1;
+
+            $account->save();
+
+            $logData = [
+                "user_id" => auth()->user()->id,
+                "account_id" => $account->id,
+                "category_id" => 8,
+//                "data" => $data
+            ];
+
+            $log = Log::create($logData);
+
+            $notificationData = [
+                "log_id" => $log->id,
+                "icon" => auth()->user()->icon_id,
+                "message" => $accountUsername . " has logged in!",
+            ];
+
+            $notification = Notification::create($notificationData);
+
+            All::dispatch($notification);
+
+            AccountAll::dispatch($account, $notification);
+
+            return response($accountUsername . " has been logged in to RuneManager");
+        } else {
+            return response("This account is not authenticated with " . auth()->user()->name, 403);
+        }
+    }
+
+    public function logout($accountUsername)
+    {
+        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
+
+        if ($account) {
+            if ($account->online === 0) {
+                return response($accountUsername . " is not online");
+            }
+
+            $account->online = 0;
+
+            $account->save();
+
+            $logData = [
+                "user_id" => auth()->user()->id,
+                "account_id" => $account->id,
+                "category_id" => 8,
+//                "data" => $data
+            ];
+
+            $log = Log::create($logData);
+
+            $notificationData = [
+                "log_id" => $log->id,
+                "icon" => auth()->user()->icon_id,
+                "message" => $accountUsername . " has logged out!",
+            ];
+
+            $notification = Notification::create($notificationData);
+
+            All::dispatch($notification);
+
+            AccountAll::dispatch($account, $notification);
+
+            return response($accountUsername . " has been logged off RuneManager");
+        } else {
+            return response("This account is not authenticated with " . auth()->user()->name, 403);
         }
     }
 }

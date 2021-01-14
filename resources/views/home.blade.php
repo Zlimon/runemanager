@@ -53,7 +53,9 @@
                                              alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon"
                                              style="width: 1rem;">
                                     @endif
-                                    <strong>{{ $account->username }}</strong>
+                                    <strong>
+                                        <a href="{{ route('account-show', $account->username) }}">{{ $account->username }}</a>
+                                    </strong>
                                 </p>
                             </div>
 
@@ -61,6 +63,47 @@
                                 <span>Total level:</span>
                                 <br>
                                 <span><strong>{{ $account->level }}</strong></span>
+                            </div>
+                        </div>
+
+                        <hr>
+                    @endforeach
+
+                    @foreach ($user->authStatus as $account)
+                        @if ($loop->first)
+                            <h3 class="text-center">Account Auth Status</h3>
+
+                            <hr>
+                        @endif
+
+                        <div class="row align-items-center">
+                            <div class="col-md-5">
+                                <p>
+                                    @if ($account->account_type !== "normal")
+                                        <img src="{{ asset('images/'.$account->account_type.'.png') }}"
+                                             class="pixel"
+                                             alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon"
+                                             style="width: 1rem;">
+                                    @endif
+                                    <strong>
+                                        <a href="{{ route('account-show', $account->username) }}">{{ $account->username }}</a>
+                                    </strong>
+                                </p>
+                            </div>
+
+                            <div class="col-md-4">
+                                <span>Status:</span>
+                                <br>
+                                <span><strong>{{ ucfirst($account->status) }}</strong></span>
+                            </div>
+
+                            <div class="col-md-2">
+                                <form method="POST" action="{{ route('account-auth-delete') }}">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
                             </div>
                         </div>
 
