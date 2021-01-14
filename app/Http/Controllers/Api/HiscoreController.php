@@ -65,7 +65,7 @@ class HiscoreController extends Controller
             return HiscoreResource::collection($hiscores)
                 ->additional([
                     'meta' => [
-                        'skill' => ucfirst($skillName),
+                        'skill' => $skillName,
                         'total_xp' => number_format($sumTotalXp),
                         'average_total_level' => round($averageTotalLevel),
                         'total_max_level' => $totalMaxLevel,
