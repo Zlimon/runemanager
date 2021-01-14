@@ -86,7 +86,7 @@ class AccountUpdate extends Command
                         for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
                             $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
-                            $collectionLoot = $collection->model::where('account_id', $account->id)->firstOrFail();
+                            $collectionLoot = $collection->model::where('account_id', $account->id)->first();
 
                             // If account has no collection entry, create it
                             if (is_null($collectionLoot)) {
@@ -124,7 +124,7 @@ class AccountUpdate extends Command
                          * This might also happen with other bosses in the future
                          * that share collection log entry, but have separate hiscores.
                          */
-                        $dks = \App\Boss\DagannothKings::where('account_id', $account->id)->firstOrFail();
+                        $dks = \App\Boss\DagannothKings::where('account_id', $account->id)->first();
 
                         if (is_null($dks)) {
                             $dks = new \App\Boss\DagannothKings;
