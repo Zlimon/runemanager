@@ -7,6 +7,7 @@ use App\Events\AccountAll;
 use App\Events\AccountLevelUp;
 use App\Events\All;
 use App\Http\Controllers\Controller;
+use App\Log;
 use App\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,13 +23,19 @@ class AccountSkillController extends Controller
 
             $skill = DB::table($skillName)->where('account_id', $account->id)->first();
 
-            $notificationData = [
+            $logData = [
                 "user_id" => auth()->user()->id,
                 "account_id" => $account->id,
                 "category_id" => 1,
+                "data" => null
+            ];
+
+            $log = Log::create($logData);
+
+            $notificationData = [
+                "log_id" => $log->id,
                 "icon" => $skillName,
                 "message" => $accountUsername . " just achieved level " . $skill->level . " " . ucfirst($skillName) . "!" . ($skill->level === 92 ? " Half way there!" : ""),
-                "data" => null
             ];
 
             $notification = Notification::create($notificationData);
