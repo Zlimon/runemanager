@@ -88,16 +88,31 @@ class AccountUpdate extends Command
 
                             $collectionLoot = $collection->model::where('account_id', $account->id)->firstOrFail();
 
-                            $collectionLoot->account_id = $account->id;
-                            $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-                            $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+                            // If account has no collection entry, create it
+                            if (is_null($collectionLoot)) {
+                                $collectionLoot = new $collection->model;
+
+                                $collectionLoot->getAttributes();
+
+                                foreach ($collectionLoot->getFillable() as $fillable) {
+                                    $collectionLoot->$fillable = 0;
+                                }
+
+                                $collectionLoot->account_id = $account->id;
+
+                                $collectionLoot->save();
+                            } else {
+                                $collectionLoot->account_id = $account->id;
+                                $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+                                $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+
+                                $collectionLoot->update();
+                            }
 
                             if (in_array($bosses[$bossIndex],
                                 ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
                                 $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                             }
-
-                            $collectionLoot->update();
 
                             $bossIndex++;
                         }
@@ -111,9 +126,18 @@ class AccountUpdate extends Command
                          */
                         $dks = \App\Boss\DagannothKings::where('account_id', $account->id)->firstOrFail();
 
-                        $dks->kill_count = $dksKillCount;
+                        if (is_null($dks)) {
+                            $dks = new \App\Boss\DagannothKings;
 
-                        $dks->update();
+                            $dks->account_id = $account->id;
+                            $dks->kill_count = $dksKillCount;
+
+                            $dks->save();
+                        } else {
+                            $dks->kill_count = $dksKillCount;
+
+                            $dks->update();
+                        }
 
                         $this->info(sprintf("Updated %s!", $account->username));
                     } else {
