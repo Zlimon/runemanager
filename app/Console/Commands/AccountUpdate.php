@@ -143,6 +143,20 @@ class AccountUpdate extends Command
                             $dks->update();
                         }
 
+                        $npcs = Helper::listNpcs();
+
+                        foreach ($npcs as $npc) {
+                            $collection = Collection::findByNameAndCategory($npc, 4);
+
+                            if (is_null($collection)) {
+                                $collectionLoot = new $collection->model;
+
+                                $collectionLoot->account_id = $account->id;
+
+                                $collectionLoot->save();
+                            }
+                        }
+
                         $this->info(sprintf("Updated %s!", $account->username));
                     } else {
                         $this->info(sprintf("No outdated data for %s! Not updating", $account->username));

@@ -29,7 +29,7 @@ class Collection extends Model
 
     public static function findByNameAndCategory($name, $category_id)
     {
-        return self::where([['name', $name], ['category_id', $category_id]])->firstOrFail();
+        return self::where([['name', $name], ['category_id', $category_id]])->first();
     }
 
     public function category()
