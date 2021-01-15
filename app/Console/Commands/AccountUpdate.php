@@ -90,27 +90,27 @@ class AccountUpdate extends Command
                         for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
                             $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
-                            $collectionLoot = $collection->model::where('account_id', $account->id)->first();
+                            $collectionLog = $collection->model::where('account_id', $account->id)->first();
 
                             // If account has no collection entry, create it
-                            if (is_null($collectionLoot)) {
-                                $collectionLoot = new $collection->model;
+                            if (is_null($collectionLog)) {
+                                $collectionLog = new $collection->model;
 
-                                $collectionLoot->getAttributes();
+                                $collectionLog->getAttributes();
 
-                                foreach ($collectionLoot->getFillable() as $fillable) {
-                                    $collectionLoot->$fillable = 0;
+                                foreach ($collectionLog->getFillable() as $fillable) {
+                                    $collectionLog->$fillable = 0;
                                 }
 
-                                $collectionLoot->account_id = $account->id;
+                                $collectionLog->account_id = $account->id;
 
-                                $collectionLoot->save();
+                                $collectionLog->save();
                             } else {
-                                $collectionLoot->account_id = $account->id;
-                                $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-                                $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+                                $collectionLog->account_id = $account->id;
+                                $collectionLog->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+                                $collectionLog->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-                                $collectionLoot->update();
+                                $collectionLog->update();
                             }
 
                             if (in_array($bosses[$bossIndex],
@@ -149,11 +149,11 @@ class AccountUpdate extends Command
                             $collection = Collection::findByNameAndCategory($npc, 4);
 
                             if (is_null($collection)) {
-                                $collectionLoot = new $collection->model;
+                                $collectionLog = new $collection->model;
 
-                                $collectionLoot->account_id = $account->id;
+                                $collectionLog->account_id = $account->id;
 
-                                $collectionLoot->save();
+                                $collectionLog->save();
                             }
                         }
 
