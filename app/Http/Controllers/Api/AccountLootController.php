@@ -81,7 +81,7 @@ class AccountLootController extends Controller
 
                             $notificationData = [
                                 "log_id" => $log->id,
-                                "icon" => $collectionName,
+                                "icon" => strtolower($collectionName),
                                 "message" => $accountUsername . " unlocked a new unique!",
                             ];
 
@@ -127,7 +127,7 @@ class AccountLootController extends Controller
 
                 $notificationData = [
                     "log_id" => $log->id,
-                    "icon" => $collectionName,
+                    "icon" => strtolower($collectionName),
                     "message" => $accountUsername . " defeated " . $collection->alias . "!",
                 ];
 

@@ -34,7 +34,7 @@ class AccountSkillController extends Controller
 
             $notificationData = [
                 "log_id" => $log->id,
-                "icon" => $skillName,
+                "icon" => strtolower($skillName),
                 "message" => $accountUsername . " just achieved level " . $skill->level . " " . ucfirst($skillName) . "!" . ($skill->level === 92 ? " Half way there!" : ""),
             ];
 
