@@ -53,7 +53,7 @@ class AccountUpdate extends Command
                 $playerData = Helper::getPlayerData($playerDataUrl);
 
                 if ($playerData) {
-                    if ($account->xp != $playerData[0][2]) {
+                    if ($account->xp != $playerData[0][2] || $account->xp == 4600000000) {
                         $this->info(sprintf("Found outdated data for %s!", $account->username));
 
                         $account->rank = $playerData[0][0];
