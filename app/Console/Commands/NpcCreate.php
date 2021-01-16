@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Account;
 use App\Collection;
 use Artisan;
 use Illuminate\Console\Command;
@@ -99,6 +100,18 @@ class NpcCreate extends Command
         fclose($modelFile);
 
         Artisan::call('migrate');
+
+        $accounts = Account::get();
+
+        foreach ($accounts as $account) {
+            $collection = Collection::findByNameAndCategory(ucfirst(str_replace("_", " ", Str::snake(Str::singular($this->argument('npc'))))), 4);
+
+            $collectionLog = new $collection->model;
+
+            $collectionLog->account_id = $account->id;
+
+            $collectionLog->save();
+        }
 
         $i = 0;
         foreach ($this->argument('unique') as $key => $unique) {
