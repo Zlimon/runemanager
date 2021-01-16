@@ -210,8 +210,6 @@ class AccountController extends Controller
 
             All::dispatch($notification);
 
-            AccountAll::dispatch($account, $notification);
-
             return response($accountUsername . " has been logged in to RuneManager");
         } else {
             return response("This account is not authenticated with " . auth()->user()->name, 403);
@@ -249,8 +247,6 @@ class AccountController extends Controller
             $notification = Notification::create($notificationData);
 
             All::dispatch($notification);
-
-            AccountAll::dispatch($account, $notification);
 
             return response($accountUsername . " has been logged off RuneManager");
         } else {
