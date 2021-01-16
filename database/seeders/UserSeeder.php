@@ -1,20 +1,25 @@
 <?php
 
+namespace Database\Seeders;
+
 use App\Account;
 use App\Collection;
+use App\Helpers\Helper;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the database seeders.
      *
      * @return void
      */
     public function run()
     {
-        DB::table('users')->insert([
+        User::create([
             'name' => 'Simon',
             'email' => 'simon@runemanager.com',
             'password' => bcrypt('runemanager1234'),
@@ -72,15 +77,15 @@ class UserSeeder extends Seeder
 
         shuffle($accounts);
 
-        factory(App\User::class, sizeof($accounts))->create()->each(function ($u) use ($accounts) {
-            $randomId = rand(1, sizeof($accounts));
+        User::factory()->count(sizeof($accounts) - 1)->create()->each(function ($u) use ($accounts) {
+            $randomId = rand(1, sizeof($accounts) - 1);
 
-            if (App\Account::where('username', $accounts[$randomId])->first()) {
+            if (Account::where('username', $accounts[$randomId - 1])->first()) {
                 return null;
             }
 
             $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(' ',
-                    '%20', $accounts[$randomId]);
+                    '%20', $accounts[$randomId - 1]);
 
             /* Get the $playerDataUrl file content. */
             $playerData = Helper::getPlayerData($playerDataUrl);
