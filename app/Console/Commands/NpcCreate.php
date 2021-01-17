@@ -50,7 +50,7 @@ class NpcCreate extends Command
 
         $aliasName = ucwords(str_replace("_", " ", $migrationName)); // Abyssal Demon
 
-        $this->info(sprintf("Creating collection entry for %s!", $normalName));
+        $this->info(sprintf("Creating collection entry for %s!", $aliasName));
 
         Collection::create([
             'category_id' => 4,
@@ -80,7 +80,7 @@ class NpcCreate extends Command
 
         $this->info(sprintf("Created migration file for %s!", $aliasName));
 
-        $model = 'app/npc/' . $modelName . '.php';
+        $model = 'app/Npc/' . $modelName . '.php';
 
         $table = '$table';
         $fillable = '$fillable';
