@@ -170,6 +170,14 @@ class NpcCreate extends Command
             }
         }
 
+        $this->info(sprintf("Migrating %s to database!", $aliasName));
+
+        Artisan::call('migrate', [
+            '--force' => true,
+        ]);
+
+        $this->info(sprintf("Migrated %s to database!", $aliasName));
+
         $this->info(sprintf("Creating collection entry for %s!", $aliasName));
 
         Collection::create([
@@ -180,12 +188,6 @@ class NpcCreate extends Command
         ]);
 
         $this->info(sprintf("Created collection entry for %s!", $aliasName));
-
-        $this->info(sprintf("Migrating %s to database!", $aliasName));
-
-        Artisan::call('migrate');
-
-        $this->info(sprintf("Migrated %s to database!", $aliasName));
 
         $accounts = Account::get();
 
