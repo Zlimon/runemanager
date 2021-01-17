@@ -9,8 +9,14 @@
         @if ($account->user->private === 0 || (Auth::check() && $account->user->id == Auth::user()->id))
             <accounthiscore account="{{ $account->username }}"></accounthiscore>
 
-            <div class="col-md-6">
-                <accountnotification :account="{{ $account }}"></accountnotification>
+            <div class="row">
+                <div class="col-md-6">
+                    <accountnotification :account="{{ $account }}"></accountnotification>
+                </div>
+
+                <div class="col-md-6">
+                    <equipment :account="{{ $account }}"></equipment>
+                </div>
             </div>
         @else
             <div class="text-center py-5">
