@@ -42,80 +42,120 @@ class NpcCreate extends Command
      */
     public function handle()
     {
-        $modelName = Str::studly(Str::singular(class_basename($this->argument('npc'))));
+        $modelName = Str::studly(Str::singular(class_basename(strtolower($this->argument('npc'))))); // AbyssalDemon
+
+        $migrationName = str_replace("-", "_", Str::snake(Str::singular(strtolower($this->argument('npc'))))); // abyssal_demon
+
+        $normalName = str_replace("_", " ", $migrationName); // abyssal demon
+
+        $aliasName = ucwords(str_replace("_", " ", $migrationName)); // Abyssal Demon
+
+        $this->info(sprintf("Creating collection entry for %s!", $normalName));
 
         Collection::create([
             'category_id' => 4,
-            'name' => str_replace("_", " ", Str::snake(Str::singular($this->argument('npc')))),
-            'alias' => ucfirst(str_replace("_", " ", Str::snake(Str::singular($this->argument('npc'))))),
+            'name' => $normalName,
+            'alias' => $aliasName,
             'model' => "App\Npc\\" . $modelName,
         ]);
+
+        $this->info(sprintf("Created collection entry for %s!", $aliasName));
 
         $uniques = implode(
             ' ',
             array_map(
                 function ($unique) {
-                    return (str_replace("-", "_", Str::snake($unique)) . ':integer:default(0):unsigned,');
+                    return (str_replace("-", "_", Str::snake(strtolower($unique))) . ':integer:default(0):unsigned,'); // abyssal_whip
                 },
                 $this->argument('unique')
             )
         );
 
-        $command = 'make:migration:schema create_' . Str::snake(Str::singular($this->argument('npc'))) . '_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, ' . substr($uniques, 0, -1) . '"';
+        $command = 'make:migration:schema create_' . $migrationName . '_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, ' . substr($uniques,
+                0, -1) . '"';
 
-        $execute = Artisan::call($command);
+        $this->info(sprintf("Creating migration file for %s!", $aliasName));
 
-//        $oldPath = 'app/' . ucfirst($this->argument('npc') . '.php');
+        Artisan::call($command);
+
+        $this->info(sprintf("Created migration file for %s!", $aliasName));
+
         $model = 'app/npc/' . $modelName . '.php';
 
-//        $move = \File::move($oldPath, $newPath);
+        $table = '$table';
+        $fillable = '$fillable';
+        $hidden = '$hidden';
+        $thisBelongsTo = '$this->belongsTo(\App\Account::class)';
 
-        $modelFile = fopen($model,
-            'w') or die ('Unable to open or create model file! You have to manually edit this for this hiscore to work!');
+        $modelFile = <<<EOD
+        <?php
 
-        fwrite($modelFile, "<?php\n");
-        fwrite($modelFile, "\r\n");
-        fwrite($modelFile, "namespace App\\Npc;\r\n");
-        fwrite($modelFile, "\r\n");
-        fwrite($modelFile, "use Illuminate\\Database\\Eloquent\\Model;\r\n");
-        fwrite($modelFile, "\r\n");
-        fwrite($modelFile, "class " . $modelName . " extends Model\r\n");
-        fwrite($modelFile, "{\r\n");
-        fwrite($modelFile, '    protected $table = \'' . Str::snake(Str::singular($this->argument('npc'))) . '\';' . "\r\n");
-        fwrite($modelFile, "\r\n");
-        fwrite($modelFile, '    protected $fillable = [' . "\r\n");
-        fwrite($modelFile, "        'obtained',\r\n");
-        fwrite($modelFile, "        'kill_count',\r\n");
-        foreach ($this->argument('unique') as $unique) fwrite($modelFile, "        '" . str_replace("-","_", Str::snake($unique)) . "',\r\n");
-        fwrite($modelFile, "    ];\r\n");
-        fwrite($modelFile, "\r\n");
-        fwrite($modelFile, '    protected $hidden = [\'user_id\'];' . "\r\n");
-        fwrite($modelFile, "\r\n");
-        fwrite($modelFile, "    public function account()\r\n");
-        fwrite($modelFile, "    {\r\n");
-        fwrite($modelFile, '        return $this->belongsTo(\App\Account::class);' . "\r\n");
-        fwrite($modelFile, "    }\r\n");
-        fwrite($modelFile, "}\r\n");
+        namespace App\Npc;
 
-        fclose($modelFile);
+        use Illuminate\Database\Eloquent\Model;
+
+        class $modelName extends Model
+        {
+            protected $table = '$migrationName';
+
+            protected $fillable = [
+                'obtained',
+                'kill_count',\r\n
+        EOD;
+        foreach ($this->argument('unique') as $unique) {
+            $fillable = str_replace("-", "_", Str::snake(strtolower($unique)));
+
+            $modelFile .= <<<EOD
+                    '$fillable',\r\n
+            EOD;
+        }
+        $modelFile .= <<<EOD
+            ];
+
+            protected $hidden = ['user_id'];
+
+            public function account()
+            {
+                return $thisBelongsTo;
+            }
+        }
+        EOD;
+
+        $this->info(sprintf("Creating model file for %s!", $aliasName));
+
+        File::put($model, $modelFile);
+
+        $this->info(sprintf("Created model file for %s!", $aliasName));
+
+        $this->info(sprintf("Migrating %s to database!", $aliasName));
 
         Artisan::call('migrate');
 
+        $this->info(sprintf("Migrated %s to database!", $aliasName));
+
         $accounts = Account::get();
 
+        $this->info(sprintf("Creating %s collection entries for accounts!", $aliasName));
+
         foreach ($accounts as $account) {
-            $collection = Collection::findByNameAndCategory(ucfirst(str_replace("_", " ", Str::snake(Str::singular($this->argument('npc'))))), 4);
+            $collection = Collection::findByNameAndCategory($normalName, 4);
 
             $collectionLog = new $collection->model;
 
             $collectionLog->account_id = $account->id;
 
             $collectionLog->save();
+
+            $this->info(sprintf("Created %s collection entry for %s!", $aliasName, $account->username));
         }
+
+        $this->info(sprintf("Downloading icons for %s!", $aliasName));
 
         $i = 0;
         foreach ($this->argument('unique') as $key => $unique) {
-            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("_", " ", Str::snake($unique))) . '","duplicate":false}'));
+            $this->info(sprintf("Fetching item data for %s!", $unique));
+
+            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("-", " ", Str::snake(strtolower($unique)))) . '","duplicate":false}'));
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
             /* Get the content of $url. */
@@ -129,28 +169,39 @@ class NpcCreate extends Command
             if ($httpCode >= 200 && $httpCode < 300) {
                 $json = json_decode($response, true);
 
-                print_r($json["_items"][0]["id"]);
+                if (isset($json["_items"][0])) {
+                    $url = 'https://www.osrsbox.com/osrsbox-db/items-icons/' . (int)$json["_items"][0]["id"] . '.png'; // 4151
 
-                $url = 'https://www.osrsbox.com/osrsbox-db/items-icons/' . (int)$json["_items"][0]["id"] . '.png'; // 4151
+                    $dir = public_path() . '/images/npc/' . $migrationName . '/'; // /images/npc/abyssal_demon/
+                    $imgName = str_replace("-", "_", Str::snake(strtolower($unique))) . '.png'; // abyssal_whip.png
 
-                $dir = public_path() . '/images/npc/' . lcfirst(Str::snake(Str::singular($this->argument('npc')))) . '/'; // /images/npc/abyssal_demon/
-                $imgName = lcfirst(str_replace(" ", "_", Str::snake($unique))) . '.png'; // abyssal_whip.png
+                    if (!File::exists($dir)) {
+                        File::makeDirectory($dir, 0777, true);
+                    }
 
-                if (!File::exists($dir)) {
-                    File::makeDirectory($dir, 0777, true);
+                    $img = $dir . $imgName;
+
+                    file_put_contents($img, file_get_contents($url));
+
+                    $this->info(sprintf("Downloaded icon for %s!", $unique));
+
+                    // If first iteration, make an icon for npc. This will be the first item in uniques
+                    if ($i === 0) {
+                        File::copy($img,
+                            public_path() . '/images/npc/' . $migrationName . '.png');
+
+                        $this->info(sprintf("Downloaded index icon for %s!", $aliasName));
+                    }
+
+                    $i++;
+                } else {
+                    $this->info(sprintf("Could not find item %s!", $unique));
                 }
-
-                $img = $dir . $imgName;
-
-                file_put_contents($img, file_get_contents($url));
-
-                // If first iteration, make an icon for boss. This will be the first item in uniques
-                if ($i === 0) {
-                    File::copy($img, public_path() . '/images/npc/' . lcfirst(Str::snake(Str::singular($this->argument('npc')))) . '.png');
-                }
-
-                $i++;
+            } else {
+                $this->info(sprintf("Could not find item %s!", $unique));
             }
         }
+
+        $this->info(sprintf("Successfully created %s!", $aliasName));
     }
 }
