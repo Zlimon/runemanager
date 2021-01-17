@@ -33,6 +33,7 @@ Vue.component('accountbosshiscore', require('./components/AccountBossHiscore.vue
 Vue.component('allnotification', require('./components/AllNotification.vue').default);
 Vue.component('accountnotification', require('./components/AccountNotification.vue').default);
 Vue.component('notification', require('./components/Notification.vue').default);
+Vue.component('equipment', require('./components/Equipment.vue').default);
 
 Vue.component(
     'passport-clients',

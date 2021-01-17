@@ -17,47 +17,28 @@
             </div>
 
             <div v-else>
-                <div class="d-flex flex-row">
-                    <img :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + data.user.icon_id + '.png'"
-                         class="d-none d-md-inline pixel icon float-left"
-                         alt="Profile icon"
-                         style="width: 7.5rem; height: 7.5rem;">
-
-                    <div class="col">
-                        <h1 class="text-left">{{ data.username }}</h1>
-
-                        <span>Rank: <strong>{{ data.rank }}</strong></span>
-                        <br>
-                        <span>Total XP: <strong>{{ data.xp }}</strong></span>
-                        <br>
-                        <span>Total Level: <strong>{{ data.level }}</strong></span>
-                        <br>
-                        <span>Joined: <strong>{{ data.joined }}</strong></span>
-                    </div>
-                </div>
-
-                <table>
-                    <tr>
-                        <th></th>
-                        <th>Level</th>
-                        <th>XP</th>
-                        <th>Hiscore Rank</th>
-                    </tr>
-                    <tr v-for="(hiscore, name) in hiscores">
-                        <td>
+                <div class="d-flex flex-wrap">
+                    <div v-for="(hiscore, name) in hiscores">
+                        <div class="button-combat-style-narrow text-center button-small">
                             <a :href="'/hiscore/skill/' + name">
                                 <img :alt="name + ' skill icon'"
                                      :src="'/images/skill/' + name + '.png'"
                                      :title="'Click here to visit ' + name + ' hiscores'"
-                                     class="pixel hiscore-icon">
-                                <span class="d-none d-md-inline">{{ name | capitalize }}</span>
+                                     class="">
+                                <span>{{ hiscore.level }}</span>
                             </a>
-                        </td>
-                        <td>{{ hiscore.level }}</td>
-                        <td>{{ hiscore.xp }}</td>
-                        <td>{{ hiscore.rank }}</td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+                    <div class="button-combat-style-narrow text-center button-small">
+                        <a :href="'/hiscore/skill/overall'">
+                            <img :alt="'overall skill icon'"
+                                 :src="'/images/skill/overall.png'"
+                                 :title="'Click here to visit overall hiscores'"
+                                 class="">
+                            <span>{{ data.level }}</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -84,6 +65,7 @@ export default {
             .then((response) => {
                 this.data = response.data.data;
                 this.hiscores = response.data.meta.skillHiscores;
+                this.$emit('load', response.data.data)
             })
             .catch(error => {
                 console.log(error)
