@@ -44,28 +44,19 @@ class NpcCreate extends Command
     {
         $modelName = Str::studly(Str::singular(class_basename(strtolower($this->argument('npc'))))); // AbyssalDemon
 
-        $migrationName = str_replace("-", "_", Str::snake(Str::singular(strtolower($this->argument('npc'))))); // abyssal_demon
+        $migrationName = str_replace("-", "_",
+            Str::snake(Str::singular(strtolower($this->argument('npc'))))); // abyssal_demon
 
         $normalName = str_replace("_", " ", $migrationName); // abyssal demon
 
         $aliasName = ucwords(str_replace("_", " ", $migrationName)); // Abyssal Demon
 
-        $this->info(sprintf("Creating collection entry for %s!", $aliasName));
-
-        Collection::create([
-            'category_id' => 4,
-            'name' => $normalName,
-            'alias' => $aliasName,
-            'model' => "App\Npc\\" . $modelName,
-        ]);
-
-        $this->info(sprintf("Created collection entry for %s!", $aliasName));
-
         $uniques = implode(
             ' ',
             array_map(
                 function ($unique) {
-                    return (str_replace("-", "_", Str::snake(strtolower($unique))) . ':integer:default(0):unsigned,'); // abyssal_whip
+                    return (str_replace("-", "_",
+                            Str::snake(strtolower($unique))) . ':integer:default(0):unsigned,'); // abyssal_whip
                 },
                 $this->argument('unique')
             )
@@ -127,35 +118,12 @@ class NpcCreate extends Command
 
         $this->info(sprintf("Created model file for %s!", $aliasName));
 
-        $this->info(sprintf("Migrating %s to database!", $aliasName));
-
-        Artisan::call('migrate');
-
-        $this->info(sprintf("Migrated %s to database!", $aliasName));
-
-        $accounts = Account::get();
-
-        $this->info(sprintf("Creating %s collection entries for accounts!", $aliasName));
-
-        foreach ($accounts as $account) {
-            $collection = Collection::findByNameAndCategory($normalName, 4);
-
-            $collectionLog = new $collection->model;
-
-            $collectionLog->account_id = $account->id;
-
-            $collectionLog->save();
-
-            $this->info(sprintf("Created %s collection entry for %s!", $aliasName, $account->username));
-        }
-
-        $this->info(sprintf("Downloading icons for %s!", $aliasName));
-
         $i = 0;
         foreach ($this->argument('unique') as $key => $unique) {
             $this->info(sprintf("Fetching item data for %s!", $unique));
 
-            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("-", " ", Str::snake(strtolower($unique)))) . '","duplicate":false}'));
+            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("-",
+                        " ", Str::snake(strtolower($unique)))) . '","duplicate":false}'));
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
             /* Get the content of $url. */
@@ -201,6 +169,41 @@ class NpcCreate extends Command
                 $this->info(sprintf("Could not find item %s!", $unique));
             }
         }
+
+        $this->info(sprintf("Creating collection entry for %s!", $aliasName));
+
+        Collection::create([
+            'category_id' => 4,
+            'name' => $normalName,
+            'alias' => $aliasName,
+            'model' => "App\Npc\\" . $modelName,
+        ]);
+
+        $this->info(sprintf("Created collection entry for %s!", $aliasName));
+
+        $this->info(sprintf("Migrating %s to database!", $aliasName));
+
+        Artisan::call('migrate');
+
+        $this->info(sprintf("Migrated %s to database!", $aliasName));
+
+        $accounts = Account::get();
+
+        $this->info(sprintf("Creating %s collection entries for accounts!", $aliasName));
+
+        foreach ($accounts as $account) {
+            $collection = Collection::findByNameAndCategory($normalName, 4);
+
+            $collectionLog = new $collection->model;
+
+            $collectionLog->account_id = $account->id;
+
+            $collectionLog->save();
+
+            $this->info(sprintf("Created %s collection entry for %s!", $aliasName, $account->username));
+        }
+
+        $this->info(sprintf("Downloading icons for %s!", $aliasName));
 
         $this->info(sprintf("Successfully created %s!", $aliasName));
     }
