@@ -10,11 +10,15 @@
             <accounthiscore account="{{ $account->username }}"></accounthiscore>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
+                    <h3 class="text-center header-chatbox-sword">Recent Events</h3>
+
                     <accountnotification :account="{{ $account }}"></accountnotification>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-7">
+                    <h3 class="text-center header-chatbox-sword">Equipment</h3>
+
                     <equipment :account="{{ $account }}"></equipment>
                 </div>
             </div>

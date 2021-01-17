@@ -1,7 +1,5 @@
 <template>
     <div>
-        <h3 class="text-center header-chatbox-sword">Equipment</h3>
-
         <div v-if="loading">
             <div class="d-flex justify-content-center">
                 <div class="spinner-border" role="status">
