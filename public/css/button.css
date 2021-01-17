@@ -23,9 +23,7 @@
 
 .button-combat-style-narrow {
     font-family: 'runescape', sans-serif;
-    font-size: 1.5em;
     font-weight: bold;
-    line-height: 4rem;
 
     transition: all .2s ease-in;
 
@@ -93,4 +91,11 @@
 .button-with-icon {
     width: 12.5rem;
     height: 5rem;
+}
+
+.button-small {
+    width: 66px;
+    height: 30px;
+    padding: 2px;
+    margin: 2px;
 }

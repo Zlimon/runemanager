@@ -113,18 +113,18 @@ class AccountController extends Controller
                             for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
                                 $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
-                                $collectionLoot = new $collection->model;
+                                $collectionLog = new $collection->model;
 
-                                $collectionLoot->account_id = $account->id;
-                                $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-                                $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+                                $collectionLog->account_id = $account->id;
+                                $collectionLog->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+                                $collectionLog->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
                                 if (in_array($bosses[$bossIndex],
                                     ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
                                     $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                                 }
 
-                                $collectionLoot->save();
+                                $collectionLog->save();
 
                                 $bossIndex++;
                             }
@@ -148,11 +148,11 @@ class AccountController extends Controller
                             foreach ($npcs as $npc) {
                                 $collection = Collection::findByNameAndCategory($npc, 4);
 
-                                $collectionLoot = new $collection->model;
+                                $collectionLog = new $collection->model;
 
-                                $collectionLoot->account_id = $account->id;
+                                $collectionLog->account_id = $account->id;
 
-                                $collectionLoot->save();
+                                $collectionLog->save();
                             }
 
                             $authStatus->status = "success";
@@ -210,8 +210,6 @@ class AccountController extends Controller
 
             All::dispatch($notification);
 
-            AccountAll::dispatch($account, $notification);
-
             return response($accountUsername . " has been logged in to RuneManager");
         } else {
             return response("This account is not authenticated with " . auth()->user()->name, 403);
@@ -249,8 +247,6 @@ class AccountController extends Controller
             $notification = Notification::create($notificationData);
 
             All::dispatch($notification);
-
-            AccountAll::dispatch($account, $notification);
 
             return response($accountUsername . " has been logged off RuneManager");
         } else {

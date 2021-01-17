@@ -20,7 +20,7 @@ class NotificationController extends Controller
         $account = Account::where('username', $accountUsername)->pluck('id')->first();
 
         if ($account) {
-            $notifications = Notification::with('log')->with('log.category')->whereHas('log', function ($query) use($account) {
+            $notifications = Notification::with('log')->with('log.category')->where('message', 'NOT LIKE', '%logged%')->whereHas('log', function ($query) use($account) {
                 return $query->where('account_id', '=', $account);
             })->orderByDesc('id')->paginate(10);
 

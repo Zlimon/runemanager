@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Account;
 use App\Collection;
 use App\Helpers\Helper;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -52,7 +53,7 @@ class AccountUpdate extends Command
                 $playerData = Helper::getPlayerData($playerDataUrl);
 
                 if ($playerData) {
-                    if ($account->xp != $playerData[0][2]) {
+                    if ($account->xp != $playerData[0][2] || $account->xp == 4600000000) {
                         $this->info(sprintf("Found outdated data for %s!", $account->username));
 
                         $account->rank = $playerData[0][0];
@@ -65,12 +66,15 @@ class AccountUpdate extends Command
 
                         for ($i = 0; $i < count($skills); $i++) {
                             DB::table($skills[$i])
-                                ->where('account_id', $account->id)
-                                ->update([
-                                    'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
-                                    'level' => $playerData[$i + 1][1],
-                                    'xp' => ($playerData[$i + 1][2] >= 0 ? $playerData[$i + 1][2] : 0)
-                                ]);
+                                ->updateOrInsert(
+                                    ['account_id' => $account->id],
+                                    [
+                                        'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
+                                        'level' => $playerData[$i + 1][1],
+                                        'xp' => ($playerData[$i + 1][2] >= 0 ? $playerData[$i + 1][2] : 0),
+                                        'created_at' => Carbon::now(),
+                                        'updated_at' => Carbon::now()
+                                    ]);
                         }
 
                         $clueScrollAmount = count(Helper::listClueScrollTiers());
@@ -86,27 +90,27 @@ class AccountUpdate extends Command
                         for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
                             $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
-                            $collectionLoot = $collection->model::where('account_id', $account->id)->first();
+                            $collectionLog = $collection->model::where('account_id', $account->id)->first();
 
                             // If account has no collection entry, create it
-                            if (is_null($collectionLoot)) {
-                                $collectionLoot = new $collection->model;
+                            if (is_null($collectionLog)) {
+                                $collectionLog = new $collection->model;
 
-                                $collectionLoot->getAttributes();
+                                $collectionLog->getAttributes();
 
-                                foreach ($collectionLoot->getFillable() as $fillable) {
-                                    $collectionLoot->$fillable = 0;
+                                foreach ($collectionLog->getFillable() as $fillable) {
+                                    $collectionLog->$fillable = 0;
                                 }
 
-                                $collectionLoot->account_id = $account->id;
+                                $collectionLog->account_id = $account->id;
 
-                                $collectionLoot->save();
+                                $collectionLog->save();
                             } else {
-                                $collectionLoot->account_id = $account->id;
-                                $collectionLoot->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-                                $collectionLoot->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+                                $collectionLog->account_id = $account->id;
+                                $collectionLog->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+                                $collectionLog->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-                                $collectionLoot->update();
+                                $collectionLog->update();
                             }
 
                             if (in_array($bosses[$bossIndex],
@@ -137,6 +141,20 @@ class AccountUpdate extends Command
                             $dks->kill_count = $dksKillCount;
 
                             $dks->update();
+                        }
+
+                        $npcs = Helper::listNpcs();
+
+                        foreach ($npcs as $npc) {
+                            $collection = Collection::findByNameAndCategory($npc, 4);
+
+                            if (is_null($collection)) {
+                                $collectionLog = new $collection->model;
+
+                                $collectionLog->account_id = $account->id;
+
+                                $collectionLog->save();
+                            }
                         }
 
                         $this->info(sprintf("Updated %s!", $account->username));

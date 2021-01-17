@@ -29,6 +29,8 @@ Route::middleware('auth:api')->group(function() {
 		Route::put('/{accountUsername}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
 		Route::post('/{accountUsername}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
 		Route::post('/{accountUsername}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
+
+        Route::post('/{accountUsername}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
 	});
 });
 
@@ -37,6 +39,7 @@ Route::prefix('/account')->group(function() {
 	Route::get('/{account}/skill', 'Api\AccountController@skill')->name('account-show-skill');
 	Route::get('/{account}/boss', 'Api\AccountController@boss')->name('account-show-boss');
 	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
+    Route::get('/{accountUsername}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
 });
 
 Route::prefix('/hiscore')->group(function() {

@@ -20,8 +20,10 @@ window.Vue = require('vue');
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 import UniqueId from 'vue-unique-id';
+import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css'
 
 Vue.use(UniqueId);
+Vue.use(require('advanced-laravel-vue-paginate'));
 Vue.use(require('vue-moment'));
 
 Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
@@ -33,6 +35,7 @@ Vue.component('accountbosshiscore', require('./components/AccountBossHiscore.vue
 Vue.component('allnotification', require('./components/AllNotification.vue').default);
 Vue.component('accountnotification', require('./components/AccountNotification.vue').default);
 Vue.component('notification', require('./components/Notification.vue').default);
+Vue.component('equipment', require('./components/Equipment.vue').default);
 
 Vue.component(
     'passport-clients',

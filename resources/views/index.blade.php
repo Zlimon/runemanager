@@ -20,13 +20,13 @@
                 @guest
                     <div class="align-self-center">
                         <a href="{{ route('login') }}">
-                            <div class="btn btn-block button-combat-style-narrow">
+                            <div class="btn btn-block button-combat-style-thin">
                                 <span>Log in</span>
                             </div>
                         </a>
 
                         <a href="{{ route('register') }}">
-                            <div class="btn btn-block button-combat-style-narrow">
+                            <div class="btn btn-block button-combat-style-thin">
                                 <span>Register</span>
                             </div>
                         </a>

@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Log;
 use App\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AccountLootController extends Controller
 {
@@ -81,7 +82,7 @@ class AccountLootController extends Controller
 
                             $notificationData = [
                                 "log_id" => $log->id,
-                                "icon" => $collectionName,
+                                "icon" => strtolower(Str::snake($collectionName)),
                                 "message" => $accountUsername . " unlocked a new unique!",
                             ];
 
@@ -127,7 +128,7 @@ class AccountLootController extends Controller
 
                 $notificationData = [
                     "log_id" => $log->id,
-                    "icon" => $collectionName,
+                    "icon" => strtolower(Str::snake($collectionName)),
                     "message" => $accountUsername . " defeated " . $collection->alias . "!",
                 ];
 

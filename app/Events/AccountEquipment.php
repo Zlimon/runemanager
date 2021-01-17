@@ -3,29 +3,30 @@
 namespace App\Events;
 
 use App\Account;
+use App\Equipment;
 use App\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AccountLevelUp implements ShouldBroadcast
+class AccountEquipment implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $notification;
+    public $equipment;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Account $account, Notification $notification)
+    public function __construct(Equipment $equipment)
     {
-        $this->notification = $notification::with('log')->with('log.category')->whereHas('log', function ($query) use($account) {
-            return $query->where('account_id', '=', $account->id);
-        })->orderByDesc('id')->first();
+        $this->equipment = $equipment;
     }
 
     /**
@@ -35,6 +36,6 @@ class AccountLevelUp implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('account');
+        return new Channel('account-equipment');
     }
 }
