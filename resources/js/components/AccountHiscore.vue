@@ -15,10 +15,11 @@
 
                     <div class="row">
                         <div class="col">
-                            <img :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + accountData.user.icon_id + '.png'"
-                                 class="pixel icon"
-                                 alt="Profile icon"
-                                 style="width: 7.5rem; height: 7.5rem;">
+                            <img
+                                :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + accountData.user.icon_id + '.png'"
+                                class="pixel icon"
+                                alt="Profile icon"
+                                style="width: 7.5rem; height: 7.5rem;">
                         </div>
 
                         <div class="col">
