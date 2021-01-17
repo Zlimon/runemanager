@@ -122,8 +122,8 @@ class NpcCreate extends Command
         foreach ($this->argument('unique') as $key => $unique) {
             $this->info(sprintf("Fetching item data for %s!", $unique));
 
-            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("-",
-                        " ", Str::snake(strtolower($unique)))) . '","duplicate":false}'));
+            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("_", " ", str_replace("-",
+                        " ", Str::snake(strtolower($unique))))) . '","duplicate":false}'));
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
             /* Get the content of $url. */
