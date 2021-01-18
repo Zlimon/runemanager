@@ -41,7 +41,7 @@ export default {
     methods: {
         getNotifications(page = 1) {
             axios
-                .get('http://runemanager.test/api/notification/account/' + this.account.username + '?page=' + page)
+                .get('/api/notification/account/' + this.account.username + '?page=' + page)
                 .then((response) => {
                     this.notificationsData = response.data;
                 })

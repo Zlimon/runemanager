@@ -122,8 +122,8 @@ class NpcCreate extends Command
         foreach ($this->argument('unique') as $key => $unique) {
             $this->info(sprintf("Fetching item data for %s!", $unique));
 
-            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("-",
-                        " ", Str::snake(strtolower($unique)))) . '","duplicate":false}'));
+            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("_", " ", str_replace("-",
+                        " ", Str::snake(strtolower($unique))))) . '","duplicate":false}'));
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
             /* Get the content of $url. */
@@ -170,6 +170,14 @@ class NpcCreate extends Command
             }
         }
 
+        $this->info(sprintf("Migrating %s to database!", $aliasName));
+
+        Artisan::call('migrate', [
+            '--force' => true,
+        ]);
+
+        $this->info(sprintf("Migrated %s to database!", $aliasName));
+
         $this->info(sprintf("Creating collection entry for %s!", $aliasName));
 
         Collection::create([
@@ -180,12 +188,6 @@ class NpcCreate extends Command
         ]);
 
         $this->info(sprintf("Created collection entry for %s!", $aliasName));
-
-        $this->info(sprintf("Migrating %s to database!", $aliasName));
-
-        Artisan::call('migrate');
-
-        $this->info(sprintf("Migrated %s to database!", $aliasName));
 
         $accounts = Account::get();
 
