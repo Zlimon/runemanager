@@ -77,7 +77,7 @@ export default {
         window.Echo.channel('account-all')
             .listen('AccountAll', (e) => {
                 if (this.checkAccount(e.notification.log.account_id)) {
-                    this.notificationsData.unshift(e.notification);
+                    this.notificationsData.data.unshift(e.notification);
                 }
             });
     },
