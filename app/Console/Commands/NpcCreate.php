@@ -51,18 +51,52 @@ class NpcCreate extends Command
 
         $aliasName = ucwords(str_replace("_", " ", $migrationName)); // Abyssal Demon
 
-        $uniques = implode(
+        if ($this->argument('unique')[0] === "drops" && sizeof($this->argument('unique')) === 1) {
+            $handle = curl_init('https://api.osrsbox.com/monsters?where=' . urlencode('{"name":"' . ucfirst(str_replace("_",
+                        " ", str_replace("-",
+                            " ", $this->argument('npc')))) . '"}') . '');
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+
+            /* Get the content of $url. */
+            $response = curl_exec($handle);
+
+            /* Check for errors (content not found). */
+            $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            curl_close($handle);
+
+            /* If the document has loaded successfully without any redirection or error */
+            if ($httpCode >= 200 && $httpCode < 300) {
+                $json = json_decode($response, true);
+
+                if (!empty($json["_items"][0]["drops"])) {
+                    foreach ($json["_items"][0]["drops"] as $drop) {
+                        $uniques[] = $drop["name"];
+                    }
+                } else {
+                    $this->info(sprintf("Could not find any drops for %s! Try to manually type the items you wish to track instead",
+                        $this->argument('npc')));
+
+                    return 1;
+                }
+            }
+        } else {
+            $uniques = $this->argument('unique');
+        }
+
+        $uniques = array_unique($uniques);
+
+        $migrationUniques = implode(
             ' ',
             array_map(
                 function ($unique) {
                     return (str_replace("-", "_",
-                            Str::snake(strtolower($unique))) . ':integer:default(0):unsigned,'); // abyssal_whip
+                            Str::snake(strtolower($unique)))) . ':integer:default(0):unsigned,'; // abyssal_whip
                 },
-                $this->argument('unique')
+                $uniques
             )
         );
 
-        $command = 'make:migration:schema create_' . $migrationName . '_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, ' . substr($uniques,
+        $command = 'make:migration:schema create_' . $migrationName . '_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, ' . substr($migrationUniques,
                 0, -1) . '"';
 
         $this->info(sprintf("Creating migration file for %s!", $aliasName));
@@ -93,7 +127,7 @@ class NpcCreate extends Command
                 'obtained',
                 'kill_count',\r\n
         EOD;
-        foreach ($this->argument('unique') as $unique) {
+        foreach ($uniques as $unique) {
             $fillable = str_replace("-", "_", Str::snake(strtolower($unique)));
 
             $modelFile .= <<<EOD
@@ -119,11 +153,12 @@ class NpcCreate extends Command
         $this->info(sprintf("Created model file for %s!", $aliasName));
 
         $i = 0;
-        foreach ($this->argument('unique') as $key => $unique) {
+        foreach ($uniques as $key => $unique) {
             $this->info(sprintf("Fetching item data for %s!", $unique));
 
-            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("_", " ", str_replace("-",
-                        " ", Str::snake(strtolower($unique))))) . '","duplicate":false}'));
+            $handle = curl_init("https://api.osrsbox.com/items?where=" . urlencode('{"name":"' . ucfirst(str_replace("_",
+                        " ", str_replace("-",
+                            " ", Str::snake(strtolower($unique))))) . '","duplicate":false}'));
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
             /* Get the content of $url. */
@@ -208,5 +243,7 @@ class NpcCreate extends Command
         $this->info(sprintf("Downloading icons for %s!", $aliasName));
 
         $this->info(sprintf("Successfully created %s!", $aliasName));
+
+        return 0;
     }
 }
