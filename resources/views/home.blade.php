@@ -45,7 +45,7 @@
 
                     @foreach ($user->account as $account)
                         <div class="row align-items-center">
-                            <div class="col-md-8">
+                            <div class="col-md-5">
                                 <p>
                                     @if ($account->account_type !== "normal")
                                         <img src="{{ asset('images/'.$account->account_type.'.png') }}"
@@ -64,6 +64,16 @@
                                 <br>
                                 <span><strong>{{ $account->level }}</strong></span>
                             </div>
+
+                            @if ($account->online === 1)
+                                <div class="col-md-2">
+                                    <form method="POST" action="{{ route('account-force-logout', $account->username) }}">
+                                        @csrf
+
+                                        <button type="submit" class="btn btn-danger">Logout</button>
+                                    </form>
+                                </div>
+                            @endif
                         </div>
 
                         <hr>
