@@ -19,7 +19,7 @@ class AccountSkillController extends Controller
         $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
 
         if ($account) {
-            DB::table($skillName)->where('account_id', $account->id)->increment('level', 1/*, ["xp" => $request->xp]*/);
+            DB::table($skillName)->where('account_id', $account->id)->update(['level' => $request->level]);
 
             $skill = DB::table($skillName)->where('account_id', $account->id)->first();
 
