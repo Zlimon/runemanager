@@ -1,5 +1,3 @@
-**NOTICE!** This project remains inacitve until the clan update arrives to OSRS!**
-
 # RuneManager for Old School RuneScape
 **Welcome to RuneManager!**
 
@@ -70,6 +68,8 @@ RuneManager allows clan members to show off their accomplishments. With the Rune
 # Quick Installation
 If you are already familiar with Laravel and setting up a Laravel application with Nginx or Apache, just follow these instructions.
 If not, visit our [wiki](https://github.com/Zlimon/RuneManager-OSRS/wiki/Installing-RuneManager-(Linux)-(MySQL)-(Nginx)) for clear instructions on how to install everything you need!
+
+To have scheduled actions such as hiscore synchronization, it is recommended to host RuneManager with Linux
 
 ## Linux
 1. Create a folder and give your current user ownership of it.
