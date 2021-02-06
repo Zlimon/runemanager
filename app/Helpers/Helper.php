@@ -197,7 +197,7 @@ class Helper
 
     public static function downloadItemIcon($itemName)
     {
-        $dir = public_path() . '/images/item/'; // /images/item/
+        $dir = storage_path() . '/item/'; // /images/item/
         $imgName = str_replace(
                 "'",
                 "",
