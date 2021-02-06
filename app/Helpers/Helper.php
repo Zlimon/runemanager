@@ -4,6 +4,8 @@ namespace App\Helpers;
 
 use App\Collection;
 use DateTime;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class Helper
 {
@@ -122,8 +124,10 @@ class Helper
     {
         $itemData = [];
 
-        array_push($itemData,
-            json_decode(file_get_contents('https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json'), true));
+        array_push(
+            $itemData,
+            json_decode(file_get_contents('https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json'), true)
+        );
 
         return $itemData[0][$attribute];
     }
@@ -184,7 +188,65 @@ class Helper
 
     public static function formatHiscoreUrl($accountType, $playerName)
     {
-        return 'https://secure.runescape.com/m=hiscore_oldschool' . ($accountType === 'normal' ? '' : '_' . ($accountType === 'ultimate_ironman' ? 'ultimate' : $accountType)) . '/index_lite.ws?player=' . str_replace(' ',
-                '%20', $playerName);
+        return 'https://secure.runescape.com/m=hiscore_oldschool' . ($accountType === 'normal' ? '' : '_' . ($accountType === 'ultimate_ironman' ? 'ultimate' : $accountType)) . '/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $playerName
+            );
+    }
+
+    public static function downloadItemIcon($itemName)
+    {
+        $dir = public_path() . '/images/item/'; // /images/item/
+        $imgName = str_replace(
+                "'",
+                "",
+                str_replace("-", "_", Str::snake(strtolower($itemName)))
+            ) . '.png'; // abyssal_whip.png
+
+        if (File::exists($dir . $imgName)) {
+            return;
+        }
+
+        $handle = curl_init(
+            "https://api.osrsbox.com/items?where=" . urlencode(
+                '{"name":"' . ucfirst(
+                    str_replace(
+                        "_",
+                        " ",
+                        str_replace(
+                            "-",
+                            " ",
+                            Str::snake(strtolower($itemName))
+                        )
+                    )
+                ) . '","duplicate":false}'
+            )
+        );
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+
+        /* Get the content of $url. */
+        $response = curl_exec($handle);
+
+        /* Check for errors (content not found). */
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        curl_close($handle);
+
+        /* If the document has loaded successfully without any redirection or error */
+        if ($httpCode >= 200 && $httpCode < 300) {
+            $json = json_decode($response, true);
+
+            if (isset($json["_items"][0])) {
+                $url = 'https://www.osrsbox.com/osrsbox-db/items-icons/' . (int)$json["_items"][0]["id"] . '.png'; // 4151
+
+                if (!File::exists($dir)) {
+                    File::makeDirectory($dir, 0777, true);
+                }
+
+                $img = $dir . $imgName;
+
+                file_put_contents($img, file_get_contents($url));
+            }
+        }
     }
 }
