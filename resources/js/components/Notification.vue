@@ -28,7 +28,7 @@
                              class="background-world-map mx-2 p-1">
                             <img
                                 :alt="index.replaceAll('_', ' ') + ' item icon'"
-                                :src="!isNaN(notification.icon) ? '/storage/item/' + index + '.png' : '/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'"
+                                :src="!isNaN(notification.icon) ? '/storage/items/' + index + '.png' : '/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'"
                                 :title="index.replaceAll('_', ' ')"
                                 class="pixel hiscore-icon">
                         </div>

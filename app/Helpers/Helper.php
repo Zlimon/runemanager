@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Collection;
 use DateTime;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Helper
@@ -197,14 +198,14 @@ class Helper
 
     public static function downloadItemIcon($itemName)
     {
-        $dir = storage_path() . '/item/'; // /images/item/
+        $dir = storage_path() . '/app/public/items'; // /storage/items/
         $imgName = str_replace(
                 "'",
                 "",
                 str_replace("-", "_", Str::snake(strtolower($itemName)))
             ) . '.png'; // abyssal_whip.png
 
-        if (File::exists($dir . $imgName)) {
+        if (Storage::disk('items')->exists('items/'.$imgName)) {
             return;
         }
 
@@ -240,12 +241,10 @@ class Helper
                 $url = 'https://www.osrsbox.com/osrsbox-db/items-icons/' . (int)$json["_items"][0]["id"] . '.png'; // 4151
 
                 if (!File::exists($dir)) {
-                    File::makeDirectory($dir, 0777, true);
+                    Storage::disk('items')->makeDirectory("items");
                 }
 
-                $img = $dir . $imgName;
-
-                file_put_contents($img, file_get_contents($url));
+                Storage::disk('items')->put('items/' . $imgName, file_get_contents($url));
             }
         }
     }
