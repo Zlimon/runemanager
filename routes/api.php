@@ -34,6 +34,8 @@ Route::middleware('auth:api')->group(function() {
         Route::post('/{accountUsername}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
 
         Route::post('/{accountUsername}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
+
+        Route::post('/{accountUsername}/quests', 'Api\AccountQuestController@update')->name('account-quests-update');
 	});
 });
 
@@ -44,6 +46,7 @@ Route::prefix('/account')->group(function() {
 	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
     Route::get('/{accountUsername}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
     Route::get('/{accountUsername}/bank', 'Api\AccountBankController@show')->name('account-bank-show');
+    Route::get('/{accountUsername}/quests', 'Api\AccountQuestController@show')->name('account-quests-show');
 });
 
 Route::prefix('/hiscore')->group(function() {
