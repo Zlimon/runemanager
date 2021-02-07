@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Bank;
+use App\Account;
 use App\Equipment;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -16,16 +16,17 @@ class AccountBank implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $bank;
+    public $account;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Bank $bank)
+    public function __construct(Account $account)
     {
-        $this->bank = $bank;
+
+        $this->account = $account->id;
     }
 
     /**

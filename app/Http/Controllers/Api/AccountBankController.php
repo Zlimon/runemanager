@@ -41,8 +41,6 @@ class AccountBankController extends Controller
                 ]
             );
 
-            $bank = Bank::where('account_id', $account->id)->first();
-
             $logData = [
                 "user_id" => auth()->user()->id,
                 "account_id" => $account->id,
@@ -52,7 +50,7 @@ class AccountBankController extends Controller
 
             $log = Log::create($logData);
 
-//            AccountBank::dispatch($bank);
+            AccountBank::dispatch($account);
 
             return response()->json("Updated bank for " . $accountUsername, 200);
         }

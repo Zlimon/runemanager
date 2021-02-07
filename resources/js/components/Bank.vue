@@ -63,6 +63,19 @@ export default {
         checkAccount(accountId) {
             return this.account.id === accountId;
         },
+
+        fetchBank() {
+            axios
+                .get('/api/account/' + this.account.username + '/bank')
+                .then((response) => {
+                    this.bank = response.data.data;
+                })
+                .catch(error => {
+                    console.log(error)
+                    this.errored = true
+                })
+                .finally(() => this.loading = false)
+        }
     },
 
     data() {
@@ -74,26 +87,16 @@ export default {
     },
 
     mounted() {
-        axios
-            .get('/api/account/' + this.account.username + '/bank')
-            .then((response) => {
-                this.bank = response.data.data;
-                console.log(this.bank)
-            })
-            .catch(error => {
-                console.log(error)
-                this.errored = true
-            })
-            .finally(() => this.loading = false)
+        this.fetchBank();
     },
 
-    // created() {
-    //     window.Echo.channel('account-equipment')
-    //         .listen('AccountEquipment', (e) => {
-    //             if (this.checkAccount(e.equipment.account_id)) {
-    //                 this.equipment = e.equipment.data;
-    //             }
-    //         });
-    // },
+    created() {
+        window.Echo.channel('account-bank')
+            .listen('AccountBank', (e) => {
+                if (this.checkAccount(e.account)) {
+                    this.fetchBank();
+                }
+            });
+    },
 }
 </script>
