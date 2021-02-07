@@ -29,14 +29,14 @@
                             <img
                                 :alt="index.replaceAll('_', ' ') + ' item icon'"
                                 :src="!isNaN(notification.icon) ? '/storage/items/' + index + '.png' : '/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'"
-                                :title="index.replaceAll('_', ' ')"
+                                :title="index.replaceAll('_', ' ') + ' x ' + count | capitalize"
                                 class="pixel hiscore-icon">
                         </div>
                     </div>
                 </div>
 
                 <div class="text-right">
-                    <small class="text-muted">{{ notification.log.created_at | moment("from") }}</small>
+                    <small class="text-muted" :title="notification.log.created_at | moment('dddd, MMMM Do YYYY, hh:mm:ss')">{{ notification.log.created_at | moment("from") | capitalize }}</small>
                 </div>
             </div>
         </div>
@@ -48,5 +48,13 @@ export default {
     props: {
         notifications: {required: true},
     },
+
+    filters: {
+        capitalize: function (value) {
+            if (!value) return ''
+            value = value.toString()
+            return value.charAt(0).toUpperCase() + value.slice(1)
+        },
+    }
 }
 </script>
