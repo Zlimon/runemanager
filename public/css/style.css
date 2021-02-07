@@ -314,6 +314,17 @@ table th
     text-align: center;
 }
 
+.bank-item
+{
+    position: relative;
+
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+
+    white-space: nowrap;
+}
+
 .faded
 {
     opacity: .25;

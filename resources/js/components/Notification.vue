@@ -5,12 +5,12 @@
                 <div class="d-flex flex-row flex-wrap justify-content-center">
                     <div class="col-3 col-sm-4" style="padding: 0; margin: 0;">
                         <div v-if="isNaN(notification.icon)">
-                            <img :alt="notification.icon + ' icon'"
+                            <img alt="Notification icon'"
                                  :src="'/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '.png'"
                                  class="pixel notification-icon">
                         </div>
                         <div v-else>
-                            <img :alt="'Profile icon'"
+                            <img alt="Notification icon"
                                  :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + notification.icon + '.png'"
                                  class="pixel notification-icon">
                         </div>

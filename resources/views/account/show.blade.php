@@ -20,6 +20,10 @@
                     <h3 class="text-center header-chatbox-sword">Equipment</h3>
 
                     <equipment :account="{{ $account }}"></equipment>
+
+                    <h3 class="text-center header-chatbox-sword">The Bank of Gielinor</h3>
+
+                    <bank :account="{{ $account }}"></bank>
                 </div>
             </div>
         @else
