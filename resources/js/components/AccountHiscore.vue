@@ -38,33 +38,25 @@
             <div class="col-md-7">
                 <div v-if="skills">
                     <div class="row">
-                        <div class="col-9 col-md-9">
-                            <h3 class="text-center header-chatbox-sword">Skills</h3>
-                        </div>
+                        <h3 class="text-center header-chatbox-sword" style="width: 100%;">Skills</h3>
 
-                        <div class="col-3 col-md-1">
-                            <div class="btn background-world-map" v-on:click="toggle">
-                                <img alt="Bosses icon"
-                                     class="pixel icon-small"
-                                     src="/images/boss/boss.png"
-                                     title="Click here to see the boss hiscores">
-                            </div>
+                        <div class="btn background-world-map mr-3" style="position: absolute; right: 0;" v-on:click="toggle">
+                            <img alt="Bosses icon"
+                                 class="pixel icon-small"
+                                 src="/images/boss/boss.png"
+                                 title="Click here to see the boss hiscores">
                         </div>
                     </div>
                 </div>
                 <div v-else>
                     <div class="row">
-                        <div class="col-9 col-md-9">
-                            <h3 class="text-center header-chatbox-sword">Bosses</h3>
-                        </div>
+                        <h3 class="text-center header-chatbox-sword" style="width: 100%;">Bosses</h3>
 
-                        <div class="col-3 col-md-1">
-                            <div class="btn background-world-map" v-on:click="toggle">
-                                <img alt="Skills icon"
-                                     class="pixel icon-small"
-                                     src="/images/skill/overall.png"
-                                     title="Click here to see the skill hiscores">
-                            </div>
+                        <div class="btn background-world-map mr-3" style="position: absolute; right: 0;" v-on:click="toggle">
+                            <img alt="Skills icon"
+                                 class="pixel icon-small"
+                                 src="/images/skill/overall.png"
+                                 title="Click here to see the skill hiscores">
                         </div>
                     </div>
                 </div>
