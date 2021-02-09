@@ -11,25 +11,27 @@
                 </div>
 
                 <div v-else>
-                    <h1 class="text-center header-chatbox-sword">{{ accountData.username }}</h1>
+                    <div class="col-md-12">
+                        <h1 class="text-center header-chatbox-sword">{{ accountData.username }}</h1>
 
-                    <div class="row">
-                        <div class="col">
+                        <div class="row">
                             <img
                                 :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + accountData.user.icon_id + '.png'"
                                 class="pixel icon"
                                 alt="Profile icon"
                                 style="width: 7.5rem; height: 7.5rem;">
-                        </div>
 
-                        <div class="col">
-                            <span>Rank: <strong>{{ accountData.rank }}</strong></span>
-                            <br>
-                            <span>Total XP: <strong>{{ accountData.xp }}</strong></span>
-                            <br>
-                            <span>Total Level: <strong>{{ accountData.level }}</strong></span>
-                            <br>
-                            <span>Joined: <strong>{{ accountData.joined }}</strong></span>
+                            <div class="col">
+                                <span>Rank: <strong>{{ accountData.rank }}</strong></span>
+                                <br>
+                                <span>Total XP: <strong>{{ accountData.xp }}</strong></span>
+                                <br>
+                                <span>Total Level: <strong>{{ accountData.level }}</strong></span>
+                                <br>
+                                <span>Joined: <strong>{{ accountData.joined }}</strong></span>
+                                <br>
+                                <span>Online? <strong>{{ accountData.online }}</strong></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -40,7 +42,8 @@
                     <div class="row">
                         <h3 class="text-center header-chatbox-sword" style="width: 100%;">Skills</h3>
 
-                        <div class="btn background-world-map mr-3" style="position: absolute; right: 0;" v-on:click="toggle">
+                        <div class="btn background-world-map mr-3" style="position: absolute; right: 0;"
+                             v-on:click="toggle">
                             <img alt="Bosses icon"
                                  class="pixel icon-small"
                                  src="/images/boss/boss.png"
@@ -52,7 +55,8 @@
                     <div class="row">
                         <h3 class="text-center header-chatbox-sword" style="width: 100%;">Bosses</h3>
 
-                        <div class="btn background-world-map mr-3" style="position: absolute; right: 0;" v-on:click="toggle">
+                        <div class="btn background-world-map mr-3" style="position: absolute; right: 0;"
+                             v-on:click="toggle">
                             <img alt="Skills icon"
                                  class="pixel icon-small"
                                  src="/images/skill/overall.png"
