@@ -36,14 +36,14 @@
 
                 <table>
                     <tr>
-                        <th>Rank</th>
+                        <th class="d-none d-md-table-cell">Rank</th>
                         <th>Account</th>
                         <th>Level</th>
                         <th>XP</th>
                         <th>Hiscore Rank</th>
                     </tr>
                     <tr v-for="(hiscore, index) in hiscores">
-                        <td>{{ index + 1 }}</td>
+                        <td class="d-none d-md-table-cell">{{ index + 1 }}</td>
                         <td><a :href="'/account/' + hiscore.username">{{ hiscore.username }}</a></td>
                         <td>{{ hiscore.level }}</td>
                         <td>{{ hiscore.xp }}</td>
