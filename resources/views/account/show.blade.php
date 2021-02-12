@@ -24,7 +24,7 @@
                             <equipment :account="{{ $account }}"></equipment>
                         </div>
 
-                        <div class="col-md-6 " style="">
+                        <div class="col-md-6">
                             <h3 class="text-center header-chatbox-sword">Quests</h3>
 
                             <div class="background-dialog-iron-rivets p-1 mb-1 pl-2">
@@ -35,7 +35,9 @@
 
                     <h3 class="text-center header-chatbox-sword">The Bank of Gielinor</h3>
 
-                    <bank :account="{{ $account }}"></bank>
+                    <div class="background-dialog-iron-rivets p-1 mb-1 pl-2">
+                        <bank :account="{{ $account }}" style="max-height: 40rem; overflow: scroll; overflow-x: hidden;"></bank>
+                    </div>
                 </div>
             </div>
         @else

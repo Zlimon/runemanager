@@ -17,34 +17,32 @@
             </div>
 
             <div v-else>
-                <div class="background-dialog-iron-rivets p-2 mb-2">
-                    <div class="d-flex flex-row flex-wrap" style="max-width: 25rem; margin: 0 auto;">
-                        <div v-for="(item, index) in bank" class="bank-item p-1">
-                            <div v-if="item.quantity === 1">
-                                <img
-                                    :alt="item.name + ' item icon'"
-                                    :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
-                                    :title="item.name + ' x ' + item.quantity"
-                                    class="hiscore-icon">
-                            </div>
-                            <div v-else-if="item.quantity > 0">
-                                <img
-                                    :alt="item.name + ' item icon'"
-                                    :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
-                                    :title="item.name + ' x ' + item.quantity"
-                                    class="hiscore-icon">
-                                <span class="collection-log-item-counter runescape-progress"
-                                      style="left: 0; font-weight: normal;">
-                                    {{ item.quantity }}
-                                </span>
-                            </div>
-                            <div v-else>
-                                <img
-                                    :alt="item.name + ' item icon'"
-                                    :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
-                                    :title="item.name + ' x ' + item.quantity"
-                                    class="hiscore-icon faded">
-                            </div>
+                <div class="d-flex flex-row flex-wrap" style="max-width: 25rem; margin: 0 auto;">
+                    <div v-for="(item, index) in bank" class="bank-item p-1">
+                        <div v-if="item.quantity === 1">
+                            <img
+                                :alt="item.name + ' item icon'"
+                                :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
+                                :title="item.name + ' x ' + item.quantity"
+                                class="hiscore-icon">
+                        </div>
+                        <div v-else-if="item.quantity > 0">
+                            <img
+                                :alt="item.name + ' item icon'"
+                                :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
+                                :title="item.name + ' x ' + item.quantity"
+                                class="hiscore-icon">
+                            <span class="collection-log-item-counter runescape-progress"
+                                  style="left: 0; font-weight: normal;">
+                                {{ item.quantity }}
+                            </span>
+                        </div>
+                        <div v-else>
+                            <img
+                                :alt="item.name + ' item icon'"
+                                :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
+                                :title="item.name + ' x ' + item.quantity"
+                                class="hiscore-icon faded">
                         </div>
                     </div>
                 </div>
