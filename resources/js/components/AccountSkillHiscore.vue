@@ -17,7 +17,7 @@
             </div>
 
             <div v-else>
-                <div class="d-flex flex-wrap">
+                <div class="d-flex flex-wrap justify-content-around">
                     <div v-for="(hiscore, name) in hiscores">
                         <div class="button-combat-style-narrow text-center button-small">
                             <a :href="'/hiscore/skill/' + name">

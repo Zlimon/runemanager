@@ -20,10 +20,12 @@ class AccountResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'account_type' => $this->account_type,
             'username' => $this->username,
             'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
             'level' => $this->level,
             'xp' => (number_format($this->xp) >= 1 ? number_format($this->xp) : "Unranked"),
+            'online' => $this->online == 0 ? "Offline" : "Online",
             'joined' => date_format($this->created_at, "d. M Y"),
             'user' => new UserResource($this->user),
         ];

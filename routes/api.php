@@ -28,9 +28,14 @@ Route::middleware('auth:api')->group(function() {
 
 		Route::put('/{accountUsername}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
 		Route::post('/{accountUsername}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
+        Route::post('/{accountUsername}/lootcrate', 'Api\AccountLootCrateController@store')->name('account-loot-crate-store'); // Store loot crate data - Wintertodt, Barbarian assault, Soul Wars, etc.
 		Route::post('/{accountUsername}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
 
         Route::post('/{accountUsername}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
+
+        Route::post('/{accountUsername}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
+
+        Route::post('/{accountUsername}/quests', 'Api\AccountQuestController@update')->name('account-quests-update');
 	});
 });
 
@@ -40,6 +45,8 @@ Route::prefix('/account')->group(function() {
 	Route::get('/{account}/boss', 'Api\AccountController@boss')->name('account-show-boss');
 	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
     Route::get('/{accountUsername}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
+    Route::get('/{accountUsername}/bank', 'Api\AccountBankController@show')->name('account-bank-show');
+    Route::get('/{accountUsername}/quests', 'Api\AccountQuestController@show')->name('account-quests-show');
 });
 
 Route::prefix('/hiscore')->group(function() {

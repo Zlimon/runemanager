@@ -6,6 +6,7 @@ use App\Account;
 use App\AccountAuthStatus;
 use App\Collection;
 use App\Events\AccountAll;
+use App\Events\AccountOnline;
 use App\Events\All;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
@@ -183,11 +184,7 @@ class AccountController extends Controller
         $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
 
         if ($account) {
-            if ($account->online === 1) {
-                return response($accountUsername . " is already online");
-            }
-
-            $account->online = 1;
+            $account->online ^= 1;
 
             $account->save();
 
@@ -203,52 +200,16 @@ class AccountController extends Controller
             $notificationData = [
                 "log_id" => $log->id,
                 "icon" => auth()->user()->icon_id,
-                "message" => $accountUsername . " has logged in!",
+                "message" => $accountUsername . " has logged " . ($account->online ? 'in' : 'out') . "!",
             ];
 
             $notification = Notification::create($notificationData);
 
             All::dispatch($notification);
 
-            return response($accountUsername . " has been logged in to RuneManager");
-        } else {
-            return response("This account is not authenticated with " . auth()->user()->name, 403);
-        }
-    }
+            AccountOnline::dispatch($account);
 
-    public function logout($accountUsername)
-    {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-
-        if ($account) {
-            if ($account->online === 0) {
-                return response($accountUsername . " is not online");
-            }
-
-            $account->online = 0;
-
-            $account->save();
-
-            $logData = [
-                "user_id" => auth()->user()->id,
-                "account_id" => $account->id,
-                "category_id" => 8,
-//                "data" => $data
-            ];
-
-            $log = Log::create($logData);
-
-            $notificationData = [
-                "log_id" => $log->id,
-                "icon" => auth()->user()->icon_id,
-                "message" => $accountUsername . " has logged out!",
-            ];
-
-            $notification = Notification::create($notificationData);
-
-            All::dispatch($notification);
-
-            return response($accountUsername . " has been logged off RuneManager");
+            return response($accountUsername . " has been logged " . ($account->online ? 'in' : 'out') . " to RuneManager");
         } else {
             return response("This account is not authenticated with " . auth()->user()->name, 403);
         }
