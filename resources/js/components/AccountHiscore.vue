@@ -30,7 +30,7 @@
                                 <br>
                                 <span>Joined: <strong>{{ accountData.joined }}</strong></span>
                                 <br>
-                                <span>Online? <strong>{{ accountData.online }}</strong></span>
+                                <span>Online? <strong>{{ online }}</strong></span>
                             </div>
                         </div>
                     </div>
@@ -86,6 +86,7 @@ export default {
         onLoadAccount(account) {
             this.accountData = account;
             this.loading = false;
+            this.online = account.online;
         },
 
         toggle() {
@@ -110,7 +111,23 @@ export default {
             accountData: {},
             skills: true,
             component: AccountSkillHiscore,
+            online: {},
         }
+    },
+
+    created() {
+        window.Echo.channel('account-online')
+            .listen('AccountOnline', (e) => {
+                // TODO rework...
+                if (this.accountData.id === e.account[0]) {
+                    if (e.account[1] === 1) {
+                        this.online = "Online"
+                    }
+                    if (e.account[1] === 0) {
+                        this.online = "Offline"
+                    }
+                }
+            });
     },
 }
 </script>

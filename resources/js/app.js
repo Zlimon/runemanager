@@ -38,6 +38,7 @@ Vue.component('notification', require('./components/Notification.vue').default);
 Vue.component('equipment', require('./components/Equipment.vue').default);
 Vue.component('bank', require('./components/Bank.vue').default);
 Vue.component('quests', require('./components/Quests.vue').default);
+Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
 
 Vue.component(
     'passport-clients',

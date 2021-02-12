@@ -6,6 +6,7 @@ use App\Account;
 use App\AccountAuthStatus;
 use App\Collection;
 use App\Events\AccountAll;
+use App\Events\AccountOnline;
 use App\Events\All;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
@@ -205,6 +206,8 @@ class AccountController extends Controller
             $notification = Notification::create($notificationData);
 
             All::dispatch($notification);
+
+            AccountOnline::dispatch($account);
 
             return response($accountUsername . " has been logged " . ($account->online ? 'in' : 'out') . " to RuneManager");
         } else {
