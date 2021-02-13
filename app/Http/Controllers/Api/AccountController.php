@@ -179,7 +179,7 @@ class AccountController extends Controller
         }
     }
 
-    public function login($accountUsername)
+    public function loginLogout($accountUsername)
     {
         $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
 
