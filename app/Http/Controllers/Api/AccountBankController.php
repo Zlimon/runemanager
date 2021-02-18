@@ -30,29 +30,38 @@ class AccountBankController extends Controller
     public function update($accountUsername, Request $request)
     {
         $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-
-        if ($account) {
-            Bank::updateOrInsert(
-                ['account_id' => $account->id],
-                [
-                    'data' => json_encode($request->all()),
-                    'created_at' => Carbon::now(), // TODO make better logic to not update this
-                    'updated_at' => Carbon::now(),
-                ]
-            );
-
-            $logData = [
-                "user_id" => auth()->user()->id,
-                "account_id" => $account->id,
-                "category_id" => 8,
-                "data" => $request->all()
-            ];
-
-            $log = Log::create($logData);
-
-            AccountBank::dispatch($account);
-
-            return response()->json("Updated bank for " . $accountUsername, 200);
+        if (!$account) {
+            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
         }
+
+        // Check if someone has tried something funny
+        if (sizeof($request->all()) > 816) {
+            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 406);
+        }
+
+        Bank::updateOrInsert(
+            ['account_id' => $account->id],
+            [
+                'data' => json_encode($request->all()),
+                'created_at' => Carbon::now(), // TODO make better logic to not update this
+                'updated_at' => Carbon::now(),
+            ]
+        );
+
+        $bank = Bank::where('account_id', $account->id)->first();
+
+        $logData = [
+            "user_id" => auth()->user()->id,
+            "account_id" => $account->id,
+            "category_id" => 8,
+            "description" => $request->route()->getName(),
+            "data" => $request->all()
+        ];
+
+        $log = Log::create($logData);
+
+        AccountBank::dispatch($account);
+
+        return response("Updated bank for " . $accountUsername, 200);
     }
 }
