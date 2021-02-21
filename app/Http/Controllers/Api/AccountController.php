@@ -195,7 +195,7 @@ class AccountController extends Controller
             "account_id" => $account->id,
             "category_id" => 8,
             "description" => $request->route()->getName(),
-//            "data" => $data
+            "data" => $request->all()
         ];
 
         $log = Log::create($logData);
