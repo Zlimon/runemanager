@@ -39,10 +39,19 @@ class AccountBankController extends Controller
             return response($accountUsername . " is not authenticated with " . auth()->user()->name, 406);
         }
 
+        $totalBankValue = 0;
+
+        $priceType = "gePrice"; // TODO gePrice / haPrice -> Admin panel
+
+        foreach ($request->all() as $bankItem) {
+            $totalBankValue += $bankItem[$priceType] * $bankItem["quantity"];
+        }
+
         Bank::updateOrInsert(
             ['account_id' => $account->id],
             [
                 'data' => json_encode($request->all()),
+                'total' => $totalBankValue,
                 'created_at' => Carbon::now(), // TODO make better logic to not update this
                 'updated_at' => Carbon::now(),
             ]
@@ -55,7 +64,8 @@ class AccountBankController extends Controller
             "account_id" => $account->id,
             "category_id" => 8,
             "action" => $request->route()->getName(),
-            "data" => $request->all()
+            "data" => $request->all(),
+            "total" => $totalBankValue
         ];
 
         $log = Log::create($logData);

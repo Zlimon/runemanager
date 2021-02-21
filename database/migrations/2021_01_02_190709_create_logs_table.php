@@ -20,6 +20,7 @@ class CreateLogsTable extends Migration
             $table->integer('category_id')->unsigned();
             $table->string('action'); // TODO enum?
             $table->text('data')->nullable();
+            $table->integer('total')->nullable();
             $table->timestamps();
         });
     }

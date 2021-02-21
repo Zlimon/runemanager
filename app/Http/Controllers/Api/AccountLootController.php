@@ -61,9 +61,14 @@ class AccountLootController extends Controller
             "updated_at" => 0
         ]);
 
-        foreach ($request->all()["metadata"] as $lootItem) {
+        $totalLootValue = 0;
+
+        $priceType = "gePrice"; // TODO gePrice / haPrice -> Admin panel
+
+        foreach ($request->all()["metadata"] as $key => $lootItem) {
             if (!in_array($lootItem["name"], ["kill_count", "rank", "obtained"])) {
                 $lootValues[$lootItem["name"]] = $lootItem["quantity"];
+                $totalLootValue += $lootItem[$priceType] * $lootItem["quantity"];
             }
         }
 
@@ -119,7 +124,8 @@ class AccountLootController extends Controller
             "account_id" => $account->id,
             "category_id" => $collection->category_id,
             "action" => $request->route()->getName(),
-            "data" => $data
+            "data" => $data,
+            "total" => $totalLootValue
         ];
 
         $log = Log::create($logData);
