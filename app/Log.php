@@ -10,7 +10,7 @@ class Log extends Model
         'user_id',
         'account_id',
         'category_id',
-        'description',
+        'action',
         'data'
     ];
 
