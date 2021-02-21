@@ -132,7 +132,7 @@ class AccountCollectionController extends Controller
             "user_id" => auth()->user()->id,
             "account_id" => $account->id,
             "category_id" => 8,
-            "description" => $request->route()->getName(),
+            "action" => $request->route()->getName(),
             "data" => $request->all()
         ];
 

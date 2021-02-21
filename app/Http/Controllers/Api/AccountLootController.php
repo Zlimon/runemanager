@@ -118,7 +118,7 @@ class AccountLootController extends Controller
             "user_id" => auth()->user()->id,
             "account_id" => $account->id,
             "category_id" => $collection->category_id,
-            "description" => $request->route()->getName(),
+            "action" => $request->route()->getName(),
             "data" => $data
         ];
 
