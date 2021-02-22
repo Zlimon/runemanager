@@ -30,29 +30,31 @@ class AccountQuestController extends Controller
     public function update($accountUsername, Request $request)
     {
         $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-
-        if ($account) {
-            Quest::updateOrInsert(
-                ['account_id' => $account->id],
-                [
-                    'data' => json_encode($request->all()),
-                    'created_at' => Carbon::now(), // TODO make better logic to not update this
-                    'updated_at' => Carbon::now(),
-                ]
-            );
-
-            $quests = Quest::where('account_id', $account->id)->first();
-
-            $logData = [
-                "user_id" => auth()->user()->id,
-                "account_id" => $account->id,
-                "category_id" => 8,
-                "data" => $request->all()
-            ];
-
-            $log = Log::create($logData);
-
-            return response()->json("Updated quests for " . $accountUsername, 200);
+        if (!$account) {
+            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
         }
+
+        Quest::updateOrInsert(
+            ['account_id' => $account->id],
+            [
+                'data' => json_encode($request->all()),
+                'created_at' => Carbon::now(), // TODO make better logic to not update this
+                'updated_at' => Carbon::now(),
+            ]
+        );
+
+        $quests = Quest::where('account_id', $account->id)->first();
+
+        $logData = [
+            "user_id" => auth()->user()->id,
+            "account_id" => $account->id,
+            "category_id" => 8,
+            "action" => $request->route()->getName(),
+            "data" => $request->all()
+        ];
+
+        $log = Log::create($logData);
+
+        return response("Updated quest list for " . $accountUsername, 200);
     }
 }

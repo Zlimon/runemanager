@@ -18,7 +18,9 @@ class CreateLogsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('account_id')->unsigned();
             $table->integer('category_id')->unsigned();
+            $table->string('action'); // TODO enum?
             $table->text('data')->nullable();
+            $table->integer('total')->nullable();
             $table->timestamps();
         });
     }

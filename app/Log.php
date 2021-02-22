@@ -10,7 +10,9 @@ class Log extends Model
         'user_id',
         'account_id',
         'category_id',
-        'data'
+        'action',
+        'data',
+        'total'
     ];
 
     protected $casts = [

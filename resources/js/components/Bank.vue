@@ -17,6 +17,7 @@
             </div>
 
             <div v-else>
+                <h3 class="text-center">Total value: {{ total.toLocaleString() }} gp</h3>
                 <div class="d-flex flex-row flex-wrap" style="max-width: 25rem; margin: 0 auto;">
                     <div v-for="(item, index) in bank" class="bank-item p-1">
                         <div v-if="item.quantity === 1">
@@ -67,6 +68,7 @@ export default {
                 .get('/api/account/' + this.account.username + '/bank')
                 .then((response) => {
                     this.bank = response.data.data;
+                    this.total = response.data.total;
                 })
                 .catch(error => {
                     console.log(error)
@@ -81,6 +83,7 @@ export default {
             loading: true,
             errored: false,
             bank: [],
+            total: 0,
         }
     },
 
