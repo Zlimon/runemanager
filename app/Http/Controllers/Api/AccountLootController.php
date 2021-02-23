@@ -80,17 +80,19 @@ class AccountLootController extends Controller
 
         $uniques = [];
 
-        // Merge old data and new data and sum the total of common keys
-        foreach (array_keys($lootValues + $oldCollectionValues) as $itemName) {
-            if (isset($lootValues[$itemName]) && isset($oldCollectionValues[$itemName])) {
-                // If unique loot is detected, increase the total amount of uniques obtained by 1
-                if ($oldCollectionValues[$itemName] == 0) {
-                    $uniquesCount++;
+        if (isset($lootValues)) {
+            // Merge old data and new data and sum the total of common keys
+            foreach (array_keys($lootValues + $oldCollectionValues) as $itemName) {
+                if (isset($lootValues[$itemName]) && isset($oldCollectionValues[$itemName])) {
+                    // If unique loot is detected, increase the total amount of uniques obtained by 1
+                    if ($oldCollectionValues[$itemName] == 0) {
+                        $uniquesCount++;
 
-                    $uniques[] = $itemName;
+                        $uniques[] = $itemName;
+                    }
+
+                    $newCollectionValues[$itemName] = (isset($lootValues[$itemName]) ? $lootValues[$itemName] : 0) + (isset($oldCollectionValues) ? $oldCollectionValues[$itemName] : 0);
                 }
-
-                $newCollectionValues[$itemName] = (isset($lootValues[$itemName]) ? $lootValues[$itemName] : 0) + (isset($oldCollectionValues) ? $oldCollectionValues[$itemName] : 0);
             }
         }
 
@@ -132,7 +134,7 @@ class AccountLootController extends Controller
 
         $notificationData = [
             "log_id" => $log->id,
-            "icon" => strtolower(Str::snake($collectionName)),
+            "icon" => $collectionLog->getTable(),
             "message" => $accountUsername . " defeated " . $collection->alias . "!",
         ];
 
