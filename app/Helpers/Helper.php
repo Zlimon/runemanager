@@ -169,7 +169,7 @@ class Helper
 
     public static function listBosses()
     {
-        return Collection::where('category_id', 2)->orWhere('category_id', 3)->pluck('name')->toArray();
+        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('name')->toArray();
     }
 
     public static function listNpcs()

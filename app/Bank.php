@@ -15,7 +15,8 @@ class Bank extends Model
      * @var array
      */
     protected $fillable = [
-        'data'
+        'data',
+        'total'
     ];
 
     protected $casts = [
