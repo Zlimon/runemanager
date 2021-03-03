@@ -65,7 +65,7 @@ class AccountCollectionController extends Controller
         $account = Account::where('username', $accountUsername)->first();
 
         if ($account) {
-            $collection = Collection::where('name', $collectionName)->firstOrFail();
+            $collection = Collection::where('alias', $collectionName)->firstOrFail();
 
             if ($collection) {
                 $collectionLog = $collection->model::where('account_id', $account->id)->first();
@@ -90,7 +90,7 @@ class AccountCollectionController extends Controller
             return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
         }
 
-        $collection = Collection::where('name', $collectionName)->first();
+        $collection = Collection::where('alias', $collectionName)->first();
         if (!$collection) {
             return response($collectionName . " is not currently supported", 406);
         }

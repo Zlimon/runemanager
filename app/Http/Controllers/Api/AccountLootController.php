@@ -23,7 +23,7 @@ class AccountLootController extends Controller
             return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
         }
 
-        $collection = Collection::where('name', $collectionName)->first();
+        $collection = Collection::where('alias', $collectionName)->first();
         if (!$collection) {
             return response($collectionName . " is not currently supported", 406);
         }
