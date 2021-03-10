@@ -174,7 +174,7 @@ class AccountLootController extends Controller
             $notificationData = [
                 "log_id" => $log->id,
                 "icon" => $collectionLog->getTable(),
-                "message" => $accountUsername . " unlocked a new unique!",
+                "message" => $accountUsername . " unlocked " . (count($uniquesList) == 1 ? " a new unique" : "new uniques") . "!",
             ];
 
             $notification = Notification::create($notificationData);

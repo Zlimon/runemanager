@@ -62,7 +62,6 @@
 
                         <div v-else-if="notification.log.data.type === 'UNIQUE'">
                             <div v-if="notification.log.data.metadata !== null && Object.keys(notification.log.data.metadata).length > 0">
-                                <h3 class="text-center">Received loot:</h3>
                                 <div class="d-flex flex-row flex-wrap justify-content-center">
                                     <div v-for="loot in notification.log.data.metadata"
                                          class="background-world-map mx-2 p-1">
