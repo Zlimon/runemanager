@@ -40,7 +40,7 @@
                             </div>
                         </div>
 
-                        <div v-if="notification.log.data.type === 'EVENT'">
+                        <div v-else-if="notification.log.data.type === 'EVENT'">
                             <div v-if="notification.log.data.metadata !== null && Object.keys(notification.log.data.metadata).length > 0">
                                 <h3 class="text-center">Received loot:</h3>
                                 <div class="d-flex flex-row flex-wrap justify-content-center">
@@ -56,6 +56,22 @@
 
                                 <div class="text-center">
                                     <small>Total value: {{ notification.log.total}} gp</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-else-if="notification.log.data.type === 'UNIQUE'">
+                            <div v-if="notification.log.data.metadata !== null && Object.keys(notification.log.data.metadata).length > 0">
+                                <h3 class="text-center">Received loot:</h3>
+                                <div class="d-flex flex-row flex-wrap justify-content-center">
+                                    <div v-for="loot in notification.log.data.metadata"
+                                         class="background-world-map mx-2 p-1">
+                                        <img
+                                            :alt="loot.name.replaceAll('_', ' ') + ' item icon'"
+                                            :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + loot.id + '.png'"
+                                            :title="loot.name.replaceAll('_', ' ') + ' x ' + loot.quantity | capitalize"
+                                            class="pixel hiscore-icon">
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -146,10 +146,34 @@ class AccountLootController extends Controller
 
         AccountKill::dispatch($account, $notification);
 
-        foreach ($uniques as $unique) {
+        $uniquesList = [];
+
+        foreach ($data["metadata"] as $key => $metaData) {
+            if (isset($metaData["name"]) &&  in_array($metaData["name"], $uniques)) {
+                $uniquesList[] = $metaData;
+            }
+        }
+
+        if ($uniquesList) {
+            $data["type"] = "UNIQUE";
+            $data["metadata"] = $uniquesList;
+            unset($data["drops"]);
+            unset($data["oldCollection"]);
+            unset($data["updatedCollection"]);
+
+            $logData = [
+                "user_id" => auth()->user()->id,
+                "account_id" => $account->id,
+                "category_id" => $collection->category_id,
+                "action" => $request->route()->getName(),
+                "data" => $data
+            ];
+
+            $log = Log::create($logData);
+
             $notificationData = [
                 "log_id" => $log->id,
-                "icon" => strtolower(Str::snake($collectionName)),
+                "icon" => $collectionLog->getTable(),
                 "message" => $accountUsername . " unlocked a new unique!",
             ];
 
