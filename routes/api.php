@@ -53,6 +53,7 @@ Route::prefix('/hiscore')->group(function() {
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
 	Route::get('/boss/{boss}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
     Route::get('/npc/{npc}', 'Api\HiscoreController@npc')->name('hiscore-npc-show');
+    Route::get('/clue/{clue}', 'Api\HiscoreController@clue')->name('hiscore-clue-show');
 });
 
 Route::prefix('/collection')->group(function() {

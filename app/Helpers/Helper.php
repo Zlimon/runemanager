@@ -177,6 +177,11 @@ class Helper
         return Collection::where('category_id', 4)->pluck('name')->toArray();
     }
 
+    public static function listClues()
+    {
+        return Collection::where('category_id', 5)->pluck('name')->toArray();
+    }
+
     public static function listAccountTypes()
     {
         return ["normal", "ironman", "hardcore_ironman", "ultimate_ironman"];

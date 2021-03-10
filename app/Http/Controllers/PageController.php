@@ -45,6 +45,9 @@ class PageController extends Controller
             case "npc":
                 $hiscoreList = Helper::listNpcs();
                 break;
+            case "clue":
+                $hiscoreList = Helper::listClues();
+                break;
             default:
                 return abort(404);
         }
