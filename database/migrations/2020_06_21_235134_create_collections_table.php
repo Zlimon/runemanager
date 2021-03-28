@@ -68,6 +68,7 @@ class CreateCollectionsTable extends Migration
             ["category_id" => 2, "name" => "sarachnis", "alias" => "Sarachnis", "model" => "App\Boss\Sarachnis"],
             ["category_id" => 2, "name" => "scorpia", "alias" => "Scorpia", "model" => "App\Boss\Scorpia"],
             ["category_id" => 2, "name" => "skotizo", "alias" => "Skotizo", "model" => "App\Boss\Skotizo"],
+            ["category_id" => 2, "name" => "tempoross", "alias" => "Tempoross", "model" => "App\Boss\Tempoross"],
             ["category_id" => 2, "name" => "the gauntlet", "alias" => "The Gauntlet", "model" => "App\Boss\TheGauntlet"],
             ["category_id" => 2, "name" => "the corrupted gauntlet", "alias" => "The Corrupted Gauntlet", "model" => "App\Boss\TheCorruptedGauntlet"],
             ["category_id" => 3, "name" => "theatre of blood", "alias" => "Theatre of Blood", "model" => "App\Raid\TheatreOfBlood"],
