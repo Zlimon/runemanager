@@ -43,6 +43,19 @@
                     </div>
                 </a>
             @endif
+
+            @if (count(Helper::listClues()) > 0)
+                <a href="{{ route('hiscore', ['clue', Helper::listClues()[0]]) }}" class="mx-2">
+                    <div class="btn button-square background-world-map">
+                        <img src="{{ asset('images/clue/clue.png') }}"
+                             class="pixel icon"
+                             alt="Treasure Trails icon"
+                             title="Click here to see the treasure trails hiscores">
+                        <br>
+                        <span>Treasure Trails</span>
+                    </div>
+                </a>
+            @endif
         </div>
 
         <div id="highscore_top">
@@ -86,6 +99,8 @@
                 <bosshiscore boss="{{ $hiscoreName }}"></bosshiscore>
             @elseif ($hiscoreType == "npc")
                 <npchiscore npc="{{ $hiscoreName }}"></npchiscore>
+            @elseif ($hiscoreType == "clue")
+                <cluehiscore clue="{{ $hiscoreName }}"></cluehiscore>
             @endif
         @else
             <div class="text-center py-5">

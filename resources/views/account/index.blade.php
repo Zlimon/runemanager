@@ -134,6 +134,11 @@
             <div class="d-flex flex-row flex-wrap justify-content-around">
                 @foreach($accounts as $account)
                     <a href="{{ route('account-show', $account->username) }}">
+                        {{--TODO this needs to be reworked (front end rework)--}}
+                        @if ($account->online === 1)
+                            <onlinestatus :account="{{ $account }}" class="online"></onlinestatus>
+                        @endif
+
                         <div class="btn button-rectangle background-world-map mb-2">
                             <div class="row align-items-center mb-2">
                                 <div class="col-4">
@@ -178,3 +183,25 @@
         @endif
     </div>
 @endsection
+
+<style>
+    .online {
+        position: relative;
+    }
+
+    .online::before,
+    .online::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-color: transparent;
+        border-style: solid;
+    }
+
+    .online::after {
+        border-width: .5em;
+        border-right-color: #0c0;
+        border-top-color: #0c0;
+    }
+</style>

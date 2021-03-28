@@ -140,4 +140,35 @@ class HiscoreController extends Controller
             return response()->json("There are no linked accounts", 404);
         }
     }
+
+    public function clue($clueDifficulty)
+    {
+        if (Account::count() > 0) {
+            $collection = Collection::where('name', $clueDifficulty)->where('category_id', 5)->firstOrFail();
+
+            $npcHiscore = $collection->model::with('account')->orderByDesc('kill_count')->get();
+
+            if (sizeof($npcHiscore) > 0) {
+                $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
+                    ->selectRaw('COUNT(*) AS total_kills')
+                    ->first();
+
+                $averageTotalKills = $sumKills["total_kill_count"] / $sumKills["total_kills"];
+
+                return BossHiscoreResource::collection($npcHiscore)
+                    ->additional([
+                         'meta' => [
+                             'clue' => str_replace(" ", "_", $clueDifficulty),
+                             'alias' => $collection->alias,
+                             'total_kills' => number_format($sumKills["total_kill_count"]),
+                             'average_total_kills' => round($averageTotalKills),
+                         ]
+                     ]);
+            } else {
+                return response()->json("There are no registered collections for " . $clueDifficulty, 404);
+            }
+        } else {
+            return response()->json("There are no linked accounts", 404);
+        }
+    }
 }

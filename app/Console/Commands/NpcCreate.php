@@ -89,8 +89,8 @@ class NpcCreate extends Command
             ' ',
             array_map(
                 function ($unique) {
-                    return (str_replace("-", "_",
-                            Str::snake(strtolower($unique)))) . ':integer:default(0):unsigned,'; // abyssal_whip
+                    return (str_replace("'", "", str_replace("-", "_",
+                            Str::snake(strtolower($unique))))) . ':integer:default(0):unsigned,'; // abyssal_whip
                 },
                 $uniques
             )
@@ -128,7 +128,7 @@ class NpcCreate extends Command
                 'kill_count',\r\n
         EOD;
         foreach ($uniques as $unique) {
-            $fillable = str_replace("-", "_", Str::snake(strtolower($unique)));
+            $fillable = str_replace("'", "", str_replace("-", "_", Str::snake(strtolower($unique))));
 
             $modelFile .= <<<EOD
                     '$fillable',\r\n
@@ -176,7 +176,7 @@ class NpcCreate extends Command
                     $url = 'https://www.osrsbox.com/osrsbox-db/items-icons/' . (int)$json["_items"][0]["id"] . '.png'; // 4151
 
                     $dir = public_path() . '/images/npc/' . $migrationName . '/'; // /images/npc/abyssal_demon/
-                    $imgName = str_replace("-", "_", Str::snake(strtolower($unique))) . '.png'; // abyssal_whip.png
+                    $imgName = str_replace("'", "", str_replace("-", "_", Str::snake(strtolower($unique)))) . '.png'; // abyssal_whip.png
 
                     if (!File::exists($dir)) {
                         File::makeDirectory($dir, 0777, true);

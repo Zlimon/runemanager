@@ -34,15 +34,15 @@
 
                 <table>
                     <tr>
-                        <th>Rank</th>
+                        <th class="d-none d-md-table-cell">Rank</th>
                         <th>Account</th>
                         <th>Kill Count</th>
                         <th>Hiscore Rank</th>
                         <th>Collection Log</th>
-                        <th>Obtained</th>
+                        <th class="d-none d-sm-table-cell">Obtained</th>
                     </tr>
                     <tr v-for="(hiscore, index) in hiscores">
-                        <td>{{ index + 1 }}</td>
+                        <td class="d-none d-md-table-cell">{{ index + 1 }}</td>
                         <td><a :href="'/account/' + hiscore.account.username">{{ hiscore.account.username }}</a></td>
                         <td>{{ hiscore.kill_count }}</td>
                         <td>{{ hiscore.rank }}</td>
@@ -53,7 +53,7 @@
                                      src="https://www.osrsbox.com/osrsbox-db/items-icons/22711.png">
                             </a>
                         </td>
-                        <td>
+                        <td class="d-none d-sm-table-cell">
                             <div v-if="(hiscore.obtained !== null ? hiscore.obtained : 0) === total">
                         <span class="runescape-success">
                             {{ (hiscore.obtained !== null ? hiscore.obtained : 0) }} / {{ total }}

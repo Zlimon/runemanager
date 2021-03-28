@@ -106,6 +106,16 @@ class AccountUpdate extends Command
 
                                 $collectionLog->save();
                             } else {
+                                if (in_array($bosses[$bossIndex], ['mimic', 'the inferno']) && $collectionLog->kill_count <= 2) {
+                                    $bossIndex++;
+                                    continue;
+                                }
+
+                                if (in_array($bosses[$bossIndex], ['bryophyta', 'chambers of xeric challenge mode', 'hespori', 'obor', 'skotizo', 'the corrupted gauntlet', 'the fight caves']) && $collectionLog->kill_count <= 10) {
+                                    $bossIndex++;
+                                    continue;
+                                }
+
                                 $collectionLog->account_id = $account->id;
                                 $collectionLog->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
                                 $collectionLog->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);

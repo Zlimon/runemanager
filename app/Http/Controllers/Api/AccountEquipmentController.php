@@ -30,31 +30,33 @@ class AccountEquipmentController extends Controller
     public function update($accountUsername, Request $request)
     {
         $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-
-        if ($account) {
-            Equipment::updateOrInsert(
-                ['account_id' => $account->id],
-                [
-                    'data' => json_encode($request->all()),
-                    'created_at' => Carbon::now(), // TODO make better logic to not update this
-                    'updated_at' => Carbon::now(),
-                ]
-            );
-
-            $equipment = Equipment::where('account_id', $account->id)->first();
-
-            $logData = [
-                "user_id" => auth()->user()->id,
-                "account_id" => $account->id,
-                "category_id" => 8,
-                "data" => $request->all()
-            ];
-
-            $log = Log::create($logData);
-
-            AccountEquipment::dispatch($equipment);
-
-            return response()->json("Updated equipment for " . $accountUsername, 200);
+        if (!$account) {
+            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
         }
+
+        Equipment::updateOrInsert(
+            ['account_id' => $account->id],
+            [
+                'data' => json_encode($request->all()),
+                'created_at' => Carbon::now(), // TODO make better logic to not update this
+                'updated_at' => Carbon::now(),
+            ]
+        );
+
+        $equipment = Equipment::where('account_id', $account->id)->first();
+
+        $logData = [
+            "user_id" => auth()->user()->id,
+            "account_id" => $account->id,
+            "category_id" => 8,
+            "action" => $request->route()->getName(),
+            "data" => $request->all()
+        ];
+
+        $log = Log::create($logData);
+
+        AccountEquipment::dispatch($equipment);
+
+        return response("Updated equipment for " . $accountUsername, 200);
     }
 }

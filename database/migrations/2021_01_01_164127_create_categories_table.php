@@ -28,6 +28,7 @@ class CreateCategoriesTable extends Migration
                 ["category" => 'minigame'],
                 ["category" => 'other'],
                 ["category" => "account"],
+                ["category" => "lootcrate"],
             ]
         );
     }

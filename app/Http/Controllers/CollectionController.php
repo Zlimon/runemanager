@@ -13,7 +13,7 @@ class CollectionController extends Controller
     {
         if (in_array($collectionType, ['all', 'boss', 'raid', 'clue', 'minigame', 'other'], true)) {
             if ($collectionType === "all") {
-                $collectionList = Collection::select('name')->get();
+                $collectionList = Collection::get();
 
                 return response()->json($collectionList, 200);
             }
