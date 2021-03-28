@@ -16,7 +16,7 @@ class PageController extends Controller
     }
 
     /**
-     * Show the latest account updates.
+     * Show the latest account updates
      *
      * @return
      */
@@ -28,27 +28,46 @@ class PageController extends Controller
     }
 
     /**
-     * Show the skill hiscores.
+     * Show the skill hiscores
      *
      * @return
      */
     public function hiscore($hiscoreType, $hiscoreName)
     {
-        $hiscoreList = Helper::listSkills();
-
-        array_push($hiscoreList, "overall");
-
-        if ($hiscoreType == "boss") {
-            $hiscoreList = Helper::listBosses();
-            $hiscoreList = array_values($hiscoreList);
+        switch ($hiscoreType) {
+            case "skill":
+                $hiscoreList = Helper::listSkills();
+                array_push($hiscoreList, "overall");
+                break;
+            case "boss":
+                $hiscoreList = Helper::listBosses();
+                break;
+            case "npc":
+                $hiscoreList = Helper::listNpcs();
+                break;
+            case "clue":
+                $hiscoreList = Helper::listClues();
+                break;
+            default:
+                return abort(404);
         }
 
-        list($hiscoreListTop, $hiscoreListBottom) = array_chunk($hiscoreList,
-            ceil(count($hiscoreList) / 2)); // Split skills array into two arrays for a top and bottom skill bar
+        if (!in_array($hiscoreName, $hiscoreList)) {
+            return abort(404);
+        }
+
+        if (count($hiscoreList) > 1) {
+            list($hiscoreListTop, $hiscoreListBottom) = array_chunk($hiscoreList,
+                ceil(count($hiscoreList) / 2)); // Split skills array into two arrays for a top and bottom skill bar
+        } else {
+            $hiscoreListTop = $hiscoreList;
+            $hiscoreListBottom = $hiscoreList;
+        }
 
         $accountCount = Account::count();
 
         return view('hiscore',
-            compact('hiscoreType', 'hiscoreName', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom', 'accountCount'));
+            compact('hiscoreType', 'hiscoreName', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom',
+                'accountCount'));
     }
 }

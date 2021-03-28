@@ -314,6 +314,17 @@ table th
     text-align: center;
 }
 
+.bank-item
+{
+    position: relative;
+
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+
+    white-space: nowrap;
+}
+
 .faded
 {
     opacity: .25;
@@ -325,16 +336,27 @@ table th
     object-fit: contain;
 }
 
+.icon-small {
+    width: 36px;
+    height: 32px;
+    object-fit: contain;
+}
+
 .notification-icon {
     width: 60px;
     height: 60px;
     object-fit: contain;
-    border-right: solid 2px;
 }
 
 .hiscore-icon {
     width: 40px;
     height: 40px;
+    object-fit: contain;
+}
+
+.hiscore-icon-small {
+    width: 25px;
+    height: 25px;
     object-fit: contain;
 }
 
@@ -422,4 +444,39 @@ table th
     40%, 60% {
         transform: translate3d(4px, 0, 0);
     }
+}
+
+::-webkit-scrollbar {
+    width: 16px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: url('/resource-packs/pack-osrs-dark/scrollbar/thumb_middle_dark.png');
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: url('/resource-packs/pack-osrs-dark/scrollbar/thumb_top.png') no-repeat,
+    url('/resource-packs/pack-osrs-dark/scrollbar/thumb_bottom.png') no-repeat,
+    url('/resource-packs/pack-osrs-dark/scrollbar/thumb_middle.png');
+    background-position: top,
+    bottom,
+    center;
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(255,0,0,0.4);
+}
+
+/* Up */
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background: url('/resource-packs/pack-osrs-dark/scrollbar/arrow_up.png');
+}
+
+::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+    border-color: transparent transparent #777777 transparent;
+}
+/* Down */
+::-webkit-scrollbar-button:single-button:vertical:increment {
+    background: url('/resource-packs/pack-osrs-dark/scrollbar/arrow_down.png');
 }

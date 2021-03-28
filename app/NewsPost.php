@@ -44,7 +44,7 @@ class NewsPost extends Model
     }
 
     public function category() {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(NewsCategory::class);
     }
 
     public function image() {

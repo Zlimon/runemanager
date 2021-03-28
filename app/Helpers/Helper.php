@@ -4,6 +4,9 @@ namespace App\Helpers;
 
 use App\Collection;
 use DateTime;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Helper
 {
@@ -122,8 +125,10 @@ class Helper
     {
         $itemData = [];
 
-        array_push($itemData,
-            json_decode(file_get_contents('https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json'), true));
+        array_push(
+            $itemData,
+            json_decode(file_get_contents('https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json'), true)
+        );
 
         return $itemData[0][$attribute];
     }
@@ -164,8 +169,17 @@ class Helper
 
     public static function listBosses()
     {
-        return Collection::where('type', 'boss')->orWhere('type', 'raid')->pluck('name')->toArray();
-//         return dd(["abyssal sire", "alchemical hydra", "barrows chests", "bryophyta", "callisto", "cerberus", "chambers of xeric", "chambers of xeric challenge mode", "chaos elemental", "chaos fanatic", "commander zilyana", "corporeal beast", "crazy archaeologist", "dagannoth kings", "dagannoth prime", "dagannoth rex", "dagannoth supreme", "deranged archaeologist", "general graardor", "giant mole","grotesque guardians", "hespori", "kalphite queen", "king black dragon", "kraken", "kreearra", "kril tsutsaroth", "mimic", "the nightmare", "obor", "sarachnis", "scorpia", "skotizo", "the gauntlet", "the corrupted gauntlet", "theatre of blood", "thermonuclear smoke devil", "tzkal zuk", "tztok jad", "venenatis", "vetion", "vorkath", "wintertodt", "zalcano", "zulrah"]);
+        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('name')->toArray();
+    }
+
+    public static function listNpcs()
+    {
+        return Collection::where('category_id', 4)->pluck('name')->toArray();
+    }
+
+    public static function listClues()
+    {
+        return Collection::where('category_id', 5)->pluck('name')->toArray();
     }
 
     public static function listAccountTypes()
@@ -180,7 +194,63 @@ class Helper
 
     public static function formatHiscoreUrl($accountType, $playerName)
     {
-        return 'https://secure.runescape.com/m=hiscore_oldschool' . ($accountType === 'normal' ? '' : '_' . ($accountType === 'ultimate_ironman' ? 'ultimate' : $accountType)) . '/index_lite.ws?player=' . str_replace(' ',
-                '%20', $playerName);
+        return 'https://secure.runescape.com/m=hiscore_oldschool' . ($accountType === 'normal' ? '' : '_' . ($accountType === 'ultimate_ironman' ? 'ultimate' : $accountType)) . '/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $playerName
+            );
+    }
+
+    public static function downloadItemIcon($itemName)
+    {
+        $dir = storage_path() . '/app/public/items'; // /storage/items/
+        $imgName = str_replace(
+                "'",
+                "",
+                str_replace("-", "_", Str::snake(strtolower($itemName)))
+            ) . '.png'; // abyssal_whip.png
+
+        if (Storage::disk('items')->exists('items/'.$imgName)) {
+            return;
+        }
+
+        $handle = curl_init(
+            "https://api.osrsbox.com/items?where=" . urlencode(
+                '{"name":"' . ucfirst(
+                    str_replace(
+                        "_",
+                        " ",
+                        str_replace(
+                            "-",
+                            " ",
+                            Str::snake(strtolower($itemName))
+                        )
+                    )
+                ) . '","duplicate":false}'
+            )
+        );
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+
+        /* Get the content of $url. */
+        $response = curl_exec($handle);
+
+        /* Check for errors (content not found). */
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        curl_close($handle);
+
+        /* If the document has loaded successfully without any redirection or error */
+        if ($httpCode >= 200 && $httpCode < 300) {
+            $json = json_decode($response, true);
+
+            if (isset($json["_items"][0])) {
+                $url = 'https://www.osrsbox.com/osrsbox-db/items-icons/' . (int)$json["_items"][0]["id"] . '.png'; // 4151
+
+                if (!File::exists($dir)) {
+                    Storage::disk('items')->makeDirectory("items");
+                }
+
+                Storage::disk('items')->put('items/' . $imgName, file_get_contents($url));
+            }
+        }
     }
 }

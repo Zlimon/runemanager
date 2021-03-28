@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('title')
-    {{ ucfirst(Helper::collectionAttribute($hiscoreName, "alias")) }}
+    {{ ucfirst((Helper::collectionAttribute($hiscoreName, "alias") ?: $hiscoreName)) }}
 @endsection
 
 @section('content')
@@ -9,7 +9,7 @@
 
     <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
         <div class="row justify-content-center">
-            <a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mr-2">
+            <a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mx-2">
                 <div class="btn button-square background-world-map">
                     <img src="{{ asset('images/skill/overall.png') }}"
                          class="pixel icon"
@@ -20,7 +20,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="ml-2">
+            <a href="{{ route('hiscore', ['boss', Helper::listBosses()[0]]) }}" class="mx-2">
                 <div class="btn button-square background-world-map">
                     <img src="{{ asset('images/boss/boss.png') }}"
                          class="pixel icon"
@@ -30,6 +30,32 @@
                     <span>Bosses</span>
                 </div>
             </a>
+
+            @if (count(Helper::listNpcs()) > 0)
+                <a href="{{ route('hiscore', ['npc', Helper::listNpcs()[0]]) }}" class="mx-2">
+                    <div class="btn button-square background-world-map">
+                        <img src="{{ asset('images/boss/boss.png') }}"
+                             class="pixel icon"
+                             alt="Monsters icon"
+                             title="Click here to see the monster hiscores">
+                        <br>
+                        <span>Monsters</span>
+                    </div>
+                </a>
+            @endif
+
+            @if (count(Helper::listClues()) > 0)
+                <a href="{{ route('hiscore', ['clue', Helper::listClues()[0]]) }}" class="mx-2">
+                    <div class="btn button-square background-world-map">
+                        <img src="{{ asset('images/clue/clue.png') }}"
+                             class="pixel icon"
+                             alt="Treasure Trails icon"
+                             title="Click here to see the treasure trails hiscores">
+                        <br>
+                        <span>Treasure Trails</span>
+                    </div>
+                </a>
+            @endif
         </div>
 
         <div id="highscore_top">
@@ -37,7 +63,7 @@
 				<span class="selection-top">
 					@foreach ($hiscoreListTop as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscore.'.png') }}"
+                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">
@@ -46,7 +72,7 @@
 				</span>
                 <div class="mid-part">
                     <h1 class="active middle-icon" style="display: inline-block;">
-                        <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
+                        <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscoreName).'.png') }}"
                             class="pixel icon"
                             alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
                         <br>
@@ -56,7 +82,7 @@
                 <span class="selection-bot">
 					@foreach ($hiscoreListBottom as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscore.'.png') }}"
+                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">
@@ -67,17 +93,14 @@
         </div>
 
         @if ($accountCount > 0)
-            <div class="float-left mt-3">
-                <img src="{{ asset('images/'.$hiscoreType.'/'.$hiscoreName.'.png') }}"
-                     class="pixel icon"
-                     alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon"
-                     style="width: 7.5rem; height: 7.5rem;">
-            </div>
-
             @if ($hiscoreType == "skill")
                 <skillhiscore skill="{{ $hiscoreName }}"></skillhiscore>
             @elseif ($hiscoreType == "boss")
                 <bosshiscore boss="{{ $hiscoreName }}"></bosshiscore>
+            @elseif ($hiscoreType == "npc")
+                <npchiscore npc="{{ $hiscoreName }}"></npchiscore>
+            @elseif ($hiscoreType == "clue")
+                <cluehiscore clue="{{ $hiscoreName }}"></cluehiscore>
             @endif
         @else
             <div class="text-center py-5">

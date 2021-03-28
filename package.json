@@ -26,6 +26,8 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "advanced-laravel-vue-paginate": "^0.1.9",
+        "vue-moment": "^4.1.0",
         "vue-unique-id": "^3.1.4"
     }
 }

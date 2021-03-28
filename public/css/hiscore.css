@@ -26,7 +26,25 @@
 #highscore_top .highscore_selection a.active,
 #highscore_top .highscore_selection a:hover
 {
-    background: #2d2d2b;
+    color: #cbcbcb;
+    background: url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_top.png') repeat-x, /* top */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_left.png') repeat-y, /* left */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_right.png') repeat-y, /* right */
+    url('/resource-packs/pack-osrs-dark/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('/resource-packs/pack-osrs-dark/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
 }
 
 a.selection-top,

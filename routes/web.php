@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'PageController@index')->name('index');
 Route::get('/update-log', 'PageController@updateLog')->name('update-log');
 Route::get('/home', 'HomeController@index')->name('home');
+Route::post('/home/{accountUsername}', 'HomeController@forceLogout')->name('account-force-logout');
 Route::get('/hiscore/{hiscoreType}/{hiscoreName}', 'PageController@hiscore')->name('hiscore');
 
 /*==========Member Controller=============*/

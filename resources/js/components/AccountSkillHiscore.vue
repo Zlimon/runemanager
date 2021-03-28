@@ -1,39 +1,46 @@
 <template>
     <div>
-        <div class="float-left ml-3">
-            <h1 class="text-left">{{ data.username }}</h1>
-
-            <span>Rank: <strong>{{ data.rank }}</strong></span>
-            <br>
-            <span>Total XP: <strong>{{ data.xp }}</strong></span>
-            <br>
-            <span>Total Level: <strong>{{ data.level }}</strong></span>
-            <br>
-            <span>Joined: <strong>{{ data.joined }}</strong></span>
+        <div v-if="errored" class="text-center py-5">
+            <img src="/images/ignore.png"
+                 class="pixel icon"
+                 alt="Sad face">
+            <h1>Sorry, no hiscores were found</h1>
         </div>
 
-        <table>
-            <tr>
-                <th></th>
-                <th>Level</th>
-                <th>XP</th>
-                <th>Hiscore Rank</th>
-            </tr>
-            <tr v-for="(hiscore, name) in hiscores">
-                <td>
-                    <a :href="'/hiscore/skill/' + name">
-                        <img :alt="name + ' skill icon'"
-                             :src="'/images/skill/' + name + '.png'"
-                             :title="'Click here to visit ' + name + ' hiscores'"
-                             class="pixel hiscore-icon">
-                        <span>{{ name | capitalize }}</span>
-                    </a>
-                </td>
-                <td>{{ hiscore.level }}</td>
-                <td>{{ hiscore.xp }}</td>
-                <td>{{ hiscore.rank }}</td>
-            </tr>
-        </table>
+        <div v-else>
+            <div v-if="loading">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else>
+                <div class="d-flex flex-wrap justify-content-around">
+                    <div v-for="(hiscore, name) in hiscores">
+                        <div class="button-combat-style-narrow text-center button-small">
+                            <a :href="'/hiscore/skill/' + name">
+                                <img :alt="name + ' skill icon'"
+                                     :src="'/images/skill/' + name + '.png'"
+                                     :title="'Click here to visit ' + name + ' hiscores'"
+                                     class="">
+                                <span>{{ hiscore.level }}</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="button-combat-style-narrow text-center button-small">
+                        <a :href="'/hiscore/skill/overall'">
+                            <img :alt="'overall skill icon'"
+                                 :src="'/images/skill/overall.png'"
+                                 :title="'Click here to visit overall hiscores'"
+                                 class="">
+                            <span>{{ data.level }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -45,6 +52,8 @@ export default {
 
     data() {
         return {
+            loading: true,
+            errored: false,
             data: {},
             hiscores: {}
         }
@@ -56,8 +65,13 @@ export default {
             .then((response) => {
                 this.data = response.data.data;
                 this.hiscores = response.data.meta.skillHiscores;
+                this.$emit('load', response.data.data)
             })
-            .catch(error => (console.log(error)))
+            .catch(error => {
+                console.log(error)
+                this.errored = true
+            })
+            .finally(() => this.loading = false)
     },
 
     filters: {
