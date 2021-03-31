@@ -63,4 +63,5 @@ Route::prefix('/collection')->group(function() {
 Route::prefix('/notification')->group(function() {
 	Route::get('/all', 'Api\NotificationController@index')->name('notification-show-all');
 	Route::get('/account/{accountUsername}', 'Api\NotificationController@show')->name('notification-account-show');
+    Route::get('/recent', 'Api\NotificationController@recent')->name('notification-recent-show');
 });
