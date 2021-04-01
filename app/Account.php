@@ -48,10 +48,6 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function notification() {
-        return $this->hasMany(Notification::class);
-    }
-
     public function equipment() {
         return $this->hasOne(Equipment::class);
     }

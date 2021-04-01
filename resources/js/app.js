@@ -26,6 +26,12 @@ Vue.use(UniqueId);
 Vue.use(require('advanced-laravel-vue-paginate'));
 Vue.use(require('vue-moment'));
 
+
+Vue.component('announcementall', require('./components/Notification/AnnouncementAll.vue').default);
+Vue.component('accountevent', require('./components/Notification/AccountEvent.vue').default);
+Vue.component('broadcast', require('./components/Notification/Broadcast.vue').default);
+
+
 Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
 Vue.component('bosshiscore', require('./components/BossHiscore.vue').default);
 Vue.component('npchiscore', require('./components/NpcHiscore.vue').default);
@@ -33,9 +39,7 @@ Vue.component('cluehiscore', require('./components/ClueHiscore.vue').default);
 Vue.component('accounthiscore', require('./components/AccountHiscore.vue').default);
 Vue.component('accountskillhiscore', require('./components/AccountSkillHiscore.vue').default);
 Vue.component('accountbosshiscore', require('./components/AccountBossHiscore.vue').default);
-Vue.component('allnotification', require('./components/AllNotification.vue').default);
-Vue.component('accountnotification', require('./components/AccountNotification.vue').default);
-Vue.component('notification', require('./components/Notification.vue').default);
+
 Vue.component('equipment', require('./components/Equipment.vue').default);
 Vue.component('bank', require('./components/Bank.vue').default);
 Vue.component('quests', require('./components/Quests.vue').default);
