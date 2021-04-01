@@ -21,7 +21,6 @@
                     </div>
                 </div>
 
-
                 <div v-if="broadcast.log !== null">
                     <div v-if="broadcast.log.action === 'account-loot-update'">
                         <div v-if="broadcast.log.data.type === 'NPC'">
@@ -67,7 +66,7 @@
                                          class="background-world-map mx-2 p-1">
                                         <img
                                             :alt="loot.name.replaceAll('_', ' ') + ' item icon'"
-                                            :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + loot.id + '.png'"
+                                            :src="'/images/' + broadcast.log.category.category + '/' + broadcast.icon.replace(/ /g,'_') + '/' + loot.name + '.png'"
                                             :title="loot.name.replaceAll('_', ' ') + ' x ' + loot.quantity | capitalize"
                                             class="pixel hiscore-icon">
                                     </div>
