@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.3.26",
         "ext-curl": "*",
+        "ext-json": "*",
         "beyondcode/laravel-websockets": "^1.9",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
@@ -19,7 +20,7 @@
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.0",
         "pusher/pusher-php-server": "^4.1",
-        "ext-json": "*"
+        "vipsoft/unzip": "^1.3"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",
