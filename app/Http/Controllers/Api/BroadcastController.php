@@ -8,29 +8,29 @@ use App\Broadcast;
 
 class BroadcastController extends Controller
 {
-    public function index($type)
+    public function index($broadcastType)
     {
-        $broadcasts = Broadcast::with('log')->with('log.category')->where('type', $type)->orderByDesc('id')->limit(5)->get();
+        $broadcasts = Broadcast::with('log')->with('log.category')->where('type', $broadcastType)->orderByDesc('id')->limit(5)->get();
 
         return response()->json($broadcasts, 200);
     }
 
-    public function show($accountUsername)
+    public function account($accountUsername, $broadcastType)
     {
         $account = Account::where('username', $accountUsername)->pluck('id')->first();
 
         if ($account) {
             $broadcasts = Broadcast::with('log')->with('log.category')->where('message', 'NOT LIKE', '%logged%')->whereHas('log', function ($query) use($account) {
                 return $query->where('account_id', '=', $account);
-            })->where('type', 'event')->orderByDesc('id')->paginate(10);
+            })->where('type', $broadcastType)->orderByDesc('id')->paginate(10);
 
             return response()->json($broadcasts, 200);
         }
     }
 
-    public function recent()
+    public function recent($broadcastType)
     {
-        $broadcasts = Broadcast::with('log')->with('log.category')->orderByDesc('id')->get();
+        $broadcasts = Broadcast::with('log')->with('log.category')->where('type', $broadcastType)->orderByDesc('id')->get();
 
         $recentBroadcasts = [];
 

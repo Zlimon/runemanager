@@ -61,7 +61,7 @@ Route::prefix('/collection')->group(function() {
 });
 
 Route::prefix('/broadcast')->group(function() {
-	Route::get('/{type}', 'Api\BroadcastController@index')->name('broadcast-show-all');
-	Route::get('/account/{accountUsername}', 'Api\BroadcastController@show')->name('broadcast-account-show');
-    Route::get('/recent', 'Api\BroadcastController@recent')->name('broadcast-recent-show');
+	Route::get('/{broadcastType}', 'Api\BroadcastController@index')->name('broadcast-show-all');
+	Route::get('/account/{accountUsername}/{broadcastType}', 'Api\BroadcastController@account')->name('broadcast-account-show');
+    Route::get('/recent/{broadcastType}', 'Api\BroadcastController@recent')->name('broadcast-recent-show');
 });

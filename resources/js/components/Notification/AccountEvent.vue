@@ -41,7 +41,7 @@ export default {
     methods: {
         getBroadcasts(page = 1) {
             axios
-                .get('/api/broadcast/account/' + this.account.username + '?page=' + page)
+                .get('/api/broadcast/account/' + this.account.username + '/event?page=' + page)
                 .then((response) => {
                     this.broadcastsData = response.data;
                 })

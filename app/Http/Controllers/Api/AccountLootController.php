@@ -203,7 +203,7 @@ class AccountLootController extends Controller
                     $unlockedUniquesItemsList[] = ucfirst(str_replace("_", " ", $metaData["name"]));
                 }
 
-                $uniqueItems = implode(", ", $unlockedUniquesItemsList);
+                $uniqueItems = implode(" and ", $unlockedUniquesItemsList);
 
                 $announcementData = [
                     "log_id" => $log->id,
