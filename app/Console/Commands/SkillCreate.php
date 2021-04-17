@@ -40,7 +40,6 @@ class SkillCreate extends Command
     public function handle()
     {
         $skills = Helper::listSkills();
-
         $skillCount = sizeof($skills);
 
         // This method create a skill migration and model file for each skill
@@ -54,7 +53,7 @@ class SkillCreate extends Command
 
             $this->info(sprintf("[%s] Making '%s' model", $count, $skill));
 
-            $makeModel = "make:model ".ucfirst($skill);
+            $makeModel = "make:model Skill/".ucfirst($skill);
             Artisan::call($makeModel);
         }
 
