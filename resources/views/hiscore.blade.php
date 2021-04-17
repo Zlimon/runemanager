@@ -76,7 +76,7 @@
                             class="pixel icon"
                             alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
                         <br>
-                        <span>{{ ucfirst(($hiscoreType === "boss" ? Helper::collectionAttribute($hiscoreName, "alias") : $hiscoreName)) }}</span>
+                        <span>{{ ucfirst(($hiscoreType === "boss" ? Helper::collectionAttribute($hiscoreName, "alias") : ($hiscoreName == "total" ? "total level" : $hiscoreName))) }}</span>
                     </h1>
                 </div>
                 <span class="selection-bot">

@@ -18,13 +18,13 @@
 
             <div v-else>
                 <div class="d-flex flex-row">
-                    <img :alt="meta.skill + ' icon'"
+                    <img :alt="meta.name + ' icon'"
                          :src="'/storage/resource-pack/skill/' + meta.skill + '.png'"
                          class="d-none d-md-inline pixel icon"
                          style="width: 7.5rem; height: 7.5rem;">
 
                     <div class="col">
-                        <h1 class="text-left">{{ meta.skill }}</h1>
+                        <h1 class="text-left">{{ meta.name }}</h1>
 
                         <span>Total XP: <strong>{{ meta.total_xp }}</strong></span>
                         <br>

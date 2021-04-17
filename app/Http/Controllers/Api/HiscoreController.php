@@ -66,6 +66,7 @@ class HiscoreController extends Controller
                 ->additional([
                     'meta' => [
                         'skill' => $skillName,
+                        'name' => ucfirst($skillName == "total" ? "total level" : $skillName),
                         'total_xp' => number_format($sumTotalXp),
                         'average_total_level' => round($averageTotalLevel),
                         'total_max_level' => $totalMaxLevel,
