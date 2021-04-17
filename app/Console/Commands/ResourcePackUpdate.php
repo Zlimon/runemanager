@@ -4,16 +4,16 @@ namespace App\Console\Commands;
 
 use Artisan;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
-class ResourcePackFetch extends Command
+class ResourcePackUpdate extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'resourcepack:fetch
+    protected $signature = 'resourcepack:update
                             {name : Filename of resource pack located on GitHub}
                             {--use= : Whether the resource pack should be used}';
 
@@ -22,7 +22,7 @@ class ResourcePackFetch extends Command
      *
      * @var string
      */
-    protected $description = 'Fetch resource pack, and optionally apply it as currently used textures';
+    protected $description = 'Update resource pack, and optionally apply it as currently used textures';
 
     /**
      * Create a new command instance.
@@ -41,23 +41,18 @@ class ResourcePackFetch extends Command
      */
     public function handle()
     {
-        $this->info(sprintf("Downloading '%s'", $this->argument('name')));
+        if (!File::exists(public_path('storage/resource-packs-downloaded/'.$this->argument('name').'.zip'))) {
+            $this->info(sprintf("Resource pack '%s' does not exist!", $this->argument('name')));
 
-        // Download resource pack
-        $resourcePack = file_get_contents(
-            'https://github.com/melkypie/resource-packs/archive/' . $this->argument('name') . '.zip'
-        );
+            return 1;
+        }
 
-        // Put resource pack file to download directory
-        Storage::disk('public')->put(
-            'resource-packs-downloaded/' . $this->argument('name') . '.zip',
-            $resourcePack
-        );
+        $this->info(sprintf("Updating '%s'", $this->argument('name')));
+
+        Artisan::call("resourcepack:fetch ".$this->argument('name')." ".($this->option('use') == "yes" ? "--use=yes" : ""));
 
         if ($this->option('use') == "yes") {
             $this->info(sprintf("Applying new textures"));
-
-            Artisan::call("resourcepack:switch " . $this->argument('name'));
         }
 
         $this->info(sprintf("Finished!"));
