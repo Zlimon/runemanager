@@ -39,17 +39,23 @@ class SkillCreate extends Command
      */
     public function handle()
     {
+        $skills = Helper::listSkills();
+
+        $skillCount = sizeof($skills);
+
         // This method create a skill migration and model file for each skill
-        foreach (Helper::listSkills() as $skill) {
-            $this->info(sprintf("Making '%s' migration", $skill));
+        foreach (Helper::listSkills() as $key => $skill) {
+            $count = ($key+1)."/".$skillCount;
+
+            $this->info(sprintf("[%s] Making '%s' migration", $count, $skill));
 
             $makeMigration = "make:migration create_".$skill."_table";
-            $this->call($makeMigration);
+            Artisan::call($makeMigration);
 
-            $this->info(sprintf("Making '%s' model", $skill));
+            $this->info(sprintf("[%s] Making '%s' model", $count, $skill));
 
             $makeModel = "make:model ".ucfirst($skill);
-            $this->call($makeModel);
+            Artisan::call($makeModel);
         }
 
         return 0;
