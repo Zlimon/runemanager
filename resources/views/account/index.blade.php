@@ -161,7 +161,7 @@
                                         <br>
                                         <span class="font-small">
                                             <img class="pixel"
-                                                 src="{{ asset('images/skill/overall.png') }}"
+                                                 src="{{ asset('images/skill/total.png') }}"
                                                  alt="Total level icon">
                                             {{ $account->level }}
                                         </span>

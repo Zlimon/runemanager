@@ -59,7 +59,7 @@
                              v-on:click="toggle">
                             <img alt="Skills icon"
                                  class="pixel icon-small"
-                                 src="/images/skill/overall.png"
+                                 src="/images/skill/total.png"
                                  title="Click here to see the skill hiscores">
                         </div>
                     </div>
