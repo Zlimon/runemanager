@@ -20,7 +20,7 @@ class SkillCreate extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Create skill migration and model files';
 
     /**
      * Create a new command instance.
@@ -39,11 +39,17 @@ class SkillCreate extends Command
      */
     public function handle()
     {
-        // This method create a migration file for each collection model in the collections table
-        foreach (Helper::listSkills() as $collection) {
-            $command = "make:model ".$collection." -m";
+        // This method create a skill migration and model file for each skill
+        foreach (Helper::listSkills() as $skill) {
+            $this->info(sprintf("Making '%s' migration", $skill));
 
-            Artisan::call($command);
+            $makeMigration = "make:migration create_".$skill."_table";
+            $this->call($makeMigration);
+
+            $this->info(sprintf("Making '%s' model", $skill));
+
+            $makeModel = "make:model ".ucfirst($skill);
+            $this->call($makeModel);
         }
 
         return 0;
