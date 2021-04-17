@@ -20,7 +20,7 @@ class HiscoreController extends Controller
     public function skill($skillName)
     {
         if (Account::count() > 0) {
-            if ($skillName == "overall") {
+            if ($skillName == "total") {
                 $hiscores = Account::orderByRaw('CASE WHEN rank > 0 THEN 1 ELSE 2 END')->orderBy('rank')->orderByDesc('level')->orderByDesc('xp')->get();
 
                 $sumTotalXp = Account::sum('xp');
@@ -66,6 +66,7 @@ class HiscoreController extends Controller
                 ->additional([
                     'meta' => [
                         'skill' => $skillName,
+                        'name' => ucfirst($skillName == "total" ? "total level" : $skillName),
                         'total_xp' => number_format($sumTotalXp),
                         'average_total_level' => round($averageTotalLevel),
                         'total_max_level' => $totalMaxLevel,

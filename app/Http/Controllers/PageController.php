@@ -37,7 +37,7 @@ class PageController extends Controller
         switch ($hiscoreType) {
             case "skill":
                 $hiscoreList = Helper::listSkills();
-                array_push($hiscoreList, "overall");
+                array_push($hiscoreList, "total");
                 break;
             case "boss":
                 $hiscoreList = Helper::listBosses();

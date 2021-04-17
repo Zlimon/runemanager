@@ -46,7 +46,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('hiscore', ['skill', 'overall']) }}">
+                                    <a class="nav-link" href="{{ route('hiscore', ['skill', 'total']) }}">
                                         <img src="{{ asset('images/hiscore.png') }}"
                                              class="pixel mr-1"
                                              alt="Hiscores page icon"

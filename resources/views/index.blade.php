@@ -63,7 +63,7 @@
         <div class="col-md-12">
             <div class="row justify-content-between">
                 <div class="col-md-3">
-                    <a href="{{ route('hiscore', ['skill', 'overall']) }}">
+                    <a href="{{ route('hiscore', ['skill', 'total']) }}">
                         <div class="btn btn-block button-combat-style-thin">
                             <span>Hiscores</span>
                         </div>
@@ -92,7 +92,7 @@
             <div class="row justify-content-around">
                 <div class="hiscore-button-parent">
                     <div class="hiscore-button bg-one">
-                        <a href="{{ route('hiscore', ['skill', 'overall']) }}">Skills</a>
+                        <a href="{{ route('hiscore', ['skill', 'total']) }}">Skills</a>
                     </div>
                 </div>
 

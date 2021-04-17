@@ -156,7 +156,7 @@ class Helper
             "thieving",
             "slayer",
             "farming",
-            "runecrafting",
+            "runecraft",
             "hunter",
             "construction"
         ];
