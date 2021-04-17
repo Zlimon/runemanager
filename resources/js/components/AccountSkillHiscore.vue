@@ -22,7 +22,7 @@
                         <div class="button-combat-style-narrow text-center button-small">
                             <a :href="'/hiscore/skill/' + name">
                                 <img :alt="name + ' skill icon'"
-                                     :src="'/images/skill/' + name + '.png'"
+                                     :src="'/storage/resource-pack/skill/' + name + '.png'"
                                      :title="'Click here to visit ' + name + ' hiscores'"
                                      class="">
                                 <span>{{ hiscore.level }}</span>

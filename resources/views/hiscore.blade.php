@@ -63,7 +63,7 @@
 				<span class="selection-top">
 					@foreach ($hiscoreListTop as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
+                            <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">
@@ -72,7 +72,7 @@
 				</span>
                 <div class="mid-part">
                     <h1 class="active middle-icon" style="display: inline-block;">
-                        <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscoreName).'.png') }}"
+                        <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscoreName).'.png') }}"
                             class="pixel icon"
                             alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
                         <br>
@@ -82,7 +82,7 @@
                 <span class="selection-bot">
 					@foreach ($hiscoreListBottom as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
+                            <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">
