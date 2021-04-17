@@ -19,7 +19,7 @@
             <div v-else>
                 <div class="d-flex flex-row">
                     <img :alt="meta.skill + ' icon'"
-                         :src="'/images/skill/' + meta.skill + '.png'"
+                         :src="'/storage/resource-pack/skill/' + meta.skill + '.png'"
                          class="d-none d-md-inline pixel icon"
                          style="width: 7.5rem; height: 7.5rem;">
 
