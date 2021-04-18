@@ -31,8 +31,8 @@
                     </div>
                     <div class="button-combat-style-narrow text-center button-small">
                         <a :href="'/hiscore/skill/total'">
-                            <img :alt="'Total level skill icon'"
-                                 :src="'/images/skill/total.png'"
+                            <img :alt="'Total level icon'"
+                                 :src="'/storage/resource-pack/skill/total.png'"
                                  :title="'Click here to visit total level hiscores'"
                                  class="">
                             <span>{{ data.level }}</span>
