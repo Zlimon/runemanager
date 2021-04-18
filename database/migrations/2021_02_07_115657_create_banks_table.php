@@ -18,6 +18,7 @@ class CreateBanksTable extends Migration
             $table->integer('account_id')->unsigned();
             $table->text('data')->nullable();
             $table->integer('total')->nullable();
+            $table->boolean('display')->default(false);
             $table->timestamps();
         });
     }

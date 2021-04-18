@@ -1,5 +1,14 @@
 <template>
     <div>
+        <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
+            <form>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch3" @change="updateDisplayBank()" :checked="display">
+                    <label class="custom-control-label" for="customSwitch3">Toggle display bank</label>
+                </div>
+            </form>
+        </div>
+
         <div v-if="errored" class="text-center py-5">
             <img src="/images/ignore.png"
                  class="pixel icon"
@@ -69,12 +78,27 @@ export default {
                 .then((response) => {
                     this.bank = response.data.data;
                     this.total = response.data.total;
+                    this.display = response.data.display !== 0;
+                    this.errored = false
                 })
                 .catch(error => {
                     console.log(error)
                     this.errored = true
                 })
                 .finally(() => this.loading = false)
+        },
+
+        updateDisplayBank() {
+            axios
+                .post('/api/account/' + this.account.username + '/bank', {
+                    _method: 'patch',
+                })
+                .then((response) => {
+                    console.log(response.data); // TODO local notification
+                })
+                .catch(error => {
+                    console.log(error)
+                });
         }
     },
 
@@ -82,12 +106,23 @@ export default {
         return {
             loading: true,
             errored: false,
+            user: {},
             bank: [],
             total: 0,
+            display: false,
         }
     },
 
     mounted() {
+        axios
+            .get('/api/user')
+            .then(response => {
+                this.user = response.data;
+            })
+            .catch(error => {
+
+            });
+
         this.fetchBank();
     },
 

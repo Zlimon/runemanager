@@ -35,6 +35,7 @@ Route::middleware('auth:api')->group(function() {
         Route::patch('/{accountUsername}/equipment', 'Api\AccountEquipmentController@updateDisplay')->name('account-equipment-update-display');
 
         Route::post('/{accountUsername}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
+        Route::patch('/{accountUsername}/bank', 'Api\AccountBankController@updateDisplay')->name('account-bank-update-display');
 
         Route::post('/{accountUsername}/quests', 'Api\AccountQuestController@update')->name('account-quests-update');
         Route::patch('/{accountUsername}/quests', 'Api\AccountQuestController@updateDisplay')->name('account-quests-update-display');
