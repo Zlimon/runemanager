@@ -9,6 +9,15 @@
         </div>
 
         <div v-else>
+            <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
+                <form>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="customSwitch1" @change="updateDisplayEquipment()" :checked="display">
+                        <label class="custom-control-label" for="customSwitch1">Toggle display equipment</label>
+                    </div>
+                </form>
+            </div>
+
             <div
                 style="background-image: url('/images/equipment_slots.png'); background-repeat: no-repeat; background-position: center;  width: 168px; margin: 0 auto;">
                 <div class="row justify-content-center">
@@ -90,32 +99,62 @@ export default {
         checkAccount(accountId) {
             return this.account.id === accountId;
         },
+
+        updateDisplayEquipment() {
+            axios
+                .post('/api/account/' + this.account.username + '/equipment', {
+                    _method: 'patch',
+                })
+                .then((response) => {
+                    console.log(response.data);
+                    //this.equipment = response.data.data;
+                })
+                .catch(error => {
+
+                });
+        }
     },
 
     data() {
         return {
             loading: true,
+            user: {},
             equipment: [],
+            display: false,
         }
     },
 
     mounted() {
         axios
+            .get('/api/user')
+            .then(response => {
+                this.user = response.data;
+            })
+            .catch(error => {
+
+            });
+
+        axios
             .get('/api/account/' + this.account.username + '/equipment')
             .then((response) => {
                 this.equipment = response.data.data;
+                this.display = response.data.display !== 0;
             })
             .catch(error => {
 
             })
-            .finally(() => this.loading = false)
+            .finally(() => this.loading = false);
     },
 
     created() {
         window.Echo.channel('account-equipment')
             .listen('AccountEquipment', (e) => {
                 if (this.checkAccount(e.equipment.account_id)) {
-                    this.equipment = e.equipment.data;
+                    if (e.equipment.display === 1) {
+                        this.equipment = e.equipment.data;
+                    } else {
+                        this.equipment = [];
+                    }
                 }
             });
     },

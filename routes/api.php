@@ -32,6 +32,7 @@ Route::middleware('auth:api')->group(function() {
 		Route::post('/{accountUsername}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
 
         Route::post('/{accountUsername}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
+        Route::patch('/{accountUsername}/equipment', 'Api\AccountEquipmentController@updateDisplay')->name('account-equipment-update-display');
 
         Route::post('/{accountUsername}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
 
