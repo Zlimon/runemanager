@@ -26,7 +26,7 @@
             </div>
 
             <div v-else>
-                <div class="background-dialog-iron-rivets p-1 mb-1 pl-2">
+                <div class="background-dialog-iron-rivets p-1 mb-1 pl-2" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;">
                     <div v-for="(questCategories, index) in quests">
                         <p class="runescape-normal" style="margin: 0; font-size: 1.25rem;">{{ (index === 0 ? "Free Quests" : index === 1 ? "Members" : index === 2 ? "Miniquests" : "Secret :o") }}</p>
                         <div v-for="(quest, index) in questCategories">
