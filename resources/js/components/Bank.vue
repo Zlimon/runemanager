@@ -3,8 +3,8 @@
         <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
             <form>
                 <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="customSwitch3" @change="updateDisplayBank()" :checked="display">
-                    <label class="custom-control-label" for="customSwitch3">Toggle display bank</label>
+                    <input type="checkbox" class="custom-control-input" id="bankDisplayToggle" @change="updateDisplayBank()" :checked="display">
+                    <label class="custom-control-label" for="bankDisplayToggle">Display bank</label>
                 </div>
             </form>
         </div>

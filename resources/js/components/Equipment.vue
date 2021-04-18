@@ -12,8 +12,8 @@
             <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
                 <form>
                     <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="customSwitch1" @change="updateDisplayEquipment()" :checked="display">
-                        <label class="custom-control-label" for="customSwitch1">Toggle display equipment</label>
+                        <input type="checkbox" class="custom-control-input" id="equipmentDisplayToggle" @change="updateDisplayEquipment()" :checked="display">
+                        <label class="custom-control-label" for="equipmentDisplayToggle">Display equipment</label>
                     </div>
                 </form>
             </div>
