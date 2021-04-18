@@ -41,7 +41,7 @@
                             </div>
                         </div>
                         <div class="collapse advance-search background-dialog-iron-rivets" id="collapseExample">
-                            <span class="desc">ADVANCED SEARCH</span>
+                            <h2 class="text-center header-chatbox-sword desc">Advanced search</h2>
                             <div class="form-row">
                                 <div class="col">
                                     <label for="account_type">Account type</label>
@@ -112,11 +112,15 @@
                             <div class="form-row third">
                                 <div class="input-group">
                                     <div class="result-count">
-                                        <span>{{ $accounts->count() }} </span>results
+                                        <span>{{ $accounts->count() }}</span> results
                                     </div>
                                     <div class="group-btn">
-                                        <button class="btn btn-danger" id="delete">RESET</button>
-                                        <button class="btn btn-primary">SEARCH</button>
+                                        <button class="btn btn-lg button-combat-style-narrow button-rectangle-small">
+                                            <span>Reset</span>
+                                        </button>
+                                        <button class="btn btn-lg button-combat-style-narrow button-rectangle-small">
+                                            <span>Search</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

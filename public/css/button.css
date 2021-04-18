@@ -83,6 +83,11 @@
     height: 5rem;
 }
 
+.button-rectangle-small {
+    width: 6rem;
+    height: 3rem;
+}
+
 .button-square {
     width: 6.5rem;
     height: 6.5rem;
