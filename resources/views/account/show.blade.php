@@ -27,9 +27,7 @@
                         <div class="col-md-6">
                             <h3 class="text-center header-chatbox-sword">Quests</h3>
 
-                            <div class="background-dialog-iron-rivets p-1 mb-1 pl-2">
-                                <quests :account="{{ $account }}" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;"></quests>
-                            </div>
+                            <quests :account="{{ $account }}" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;"></quests>
                         </div>
                     </div>
 
