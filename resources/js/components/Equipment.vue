@@ -106,11 +106,10 @@ export default {
                     _method: 'patch',
                 })
                 .then((response) => {
-                    console.log(response.data);
-                    //this.equipment = response.data.data;
+                    console.log(response.data); // TODO local notification
                 })
                 .catch(error => {
-
+                    console.log(error)
                 });
         }
     },
@@ -141,7 +140,7 @@ export default {
                 this.display = response.data.display !== 0;
             })
             .catch(error => {
-
+                console.log(error)
             })
             .finally(() => this.loading = false);
     },

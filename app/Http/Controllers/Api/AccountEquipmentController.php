@@ -25,7 +25,7 @@ class AccountEquipmentController extends Controller
             if ($equipment) {
                 return response()->json($equipment, 200);
             } else {
-                return response()->json("No equipment for " . $accountUsername . " were found!", 404);
+                return response("No equipment for " . $accountUsername . " were found!", 404);
             }
         }
     }
@@ -71,6 +71,10 @@ class AccountEquipmentController extends Controller
         }
 
         $equipment = Equipment::where('account_id', $account->id)->first();
+
+        if (!$equipment) {
+            return response("No equipment for " . $accountUsername . " were found!", 404);
+        }
 
         $equipment->display ^= 1;
 
