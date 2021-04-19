@@ -32,11 +32,14 @@ Route::middleware('auth:api')->group(function() {
 		Route::post('/{accountUsername}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
 
         Route::post('/{accountUsername}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
+        Route::patch('/{accountUsername}/equipment', 'Api\AccountEquipmentController@updateDisplay')->name('account-equipment-update-display');
 
         Route::post('/{accountUsername}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
+        Route::patch('/{accountUsername}/bank', 'Api\AccountBankController@updateDisplay')->name('account-bank-update-display');
 
         Route::post('/{accountUsername}/quests', 'Api\AccountQuestController@update')->name('account-quests-update');
-	});
+        Route::patch('/{accountUsername}/quests', 'Api\AccountQuestController@updateDisplay')->name('account-quests-update-display');
+    });
 });
 
 Route::prefix('/account')->group(function() {
@@ -63,4 +66,5 @@ Route::prefix('/collection')->group(function() {
 Route::prefix('/notification')->group(function() {
 	Route::get('/all', 'Api\NotificationController@index')->name('notification-show-all');
 	Route::get('/account/{accountUsername}', 'Api\NotificationController@show')->name('notification-account-show');
+    Route::get('/recent', 'Api\NotificationController@recent')->name('notification-recent-show');
 });

@@ -1,5 +1,14 @@
 <template>
     <div>
+        <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
+            <form>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="bankDisplayToggle" @change="updateDisplayBank()" :checked="display">
+                    <label class="custom-control-label" for="bankDisplayToggle">Display bank</label>
+                </div>
+            </form>
+        </div>
+
         <div v-if="errored" class="text-center py-5">
             <img src="/images/ignore.png"
                  class="pixel icon"
@@ -17,33 +26,35 @@
             </div>
 
             <div v-else>
-                <h3 class="text-center">Total value: {{ total.toLocaleString() }} gp</h3>
-                <div class="d-flex flex-row flex-wrap" style="max-width: 25rem; margin: 0 auto;">
-                    <div v-for="(item, index) in bank" class="bank-item p-1">
-                        <div v-if="item.quantity === 1">
-                            <img
-                                :alt="item.name + ' item icon'"
-                                :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
-                                :title="item.name + ' x ' + item.quantity"
-                                class="hiscore-icon">
-                        </div>
-                        <div v-else-if="item.quantity > 0">
-                            <img
-                                :alt="item.name + ' item icon'"
-                                :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
-                                :title="item.name + ' x ' + item.quantity"
-                                class="hiscore-icon">
-                            <span class="collection-log-item-counter runescape-progress"
-                                  style="left: 0; font-weight: normal;">
-                                {{ item.quantity }}
-                            </span>
-                        </div>
-                        <div v-else>
-                            <img
-                                :alt="item.name + ' item icon'"
-                                :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
-                                :title="item.name + ' x ' + item.quantity"
-                                class="hiscore-icon faded">
+                <div class="background-dialog-iron-rivets p-1 mb-1 pl-2" style="max-height: 40rem; overflow: scroll; overflow-x: hidden;">
+                    <h3 class="text-center">Total value: {{ total.toLocaleString() }} gp</h3>
+                    <div class="d-flex flex-row flex-wrap" style="max-width: 25rem; margin: 0 auto;">
+                        <div v-for="(item, index) in bank" class="bank-item p-1">
+                            <div v-if="item.quantity === 1">
+                                <img
+                                    :alt="item.name + ' item icon'"
+                                    :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
+                                    :title="item.name + ' x ' + item.quantity"
+                                    class="hiscore-icon">
+                            </div>
+                            <div v-else-if="item.quantity > 0">
+                                <img
+                                    :alt="item.name + ' item icon'"
+                                    :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
+                                    :title="item.name + ' x ' + item.quantity"
+                                    class="hiscore-icon">
+                                <span class="collection-log-item-counter runescape-progress"
+                                      style="left: 0; font-weight: normal;">
+                                    {{ item.quantity }}
+                                </span>
+                            </div>
+                            <div v-else>
+                                <img
+                                    :alt="item.name + ' item icon'"
+                                    :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
+                                    :title="item.name + ' x ' + item.quantity"
+                                    class="hiscore-icon faded">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -69,12 +80,27 @@ export default {
                 .then((response) => {
                     this.bank = response.data.data;
                     this.total = response.data.total;
+                    this.display = response.data.display !== 0;
+                    this.errored = false
                 })
                 .catch(error => {
                     console.log(error)
                     this.errored = true
                 })
                 .finally(() => this.loading = false)
+        },
+
+        updateDisplayBank() {
+            axios
+                .post('/api/account/' + this.account.username + '/bank', {
+                    _method: 'patch',
+                })
+                .then((response) => {
+                    console.log(response.data); // TODO local notification
+                })
+                .catch(error => {
+                    console.log(error)
+                });
         }
     },
 
@@ -82,12 +108,23 @@ export default {
         return {
             loading: true,
             errored: false,
+            user: {},
             bank: [],
             total: 0,
+            display: false,
         }
     },
 
     mounted() {
+        axios
+            .get('/api/user')
+            .then(response => {
+                this.user = response.data;
+            })
+            .catch(error => {
+
+            });
+
         this.fetchBank();
     },
 

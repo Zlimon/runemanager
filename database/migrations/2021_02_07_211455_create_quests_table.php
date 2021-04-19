@@ -17,6 +17,7 @@ class CreateQuestsTable extends Migration
             $table->id();
             $table->integer('account_id')->unsigned();
             $table->text('data')->nullable();
+            $table->boolean('display')->default(false);
             $table->timestamps();
         });
     }

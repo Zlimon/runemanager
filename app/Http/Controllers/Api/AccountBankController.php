@@ -17,12 +17,15 @@ class AccountBankController extends Controller
         $account = Account::where('username', $accountUsername)->pluck('id')->first();
 
         if ($account) {
-            $bank = Bank::where('account_id', $account)->first();
+            $bank = Bank::where([
+                ['account_id', '=', $account],
+                ['display', '=', 1]
+            ])->first();
 
             if ($bank) {
                 return response()->json($bank, 200);
             } else {
-                return response()->json("No bank for " . $accountUsername . " were found!", 404);
+                return response("No bank for " . $accountUsername . " were found!", 404);
             }
         }
     }
@@ -73,5 +76,27 @@ class AccountBankController extends Controller
         AccountBank::dispatch($account);
 
         return response("Updated bank for " . $accountUsername, 200);
+    }
+
+    public function updateDisplay($accountUsername)
+    {
+        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
+        if (!$account) {
+            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
+        }
+
+        $bank = Bank::where('account_id', $account->id)->first();
+
+        if (!$bank) {
+            return response("No bank for " . $accountUsername . " were found!", 404);
+        }
+
+        $bank->display ^= 1;
+
+        $bank->save();
+
+        AccountBank::dispatch($account);
+
+        return response(($bank->display === 1 ? "Displaying" : "No longer displaying") . " bank for " . $accountUsername, 200);
     }
 }

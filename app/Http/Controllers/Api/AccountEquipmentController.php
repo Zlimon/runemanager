@@ -17,12 +17,15 @@ class AccountEquipmentController extends Controller
         $account = Account::where('username', $accountUsername)->pluck('id')->first();
 
         if ($account) {
-            $equipment = Equipment::where('account_id', $account)->first();
+            $equipment = Equipment::where([
+                ['account_id', '=', $account],
+                ['display', '=', 1]
+            ])->first();
 
             if ($equipment) {
                 return response()->json($equipment, 200);
             } else {
-                return response()->json("No equipment for " . $accountUsername . " were found!", 404);
+                return response("No equipment for " . $accountUsername . " were found!", 404);
             }
         }
     }
@@ -58,5 +61,27 @@ class AccountEquipmentController extends Controller
         AccountEquipment::dispatch($equipment);
 
         return response("Updated equipment for " . $accountUsername, 200);
+    }
+
+    public function updateDisplay($accountUsername)
+    {
+        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
+        if (!$account) {
+            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
+        }
+
+        $equipment = Equipment::where('account_id', $account->id)->first();
+
+        if (!$equipment) {
+            return response("No equipment for " . $accountUsername . " were found!", 404);
+        }
+
+        $equipment->display ^= 1;
+
+        $equipment->save();
+
+        AccountEquipment::dispatch($equipment);
+
+        return response(($equipment->display === 1 ? "Displaying" : "No longer displaying") . " equipment for " . $accountUsername, 200);
     }
 }

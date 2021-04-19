@@ -9,9 +9,9 @@
 
     <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
         <div class="row justify-content-center">
-            <a href="{{ route('hiscore', ['skill', 'overall']) }}" class="mx-2">
+            <a href="{{ route('hiscore', ['skill', 'total']) }}" class="mx-2">
                 <div class="btn button-square background-world-map">
-                    <img src="{{ asset('images/skill/overall.png') }}"
+                    <img src="{{ asset('images/skill/total.png') }}"
                          class="pixel icon"
                          alt="Skills icon"
                          title="Click here to see the skills hiscores">
@@ -63,7 +63,7 @@
 				<span class="selection-top">
 					@foreach ($hiscoreListTop as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
+                            <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">
@@ -72,17 +72,17 @@
 				</span>
                 <div class="mid-part">
                     <h1 class="active middle-icon" style="display: inline-block;">
-                        <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscoreName).'.png') }}"
+                        <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscoreName).'.png') }}"
                             class="pixel icon"
                             alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
                         <br>
-                        <span>{{ ucfirst(($hiscoreType === "boss" ? Helper::collectionAttribute($hiscoreName, "alias") : $hiscoreName)) }}</span>
+                        <span>{{ ucfirst(($hiscoreType === "boss" ? Helper::collectionAttribute($hiscoreName, "alias") : ($hiscoreName == "total" ? "total level" : $hiscoreName))) }}</span>
                     </h1>
                 </div>
                 <span class="selection-bot">
 					@foreach ($hiscoreListBottom as $hiscore)
                         <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset('images/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
+                            <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
                                  class="icon"
                                  alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
                                  title="Click here to see {{ ucfirst($hiscore) }} hiscores">

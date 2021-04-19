@@ -27,4 +27,19 @@ class NotificationController extends Controller
             return response()->json($notifications, 200);
         }
     }
+
+    public function recent()
+    {
+        $notifications = Notification::with('log')->with('log.category')->orderByDesc('id')->get();
+
+        $recentNotifications = [];
+
+        foreach ($notifications as $notification) {
+            if ($notification->created_at->diffInSeconds() <= 5) {
+                $recentNotifications[] = $notification->message;
+            }
+        }
+
+        return response()->json($recentNotifications, 200);
+    }
 }

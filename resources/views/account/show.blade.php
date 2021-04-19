@@ -10,13 +10,13 @@
             <accounthiscore account="{{ $account->username }}"></accounthiscore>
 
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <h3 class="text-center header-chatbox-sword">Recent Events</h3>
 
                     <accountnotification :account="{{ $account }}"></accountnotification>
                 </div>
 
-                <div class="col-md-7">
+                <div class="col-md-8">
                     <div class="row">
                         <div class="col-md-6">
                             <h3 class="text-center header-chatbox-sword">Equipment</h3>
@@ -27,17 +27,13 @@
                         <div class="col-md-6">
                             <h3 class="text-center header-chatbox-sword">Quests</h3>
 
-                            <div class="background-dialog-iron-rivets p-1 mb-1 pl-2">
-                                <quests :account="{{ $account }}" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;"></quests>
-                            </div>
+                            <quests :account="{{ $account }}"></quests>
                         </div>
                     </div>
 
                     <h3 class="text-center header-chatbox-sword">The Bank of Gielinor</h3>
 
-                    <div class="background-dialog-iron-rivets p-1 mb-1 pl-2">
-                        <bank :account="{{ $account }}" style="max-height: 40rem; overflow: scroll; overflow-x: hidden;"></bank>
-                    </div>
+                    <bank :account="{{ $account }}"></bank>
                 </div>
             </div>
         @else
