@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Account;
 use App\AccountAuthStatus;
+use App\Broadcast;
 use App\Collection;
 use App\Events\AccountAll;
 use App\Events\AccountOnline;
 use App\Events\All;
+use App\Events\EventAll;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountBossResource;
@@ -200,15 +202,16 @@ class AccountController extends Controller
 
         $log = Log::create($logData);
 
-        $notificationData = [
+        $eventData = [
             "log_id" => $log->id,
+            "type" => "event",
             "icon" => auth()->user()->icon_id,
             "message" => $accountUsername . " has logged " . ($account->online ? 'in' : 'out') . "!",
         ];
 
-        $notification = Notification::create($notificationData);
+        $event = Broadcast::create($eventData);
 
-        All::dispatch($notification);
+        EventAll::dispatch($event);
 
         AccountOnline::dispatch($account);
 

@@ -13,7 +13,7 @@
                 <div class="col-md-4">
                     <h3 class="text-center header-chatbox-sword">Recent Events</h3>
 
-                    <accountnotification :account="{{ $account }}"></accountnotification>
+                    <accountevent :account="{{ $account }}"></accountevent>
                 </div>
 
                 <div class="col-md-8">

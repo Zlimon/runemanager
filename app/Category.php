@@ -11,8 +11,8 @@ class Category extends Model
         return $this->hasMany(Collection::class);
     }
 
-    public function notification()
+    public function broadcast()
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasMany(Broadcast::class);
     }
 }

@@ -63,8 +63,8 @@ Route::prefix('/collection')->group(function() {
 	Route::get('/{collectionType}', 'CollectionController@list');
 });
 
-Route::prefix('/notification')->group(function() {
-	Route::get('/all', 'Api\NotificationController@index')->name('notification-show-all');
-	Route::get('/account/{accountUsername}', 'Api\NotificationController@show')->name('notification-account-show');
-    Route::get('/recent', 'Api\NotificationController@recent')->name('notification-recent-show');
+Route::prefix('/broadcast')->group(function() {
+	Route::get('/{broadcastType}', 'Api\BroadcastController@index')->name('broadcast-show-all');
+	Route::get('/account/{accountUsername}/{broadcastType}', 'Api\BroadcastController@account')->name('broadcast-account-show');
+    Route::get('/recent/{broadcastType}', 'Api\BroadcastController@recent')->name('broadcast-recent-show');
 });

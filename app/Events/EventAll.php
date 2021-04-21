@@ -2,30 +2,29 @@
 
 namespace App\Events;
 
-use App\Account;
-use App\Notification;
+use App\Broadcast;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AccountKill implements ShouldBroadcast
+class EventAll implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $notification;
+    public $broadcast;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Account $account, Notification $notification)
+    public function __construct(Broadcast $broadcast)
     {
-        $this->notification = $notification::with('log')->with('log.category')->whereHas('log', function ($query) use($account) {
-            return $query->where('account_id', '=', $account->id);
-        })->orderByDesc('id')->first();
+        $this->broadcast = $broadcast::with('log')->with('log.category')->where('type', 'event')->orderByDesc('id')->first();
     }
 
     /**
@@ -35,6 +34,6 @@ class AccountKill implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('account');
+        return new Channel('all');
     }
 }

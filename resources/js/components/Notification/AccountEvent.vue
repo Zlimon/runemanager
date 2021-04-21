@@ -16,22 +16,22 @@
             </div>
 
             <div v-else>
-                <div v-if="notificationsData.data.length === 0">
+                <div v-if="broadcastsData.data.length === 0">
                     <div class="text-center">
                         <h3>Nothing interesting happens.</h3>
                     </div>
                 </div>
 
-                <advanced-laravel-vue-paginate :data="notificationsData" previousText="&lt;" nextText="&gt;" @paginateTo="getNotifications"/>
+                <advanced-laravel-vue-paginate :data="broadcastsData" previousText="&lt;" nextText="&gt;" @paginateTo="getBroadcasts"/>
 
-                <notifications :notifications="notificationsData.data"></notifications>
+                <broadcast :broadcasts="broadcastsData.data"></broadcast>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import notifications from './Notification.vue'
+import broadcasts from './Broadcast.vue'
 
 export default {
     props: {
@@ -39,11 +39,11 @@ export default {
     },
 
     methods: {
-        getNotifications(page = 1) {
+        getBroadcasts(page = 1) {
             axios
-                .get('/api/notification/account/' + this.account.username + '?page=' + page)
+                .get('/api/broadcast/account/' + this.account.username + '/event?page=' + page)
                 .then((response) => {
-                    this.notificationsData = response.data;
+                    this.broadcastsData = response.data;
                 })
                 .catch(error => {
                     console.log(error)
@@ -58,26 +58,26 @@ export default {
     },
 
     components: {
-        'notifications': notifications,
+        'broadcasts': broadcasts,
     },
 
     data() {
         return {
             loading: true,
             errored: false,
-            notificationsData: {}
+            broadcastsData: {}
         }
     },
 
     mounted() {
-        this.getNotifications();
+        this.getBroadcasts();
     },
 
     created() {
-        window.Echo.channel('account-all')
-            .listen('AccountAll', (e) => {
-                if (this.checkAccount(e.notification.log.account_id)) {
-                    this.notificationsData.data.unshift(e.notification);
+        window.Echo.channel('account')
+            .listen('AccountEvent', (e) => {
+                if (this.checkAccount(e.broadcast.log.account_id)) {
+                    this.broadcastsData.data.unshift(e.broadcast);
                 }
             });
     },
