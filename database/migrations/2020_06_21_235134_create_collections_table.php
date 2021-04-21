@@ -85,6 +85,7 @@ class CreateCollectionsTable extends Migration
             ["category_id" => 2, "name" => "zalcano", "alias" => "Zalcano", "model" => "App\Boss\Zalcano"],
             ["category_id" => 2, "name" => "zulrah", "alias" => "Zulrah", "model" => "App\Boss\Zulrah"],
 
+            ["category_id" => 5, "name" => "all treasure trails", "alias" => "All Treasure Trails", "model" => "App\Clues\AllTreasureTrails"],
             ["category_id" => 5, "name" => "beginner treasure trails", "alias" => "Clue scroll (beginner)", "model" => "App\Clues\BeginnerTreasureTrails"],
             ["category_id" => 5, "name" => "easy treasure trails", "alias" => "Clue scroll (easy)", "model" => "App\Clues\EasyTreasureTrails"],
             ["category_id" => 5, "name" => "medium treasure trails", "alias" => "Clue scroll (medium)", "model" => "App\Clues\MediumTreasureTrails"],
