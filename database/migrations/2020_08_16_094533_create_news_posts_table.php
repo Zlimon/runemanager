@@ -15,9 +15,9 @@ class CreateNewsPostsTable extends Migration
     {
         Schema::create('news_posts', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->integer('category_id')->unsigned();
-            $table->integer('image_id')->unsigned()->default('1');
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('news_category_id')->constrained();
+            $table->foreignId('image_id')->constrained()->default('1');
             $table->string('title');
             $table->string('shortstory');
             $table->longText('longstory');

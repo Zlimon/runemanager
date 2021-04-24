@@ -16,7 +16,7 @@ class CreateAccountsTable extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
+            $table->foreignId('user_id')->constrained();
             $table->enum('account_type', Helper::listAccountTypes());
             $table->string('username', 13)->unique();
             $table->integer('rank')->default(0);

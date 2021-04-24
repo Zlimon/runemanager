@@ -16,7 +16,7 @@ class CreateAccountAuthStatusesTable extends Migration
     {
         Schema::create('account_auth_statuses', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
+            $table->foreignId('user_id')->constrained();
             $table->enum('account_type', Helper::listAccountTypes());
             $table->string('username', 13);
             $table->string('code', 8);
