@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Collection;
+use App\Skill;
 use DateTime;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -135,31 +136,7 @@ class Helper
 
     public static function listSkills()
     {
-        return [
-            "attack",
-            "defence",
-            "strength",
-            "hitpoints",
-            "ranged",
-            "prayer",
-            "magic",
-            "cooking",
-            "woodcutting",
-            "fletching",
-            "fishing",
-            "firemaking",
-            "crafting",
-            "smithing",
-            "mining",
-            "herblore",
-            "agility",
-            "thieving",
-            "slayer",
-            "farming",
-            "runecraft",
-            "hunter",
-            "construction"
-        ];
+        return Skill::pluck('name')->toArray();
     }
 
     public static function listClueScrollTiers()
