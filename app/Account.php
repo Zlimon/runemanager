@@ -48,7 +48,23 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function log() {
+        return $this->hasMany(Log::class);
+    }
+
+    public function logBroadcast() {
+        return $this->hasManyThrough(Broadcast::class, Log::class);
+    }
+
     public function equipment() {
         return $this->hasOne(Equipment::class);
+    }
+
+    public function bank() {
+        return $this->hasOne(Bank::class);
+    }
+
+    public function quest() {
+        return $this->hasOne(Quest::class);
     }
 }

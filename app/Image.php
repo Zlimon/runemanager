@@ -37,7 +37,7 @@ class Image extends Model
         'image_file_size'
     ];
 
-    public function image()
+    public function newspost()
     {
         return $this->hasMany(NewsPost::class);
     }
