@@ -235,16 +235,16 @@ class CreateCollectionsTable extends Migration
                 [
                     "category_id" => 2,
                     "order" => 29,
-                    "name" => "the nightmare",
-                    "alias" => "Nightmare",
-                    "model" => "App\Boss\TheNightmare"
+                    "name" => "nightmare",
+                    "alias" => "The Nightmare",
+                    "model" => "App\Boss\Nightmare"
                 ],
                 [
                     "category_id" => 2,
                     "order" => 30,
                     "name" => "the nightmare",
                     "alias" => "The Nightmare",
-                    "model" => "App\Boss\TheNightmare"
+                    "model" => "App\Boss\Nightmare"
                 ],
                 [
                     "category_id" => 2,
@@ -312,30 +312,30 @@ class CreateCollectionsTable extends Migration
                 [
                     "category_id" => 2,
                     "order" => 40,
-                    "name" => "the inferno",
-                    "alias" => "The Inferno",
-                    "model" => "App\Boss\TheInferno"
+                    "name" => "tzkal-zuk",
+                    "alias" => "TzKal-Zuk",
+                    "model" => "App\Boss\TzKalZuk"
                 ],
                 [
                     "category_id" => 2,
                     "order" => 41,
                     "name" => "the inferno",
                     "alias" => "TzKal-Zuk",
-                    "model" => "App\Boss\TheInferno"
+                    "model" => "App\Boss\TzKalZuk"
                 ],
                 [
                     "category_id" => 2,
                     "order" => 42,
-                    "name" => "the fight caves",
-                    "alias" => "The Fight Caves",
-                    "model" => "App\Boss\TheFightCaves"
+                    "name" => "tztok-jad",
+                    "alias" => "TzTok-Jad",
+                    "model" => "App\Boss\TzTokJad"
                 ],
                 [
                     "category_id" => 2,
                     "order" => 43,
                     "name" => "the fight caves",
                     "alias" => "TzTok-Jad",
-                    "model" => "App\Boss\TheFightCaves"
+                    "model" => "App\Boss\TzTokJad"
                 ],
                 [
                     "category_id" => 2,
@@ -349,7 +349,7 @@ class CreateCollectionsTable extends Migration
                     "order" => 45,
                     "name" => "vetion",
                     "alias" => "Vet'ion",
-                    "model" => "App\Boss\Vetion"
+                    "model" => "App\Boss\VetIon"
                 ],
                 [
                     "category_id" => 2,
