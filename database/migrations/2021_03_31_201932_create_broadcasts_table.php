@@ -15,7 +15,7 @@ class CreateBroadcastsTable extends Migration
     {
         Schema::create('broadcasts', function (Blueprint $table) {
             $table->id();
-            $table->integer('log_id')->unsigned();
+            $table->foreignId('log_id')->constrained();
             $table->enum('type', ['announcement', 'event', 'notification'])->default('notification');
             $table->string('icon');
             $table->string('message');
