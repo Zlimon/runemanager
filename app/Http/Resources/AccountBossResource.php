@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use App\Collection;
 use App\Helpers\Helper;
+use App\Collection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AccountBossResource extends JsonResource
@@ -32,21 +32,17 @@ class AccountBossResource extends JsonResource
 
     public function with($request)
     {
-        $bosses = Helper::listBosses();
-
         $bossHiscores = [];
 
-        foreach ($bosses as $bossName) {
-            $collection = Collection::where('name', $bossName)->firstOrFail();
+        foreach (Helper::listBosses() as $bossName) {
+            $boss = Collection::where('name', $bossName)->firstOrFail();
 
-            $bossHiscores[$bossName] = $collection->model::where('account_id', $this->id)->first();
-
-            $bossHiscores[$bossName]["boss_name"] = $bossName;
+            $bossHiscores[$bossName] = $boss->model::where('account_id', $this->id)->first();
         }
 
         return [
             'meta' => [
-                'bossHiscores' => BossResource::collection(collect($bossHiscores)),
+                'boss_hiscores' => BossResource::collection(collect($bossHiscores)),
             ]
         ];
     }

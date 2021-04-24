@@ -13,6 +13,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
+use App\Http\Resources\BossResource;
+use App\Http\Resources\SkillResource;
 use App\Log;
 use App\Skill;
 use Illuminate\Http\Request;
@@ -30,17 +32,40 @@ class AccountController extends Controller
      */
     public function show($accountUsername)
     {
-        return new AccountResource(Account::where('username', $accountUsername)->firstOrFail());
+        return new AccountResource(Account::whereUsername($accountUsername)->firstOrFail());
     }
 
-    public function skill($accountUsername)
+    public function skills($accountUsername)
     {
-        return new AccountSkillResource(Account::where('username', $accountUsername)->firstOrFail());
+        return new AccountSkillResource(Account::whereUsername($accountUsername)->firstOrFail());
     }
 
-    public function boss($accountUsername)
+    public function skill($accountUsername, $skillName)
     {
-        return new AccountBossResource(Account::where('username', $accountUsername)->firstOrFail());
+        $account = Account::whereUsername($accountUsername)->pluck('id');
+
+        $skill = Skill::where('name', $skillName)->firstOrFail();
+
+        return new SkillResource($skill->model::where('account_id', $account)->first());
+    }
+
+    public function bosses($accountUsername)
+    {
+        return new AccountBossResource(Account::whereUsername($accountUsername)->firstOrFail());
+    }
+
+    public function boss($accountUsername, $bossName)
+    {
+        $account = Account::whereUsername($accountUsername)->pluck('id');
+
+        // Allow only selecting bosses
+        $boss = Collection::where(
+            function ($query) use ($bossName) {
+                $query->where('category_id', '=', 2)
+                    ->orWhere('category_id', '=', 3);
+            })->where('name', $bossName)->firstOrFail();
+
+        return new BossResource($boss->model::where('account_id', $account)->first());
     }
 
     /**

@@ -44,9 +44,16 @@ Route::middleware('auth:api')->group(function() {
 
 Route::prefix('/account')->group(function() {
 	Route::get('/{account}', 'Api\AccountController@show')->name('account-show');
-	Route::get('/{account}/skill', 'Api\AccountController@skill')->name('account-show-skill');
-	Route::get('/{account}/boss', 'Api\AccountController@boss')->name('account-show-boss');
+
+	Route::get('/{account}/skill', 'Api\AccountController@skills')->name('account-show-skills');
+	Route::get('/{account}/skill/{skill}', 'Api\AccountController@skill')->name('account-show-skill');
+
+	Route::get('/{account}/boss', 'Api\AccountController@bosses')->name('account-show-bosses');
+	Route::get('/{account}/boss/{boss}', 'Api\AccountController@boss')->name('account-show-boss');
+
+	Route::get('/{accountUsername}/collection', 'Api\AccountCollectionController@show')->name('account-collection-show');
 	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
+
     Route::get('/{accountUsername}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
     Route::get('/{accountUsername}/bank', 'Api\AccountBankController@show')->name('account-bank-show');
     Route::get('/{accountUsername}/quests', 'Api\AccountQuestController@show')->name('account-quests-show');

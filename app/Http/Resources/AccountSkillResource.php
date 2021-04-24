@@ -3,8 +3,8 @@
 namespace App\Http\Resources;
 
 use App\Helpers\Helper;
+use App\Skill;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\DB;
 
 class AccountSkillResource extends JsonResource
 {
@@ -32,17 +32,17 @@ class AccountSkillResource extends JsonResource
 
     public function with($request)
     {
-        $skills = Helper::listSkills();
-
         $skillHiscores = [];
 
-        foreach ($skills as $skillName) {
-            $skillHiscores[$skillName] = DB::table($skillName)->where('account_id', $this->id)->first();
+        foreach (Helper::listSkills() as $skillName) {
+            $skill = Skill::where('name', $skillName)->firstOrFail();
+
+            $skillHiscores[$skillName] = $skill->model::where('account_id', $this->id)->first();
         }
 
         return [
             'meta' => [
-                'skillHiscores' => SkillResource::collection(collect($skillHiscores)),
+                'skill_hiscores' => SkillResource::collection(collect($skillHiscores)),
             ]
         ];
     }
