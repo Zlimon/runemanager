@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Woodcutting extends Model
 {
-    use HasFactory;
+    protected $table = 'woodcutting';
+
+    protected $hidden = ['user_id'];
+
+    public function account()
+    {
+        return $this->belongsTo(\App\Account::class);
+    }
 }

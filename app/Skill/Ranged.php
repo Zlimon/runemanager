@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ranged extends Model
 {
-    use HasFactory;
+    protected $table = 'ranged';
+
+    protected $hidden = ['user_id'];
+
+    public function account()
+    {
+        return $this->belongsTo(\App\Account::class);
+    }
 }

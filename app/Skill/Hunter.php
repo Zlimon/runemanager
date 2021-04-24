@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hunter extends Model
 {
-    use HasFactory;
+    protected $table = 'hunter';
+
+    protected $hidden = ['user_id'];
+
+    public function account()
+    {
+        return $this->belongsTo(\App\Account::class);
+    }
 }

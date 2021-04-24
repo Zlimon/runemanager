@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Prayer extends Model
 {
-    use HasFactory;
+    protected $table = 'prayer';
+
+    protected $hidden = ['user_id'];
+
+    public function account()
+    {
+        return $this->belongsTo(\App\Account::class);
+    }
 }

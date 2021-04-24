@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Construction extends Model
 {
-    use HasFactory;
+    protected $table = 'construction';
+
+    protected $hidden = ['user_id'];
+
+    public function account()
+    {
+        return $this->belongsTo(\App\Account::class);
+    }
 }
