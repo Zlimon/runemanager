@@ -233,7 +233,7 @@ class Helper
     }
 
     public static function getAccountIdFromUsername($accountUsername) {
-        return Account::whereUsername($accountUsername)->firstOrFail()->pluck('id');
+        return Account::whereUsername($accountUsername)->pluck('id');
     }
 
     public static function checkIfUserOwnsAccount($accountUsername) {
