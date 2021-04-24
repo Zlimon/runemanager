@@ -10,6 +10,7 @@ use App\Events\AccountLevelUp;
 
 use App\Events\AnnouncementAll;
 use App\Events\EventAll;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Log;
 
@@ -20,10 +21,7 @@ class AccountSkillController extends Controller
 {
     public function update($accountUsername, $skillName, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         DB::table($skillName)->where('account_id', $account->id)->update(['level' => $request->level]);
 

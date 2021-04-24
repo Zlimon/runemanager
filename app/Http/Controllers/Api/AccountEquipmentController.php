@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Account;
 use App\Equipment;
 use App\Events\AccountEquipment;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Log;
 use Carbon\Carbon;
@@ -32,10 +33,7 @@ class AccountEquipmentController extends Controller
 
     public function update($accountUsername, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         Equipment::updateOrInsert(
             ['account_id' => $account->id],
@@ -65,10 +63,7 @@ class AccountEquipmentController extends Controller
 
     public function updateDisplay($accountUsername)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         $equipment = Equipment::where('account_id', $account->id)->first();
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Helpers\Helper;
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
@@ -37,16 +38,12 @@ class HomeController extends Controller
 
     public function forceLogout($accountUsername)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
-        if ($account) {
-            $account->online = 0;
+        $account->online = 0;
 
-            $account->save();
+        $account->save();
 
-            return redirect()->back()->with('message', 'Account successfully logged out!');
-        } else {
-            return response("This account is not authenticated with " . auth()->user()->name, 401);
-        }
+        return redirect()->back()->with('message', 'Account successfully logged out!');
     }
 }

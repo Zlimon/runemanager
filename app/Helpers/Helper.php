@@ -237,6 +237,11 @@ class Helper
     }
 
     public static function checkIfUserOwnsAccount($accountUsername) {
-        return Account::whereUsername($accountUsername)->firstOrFail()->pluck('id');
+        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
+        if (!$account) {
+            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
+        }
+
+        return $account;
     }
 }

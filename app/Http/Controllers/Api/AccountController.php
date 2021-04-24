@@ -271,11 +271,7 @@ class AccountController extends Controller
 
     public function loginLogout($accountUsername, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         $account->online ^= 1;
 

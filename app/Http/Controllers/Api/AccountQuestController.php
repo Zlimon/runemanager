@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Account;
 use App\Events\AccountQuest;
+use App\Helpers\Helper;
 use App\Quest;
 use App\Events\AccountEquipment;
 use App\Http\Controllers\Controller;
@@ -33,10 +34,7 @@ class AccountQuestController extends Controller
 
     public function update($accountUsername, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         Quest::updateOrInsert(
             ['account_id' => $account->id],
@@ -66,10 +64,7 @@ class AccountQuestController extends Controller
 
     public function updateDisplay($accountUsername)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         $quests = Quest::where('account_id', $account->id)->first();
 

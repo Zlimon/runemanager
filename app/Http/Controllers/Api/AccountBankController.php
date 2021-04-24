@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Account;
 use App\Bank;
 use App\Events\AccountBank;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Log;
 use Carbon\Carbon;
@@ -32,10 +33,7 @@ class AccountBankController extends Controller
 
     public function update($accountUsername, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         // Check if someone has tried something funny
         if (sizeof($request->all()) > 816) {
@@ -80,10 +78,7 @@ class AccountBankController extends Controller
 
     public function updateDisplay($accountUsername)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         $bank = Bank::where('account_id', $account->id)->first();
 

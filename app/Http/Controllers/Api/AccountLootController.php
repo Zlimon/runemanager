@@ -19,10 +19,7 @@ class AccountLootController extends Controller
 {
     public function update($accountUsername, $collectionName, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
+        $account = Helper::checkIfUserOwnsAccount($accountUsername);
 
         $collection = Collection::where('alias', $collectionName)->first();
         if (!$collection) {
