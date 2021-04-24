@@ -35,18 +35,6 @@ class AccountController extends Controller
         return new AccountResource(Helper::getAccountFromUsername($accountUsername));
     }
 
-    public function skills($accountUsername)
-    {
-        return new AccountSkillResource(Helper::getAccountFromUsername($accountUsername));
-    }
-
-    public function skill($accountUsername, $skillName)
-    {
-        $skill = Skill::where('name', $skillName)->firstOrFail();
-
-        return new SkillResource($skill->model::where('account_id', Helper::getAccountIdFromUsername($accountUsername))->first());
-    }
-
     public function bosses($accountUsername)
     {
         return new AccountBossResource(Helper::getAccountFromUsername($accountUsername));
