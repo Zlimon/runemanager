@@ -15,9 +15,9 @@ class CreateLogsTable extends Migration
     {
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->integer('account_id')->unsigned();
-            $table->integer('category_id')->unsigned();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('account_id')->constrained();
+            $table->foreignId('category_id')->constrained();
             $table->string('action'); // TODO enum?
             $table->text('data')->nullable();
             $table->integer('total')->nullable();
