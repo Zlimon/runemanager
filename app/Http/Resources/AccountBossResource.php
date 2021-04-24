@@ -42,7 +42,7 @@ class AccountBossResource extends JsonResource
 
         return [
             'meta' => [
-                'boss_hiscores' => BossResource::collection(collect($bossHiscores)),
+                'boss_hiscores' => CollectionResource::collection(collect($bossHiscores)),
             ]
         ];
     }

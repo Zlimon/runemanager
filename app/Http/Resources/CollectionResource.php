@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use App\Helpers\Helper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BossResource extends JsonResource
+class CollectionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

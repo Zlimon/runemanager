@@ -13,7 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
-use App\Http\Resources\BossResource;
+use App\Http\Resources\CollectionResource;
 use App\Http\Resources\SkillResource;
 use App\Log;
 use App\Skill;
@@ -65,7 +65,7 @@ class AccountController extends Controller
                     ->orWhere('category_id', '=', 3);
             })->where('name', $bossName)->firstOrFail();
 
-        return new BossResource($boss->model::where('account_id', $account)->first());
+        return new CollectionResource($boss->model::where('account_id', $account)->first());
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Account;
 use App\Collection;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CollectionResource;
 use App\Log;
 use Illuminate\Http\Request;
 
@@ -62,25 +63,11 @@ class AccountCollectionController extends Controller
 
     public function show($accountUsername, $collectionName)
     {
-        $account = Account::where('username', $accountUsername)->first();
+        $account = Account::whereUsername($accountUsername)->pluck('id');
 
-        if ($account) {
-            $collection = Collection::where('alias', $collectionName)->firstOrFail();
+        $collection = Collection::where('name', $collectionName)->firstOrFail();
 
-            if ($collection) {
-                $collectionLog = $collection->model::where('account_id', $account->id)->first();
-
-                if ($collectionLog) {
-                    return response()->json($collectionLog, 200);
-                } else {
-                    return response("This account does not have any registered loot for " . $collection->name, 404);
-                }
-            } else {
-                return response("This collection could not be found", 404);
-            }
-        } else {
-            return response("This account is not authenticated with " . auth()->user()->name, 401);
-        }
+        return new CollectionResource($collection->model::where('account_id', $account)->first());
     }
 
     public function update($accountUsername, $collectionName, Request $request)
