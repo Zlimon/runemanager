@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class TzKalZuk extends Model
 {
-    protected $table = 'the_inferno';
+    protected $table = 'tzkal_zuk';
 
     protected $fillable = [
         'obtained',

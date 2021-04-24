@@ -14,12 +14,12 @@ class CreateCollectionsTable extends Migration
     public function up()
     {
         Schema::create('collections', function (Blueprint $table) {
-                $table->id();
-                $table->integer('category_id')->unsigned();
-                $table->integer('order')->unsigned()->unique();
-                $table->string('name');
-                $table->string('alias')->unique();
-                $table->string('model');
+            $table->id();
+            $table->integer('category_id')->unsigned();
+            $table->integer('order')->unsigned()->unique();
+            $table->string('name');
+            $table->string('alias')->unique();
+            $table->string('model');
         });
 
         /**
@@ -236,13 +236,13 @@ class CreateCollectionsTable extends Migration
                     "category_id" => 2,
                     "order" => 29,
                     "name" => "nightmare",
-                    "alias" => "The Nightmare",
+                    "alias" => "Nightmare",
                     "model" => "App\Boss\Nightmare"
                 ],
                 [
                     "category_id" => 2,
                     "order" => 30,
-                    "name" => "the nightmare",
+                    "name" => "nightmare",
                     "alias" => "The Nightmare",
                     "model" => "App\Boss\Nightmare"
                 ],
@@ -319,8 +319,8 @@ class CreateCollectionsTable extends Migration
                 [
                     "category_id" => 2,
                     "order" => 41,
-                    "name" => "the inferno",
-                    "alias" => "TzKal-Zuk",
+                    "name" => "tzkal-zuk",
+                    "alias" => "The Inferno",
                     "model" => "App\Boss\TzKalZuk"
                 ],
                 [
@@ -333,8 +333,8 @@ class CreateCollectionsTable extends Migration
                 [
                     "category_id" => 2,
                     "order" => 43,
-                    "name" => "the fight caves",
-                    "alias" => "TzTok-Jad",
+                    "name" => "tztok-jad",
+                    "alias" => "The Fight Caves",
                     "model" => "App\Boss\TzTokJad"
                 ],
                 [
