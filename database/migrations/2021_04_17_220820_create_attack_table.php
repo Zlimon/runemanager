@@ -15,7 +15,7 @@ class CreateAttackTable extends Migration
     {
         Schema::create('attack', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('log_id')->constrained();
+            $table->foreignId('account_id')->constrained();
             $table->integer('rank')->default(0);
             $table->integer('level')->default(1);
             $table->bigInteger('xp')->default(0);
