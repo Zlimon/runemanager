@@ -32,32 +32,28 @@ class AccountController extends Controller
      */
     public function show($accountUsername)
     {
-        return new AccountResource(Account::whereUsername($accountUsername)->firstOrFail());
+        return new AccountResource(Helper::getAccountIdFromUsername($accountUsername));
     }
 
     public function skills($accountUsername)
     {
-        return new AccountSkillResource(Account::whereUsername($accountUsername)->firstOrFail());
+        return new AccountSkillResource(Helper::getAccountIdFromUsername($accountUsername));
     }
 
     public function skill($accountUsername, $skillName)
     {
-        $account = Account::whereUsername($accountUsername)->pluck('id');
-
         $skill = Skill::where('name', $skillName)->firstOrFail();
 
-        return new SkillResource($skill->model::where('account_id', $account)->first());
+        return new SkillResource($skill->model::where('account_id', Helper::getAccountIdFromUsername($accountUsername))->first());
     }
 
     public function bosses($accountUsername)
     {
-        return new AccountBossResource(Account::whereUsername($accountUsername)->firstOrFail());
+        return new AccountBossResource(Helper::getAccountIdFromUsername($accountUsername));
     }
 
     public function boss($accountUsername, $bossName)
     {
-        $account = Account::whereUsername($accountUsername)->pluck('id');
-
         // Allow only selecting bosses
         $boss = Collection::where(
             function ($query) use ($bossName) {
@@ -65,7 +61,7 @@ class AccountController extends Controller
                     ->orWhere('category_id', '=', 3);
             })->where('name', $bossName)->firstOrFail();
 
-        return new CollectionResource($boss->model::where('account_id', $account)->first());
+        return new CollectionResource($boss->model::where('account_id', Helper::getAccountIdFromUsername($accountUsername))->first());
     }
 
     /**

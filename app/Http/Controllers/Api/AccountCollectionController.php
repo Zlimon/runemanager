@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Account;
 use App\Collection;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CollectionResource;
 use App\Log;
@@ -63,11 +64,9 @@ class AccountCollectionController extends Controller
 
     public function show($accountUsername, $collectionName)
     {
-        $account = Account::whereUsername($accountUsername)->pluck('id');
-
         $collection = Collection::where('name', $collectionName)->firstOrFail();
 
-        return new CollectionResource($collection->model::where('account_id', $account)->first());
+        return new CollectionResource($collection->model::where('account_id', Helper::getAccountIdFromUsername($accountUsername))->first());
     }
 
     public function update($accountUsername, $collectionName, Request $request)

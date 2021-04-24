@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Account;
 use App\Collection;
 use App\Skill;
 use DateTime;
@@ -229,5 +230,13 @@ class Helper
                 Storage::disk('items')->put('items/' . $imgName, file_get_contents($url));
             }
         }
+    }
+
+    public static function getAccountIdFromUsername($accountUsername) {
+        return Account::whereUsername($accountUsername)->firstOrFail()->pluck('id');
+    }
+
+    public static function checkIfUserOwnsAccount($accountUsername) {
+        return Account::whereUsername($accountUsername)->firstOrFail()->pluck('id');
     }
 }
