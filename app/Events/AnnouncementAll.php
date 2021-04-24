@@ -2,27 +2,29 @@
 
 namespace App\Events;
 
-use App\Notification;
+use App\Broadcast;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class All implements ShouldBroadcast
+class AnnouncementAll implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $notification;
+    public $broadcast;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Notification $notification)
+    public function __construct(Broadcast $broadcast)
     {
-        $this->notification = $notification::with('log')->with('log.category')->orderByDesc('id')->first();
+        $this->broadcast = $broadcast::with('log')->with('log.category')->where('type', 'announcement')->orderByDesc('id')->first();
     }
 
     /**

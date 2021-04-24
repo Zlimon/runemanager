@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Account;
 use App\AccountAuthStatus;
+use App\Broadcast;
 use App\Collection;
 use App\Events\AccountAll;
 use App\Events\AccountOnline;
 use App\Events\All;
+use App\Events\EventAll;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountBossResource;
@@ -104,8 +106,10 @@ class AccountController extends Controller
         ]);
 
         $skills = Helper::listSkills();
+        $skillsCount = count($skills);
 
-        for ($i = 0; $i < count($skills); $i++) {
+        // TODO replace with Eloquent models
+        for ($i = 0; $i < $skillsCount; $i++) {
             DB::table($skills[$i])->insert([
                 'account_id' => $account->id,
                 'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
@@ -116,17 +120,31 @@ class AccountController extends Controller
             ]);
         }
 
-        $clueScrollAmount = count(Helper::listClueScrollTiers());
+        $clues = Helper::listClueScrollTiers();
+        $cluesCount = count($clues);
+        $cluesIndex = 0;
+
+        for ($i = ($skillsCount + 3); $i < ($skillsCount + 3 + $cluesCount); $i++) {
+            $collection = Collection::where('name', $clues[$cluesIndex] . ' treasure trails')->firstOrFail();
+
+            $clueLog = new $collection->model;
+
+            $clueLog->account_id = $account->id;
+            $clueLog->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            $clueLog->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+
+            $clueLog->save();
+
+            $cluesIndex++;
+        }
 
         $bosses = Helper::listBosses();
-
         array_splice($bosses, 13, 1);
-
         $bossIndex = 0;
 
         $dksKillCount = 0;
 
-        for ($i = (count($skills) + $clueScrollAmount + 5); $i < (count($skills) + $clueScrollAmount + 5 + count($bosses)); $i++) {
+        for ($i = ($skillsCount + $cluesCount + 5); $i < ($skillsCount + $cluesCount + 5 + count($bosses)); $i++) {
             $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
 
             $collectionLog = new $collection->model;
@@ -200,15 +218,16 @@ class AccountController extends Controller
 
         $log = Log::create($logData);
 
-        $notificationData = [
+        $eventData = [
             "log_id" => $log->id,
+            "type" => "event",
             "icon" => auth()->user()->icon_id,
             "message" => $accountUsername . " has logged " . ($account->online ? 'in' : 'out') . "!",
         ];
 
-        $notification = Notification::create($notificationData);
+        $event = Broadcast::create($eventData);
 
-        All::dispatch($notification);
+        EventAll::dispatch($event);
 
         AccountOnline::dispatch($account);
 

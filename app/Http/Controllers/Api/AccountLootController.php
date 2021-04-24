@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Account;
+use App\Broadcast;
 use App\Collection;
-use App\Events\AccountAll;
-use App\Events\AccountKill;
+use App\Events\AccountEvent;
 use App\Events\AccountNewUnique;
-use App\Events\All;
+use App\Events\AnnouncementAll;
+use App\Events\EventAll;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Log;
-use App\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -132,31 +133,43 @@ class AccountLootController extends Controller
 
         $log = Log::create($logData);
 
-        $notificationData = [
+        switch ($log->category_id) {
+            case 5:
+                $noun = " opened a ";
+                break;
+            case 6:
+                $noun = " finished a game of ... and received ";
+                break;
+            default:
+                $noun = " defeated ";
+                break;
+        }
+
+        $eventData = [
             "log_id" => $log->id,
+            "type" => "event",
             "icon" => $collectionLog->getTable(),
-            "message" => $accountUsername . " defeated " . $collection->alias . "!",
+            "message" => $accountUsername . $noun . $collection->alias . "!",
         ];
 
-        $notification = Notification::create($notificationData);
+        $event = Broadcast::create($eventData);
 
-        All::dispatch($notification);
+        EventAll::dispatch($event);
 
-        AccountAll::dispatch($account, $notification);
+        AccountEvent::dispatch($account, $event);
 
-        AccountKill::dispatch($account, $notification);
-
-        $uniquesList = [];
+        $unlockedUniquesList = [];
 
         foreach ($data["metadata"] as $key => $metaData) {
-            if (isset($metaData["name"]) &&  in_array($metaData["name"], $uniques)) {
-                $uniquesList[] = $metaData;
+            if (isset($metaData["name"]) && in_array($metaData["name"], $uniques)) {
+                $unlockedUniquesList[] = $metaData;
             }
         }
 
-        if ($uniquesList) {
+        // If new unique unlocked
+        if ($unlockedUniquesList) {
             $data["type"] = "UNIQUE";
-            $data["metadata"] = $uniquesList;
+            $data["metadata"] = $unlockedUniquesList;
             unset($data["drops"]);
             unset($data["oldCollection"]);
             unset($data["updatedCollection"]);
@@ -171,19 +184,61 @@ class AccountLootController extends Controller
 
             $log = Log::create($logData);
 
-            $notificationData = [
+            $eventData = [
                 "log_id" => $log->id,
+                "type" => "event",
                 "icon" => $collectionLog->getTable(),
-                "message" => $accountUsername . " unlocked " . (count($uniquesList) == 1 ? " a new unique" : "new uniques") . "!",
+                "message" => $accountUsername . " unlocked " . (count($unlockedUniquesList) == 1 ? " a new unique" : "new uniques") . "!",
             ];
 
-            $notification = Notification::create($notificationData);
+            $event = Broadcast::create($eventData);
 
-            All::dispatch($notification);
+            EventAll::dispatch($event);
 
-            AccountAll::dispatch($account, $notification);
+            AccountEvent::dispatch($account, $event);
 
-            AccountNewUnique::dispatch($account, $notification);
+            if (!in_array(str_replace('_treasure_trails', '', $collectionLog->getTable()), Helper::listClueScrollTiers())) {
+                $unlockedUniquesItemsList = [];
+                foreach ($data["metadata"] as $metaData) {
+                    $unlockedUniquesItemsList[] = ucfirst(str_replace("_", " ", $metaData["name"]));
+                }
+
+                $uniqueItems = implode(" and ", $unlockedUniquesItemsList);
+
+                $announcementData = [
+                    "log_id" => $log->id,
+                    "type" => "announcement",
+                    "icon" => $collectionLog->getTable(),
+                    "message" => $accountUsername . " unlocked " . (count($unlockedUniquesList) == 1 ? " a new unique" : "new uniques") . ": " . $uniqueItems . " from " . $collection->alias . " at " . $newCollectionValues["kill_count"] . " kills!",
+                ];
+
+                $announcement = Broadcast::create($announcementData);
+
+                AnnouncementAll::dispatch($announcement);
+            } else if (in_array(str_replace('_treasure_trails', '', $collectionLog->getTable()), Helper::listClueScrollTiers())) {
+                // TODO add all "exclusive" Clue Scroll items / 3rd age, Gilded
+            }
+        // If already unlocked unique, but a unique item drop
+        } else if ($data['updatedCollection']) {
+            if (!in_array(str_replace('_treasure_trails', '', $collectionLog->getTable()), Helper::listClueScrollTiers())) {
+                $unlockedUniquesItemsList = [];
+                foreach ($data['updatedCollection'] as $uniqueItem => $amount) {
+                    $unlockedUniquesItemsList[] = ucfirst(str_replace("_", " ", $uniqueItem));
+                }
+
+                $uniqueItems = implode(", ", $unlockedUniquesItemsList);
+
+                $announcementData = [
+                    "log_id" => $log->id,
+                    "type" => "announcement",
+                    "icon" => $collectionLog->getTable(),
+                    "message" => $accountUsername . " has received a " . $uniqueItems . " drop from " . $collection->alias . " at " . $newCollectionValues["kill_count"] . " kills!",
+                ];
+
+                $announcement = Broadcast::create($announcementData);
+
+                AnnouncementAll::dispatch($announcement);
+            }
         }
 
         return response("Submitted loot for " . $collection->alias, 200);

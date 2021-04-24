@@ -1,38 +1,37 @@
 <template>
     <div>
-        <div v-for="(notification, index) in notifications">
+        <div v-for="(broadcast, index) in broadcasts">
             <div class="background-dialog-iron-rivets p-2 mb-2" style="position:relative;">
                 <div class="d-flex flex-row flex-wrap justify-content-center">
                     <div class="col-3 col-sm-4" style="padding: 0; margin: 0;">
-                        <div v-if="isNaN(notification.icon)">
+                        <div v-if="isNaN(broadcast.icon)">
                             <img alt="Notification icon'"
-                                 :src="'/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '.png'"
-                                 class="pixel notification-icon">
+                                 :src="'/images/' + broadcast.log.category.category + '/' + broadcast.icon.replace(/ /g,'_') + '.png'"
+                                 class="pixel broadcast-icon">
                         </div>
                         <div v-else>
                             <img alt="Notification icon"
-                                 :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + notification.icon + '.png'"
-                                 class="pixel notification-icon">
+                                 :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + broadcast.icon + '.png'"
+                                 class="pixel broadcast-icon">
                         </div>
                     </div>
 
                     <div class="col" style="padding: 0; margin: 0;">
-                        <span>{{ notification.message }}</span>
+                        <span>{{ broadcast.message }}</span>
                     </div>
                 </div>
 
-
-                <div v-if="notification.log !== null">
-                    <div v-if="notification.log.action === 'account-loot-update'">
-                        <div v-if="notification.log.data.type === 'NPC'">
-                            <div v-if="notification.log.data.updatedCollection !== null && Object.keys(notification.log.data.updatedCollection).length > 0">
+                <div v-if="broadcast.log !== null">
+                    <div v-if="broadcast.log.action === 'account-loot-update'">
+                        <div v-if="broadcast.log.data.type === 'NPC'">
+                            <div v-if="broadcast.log.data.updatedCollection !== null && Object.keys(broadcast.log.data.updatedCollection).length > 0">
                                 <h3 class="text-center">Received loot:</h3>
                                 <div class="d-flex flex-row flex-wrap justify-content-center">
-                                    <div v-for="(count, index) in notification.log.data.updatedCollection"
+                                    <div v-for="(count, index) in broadcast.log.data.updatedCollection"
                                          class="background-world-map mx-2 p-1">
                                         <img
                                             :alt="index.replaceAll('_', ' ') + ' item icon'"
-                                            :src="!isNaN(notification.icon) ? '/storage/items/' + index + '.png' : '/images/' + notification.log.category.category + '/' + notification.icon.replace(/ /g,'_') + '/' + index + '.png'"
+                                            :src="!isNaN(broadcast.icon) ? '/storage/items/' + index + '.png' : '/images/' + broadcast.log.category.category + '/' + broadcast.icon.replace(/ /g,'_') + '/' + index + '.png'"
                                             :title="index.replaceAll('_', ' ') + ' x ' + count | capitalize"
                                             class="pixel hiscore-icon">
                                     </div>
@@ -40,11 +39,11 @@
                             </div>
                         </div>
 
-                        <div v-else-if="notification.log.data.type === 'EVENT'">
-                            <div v-if="notification.log.data.metadata !== null && Object.keys(notification.log.data.metadata).length > 0">
+                        <div v-else-if="broadcast.log.data.type === 'EVENT'">
+                            <div v-if="broadcast.log.data.metadata !== null && Object.keys(broadcast.log.data.metadata).length > 0">
                                 <h3 class="text-center">Received loot:</h3>
                                 <div class="d-flex flex-row flex-wrap justify-content-center">
-                                    <div v-for="loot in notification.log.data.metadata"
+                                    <div v-for="loot in broadcast.log.data.metadata"
                                          class="background-world-map mx-2 p-1">
                                         <img
                                             :alt="loot.name.replaceAll('_', ' ') + ' item icon'"
@@ -55,19 +54,19 @@
                                 </div>
 
                                 <div class="text-center">
-                                    <small>Total value: {{ notification.log.total}} gp</small>
+                                    <small>Total value: {{ broadcast.log.total}} gp</small>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-else-if="notification.log.data.type === 'UNIQUE'">
-                            <div v-if="notification.log.data.metadata !== null && Object.keys(notification.log.data.metadata).length > 0">
+                        <div v-else-if="broadcast.log.data.type === 'UNIQUE'">
+                            <div v-if="broadcast.log.data.metadata !== null && Object.keys(broadcast.log.data.metadata).length > 0">
                                 <div class="d-flex flex-row flex-wrap justify-content-center">
-                                    <div v-for="loot in notification.log.data.metadata"
+                                    <div v-for="loot in broadcast.log.data.metadata"
                                          class="background-world-map mx-2 p-1">
                                         <img
                                             :alt="loot.name.replaceAll('_', ' ') + ' item icon'"
-                                            :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + loot.id + '.png'"
+                                            :src="'/images/' + broadcast.log.category.category + '/' + broadcast.icon.replace(/ /g,'_') + '/' + loot.name + '.png'"
                                             :title="loot.name.replaceAll('_', ' ') + ' x ' + loot.quantity | capitalize"
                                             class="pixel hiscore-icon">
                                     </div>
@@ -78,7 +77,7 @@
                 </div>
 
                 <div class="text-right">
-                    <small class="text-muted" :title="notification.log.created_at | moment('dddd, MMMM Do YYYY, hh:mm:ss')">{{ notification.log.created_at | moment("from") | capitalize }}</small>
+                    <small class="text-muted" :title="broadcast.log.created_at | moment('dddd, MMMM Do YYYY, hh:mm:ss')">{{ broadcast.log.created_at | moment("from") | capitalize }}</small>
                 </div>
             </div>
         </div>
@@ -88,7 +87,7 @@
 <script>
 export default {
     props: {
-        notifications: {required: true},
+        broadcasts: {required: true},
     },
 
     filters: {

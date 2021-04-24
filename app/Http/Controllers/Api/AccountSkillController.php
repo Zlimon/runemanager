@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Account;
+use App\Broadcast;
 use App\Events\AccountAll;
+use App\Events\AccountEvent;
 use App\Events\AccountLevelUp;
-use App\Events\All;
+
+use App\Events\AnnouncementAll;
+use App\Events\EventAll;
 use App\Http\Controllers\Controller;
 use App\Log;
-use App\Notification;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -35,19 +39,31 @@ class AccountSkillController extends Controller
 
         $log = Log::create($logData);
 
-        $notificationData = [
+        $eventData = [
             "log_id" => $log->id,
+            "type" => 'event',
             "icon" => strtolower($skillName),
-            "message" => $accountUsername . " just achieved level " . $skill->level . " " . ucfirst($skillName) . "!" . ($skill->level === 92 ? " Half way there!" : ""),
+            "message" => $accountUsername . " just achieved level " . $skill->level . " " . ucfirst($skillName) . "!",
         ];
 
-        $notification = Notification::create($notificationData);
+        $event = Broadcast::create($eventData);
 
-        All::dispatch($notification);
+        EventAll::dispatch($event);
 
-        AccountAll::dispatch($account, $notification);
+        AccountEvent::dispatch($account, $event);
 
-        AccountLevelUp::dispatch($account, $notification);
+        if ($skill->level == 99) {
+            $announcementData = [
+                "log_id" => $log->id,
+                "type" => 'announcement',
+                "icon" => strtolower($skillName),
+                "message" => $accountUsername . " has achieved level 99 " . ucfirst($skillName) . "!",
+            ];
+
+            $announcement = Broadcast::create($announcementData);
+
+            AnnouncementAll::dispatch($announcement);
+        }
 
         return response("Advanced " . ucfirst($skillName) . " level for " . $accountUsername . " to level " . $request->level, 200);
     }
