@@ -1,10 +1,10 @@
 <?php
-// TODO remove later
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGoblinTable extends Migration
+class CreateZalcanoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,16 @@ class CreateGoblinTable extends Migration
      */
     public function up()
     {
-        Schema::create('goblin', function (Blueprint $table) {
+        Schema::create('zalcano', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->constrained();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->integer('rank')->default(0)->unsigned();
             $table->integer('obtained')->default(0)->unsigned();
-            $table->integer('bones')->default(0)->unsigned();
-            $table->integer('water_rune')->default(0)->unsigned();
-            $table->integer('coins')->default(0)->unsigned();
-            $table->integer('hammer')->default(0)->unsigned();
-            $table->integer('beer')->default(0)->unsigned();
-            $table->integer('goblin_mail')->default(0)->unsigned();
+            $table->integer('smolcano')->default(0)->unsigned();
+            $table->integer('crystal_tool_seed')->default(0)->unsigned();
+            $table->integer('zalcano_shard')->default(0)->unsigned();
+            $table->integer('uncut_onyx')->default(0)->unsigned();
             $table->timestamps();
         });
     }
@@ -36,6 +34,6 @@ class CreateGoblinTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('goblin');
+        Schema::dropIfExists('zalcano');
     }
 }

@@ -1,10 +1,10 @@
 <?php
-// TODO remove later
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGoblinTable extends Migration
+class CreateCerberusTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,19 @@ class CreateGoblinTable extends Migration
      */
     public function up()
     {
-        Schema::create('goblin', function (Blueprint $table) {
+        Schema::create('cerberus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->constrained();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->integer('rank')->default(0)->unsigned();
             $table->integer('obtained')->default(0)->unsigned();
-            $table->integer('bones')->default(0)->unsigned();
-            $table->integer('water_rune')->default(0)->unsigned();
-            $table->integer('coins')->default(0)->unsigned();
-            $table->integer('hammer')->default(0)->unsigned();
-            $table->integer('beer')->default(0)->unsigned();
-            $table->integer('goblin_mail')->default(0)->unsigned();
+            $table->integer('hellpuppy')->default(0)->unsigned();
+            $table->integer('eternal_crystal')->default(0)->unsigned();
+            $table->integer('pegasian_crystal')->default(0)->unsigned();
+            $table->integer('primordial_crystal')->default(0)->unsigned();
+            $table->integer('jar_of_souls')->default(0)->unsigned();
+            $table->integer('smouldering_stone')->default(0)->unsigned();
+            $table->integer('key_master_teleport')->default(0)->unsigned();
             $table->timestamps();
         });
     }
@@ -36,6 +37,6 @@ class CreateGoblinTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('goblin');
+        Schema::dropIfExists('cerberus');
     }
 }
