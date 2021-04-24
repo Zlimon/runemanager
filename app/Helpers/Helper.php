@@ -232,8 +232,12 @@ class Helper
         }
     }
 
+    public static function getAccountFromUsername($accountUsername) {
+        return Account::whereUsername($accountUsername)->first();
+    }
+
     public static function getAccountIdFromUsername($accountUsername) {
-        return Account::whereUsername($accountUsername)->pluck('id');
+        return Account::whereUsername($accountUsername)->pluck('id')->first();
     }
 
     public static function checkIfUserOwnsAccount($accountUsername) {

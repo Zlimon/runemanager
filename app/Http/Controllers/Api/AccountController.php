@@ -32,12 +32,12 @@ class AccountController extends Controller
      */
     public function show($accountUsername)
     {
-        return new AccountResource(Helper::getAccountIdFromUsername($accountUsername));
+        return new AccountResource(Helper::getAccountFromUsername($accountUsername));
     }
 
     public function skills($accountUsername)
     {
-        return new AccountSkillResource(Helper::getAccountIdFromUsername($accountUsername));
+        return new AccountSkillResource(Helper::getAccountFromUsername($accountUsername));
     }
 
     public function skill($accountUsername, $skillName)
@@ -49,7 +49,7 @@ class AccountController extends Controller
 
     public function bosses($accountUsername)
     {
-        return new AccountBossResource(Helper::getAccountIdFromUsername($accountUsername));
+        return new AccountBossResource(Helper::getAccountFromUsername($accountUsername));
     }
 
     public function boss($accountUsername, $bossName)
