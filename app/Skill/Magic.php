@@ -9,6 +9,8 @@ class Magic extends Model
 {
     protected $table = 'magic';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

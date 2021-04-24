@@ -9,6 +9,8 @@ class Strength extends Model
 {
     protected $table = 'strength';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

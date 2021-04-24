@@ -9,6 +9,8 @@ class Prayer extends Model
 {
     protected $table = 'prayer';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

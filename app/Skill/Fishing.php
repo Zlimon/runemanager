@@ -9,6 +9,8 @@ class Fishing extends Model
 {
     protected $table = 'fishing';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

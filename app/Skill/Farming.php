@@ -9,6 +9,8 @@ class Farming extends Model
 {
     protected $table = 'farming';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

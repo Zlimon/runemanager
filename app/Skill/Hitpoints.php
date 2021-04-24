@@ -9,6 +9,8 @@ class Hitpoints extends Model
 {
     protected $table = 'hitpoints';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

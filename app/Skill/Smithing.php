@@ -9,6 +9,8 @@ class Smithing extends Model
 {
     protected $table = 'smithing';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

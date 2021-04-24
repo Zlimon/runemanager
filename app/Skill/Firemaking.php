@@ -9,6 +9,8 @@ class Firemaking extends Model
 {
     protected $table = 'firemaking';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

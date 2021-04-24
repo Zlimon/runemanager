@@ -9,6 +9,8 @@ class Construction extends Model
 {
     protected $table = 'construction';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

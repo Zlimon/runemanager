@@ -9,6 +9,8 @@ class Fletching extends Model
 {
     protected $table = 'fletching';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

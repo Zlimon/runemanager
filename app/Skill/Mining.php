@@ -9,6 +9,8 @@ class Mining extends Model
 {
     protected $table = 'mining';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

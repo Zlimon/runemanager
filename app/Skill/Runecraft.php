@@ -9,6 +9,8 @@ class Runecraft extends Model
 {
     protected $table = 'runecraft';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

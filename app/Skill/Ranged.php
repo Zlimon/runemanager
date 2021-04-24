@@ -9,6 +9,8 @@ class Ranged extends Model
 {
     protected $table = 'ranged';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

@@ -9,6 +9,8 @@ class Woodcutting extends Model
 {
     protected $table = 'woodcutting';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

@@ -9,6 +9,8 @@ class Crafting extends Model
 {
     protected $table = 'crafting';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

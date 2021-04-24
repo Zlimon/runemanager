@@ -9,6 +9,8 @@ class Slayer extends Model
 {
     protected $table = 'slayer';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

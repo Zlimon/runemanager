@@ -9,6 +9,8 @@ class Cooking extends Model
 {
     protected $table = 'cooking';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

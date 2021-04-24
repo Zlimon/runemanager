@@ -9,6 +9,8 @@ class Attack extends Model
 {
     protected $table = 'attack';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

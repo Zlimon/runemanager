@@ -9,6 +9,8 @@ class Hunter extends Model
 {
     protected $table = 'hunter';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

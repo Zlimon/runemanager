@@ -9,6 +9,8 @@ class Herblore extends Model
 {
     protected $table = 'herblore';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()

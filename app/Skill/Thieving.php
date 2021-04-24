@@ -9,6 +9,8 @@ class Thieving extends Model
 {
     protected $table = 'thieving';
 
+    protected $fillable = ['level'];
+
     protected $hidden = ['user_id'];
 
     public function account()
