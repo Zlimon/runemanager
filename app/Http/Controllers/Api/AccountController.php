@@ -51,11 +51,14 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => ['required', 'string', 'min:1', 'max:13'],
-            'code' => ['required', 'string', 'min:1', 'max:8'],
-            'account_type' => ['required', Rule::in(Helper::listAccountTypes())],
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'username' => ['required', 'string', 'min:1', 'max:13'],
+                'code' => ['required', 'string', 'min:1', 'max:8'],
+                'account_type' => ['required', Rule::in(Helper::listAccountTypes())],
+            ]
+        );
 
         if ($validator->fails()) {
             foreach ($validator->messages()->all() as $value) {
@@ -75,16 +78,23 @@ class AccountController extends Controller
         }
 
         if (request('account_type') !== $authStatus->account_type) {
-            return response("This account is registered as " . lcfirst(Helper::formatAccountTypeName($authStatus->account_type)) . ", not " . request('account_type'),
-                    406);
+            return response(
+                "This account is registered as " . lcfirst(
+                    Helper::formatAccountTypeName($authStatus->account_type)
+                ) . ", not " . request('account_type'),
+                406
+            );
         }
 
         if (request('code') !== $authStatus->code) {
             return response("Invalid code", 406);
         }
 
-        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(' ',
-                '%20', $accountUsername);
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $accountUsername
+            );
 
         /* Get the $playerDataUrl file content. */
         $playerData = Helper::getPlayerData($playerDataUrl);
@@ -170,8 +180,11 @@ class AccountController extends Controller
             $bossCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
             $bossCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-            if (in_array($bosses[$bossIndex],
-                ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
+            if (in_array(
+                $bosses[$bossIndex],
+                ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'],
+                true
+            )) {
                 $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
             }
 
