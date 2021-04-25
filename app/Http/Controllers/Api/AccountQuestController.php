@@ -32,10 +32,8 @@ class AccountQuestController extends Controller
         }
     }
 
-    public function update($accountUsername, Request $request)
+    public function update(Account $account, Request $request)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
         Quest::updateOrInsert(
             ['account_id' => $account->id],
             [
@@ -59,17 +57,14 @@ class AccountQuestController extends Controller
 
         AccountQuest::dispatch($quests);
 
-        return response("Updated quest list for " . $accountUsername, 200);
+        return response("Updated quest list for " . $account->username, 200);
     }
 
-    public function updateDisplay($accountUsername)
+    public function updateDisplay(Account $account)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
         $quests = Quest::where('account_id', $account->id)->first();
-
         if (!$quests) {
-            return response("No quests for " . $accountUsername . " were found!", 404);
+            return response("No quests for " . $account->username . " were found!", 404);
         }
 
         $quests->display ^= 1;
@@ -78,6 +73,6 @@ class AccountQuestController extends Controller
 
         AccountQuest::dispatch($quests);
 
-        return response(($quests->display === 1 ? "Displaying" : "No longer displaying") . " quest journals for " . $accountUsername, 200);
+        return response(($quests->display === 1 ? "Displaying" : "No longer displaying") . " quest journals for " . $account->username, 200);
     }
 }

@@ -22,7 +22,7 @@ Route::middleware('auth:api')->group(function() {
 	Route::get('/user', 'Api\UserController@user')->name('user-show');
 	Route::post('/authenticate', 'Api\AccountController@store')->name('authenticate'); // Authenticate user
 
-	Route::prefix('/account')->group(function() {
+	Route::prefix('/account')->middleware('user.account')->group(function() {
         Route::put('/{accountUsername}/login', 'Api\AccountController@loginLogout')->name('account-login'); // Make account online
         Route::put('/{accountUsername}/logout', 'Api\AccountController@loginLogout')->name('account-logout'); // Make account offline
 
@@ -31,14 +31,14 @@ Route::middleware('auth:api')->group(function() {
         Route::post('/{accountUsername}/lootcrate', 'Api\AccountLootCrateController@store')->name('account-loot-crate-store'); // Store loot crate data - Wintertodt, Barbarian assault, Soul Wars, etc.
 		Route::post('/{accountUsername}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
 
-        Route::post('/{accountUsername}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
-        Route::patch('/{accountUsername}/equipment', 'Api\AccountEquipmentController@updateDisplay')->name('account-equipment-update-display');
+        Route::post('/{account}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
+        Route::patch('/{account}/equipment', 'Api\AccountEquipmentController@updateDisplay')->name('account-equipment-update-display');
 
-        Route::post('/{accountUsername}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
-        Route::patch('/{accountUsername}/bank', 'Api\AccountBankController@updateDisplay')->name('account-bank-update-display');
+        Route::post('/{account}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
+        Route::patch('/{account}/bank', 'Api\AccountBankController@updateDisplay')->name('account-bank-update-display');
 
-        Route::post('/{accountUsername}/quests', 'Api\AccountQuestController@update')->name('account-quests-update');
-        Route::patch('/{accountUsername}/quests', 'Api\AccountQuestController@updateDisplay')->name('account-quests-update-display');
+        Route::post('/{account}/quests', 'Api\AccountQuestController@update')->name('account-quests-update');
+        Route::patch('/{account}/quests', 'Api\AccountQuestController@updateDisplay')->name('account-quests-update-display');
     });
 });
 

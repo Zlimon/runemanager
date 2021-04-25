@@ -67,4 +67,9 @@ class Account extends Model
     public function quest() {
         return $this->hasOne(Quest::class);
     }
+
+    public function getRouteKeyName()
+    {
+        return 'username';
+    }
 }

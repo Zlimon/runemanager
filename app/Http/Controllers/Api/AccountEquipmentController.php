@@ -31,10 +31,8 @@ class AccountEquipmentController extends Controller
         }
     }
 
-    public function update($accountUsername, Request $request)
+    public function update(Account $account, Request $request)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
         Equipment::updateOrInsert(
             ['account_id' => $account->id],
             [
@@ -58,17 +56,14 @@ class AccountEquipmentController extends Controller
 
         AccountEquipment::dispatch($equipment);
 
-        return response("Updated equipment for " . $accountUsername, 200);
+        return response("Updated equipment for " . $account->username, 200);
     }
 
-    public function updateDisplay($accountUsername)
+    public function updateDisplay(Account $account)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
         $equipment = Equipment::where('account_id', $account->id)->first();
-
         if (!$equipment) {
-            return response("No equipment for " . $accountUsername . " were found!", 404);
+            return response("No equipment for " . $account->username . " were found!", 404);
         }
 
         $equipment->display ^= 1;
@@ -77,6 +72,6 @@ class AccountEquipmentController extends Controller
 
         AccountEquipment::dispatch($equipment);
 
-        return response(($equipment->display === 1 ? "Displaying" : "No longer displaying") . " equipment for " . $accountUsername, 200);
+        return response(($equipment->display === 1 ? "Displaying" : "No longer displaying") . " equipment for " . $account->username, 200);
     }
 }

@@ -31,11 +31,8 @@ class AccountBankController extends Controller
         }
     }
 
-    public function update($accountUsername, Request $request)
+    public function update(Account $account, Request $request)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
-        // Check if someone has tried something funny
         if (sizeof($request->all()) > 816) {
             return response("Not funny", 406);
         }
@@ -73,17 +70,14 @@ class AccountBankController extends Controller
 
         AccountBank::dispatch($account);
 
-        return response("Updated bank for " . $accountUsername, 200);
+        return response("Updated bank for " . $account->username, 200);
     }
 
-    public function updateDisplay($accountUsername)
+    public function updateDisplay(Account $account)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
         $bank = Bank::where('account_id', $account->id)->first();
-
         if (!$bank) {
-            return response("No bank for " . $accountUsername . " were found!", 404);
+            return response("No bank for " . $account->username . " were found!", 404);
         }
 
         $bank->display ^= 1;
@@ -92,6 +86,6 @@ class AccountBankController extends Controller
 
         AccountBank::dispatch($account);
 
-        return response(($bank->display === 1 ? "Displaying" : "No longer displaying") . " bank for " . $accountUsername, 200);
+        return response(($bank->display === 1 ? "Displaying" : "No longer displaying") . " bank for " . $account->username, 200);
     }
 }
