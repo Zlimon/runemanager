@@ -22,31 +22,25 @@ use Illuminate\Support\Facades\DB;
 
 class AccountSkillController extends Controller
 {
-    public function index($accountUsername)
+    public function index(Account $account)
     {
-        return new AccountSkillResource(Helper::getAccountFromUsername($accountUsername));
+        return new AccountSkillResource(Helper::getAccountFromUsername($account->username));
     }
 
-    public function show($accountUsername, $skillName)
+    public function show(Account $account, Skill $skill)
     {
-        $skill = Skill::where('name', $skillName)->firstOrFail();
-
-        return new SkillResource($skill->model::where('account_id', Helper::getAccountIdFromUsername($accountUsername))->first());
+        return new SkillResource($skill->model::where('account_id', Helper::getAccountIdFromUsername($account->username))->first());
     }
 
-    public function update($accountUsername, $skillName, Request $request)
+    public function update(Account $account, Skill $skill, Request $request)
     {
         if ($request->level > 99) {
             return response("Not funny", 406);
         }
 
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
+        $accountSkill = $skill->model::where('account_id', $account->id)->first();
 
-        $skill = Skill::where('name', $skillName)->firstOrFail();
-
-        $skill = $skill->model::where('account_id', $account->id)->first();
-
-        $skill->update(['level' => $request->level]);
+        $accountSkill->update(['level' => $request->level]);
 
         $logData = [
             "user_id" => auth()->user()->id,
@@ -61,8 +55,8 @@ class AccountSkillController extends Controller
         $eventData = [
             "log_id" => $log->id,
             "type" => 'event',
-            "icon" => strtolower($skillName),
-            "message" => $accountUsername . " just achieved level " . $skill->level . " " . ucfirst($skillName) . "!",
+            "icon" => strtolower($skill->name),
+            "message" => $account->username . " just achieved level " . $accountSkill->level . " " . ucfirst($skill->name) . "!",
         ];
 
         $event = Broadcast::create($eventData);
@@ -71,12 +65,12 @@ class AccountSkillController extends Controller
 
         AccountEvent::dispatch($account, $event);
 
-        if ($skill->level == 99) {
+        if ($accountSkill->level == 99) {
             $announcementData = [
                 "log_id" => $log->id,
                 "type" => 'announcement',
-                "icon" => strtolower($skillName),
-                "message" => $accountUsername . " has achieved level 99 " . ucfirst($skillName) . "!",
+                "icon" => strtolower($skill->name),
+                "message" => $account->username . " has achieved level 99 " . ucfirst($skill->name) . "!",
             ];
 
             $announcement = Broadcast::create($announcementData);
@@ -84,6 +78,6 @@ class AccountSkillController extends Controller
             AnnouncementAll::dispatch($announcement);
         }
 
-        return response("Advanced " . ucfirst($skillName) . " level for " . $accountUsername . " to level " . $request->level, 200);
+        return response("Advanced " . ucfirst($skill->name) . " level for " . $account->username . " to level " . $accountSkill->level, 200);
     }
 }
