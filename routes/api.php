@@ -45,11 +45,11 @@ Route::middleware('auth:api')->group(function() {
 Route::prefix('/account')->group(function() {
 	Route::get('/{account}', 'Api\AccountController@show')->name('account-show');
 
-	Route::get('/{account}/skill', 'Api\AccountSkillController@skills')->name('account-show-skills');
-	Route::get('/{account}/skill/{skill}', 'Api\AccountSkillController@skill')->name('account-show-skill');
+	Route::get('/{account}/skill', 'Api\AccountSkillController@index')->name('account-show-skills');
+	Route::get('/{account}/skill/{skill}', 'Api\AccountSkillController@show')->name('account-show-skill');
 
-	Route::get('/{account}/boss', 'Api\AccountController@bosses')->name('account-show-bosses');
-	Route::get('/{account}/boss/{boss}', 'Api\AccountController@boss')->name('account-show-boss');
+	Route::get('/{account}/boss', 'Api\AccountBossController@index')->name('account-show-bosses');
+	Route::get('/{account}/boss/{boss}', 'Api\AccountBossController@show')->name('account-show-boss');
 
 //	Route::get('/{accountUsername}/collection', 'Api\AccountCollectionController@show')->name('account-collection-show');
 	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');

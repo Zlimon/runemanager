@@ -22,12 +22,12 @@ use Illuminate\Support\Facades\DB;
 
 class AccountSkillController extends Controller
 {
-    public function skills($accountUsername)
+    public function index($accountUsername)
     {
         return new AccountSkillResource(Helper::getAccountFromUsername($accountUsername));
     }
 
-    public function skill($accountUsername, $skillName)
+    public function show($accountUsername, $skillName)
     {
         $skill = Skill::where('name', $skillName)->firstOrFail();
 

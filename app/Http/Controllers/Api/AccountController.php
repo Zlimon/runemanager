@@ -35,23 +35,6 @@ class AccountController extends Controller
         return new AccountResource(Helper::getAccountFromUsername($accountUsername));
     }
 
-    public function bosses($accountUsername)
-    {
-        return new AccountBossResource(Helper::getAccountFromUsername($accountUsername));
-    }
-
-    public function boss($accountUsername, $bossName)
-    {
-        // Allow only selecting bosses
-        $boss = Collection::where(
-            function ($query) use ($bossName) {
-                $query->where('category_id', '=', 2)
-                    ->orWhere('category_id', '=', 3);
-            })->where('name', $bossName)->firstOrFail();
-
-        return new CollectionResource($boss->model::where('account_id', Helper::getAccountIdFromUsername($accountUsername))->first());
-    }
-
     /**
      * Create a new account instance after a valid registration.
      *
