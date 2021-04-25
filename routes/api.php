@@ -51,8 +51,8 @@ Route::prefix('/account')->group(function() {
 	Route::get('/{account}/boss', 'Api\AccountBossController@index')->name('account-bosses-show');
 	Route::get('/{account}/boss/{boss}', 'Api\AccountBossController@show')->name('account-boss-show');
 
-	Route::get('/{accountUsername}/collection', 'Api\AccountCollectionController@index')->name('account-collections-show');
-	Route::get('/{accountUsername}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
+	Route::get('/{account}/collection', 'Api\AccountCollectionController@index')->name('account-collections-show');
+	Route::get('/{account}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
 
     Route::get('/{accountUsername}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
     Route::get('/{accountUsername}/bank', 'Api\AccountBankController@show')->name('account-bank-show');
