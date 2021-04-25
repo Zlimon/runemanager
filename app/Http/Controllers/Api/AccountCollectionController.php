@@ -2,64 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Account;
 use App\Collection;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AccountCollectionResource;
 use App\Http\Resources\CollectionResource;
 use App\Log;
 use Illuminate\Http\Request;
 
 class AccountCollectionController extends Controller
 {
-    // NOT IN USE ATM
-    public function index($accountUsername, $collectionType)
+    public function index($accountUsername)
     {
-        $account = Account::where('username', $accountUsername)->first();
-
-        if ($account) {
-            if (in_array($collectionType, ['all', 'boss', 'raid', 'clue', 'minigame', 'other'], true)) {
-                if ($collectionType === "all") {
-                    $allCollections = Collection::select('name')->where('type', $collectionType)->get();
-                }
-                $allCollections = Collection::select('name')->where('type', $collectionType)->get();
-
-                // TODO create function
-                // This method create a migration file for each collection model in the collections table
-                // $listOfS = [];
-                // foreach ($allCollections as $key => $collection) {
-                // 	$collectionName = $collection->name;
-                // 	if ($collectionName[strlen($collectionName) - 1] == "s") {
-                // 		$listOfS[$key] = $collectionName;
-                // 		$command = "make:migration create_".str_replace(" ", "_", $collectionName)."_table";
-                // 	} else {
-                // 		$command = "make:migration create_".str_replace(" ", "_", $collectionName)."s_table";
-                // 	}
-
-                // 	$execute = Artisan::call($command);
-                // }
-
-                $allCollectionLoot = [];
-                foreach ($allCollections as $key => $collection) {
-                    $findCollection = Collection::where('name', $collection->name)->firstOrFail();
-
-                    $collectionLog = $findCollection->model::where('account_id', $account->id)->first();
-
-                    if (!$collectionLog) {
-                        return response()->json("This account does not have any registered loot for " . $collection->name,
-                            404);
-                    }
-
-                    $allCollectionLoot[$key] = $collectionLog;
-                }
-
-                return response()->json($allCollectionLoot, 200);
-            } else {
-                return response()->json("This collection type could not be found", 404);
-            }
-        } else {
-            return response()->json("This account could not be found", 404);
-        }
+        return new AccountCollectionResource(Helper::getAccountFromUsername($accountUsername));
     }
 
     public function show($accountUsername, $collectionName)
