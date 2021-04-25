@@ -15,7 +15,7 @@ class AccountBankController extends Controller
 {
     public function show($accountUsername)
     {
-        $account = Account::where('username', $accountUsername)->pluck('id')->first();
+        $account = Helper::getAccountIdFromUsername($accountUsername);
 
         if ($account) {
             $bank = Bank::where([
@@ -37,7 +37,7 @@ class AccountBankController extends Controller
 
         // Check if someone has tried something funny
         if (sizeof($request->all()) > 816) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 406);
+            return response("Not funny", 406);
         }
 
         $totalBankValue = 0;

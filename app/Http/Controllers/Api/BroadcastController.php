@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Account;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Broadcast;
 
@@ -17,7 +18,7 @@ class BroadcastController extends Controller
 
     public function account($accountUsername, $broadcastType)
     {
-        $account = Account::where('username', $accountUsername)->pluck('id')->first();
+        $account = Helper::getAccountIdFromUsername($accountUsername);
 
         if ($account) {
             $broadcasts = Broadcast::with('log')->with('log.category')->where('message', 'NOT LIKE', '%logged%')->whereHas('log', function ($query) use($account) {

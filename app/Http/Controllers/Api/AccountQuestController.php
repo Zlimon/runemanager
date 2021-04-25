@@ -16,7 +16,7 @@ class AccountQuestController extends Controller
 {
     public function show($accountUsername)
     {
-        $account = Account::where('username', $accountUsername)->pluck('id')->first();
+        $account = Helper::getAccountIdFromUsername($accountUsername);
 
         if ($account) {
             $quests = Quest::where([
