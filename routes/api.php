@@ -67,7 +67,7 @@ Route::prefix('/hiscore')->group(function() {
 });
 
 Route::prefix('/collection')->group(function() {
-	Route::get('/{collectionType}', 'CollectionController@list');
+	Route::get('/{collectionCategory}', 'Api\CollectionController@index');
 });
 
 Route::prefix('/broadcast')->group(function() {
