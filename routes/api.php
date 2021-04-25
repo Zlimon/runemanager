@@ -54,9 +54,9 @@ Route::prefix('/account')->group(function() {
 	Route::get('/{account}/collection', 'Api\AccountCollectionController@index')->name('account-collections-show');
 	Route::get('/{account}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
 
-    Route::get('/{accountUsername}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
-    Route::get('/{accountUsername}/bank', 'Api\AccountBankController@show')->name('account-bank-show');
-    Route::get('/{accountUsername}/quests', 'Api\AccountQuestController@show')->name('account-quests-show');
+    Route::get('/{account}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
+    Route::get('/{account}/bank', 'Api\AccountBankController@show')->name('account-bank-show');
+    Route::get('/{account}/quests', 'Api\AccountQuestController@show')->name('account-quests-show');
 });
 
 Route::prefix('/hiscore')->group(function() {

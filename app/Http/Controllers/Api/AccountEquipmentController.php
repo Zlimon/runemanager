@@ -13,20 +13,18 @@ use Illuminate\Http\Request;
 
 class AccountEquipmentController extends Controller
 {
-    public function show($accountUsername)
+    public function show(Account $account)
     {
-        $account = Helper::getAccountIdFromUsername($accountUsername);
-
         if ($account) {
             $equipment = Equipment::where([
-                ['account_id', '=', $account],
+                ['account_id', '=', $account->id],
                 ['display', '=', 1]
             ])->first();
 
             if ($equipment) {
                 return response()->json($equipment, 200);
             } else {
-                return response("No equipment for " . $accountUsername . " were found!", 404);
+                return response("No equipment for " . $account->username . " were found!", 404);
             }
         }
     }

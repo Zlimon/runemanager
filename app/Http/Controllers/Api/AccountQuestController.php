@@ -14,20 +14,18 @@ use Illuminate\Http\Request;
 
 class AccountQuestController extends Controller
 {
-    public function show($accountUsername)
+    public function show(Account $account)
     {
-        $account = Helper::getAccountIdFromUsername($accountUsername);
-
         if ($account) {
             $quests = Quest::where([
-               ['account_id', '=', $account],
-               ['display', '=', 1]
-           ])->first();
+                ['account_id', '=', $account->id],
+                ['display', '=', 1]
+            ])->first();
 
             if ($quests) {
                 return response()->json($quests, 200);
             } else {
-                return response("No quests for " . $accountUsername . " were found!", 404);
+                return response("No quests for " . $account->username . " were found!", 404);
             }
         }
     }

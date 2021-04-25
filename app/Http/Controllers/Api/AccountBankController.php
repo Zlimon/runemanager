@@ -13,20 +13,18 @@ use Illuminate\Http\Request;
 
 class AccountBankController extends Controller
 {
-    public function show($accountUsername)
+    public function show(Account $account)
     {
-        $account = Helper::getAccountIdFromUsername($accountUsername);
-
         if ($account) {
             $bank = Bank::where([
-                ['account_id', '=', $account],
+                ['account_id', '=', $account->id],
                 ['display', '=', 1]
             ])->first();
 
             if ($bank) {
                 return response()->json($bank, 200);
             } else {
-                return response("No bank for " . $accountUsername . " were found!", 404);
+                return response("No bank for " . $account->username . " were found!", 404);
             }
         }
     }
