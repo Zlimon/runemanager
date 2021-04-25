@@ -26,8 +26,8 @@ Route::middleware('auth:api')->group(function() {
         Route::put('/{accountUsername}/login', 'Api\AccountController@loginLogout')->name('account-login'); // Make account online
         Route::put('/{accountUsername}/logout', 'Api\AccountController@loginLogout')->name('account-logout'); // Make account offline
 
-		Route::put('/{accountUsername}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
-		Route::post('/{accountUsername}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
+		Route::put('/{account}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
+		Route::post('/{account}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
 
         Route::post('/{account}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
 

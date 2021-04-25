@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Account;
 use App\Collection;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
@@ -24,10 +25,8 @@ class AccountCollectionController extends Controller
         return new CollectionResource($collection->model::where('account_id', Helper::getAccountIdFromUsername($accountUsername))->first());
     }
 
-    public function update($accountUsername, $collectionName, Request $request)
+    public function update(Account $account, $collectionName, Request $request)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
         $collection = Collection::where('alias', $collectionName)->first();
         if (!$collection) {
             return response($collectionName . " is not currently supported", 406);
@@ -51,7 +50,7 @@ class AccountCollectionController extends Controller
         }
 
         if (!$collectionLog) {
-            return response($accountUsername . " does not have any registered collction log for " . $collection->alias, 404);
+            return response($account->username . " does not have any registered collction log for " . $collection->alias, 404);
         }
 
         foreach ($request->all()["collectionLogItems"] as $lootItem) {
