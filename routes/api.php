@@ -1,5 +1,10 @@
 <?php
 
+use App\Account;
+use App\Http\Resources\AccountResource;
+use App\Http\Resources\AccountSkillResource;
+use App\Http\Resources\SkillResource;
+use App\Skill;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,10 +48,16 @@ Route::middleware('auth:api')->group(function() {
 });
 
 Route::prefix('/account')->group(function() {
-	Route::get('/{account}', 'Api\AccountController@show')->name('account-show');
+	Route::get('/{account}', function (Account $account) {
+        return new AccountResource($account);
+    })->name('account-show');
 
-	Route::get('/{account}/skill', 'Api\AccountSkillController@index')->name('account-skills-show');
-	Route::get('/{account}/skill/{skill}', 'Api\AccountSkillController@show')->name('account-skill-show');
+	Route::get('/{account}/skill', function (Account $account) {
+        return new AccountSkillResource($account);
+    })->name('account-skills-show');
+	Route::get('/{account}/skill/{skill}', function (Account $account, Skill $skill) {
+        return new SkillResource($account->{$skill->name}()->first());
+    })->name('account-skill-show');
 
 	Route::get('/{account}/boss', 'Api\AccountBossController@index')->name('account-bosses-show');
 	Route::get('/{account}/boss/{boss}', 'Api\AccountBossController@show')->name('account-boss-show');

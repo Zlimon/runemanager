@@ -25,17 +25,6 @@ use Illuminate\Validation\Rule;
 class AccountController extends Controller
 {
     /**
-     * Show a specific account and skills data from a URL request.
-     *
-     * @param string $username
-     * @return
-     */
-    public function show($accountUsername)
-    {
-        return new AccountResource(Helper::getAccountFromUsername($accountUsername));
-    }
-
-    /**
      * Create a new account instance after a valid registration.
      *
      * @param string $authCode

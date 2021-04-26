@@ -22,16 +22,6 @@ use Illuminate\Support\Facades\DB;
 
 class AccountSkillController extends Controller
 {
-    public function index(Account $account)
-    {
-        return new AccountSkillResource(Helper::getAccountFromUsername($account->username));
-    }
-
-    public function show(Account $account, Skill $skill)
-    {
-        return new SkillResource($skill->model::where('account_id', Helper::getAccountIdFromUsername($account->username))->first());
-    }
-
     public function update(Account $account, Skill $skill, Request $request)
     {
         if ($request->level > 99) {
