@@ -2,29 +2,6 @@
 
 namespace App;
 
-use App\Skill\Attack;
-use App\Skill\Defence;
-use App\Skill\Strength;
-use App\Skill\Hitpoints;
-use App\Skill\Ranged;
-use App\Skill\Prayer;
-use App\Skill\Magic;
-use App\Skill\Cooking;
-use App\Skill\Woodcutting;
-use App\Skill\Fletching;
-use App\Skill\Fishing;
-use App\Skill\Firemaking;
-use App\Skill\Crafting;
-use App\Skill\Smithing;
-use App\Skill\Mining;
-use App\Skill\Herblore;
-use App\Skill\Agility;
-use App\Skill\Thieving;
-use App\Skill\Slayer;
-use App\Skill\Farming;
-use App\Skill\Runecraft;
-use App\Skill\Hunter;
-use App\Skill\Construction;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -84,6 +61,14 @@ class Account extends Model
         return $this->hasManyThrough(Broadcast::class, Log::class);
     }
 
+    public function boss(Collection $collection) {
+        return $this->hasOne($collection->model);
+    }
+
+    public function skill(Skill $skill) {
+        return $this->hasOne($skill->model);
+    }
+
     public function equipment() {
         return $this->hasOne(Equipment::class);
     }
@@ -94,75 +79,5 @@ class Account extends Model
 
     public function quest() {
         return $this->hasOne(Quest::class);
-    }
-
-    public function attack() {
-        return $this->hasOne(Attack::class);
-    }
-    public function defence() {
-        return $this->hasOne(Defence::class);
-    }
-    public function strength() {
-        return $this->hasOne(Strength::class);
-    }
-    public function hitpoints() {
-        return $this->hasOne(Hitpoints::class);
-    }
-    public function ranged() {
-        return $this->hasOne(Ranged::class);
-    }
-    public function prayer() {
-        return $this->hasOne(Prayer::class);
-    }
-    public function magic() {
-        return $this->hasOne(Magic::class);
-    }
-    public function cooking() {
-        return $this->hasOne(Cooking::class);
-    }
-    public function woodcutting() {
-        return $this->hasOne(Woodcutting::class);
-    }
-    public function fletching() {
-        return $this->hasOne(Fletching::class);
-    }
-    public function fishing() {
-        return $this->hasOne(Fishing::class);
-    }
-    public function firemaking() {
-        return $this->hasOne(Firemaking::class);
-    }
-    public function crafting() {
-        return $this->hasOne(Crafting::class);
-    }
-    public function smithing() {
-        return $this->hasOne(Smithing::class);
-    }
-    public function mining() {
-        return $this->hasOne(Mining::class);
-    }
-    public function herblore() {
-        return $this->hasOne(Herblore::class);
-    }
-    public function agility() {
-        return $this->hasOne(Agility::class);
-    }
-    public function thieving() {
-        return $this->hasOne(Thieving::class);
-    }
-    public function slayer() {
-        return $this->hasOne(Slayer::class);
-    }
-    public function farming() {
-        return $this->hasOne(Farming::class);
-    }
-    public function runecraft() {
-        return $this->hasOne(Runecraft::class);
-    }
-    public function hunter() {
-        return $this->hasOne(Hunter::class);
-    }
-    public function construction() {
-        return $this->hasOne(Construction::class);
     }
 }

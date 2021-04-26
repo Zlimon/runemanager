@@ -1,8 +1,11 @@
 <?php
 
 use App\Account;
+use App\Collection;
+use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
+use App\Http\Resources\CollectionResource;
 use App\Http\Resources\SkillResource;
 use App\Skill;
 use Illuminate\Support\Facades\Route;
@@ -56,11 +59,22 @@ Route::prefix('/account')->group(function() {
         return new AccountSkillResource($account);
     })->name('account-skills-show');
 	Route::get('/{account}/skill/{skill}', function (Account $account, Skill $skill) {
-        return new SkillResource($account->{$skill->name}()->first());
+        return new SkillResource($account->skill($skill)->first());
     })->name('account-skill-show');
 
-	Route::get('/{account}/boss', 'Api\AccountBossController@index')->name('account-bosses-show');
-	Route::get('/{account}/boss/{boss}', 'Api\AccountBossController@show')->name('account-boss-show');
+	Route::get('/{account}/boss', function (Account $account) {
+        return new AccountBossResource($account);
+    })->name('account-bosses-show');
+	Route::get('/{account}/boss/{boss}', function (Account $account, $bossName) {
+        // Allow only selecting bosses
+        $boss = Collection::where(
+            function ($query) use ($bossName) {
+                $query->where('category_id', '=', 2)
+                    ->orWhere('category_id', '=', 3);
+            })->where('name', $bossName)->firstOrFail();
+
+        return new CollectionResource($account->boss($boss)->first());
+    })->name('account-boss-show');
 
 	Route::get('/{account}/collection', 'Api\AccountCollectionController@index')->name('account-collections-show');
 	Route::get('/{account}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
