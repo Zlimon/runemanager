@@ -3,6 +3,7 @@
 use App\Account;
 use App\Collection;
 use App\Http\Resources\AccountBossResource;
+use App\Http\Resources\AccountCollectionResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
 use App\Http\Resources\CollectionResource;
@@ -73,11 +74,17 @@ Route::prefix('/account')->group(function() {
                     ->orWhere('category_id', '=', 3);
             })->where('name', $bossName)->firstOrFail();
 
-        return new CollectionResource($account->boss($boss)->first());
+        return new CollectionResource($account->collection($boss)->first());
     })->name('account-boss-show');
 
-	Route::get('/{account}/collection', 'Api\AccountCollectionController@index')->name('account-collections-show');
-	Route::get('/{account}/collection/{collectionName}', 'Api\AccountCollectionController@show')->name('account-collection-show');
+	Route::get('/{account}/collection', function (Account $account) {
+        return new AccountCollectionResource($account);
+    })->name('account-collections-show');
+	Route::get('/{account}/collection/{collection:alias}', function (Account $account, $collectionName) {
+	    $collection = Collection::whereName($collectionName)->orWhere('alias', $collectionName)->first();
+
+	    return new CollectionResource($account->collection($collection)->first());
+    })->name('account-collection-show');
 
     Route::get('/{account}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
     Route::get('/{account}/bank', 'Api\AccountBankController@show')->name('account-bank-show');

@@ -27,6 +27,11 @@ class Collection extends Model
 
     public $timestamps = false;
 
+    public function getRouteKeyName()
+    {
+        return 'name';
+    }
+
     public static function findByNameAndCategory($name, $category_id)
     {
         return self::where([['name', $name], ['category_id', $category_id]])->first();

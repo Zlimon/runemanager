@@ -61,7 +61,7 @@ class Account extends Model
         return $this->hasManyThrough(Broadcast::class, Log::class);
     }
 
-    public function boss(Collection $collection) {
+    public function collection(Collection $collection) {
         return $this->hasOne($collection->model);
     }
 

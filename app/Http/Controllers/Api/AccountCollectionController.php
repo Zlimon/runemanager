@@ -13,18 +13,6 @@ use Illuminate\Http\Request;
 
 class AccountCollectionController extends Controller
 {
-    public function index(Account $account)
-    {
-        return new AccountCollectionResource(Helper::getAccountFromUsername($account->username));
-    }
-
-    public function show(Account $account, $collectionName)
-    {
-        $collection = Collection::where('name', $collectionName)->firstOrFail();
-
-        return new CollectionResource($collection->model::where('account_id', Helper::getAccountIdFromUsername($account->username))->first());
-    }
-
     public function update(Account $account, $collectionName, Request $request)
     {
         $collection = Collection::where('alias', $collectionName)->first();
