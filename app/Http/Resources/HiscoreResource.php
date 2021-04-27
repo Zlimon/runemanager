@@ -15,11 +15,9 @@ class HiscoreResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => ($request->getRequestUri() === "/api/hiscore/total" ? $this->id : $this->account_id),
-            'username' => $this->username,
-            'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
-            'level' => $this->level,
-            'xp' => (number_format($this->xp) >= 1 ? number_format($this->xp) : "Unranked"),
+            'id' => ($request->getRequestUri() === "/api/hiscore/skill/total" ? $this->id : $this->account_id),
+            'username' => ($request->getRequestUri() === "/api/hiscore/skill/total" ? $this->username : $this->account->username),
+            'hiscore' => new SkillResource($this)
         ];
     }
 }
