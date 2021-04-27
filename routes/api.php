@@ -103,7 +103,11 @@ Route::prefix('/hiscore')->group(function() {
 
 	    return (new HiscoreController())->collection($collection);
     })->name('hiscore-boss-show');
-    Route::get('/npc/{npc}', 'Api\HiscoreController@npc')->name('hiscore-npc-show');
+    Route::get('/npc/{collection}', function(Collection $collection) {
+	    Collection::where('name', $collection->name)->where('category_id', 4)->firstOrFail();
+
+	    return (new HiscoreController())->collection($collection);
+    })->name('hiscore-npc-show');
     Route::get('/clue/{clue}', 'Api\HiscoreController@clue')->name('hiscore-clue-show');
 });
 
