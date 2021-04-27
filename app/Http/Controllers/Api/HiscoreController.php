@@ -73,38 +73,34 @@ class HiscoreController extends Controller
             ]);
     }
 
-    public function boss($bossName)
+    public function collection(Collection $collection)
     {
-        if (Account::count() > 0) {
-            $collection = Collection::where('name', $bossName)->where(function ($query) {
-                $query->where('category_id', 2)
-                    ->orWhere('category_id', 3);
-            })->firstOrFail();
-
-            $bossHiscore = $collection->model::with('account')->orderByDesc('kill_count')->get();
-
-            if (sizeof($bossHiscore) > 0) {
-                $sumKills = $collection->model::selectRaw('SUM(kill_count) AS total_kill_count')
-                    ->selectRaw('COUNT(*) AS total_kills')
-                    ->first();
-
-                $averageTotalKills = $sumKills["total_kill_count"] / $sumKills["total_kills"];
-
-                return BossHiscoreResource::collection($bossHiscore)
-                    ->additional([
-                        'meta' => [
-                            'boss' => str_replace(" ", "_", $bossName),
-                            'alias' => $collection->alias,
-                            'total_kills' => number_format($sumKills["total_kill_count"]),
-                            'average_total_kills' => round($averageTotalKills),
-                        ]
-                    ]);
-            } else {
-                return response()->json("There are no registered collections for " . $bossName, 404);
-            }
-        } else {
+        if (!Account::count()) {
             return response()->json("There are no linked accounts", 404);
         }
+
+        $bossHiscore = $collection->model::with('account')
+            ->orderBy('rank')
+            ->orderByDesc('kill_count')
+            ->get()
+            ->partition(function ($skill) {
+                return $skill->rank > 0;
+            })
+            ->flatten();
+
+        if (sizeof($bossHiscore) <= 0) {
+            return response()->json("There are no registered collections for " . $collection->name, 404);
+        }
+
+        return BossHiscoreResource::collection($bossHiscore)
+            ->additional([
+                'meta' => [
+                    'boss' => str_replace(" ", "_", $collection->name),
+                    'alias' => $collection->alias,
+                    'total_kills' => number_format($bossHiscore->sum('kill_count')),
+                    'average_total_kills' => round($bossHiscore->sum('kill_count') / $bossHiscore->count()),
+                ]
+            ]);
     }
 
     public function npc($npcName)

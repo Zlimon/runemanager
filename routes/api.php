@@ -2,6 +2,7 @@
 
 use App\Account;
 use App\Collection;
+use App\Http\Controllers\Api\HiscoreController;
 use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountCollectionResource;
 use App\Http\Resources\AccountResource;
@@ -94,7 +95,14 @@ Route::prefix('/account')->group(function() {
 Route::prefix('/hiscore')->group(function() {
     Route::get('/skill/total', 'Api\HiscoreController@total')->name('hiscore-total-show');
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
-	Route::get('/boss/{boss}', 'Api\HiscoreController@boss')->name('hiscore-boss-show');
+	Route::get('/boss/{collection}', function(Collection $collection) {
+	    Collection::where('name', $collection->name)->where(function ($query) {
+            $query->where('category_id', 2)
+                ->orWhere('category_id', 3);
+        })->firstOrFail();
+
+	    return (new HiscoreController())->collection($collection);
+    })->name('hiscore-boss-show');
     Route::get('/npc/{npc}', 'Api\HiscoreController@npc')->name('hiscore-npc-show');
     Route::get('/clue/{clue}', 'Api\HiscoreController@clue')->name('hiscore-clue-show');
 });
