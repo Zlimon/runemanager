@@ -93,7 +93,7 @@ class HiscoreController extends Controller
             return response()->json("There are no registered collections for " . $collection->alias, 404);
         }
 
-        return BossHiscoreResource::collection($bossHiscore)
+        return HiscoreResource::collection($bossHiscore)
             ->additional([
                 'meta' => [
                     'name' => $collection->alias,

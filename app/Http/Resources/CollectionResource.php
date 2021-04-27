@@ -28,9 +28,8 @@ class CollectionResource extends JsonResource
         ]);
 
         return [
-            'alias' => Helper::collectionAttribute(str_replace("_", " ", $this->getTable()), 'alias'),
-            'kill_count' => $this->kill_count,
             'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
+            'kill_count' => $this->kill_count,
             'obtained' => $this->obtained,
             'total' => sizeof($collectionLog),
             'log' => $collectionLog,
