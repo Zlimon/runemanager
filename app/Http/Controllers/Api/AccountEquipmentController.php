@@ -15,17 +15,15 @@ class AccountEquipmentController extends Controller
 {
     public function show(Account $account)
     {
-        if ($account) {
-            $equipment = Equipment::where([
-                ['account_id', '=', $account->id],
-                ['display', '=', 1]
-            ])->first();
+        $equipment = Equipment::where([
+            ['account_id', '=', $account->id],
+            ['display', '=', 1]
+        ])->first();
 
-            if ($equipment) {
-                return response()->json($equipment, 200);
-            } else {
-                return response("No equipment for " . $account->username . " were found!", 404);
-            }
+        if ($equipment) {
+            return response()->json($equipment, 200);
+        } else {
+            return response("No equipment for " . $account->username . " were found!", 404);
         }
     }
 

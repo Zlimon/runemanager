@@ -16,17 +16,15 @@ class AccountQuestController extends Controller
 {
     public function show(Account $account)
     {
-        if ($account) {
-            $quests = Quest::where([
-                ['account_id', '=', $account->id],
-                ['display', '=', 1]
-            ])->first();
+        $quests = Quest::where([
+            ['account_id', '=', $account->id],
+            ['display', '=', 1]
+        ])->first();
 
-            if ($quests) {
-                return response()->json($quests, 200);
-            } else {
-                return response("No quests for " . $account->username . " were found!", 404);
-            }
+        if ($quests) {
+            return response()->json($quests, 200);
+        } else {
+            return response("No quests for " . $account->username . " were found!", 404);
         }
     }
 

@@ -15,17 +15,15 @@ class AccountBankController extends Controller
 {
     public function show(Account $account)
     {
-        if ($account) {
-            $bank = Bank::where([
-                ['account_id', '=', $account->id],
-                ['display', '=', 1]
-            ])->first();
+        $bank = Bank::where([
+            ['account_id', '=', $account->id],
+            ['display', '=', 1]
+        ])->first();
 
-            if ($bank) {
-                return response()->json($bank, 200);
-            } else {
-                return response("No bank for " . $account->username . " were found!", 404);
-            }
+        if ($bank) {
+            return response()->json($bank, 200);
+        } else {
+            return response("No bank for " . $account->username . " were found!", 404);
         }
     }
 
