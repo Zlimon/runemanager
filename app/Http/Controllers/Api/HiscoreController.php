@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BossHiscoreResource;
 use App\Http\Resources\HiscoreResource;
 use App\Skill;
+use Illuminate\Support\Str;
 
 class HiscoreController extends Controller
 {
@@ -29,8 +30,8 @@ class HiscoreController extends Controller
         return HiscoreResource::collection($total)
             ->additional([
                 'meta' => [
-                    'skill' => 'total',
                     'name' => 'Total level',
+                    'slug' => 'total',
                     'total_xp' => number_format($total->sum('xp')),
                     'average_total_level' => round($total->sum('level') / $total->count()),
                     'total_max_level' => Account::where('level', (99 * count(Helper::listSkills())))->count(),
@@ -64,8 +65,8 @@ class HiscoreController extends Controller
         return HiscoreResource::collection($skill)
             ->additional([
                 'meta' => [
-                    'skill' => $skillName,
                     'name' => ucfirst($skillName),
+                    'slug' => $skillName,
                     'total_xp' => number_format($skill->sum('xp')),
                     'average_total_level' => round($skill->sum('level') / $skill->count()),
                     'total_max_level' => $skill->where('level', 99)->count(),
@@ -89,16 +90,16 @@ class HiscoreController extends Controller
             ->flatten();
 
         if (sizeof($bossHiscore) <= 0) {
-            return response()->json("There are no registered collections for " . $collection->name, 404);
+            return response()->json("There are no registered collections for " . $collection->alias, 404);
         }
 
         return BossHiscoreResource::collection($bossHiscore)
             ->additional([
                 'meta' => [
-                    'collection' => str_replace(" ", "_", $collection->name),
-                    'alias' => $collection->alias,
-                    'total_kills' => number_format($bossHiscore->sum('kill_count')),
-                    'average_total_kills' => round($bossHiscore->sum('kill_count') / $bossHiscore->count()),
+                    'name' => $collection->alias,
+                    'slug' => Str::slug($collection->name),
+                    'total' => number_format($bossHiscore->sum('kill_count')),
+                    'average' => round($bossHiscore->sum('kill_count') / $bossHiscore->count()),
                 ]
             ]);
     }
