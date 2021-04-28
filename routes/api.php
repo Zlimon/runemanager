@@ -33,8 +33,8 @@ Route::middleware('auth:api')->group(function() {
 	Route::post('/authenticate', 'Api\AccountController@store')->name('authenticate'); // Authenticate user
 
 	Route::prefix('/account')->middleware('user.account')->group(function() {
-        Route::put('/{accountUsername}/login', 'Api\AccountController@loginLogout')->name('account-login'); // Make account online
-        Route::put('/{accountUsername}/logout', 'Api\AccountController@loginLogout')->name('account-logout'); // Make account offline
+        Route::put('/{account}/login', 'Api\AccountController@loginLogout')->name('account-login'); // Make account online
+        Route::put('/{account}/logout', 'Api\AccountController@loginLogout')->name('account-logout'); // Make account offline
 
 		Route::put('/{account}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
 		Route::post('/{account}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model

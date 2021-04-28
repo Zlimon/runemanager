@@ -229,10 +229,8 @@ class AccountController extends Controller
         return response("Account successfully authenticated!", 201);
     }
 
-    public function loginLogout($accountUsername, Request $request)
+    public function loginLogout(Account $account, Request $request)
     {
-        $account = Helper::checkIfUserOwnsAccount($accountUsername);
-
         $account->online ^= 1;
 
         $account->save();
@@ -251,7 +249,7 @@ class AccountController extends Controller
             "log_id" => $log->id,
             "type" => "event",
             "icon" => auth()->user()->icon_id,
-            "message" => $accountUsername . " has logged " . ($account->online ? 'in' : 'out') . "!",
+            "message" => $account->username . " has logged " . ($account->online ? 'in' : 'out') . "!",
         ];
 
         $event = Broadcast::create($eventData);
@@ -260,6 +258,6 @@ class AccountController extends Controller
 
         AccountOnline::dispatch($account);
 
-        return response($accountUsername . " has been logged " . ($account->online ? 'in' : 'out') . " to RuneManager");
+        return response($account->username . " has been logged " . ($account->online ? 'in' : 'out') . " to RuneManager");
     }
 }
