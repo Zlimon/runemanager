@@ -61,7 +61,7 @@ Route::prefix('/account')->group(function() {
         return new AccountSkillResource($account);
     })->name('account-skills-show');
 	Route::get('/{account}/skill/{skill}', function (Account $account, Skill $skill) {
-        return new SkillResource($account->skill($skill)->first());
+        return new SkillResource($account->skill($skill)->firstOrFail());
     })->name('account-skill-show');
 
 	Route::get('/{account}/boss', function (Account $account) {
@@ -73,18 +73,18 @@ Route::prefix('/account')->group(function() {
             function ($query) use ($bossName) {
                 $query->where('category_id', '=', 2)
                     ->orWhere('category_id', '=', 3);
-            })->where('name', $bossName)->firstOrFail();
+            })->whereName($bossName)->orWhere('alias', $bossName)->firstOrFail();
 
-        return new CollectionResource($account->collection($boss)->first());
+        return new CollectionResource($account->collection($boss)->firstOrFail());
     })->name('account-boss-show');
 
 	Route::get('/{account}/collection', function (Account $account) {
         return new AccountCollectionResource($account);
     })->name('account-collections-show');
 	Route::get('/{account}/collection/{collection:alias}', function (Account $account, $collectionName) {
-	    $collection = Collection::whereName($collectionName)->orWhere('alias', $collectionName)->first();
+	    $collection = Collection::whereName($collectionName)->orWhere('alias', $collectionName)->firstOrFail();
 
-	    return new CollectionResource($account->collection($collection)->first());
+	    return new CollectionResource($account->collection($collection)->firstOrFail());
     })->name('account-collection-show');
 
     Route::get('/{account}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
