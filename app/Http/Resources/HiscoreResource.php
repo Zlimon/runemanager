@@ -16,13 +16,12 @@ class HiscoreResource extends JsonResource
      */
     public function toArray($request)
     {
+        if (in_array($this->getTable(), Skill::get()->pluck('name')->toArray())) {
+            $hiscore = new SkillResource($this);
+        }
 
         if (in_array($this->getTable(), Collection::get()->pluck('name')->toArray())) {
             $hiscore = new CollectionResource($this);
-        }
-
-        if (in_array($this->getTable(), Skill::get()->pluck('name')->toArray())) {
-            $hiscore = new SkillResource($this);
         }
 
         return [
