@@ -16,17 +16,13 @@ class BroadcastController extends Controller
         return response()->json($broadcasts, 200);
     }
 
-    public function account($accountUsername, $broadcastType)
+    public function account(Account $account, $broadcastType)
     {
-        $account = Helper::getAccountIdFromUsername($accountUsername);
+        $broadcasts = Broadcast::with('log')->with('log.category')->where('message', 'NOT LIKE', '%logged%')->whereHas('log', function ($query) use($account) {
+            return $query->where('account_id', '=', $account->id);
+        })->where('type', $broadcastType)->orderByDesc('id')->paginate(10);
 
-        if ($account) {
-            $broadcasts = Broadcast::with('log')->with('log.category')->where('message', 'NOT LIKE', '%logged%')->whereHas('log', function ($query) use($account) {
-                return $query->where('account_id', '=', $account);
-            })->where('type', $broadcastType)->orderByDesc('id')->paginate(10);
-
-            return response()->json($broadcasts, 200);
-        }
+        return response()->json($broadcasts, 200);
     }
 
     public function recent($broadcastType)
