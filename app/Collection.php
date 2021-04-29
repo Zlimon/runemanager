@@ -29,7 +29,7 @@ class Collection extends Model
 
     public function getRouteKeyName()
     {
-        return 'name';
+        return 'slug';
     }
 
     public static function findByNameAndCategory($name, $category_id)

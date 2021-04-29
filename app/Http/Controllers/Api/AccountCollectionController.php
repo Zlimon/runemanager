@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 
 class AccountCollectionController extends Controller
 {
-    public function update(Account $account, $collectionName, Request $request)
+    public function update(Account $account, Collection $collection, Request $request)
     {
         $collection = Collection::where('alias', $collectionName)->first();
         if (!$collection) {
