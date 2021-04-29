@@ -35,7 +35,7 @@ class BroadcastController extends Controller
 
         $recentBroadcasts = [];
 
-        foreach ($broadcasts as $broadcast) {
+        foreach ($broadcasts->sortBy('id') as $broadcast) {
             if ($broadcast->created_at->diffInSeconds() <= 5) {
                 $recentBroadcasts[] = $broadcast->message;
             }
