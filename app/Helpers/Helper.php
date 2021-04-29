@@ -147,17 +147,17 @@ class Helper
 
     public static function listBosses()
     {
-        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('name')->toArray();
+        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('slug')->toArray();
     }
 
     public static function listNpcs()
     {
-        return Collection::where('category_id', 4)->pluck('name')->toArray();
+        return Collection::where('category_id', 4)->pluck('slug')->toArray();
     }
 
     public static function listClues()
     {
-        return Collection::where('category_id', 5)->pluck('name')->toArray();
+        return Collection::where('category_id', 5)->pluck('slug')->toArray();
     }
 
     public static function listAccountTypes()
