@@ -231,4 +231,11 @@ class Helper
             }
         }
     }
+
+    public static function getCollectionModel(Collection $collection, $categories = null)
+    {
+        $collection = $collection->model::first();
+
+	    return $collection;
+    }
 }

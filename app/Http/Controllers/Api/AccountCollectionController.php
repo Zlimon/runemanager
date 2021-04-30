@@ -15,12 +15,9 @@ class AccountCollectionController extends Controller
 {
     public function update(Account $account, Collection $collection, Request $request)
     {
-        $collection = Collection::where('alias', $collectionName)->first();
-        if (!$collection) {
-            return response($collectionName . " is not currently supported", 406);
-        }
+        $collectionModel = Helper::getCollectionModel($collection);
 
-        $collectionLog = $collection->model::where('account_id', $account->id)->first();
+        $collectionLog = $collectionModel->firstWhere('account_id', $account->id);
 
         // If account has no collection entry, create it
         if (is_null($collectionLog)) {
@@ -38,7 +35,7 @@ class AccountCollectionController extends Controller
         }
 
         if (!$collectionLog) {
-            return response($account->username . " does not have any registered collction log for " . $collection->alias, 404);
+            return response($account->username . " does not have any registered collction log for " . $collection->name, 404);
         }
 
         foreach ($request->all()["collectionLogItems"] as $lootItem) {
@@ -63,6 +60,6 @@ class AccountCollectionController extends Controller
 
         $log = Log::create($logData);
 
-        return response("Submitted " . $collection->alias . " collection log", 200);
+        return response("Submitted " . $collection->name . " collection log", 200);
     }
 }
