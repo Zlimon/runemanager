@@ -17,14 +17,11 @@ use Illuminate\Support\Str;
 
 class AccountLootController extends Controller
 {
-    public function update(Account $account, $collectionName, Request $request)
+    public function update(Account $account, Collection $collection, Request $request)
     {
-        $collection = Collection::where('alias', $collectionName)->first();
-        if (!$collection) {
-            return response($collectionName . " is not currently supported", 406);
-        }
+        $collectionModel = Helper::getCollectionModel($collection);
 
-        $collectionLog = $collection->model::where('account_id', $account->id)->first();
+        $collectionLog = $collectionModel->firstWhere('account_id', $account->id);
 
         // If account has no collection entry, create it
         if (is_null($collectionLog)) {
@@ -42,7 +39,7 @@ class AccountLootController extends Controller
         }
 
         if (!$collectionLog) {
-            return response($account->username . " does not have any registered loot for " . $collection->alias, 404);
+            return response($account->username . " does not have any registered loot for " . $collection->name, 404);
         }
 
         $oldCollection = $collectionLog->getAttributes(); // Old data
@@ -144,7 +141,7 @@ class AccountLootController extends Controller
             "log_id" => $log->id,
             "type" => "event",
             "icon" => $collectionLog->getTable(),
-            "message" => $account->username . $noun . $collection->alias . "!",
+            "message" => $account->username . $noun . $collection->name . "!",
         ];
 
         $event = Broadcast::create($eventData);
@@ -204,7 +201,7 @@ class AccountLootController extends Controller
                     "log_id" => $log->id,
                     "type" => "announcement",
                     "icon" => $collectionLog->getTable(),
-                    "message" => $account->username . " unlocked " . (count($unlockedUniquesList) == 1 ? " a new unique" : "new uniques") . ": " . $uniqueItems . " from " . $collection->alias . " at " . $newCollectionValues["kill_count"] . " kills!",
+                    "message" => $account->username . " unlocked " . (count($unlockedUniquesList) == 1 ? " a new unique" : "new uniques") . ": " . $uniqueItems . " from " . $collection->name . " at " . $newCollectionValues["kill_count"] . " kills!",
                 ];
 
                 $announcement = Broadcast::create($announcementData);
@@ -227,7 +224,7 @@ class AccountLootController extends Controller
                     "log_id" => $log->id,
                     "type" => "announcement",
                     "icon" => $collectionLog->getTable(),
-                    "message" => $account->username . " has received a " . $uniqueItems . " drop from " . $collection->alias . " at " . $newCollectionValues["kill_count"] . " kills!",
+                    "message" => $account->username . " has received a " . $uniqueItems . " drop from " . $collection->name . " at " . $newCollectionValues["kill_count"] . " kills!",
                 ];
 
                 $announcement = Broadcast::create($announcementData);
@@ -236,6 +233,6 @@ class AccountLootController extends Controller
             }
         }
 
-        return response("Submitted loot for " . $collection->alias, 200);
+        return response("Submitted loot for " . $collection->name, 200);
     }
 }
