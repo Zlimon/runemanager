@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Collection extends Model
 {
-    protected $fillable = ['category_id', 'name', 'alias', 'model'];
+    protected $fillable = ['category_id', 'order', 'name', 'slug', 'model'];
 
     public $timestamps = false;
 
