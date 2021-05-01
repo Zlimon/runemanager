@@ -15,7 +15,7 @@ class HiscoreController extends Controller
 {
     public function total() {
         if (!Account::count()) {
-            return response()->json("There are no linked accounts", 404);
+            return response("There are no linked accounts", 404);
         }
 
         $total = Account::orderBy('rank')
@@ -47,7 +47,7 @@ class HiscoreController extends Controller
     public function skill(Skill $skill)
     {
         if (!Account::count()) {
-            return response()->json("There are no linked accounts", 404);
+            return response("There are no linked accounts", 404);
         }
 
         $skill = $skill->model::with('account')
@@ -77,10 +77,10 @@ class HiscoreController extends Controller
     public function collection(Collection $collection)
     {
         if (!Account::count()) {
-            return response()->json("There are no linked accounts", 404);
+            return response("There are no linked accounts", 404);
         }
 
-        $bossHiscore = $collection->model::with('account')
+        $collectionHiscore = $collection->model::with('account')
             ->orderBy('rank')
             ->orderByDesc('kill_count')
             ->get()
@@ -89,17 +89,17 @@ class HiscoreController extends Controller
             })
             ->flatten();
 
-        if (sizeof($bossHiscore) <= 0) {
-            return response()->json("There are no registered collections for " . $collection->alias, 404);
+        if (!sizeof($collectionHiscore)) {
+            return response("There are no registered collections for " . $collection->slug, 404);
         }
 
-        return HiscoreResource::collection($bossHiscore)
+        return HiscoreResource::collection($collectionHiscore)
             ->additional([
                 'meta' => [
                     'name' => $collection->alias,
                     'slug' => Str::slug($collection->name),
-                    'total' => number_format($bossHiscore->sum('kill_count')),
-                    'average' => round($bossHiscore->sum('kill_count') / $bossHiscore->count()),
+                    'total' => number_format($collectionHiscore->sum('kill_count')),
+                    'average' => round($collectionHiscore->sum('kill_count') / $collectionHiscore->count()),
                 ]
             ]);
     }

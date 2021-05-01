@@ -68,15 +68,13 @@ Route::prefix('/account')->group(function() {
         return new AccountBossResource($account);
     })->name('account-bosses-show');
 	Route::get('/{account}/boss/{collection}', function (Account $account, Collection $collection) {
-        return new CollectionResource(Helper::getCollectionModel($account, $collection));
+        return new CollectionResource($account->collection($collection)->firstOrFail());
     })->name('account-boss-show');
 
 	Route::get('/{account}/collection', function (Account $account) {
         return new AccountCollectionResource($account);
     })->name('account-collections-show');
-	Route::get('/{account}/collection/{collection:alias}', function (Account $account, $collectionName) {
-	    $collection = Collection::whereName($collectionName)->orWhere('alias', $collectionName)->firstOrFail();
-
+	Route::get('/{account}/collection/{collection}', function (Account $account, Collection $collection) {
 	    return new CollectionResource($account->collection($collection)->firstOrFail());
     })->name('account-collection-show');
 
@@ -88,24 +86,9 @@ Route::prefix('/account')->group(function() {
 Route::prefix('/hiscore')->group(function() {
     Route::get('/skill/total', 'Api\HiscoreController@total')->name('hiscore-total-show');
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
-	Route::get('/boss/{collection}', function(Collection $collection) {
-	    Collection::where('name', $collection->name)->where(function ($query) {
-            $query->where('category_id', 2)
-                ->orWhere('category_id', 3);
-        })->firstOrFail();
-
-	    return (new HiscoreController())->collection($collection);
-    })->name('hiscore-boss-show');
-    Route::get('/npc/{collection}', function(Collection $collection) {
-	    Collection::where('name', $collection->name)->where('category_id', 4)->firstOrFail();
-
-	    return (new HiscoreController())->collection($collection);
-    })->name('hiscore-npc-show');
-    Route::get('/clue/{collection}', function(Collection $collection) {
-	    Collection::where('name', $collection->name)->where('category_id', 5)->firstOrFail();
-
-	    return (new HiscoreController())->collection($collection);
-    })->name('hiscore-clue-show');
+	Route::get('/boss/{collection}', 'Api\HiscoreController@collection')->name('hiscore-boss-show');
+    Route::get('/npc/{collection}', 'Api\HiscoreController@collection')->name('hiscore-npc-show');
+    Route::get('/clue/{collection}', 'Api\HiscoreController@collection')->name('hiscore-clue-show');
 });
 
 Route::prefix('/collection')->group(function() {
