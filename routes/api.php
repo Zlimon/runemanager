@@ -67,15 +67,8 @@ Route::prefix('/account')->group(function() {
 	Route::get('/{account}/boss', function (Account $account) {
         return new AccountBossResource($account);
     })->name('account-bosses-show');
-	Route::get('/{account}/boss/{boss}', function (Account $account, $bossName) {
-        // Allow only selecting bosses
-        $boss = Collection::where(
-            function ($query) use ($bossName) {
-                $query->where('category_id', '=', 2)
-                    ->orWhere('category_id', '=', 3);
-            })->whereName($bossName)->orWhere('alias', $bossName)->firstOrFail();
-
-        return new CollectionResource($account->collection($boss)->firstOrFail());
+	Route::get('/{account}/boss/{collection}', function (Account $account, Collection $collection) {
+        return new CollectionResource(Helper::getCollectionModel($account, $collection));
     })->name('account-boss-show');
 
 	Route::get('/{account}/collection', function (Account $account) {

@@ -232,8 +232,12 @@ class Helper
         }
     }
 
-    public static function getCollectionModel(Collection $collection, $categories = null)
+    public static function getCollectionModel(Account $account = null, Collection $collection, $categories = null)
     {
+        if ($account) {
+            return $collection->model::firstWhere('account_id', $account->id);
+        }
+
         $collection = $collection->model::first();
 
 	    return $collection;
