@@ -50,7 +50,7 @@ class HiscoreController extends Controller
             return response("There are no linked accounts", 404);
         }
 
-        $skill = $skill->model::with('account')
+        $skillHiscore = $skill->model::with('account')
             ->orderBy('rank')
             ->orderByDesc('xp')
             ->orderByDesc('level')
@@ -60,16 +60,14 @@ class HiscoreController extends Controller
             })
             ->flatten();
 
-        $skillName = $skill[0]->getTable();
-
-        return HiscoreResource::collection($skill)
+        return HiscoreResource::collection($skillHiscore)
             ->additional([
                 'meta' => [
-                    'name' => ucfirst($skillName),
-                    'slug' => $skillName,
-                    'total_xp' => number_format($skill->sum('xp')),
-                    'average_total_level' => round($skill->sum('level') / $skill->count()),
-                    'total_max_level' => $skill->where('level', 99)->count(),
+                    'name' => $skill->name,
+                    'slug' => $skill->slug,
+                    'total_xp' => number_format($skillHiscore->sum('xp')),
+                    'average_total_level' => round($skillHiscore->sum('level') / $skillHiscore->count()),
+                    'total_max_level' => $skillHiscore->where('level', 99)->count(),
                 ]
             ]);
     }
@@ -96,8 +94,8 @@ class HiscoreController extends Controller
         return HiscoreResource::collection($collectionHiscore)
             ->additional([
                 'meta' => [
-                    'name' => $collection->alias,
-                    'slug' => Str::slug($collection->name),
+                    'name' => $collection->name,
+                    'slug' => $collection->slug,
                     'total' => number_format($collectionHiscore->sum('kill_count')),
                     'average' => round($collectionHiscore->sum('kill_count') / $collectionHiscore->count()),
                 ]
