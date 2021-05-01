@@ -19,9 +19,7 @@ class AccountLootController extends Controller
 {
     public function update(Account $account, Collection $collection, Request $request)
     {
-        $collectionModel = Helper::getCollectionModel($collection);
-
-        $collectionLog = $collectionModel->firstWhere('account_id', $account->id);
+        $collectionLog = $account->collection($collection)->firstOrFail();
 
         // If account has no collection entry, create it
         if (is_null($collectionLog)) {
