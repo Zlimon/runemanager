@@ -214,14 +214,14 @@ class CreateCollectionsTable extends Migration
                 [
                     'category_id' => 2,
                     'order' => 26,
-                    'name' => 'Kree"arra',
+                    'name' => "Kree'arra",
                     'slug' => 'kreearra',
                     'model' => 'App\Boss\KreeArra'
                 ],
                 [
                     'category_id' => 2,
                     'order' => 27,
-                    'name' => 'K"ril Tsutsaroth',
+                    'name' => "K'ril Tsutsaroth",
                     'slug' => 'kril-tsutsaroth',
                     'model' => 'App\Boss\KrilTsutsaroth'
                 ],
@@ -347,14 +347,14 @@ class CreateCollectionsTable extends Migration
                 [
                     'category_id' => 2,
                     'order' => 45,
-                    'name' => 'Vet"ion',
+                    'name' => "Vet'ion",
                     'slug' => 'vetion',
                     'model' => 'App\Boss\VetIon'
                 ],
                 [
                     'category_id' => 2,
                     'order' => 46,
-                    'name' => 'Vet"ion Reborn',
+                    'name' => "Vet'ion Reborn",
                     'slug' => 'vetion',
                     'model' => 'App\Boss\Vetion'
                 ],
