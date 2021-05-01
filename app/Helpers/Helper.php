@@ -137,27 +137,39 @@ class Helper
 
     public static function listSkills()
     {
-        return Skill::pluck('name')->toArray();
+        return Skill::pluck('slug')->toArray();
+    }
+
+    public static function listBosses($asCollection = false)
+    {
+        if ($asCollection) {
+            return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->get();
+        }
+
+        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('slug')->toArray();
+    }
+
+    public static function listNpcs($asCollection = false)
+    {
+        if ($asCollection) {
+            return Collection::where('category_id', 4)->get();
+        }
+
+        return Collection::where('category_id', 4)->pluck('slug')->toArray();
+    }
+
+    public static function listClues($asCollection = false)
+    {
+        if ($asCollection) {
+            return Collection::where('category_id', 5)->get();
+        }
+
+        return Collection::where('category_id', 5)->pluck('slug')->toArray();
     }
 
     public static function listClueScrollTiers()
     {
         return ["all", "beginner", "easy", "medium", "hard", "elite", "master"];
-    }
-
-    public static function listBosses()
-    {
-        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('slug')->toArray();
-    }
-
-    public static function listNpcs()
-    {
-        return Collection::where('category_id', 4)->pluck('slug')->toArray();
-    }
-
-    public static function listClues()
-    {
-        return Collection::where('category_id', 5)->pluck('slug')->toArray();
     }
 
     public static function listAccountTypes()

@@ -35,24 +35,20 @@ class AccountResource extends JsonResource
     {
         $skillHiscores = [];
 
-        foreach (Helper::listSkills() as $skillName) {
-            $skill = Skill::where('name', $skillName)->firstOrFail();
-
-            $skillHiscores[$skillName] = $skill->model::where('account_id', $this->id)->first();
+        foreach (Skill::get() as $skill) {
+            $skillHiscores[$skill->slug] = $skill->model::firstWhere('account_id', $this->id);
         }
 
         $bossHiscores = [];
 
-        foreach (Helper::listBosses() as $bossName) {
-            $boss = Collection::where('name', $bossName)->firstOrFail();
-
-            $bossHiscores[$bossName] = $boss->model::where('account_id', $this->id)->first();
+        foreach (Collection::get() as $collection) {
+            $bossHiscores[$collection->slug] = $collection->model::firstWhere('account_id', $this->id);
         }
 
         return [
             'meta' => [
                 'skill_hiscores' => SkillResource::collection(collect($skillHiscores)),
-                'boss_hiscores' => CollectionResource::collection(collect($bossHiscores)),
+                'collection_hiscores' => CollectionResource::collection(collect($bossHiscores)),
             ]
         ];
     }
