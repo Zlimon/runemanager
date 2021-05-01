@@ -39,16 +39,16 @@ class AccountResource extends JsonResource
             $skillHiscores[$skill->slug] = $skill->model::firstWhere('account_id', $this->id);
         }
 
-        $bossHiscores = [];
+        $collectionHiscore = [];
 
         foreach (Collection::get() as $collection) {
-            $bossHiscores[$collection->slug] = $collection->model::firstWhere('account_id', $this->id);
+            $collectionHiscore[$collection->slug] = $collection->model::firstWhere('account_id', $this->id);
         }
 
         return [
             'meta' => [
                 'skill_hiscores' => SkillResource::collection(collect($skillHiscores)),
-                'collection_hiscores' => CollectionResource::collection(collect($bossHiscores)),
+                'collection_hiscores' => CollectionResource::collection(collect($collectionHiscore)),
             ]
         ];
     }

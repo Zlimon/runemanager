@@ -34,10 +34,8 @@ class AccountBossResource extends JsonResource
     {
         $bossHiscores = [];
 
-        foreach (Helper::listBosses() as $bossName) {
-            $boss = Collection::where('name', $bossName)->firstOrFail();
-
-            $bossHiscores[$bossName] = $boss->model::where('account_id', $this->id)->first();
+        foreach (Helper::listBosses(true) as $boss) {
+            $bossHiscores[$boss->slug] = $boss->model::firstWhere('account_id', $this->id);
         }
 
         return [

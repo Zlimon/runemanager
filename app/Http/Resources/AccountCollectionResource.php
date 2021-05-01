@@ -31,19 +31,15 @@ class AccountCollectionResource extends JsonResource
 
     public function with($request)
     {
-        $collections = Collection::get()->pluck('name');
+        $collectionHiscore = [];
 
-        $collectionHiscores = [];
-
-        foreach ($collections as $collectionName) {
-            $collection = Collection::where('name', $collectionName)->firstOrFail();
-
-            $collectionHiscores[$collectionName] = $collection->model::where('account_id', $this->id)->first();
+        foreach (Collection::get() as $collection) {
+            $collectionHiscore[$collection->slug] = $collection->model::firstWhere('account_id', $this->id);
         }
 
         return [
             'meta' => [
-                'collection_hiscores' => CollectionResource::collection(collect($collectionHiscores)),
+                'collection_hiscores' => CollectionResource::collection(collect($collectionHiscore)),
             ]
         ];
     }
