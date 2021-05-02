@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Collection;
 use App\Helpers\Helper;
 use App\NewsPost;
+use App\Skill;
 
 class PageController extends Controller
 {
@@ -32,27 +34,31 @@ class PageController extends Controller
      *
      * @return
      */
-    public function hiscore($hiscoreType, $hiscoreName)
+    public function hiscore($hiscoreCategory, $hiscoreName)
     {
-        switch ($hiscoreType) {
+        switch ($hiscoreCategory) {
             case "skill":
                 $hiscoreList = Helper::listSkills();
                 array_push($hiscoreList, "total");
+                $hiscore = Skill::firstWhere('slug', $hiscoreName);
                 break;
             case "boss":
                 $hiscoreList = Helper::listBosses();
+                $hiscore = Collection::firstWhere('slug', $hiscoreName);
                 break;
             case "npc":
                 $hiscoreList = Helper::listNpcs();
+                $hiscore = Collection::firstWhere('slug', $hiscoreName);
                 break;
             case "clue":
                 $hiscoreList = Helper::listClues();
+                $hiscore = Collection::firstWhere('slug', $hiscoreName);
                 break;
             default:
                 return abort(404);
         }
 
-        if (!in_array($hiscoreName, $hiscoreList)) {
+        if (!$hiscore) {
             return abort(404);
         }
 
@@ -67,7 +73,7 @@ class PageController extends Controller
         $accountCount = Account::count();
 
         return view('hiscore',
-            compact('hiscoreType', 'hiscoreName', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom',
+            compact('hiscoreCategory', 'hiscore', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom',
                 'accountCount'));
     }
 }
