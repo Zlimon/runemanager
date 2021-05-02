@@ -32,9 +32,9 @@ class Collection extends Model
         return 'slug';
     }
 
-    public static function findByNameAndCategory($name, $category_id)
+    public static function findByNameAndCategory($name, $categoryId)
     {
-        return self::where([['name', $name], ['category_id', $category_id]])->first();
+        return self::where([['name', $name], ['category_id', $categoryId]])->first();
     }
 
     public function category()

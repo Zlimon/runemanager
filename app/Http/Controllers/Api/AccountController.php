@@ -102,12 +102,10 @@ class AccountController extends Controller
             throw $e;
         }
 
-        $skills = Helper::listSkills();
+        $skills = Skill::get();
         $skillsCount = count($skills);
 
         foreach ($skills as $key => $skill) {
-            $skill = Skill::where('name', $skill)->firstOrFail();
-
             $skill = new $skill->model;
 
             $skill->account_id = $account->id;
@@ -128,7 +126,7 @@ class AccountController extends Controller
         $cluesIndex = 0;
 
         for ($i = ($skillsCount + 3); $i < ($skillsCount + 3 + $cluesCount); $i++) {
-            $clueCollection = Collection::where('name', $clues[$cluesIndex] . ' treasure trails')->firstOrFail();
+            $clueCollection = Collection::where('slug', $clues[$cluesIndex] . '-treasure-trails')->firstOrFail();
 
             $clueCollection = new $clueCollection->model;
 
@@ -153,7 +151,7 @@ class AccountController extends Controller
         $dksKillCount = 0;
 
         for ($i = ($skillsCount + $cluesCount + 5); $i < ($skillsCount + $cluesCount + 5 + count($bosses)); $i++) {
-            $bossCollection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
+            $bossCollection = Collection::where('slug', $bosses[$bossIndex])->firstOrFail();
 
             $bossCollection = new $bossCollection->model;
 
