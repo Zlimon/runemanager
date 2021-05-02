@@ -37,20 +37,28 @@ class PageController extends Controller
     public function hiscore($hiscoreCategory, $hiscoreName)
     {
         switch ($hiscoreCategory) {
-            case "skill":
+            case 'skill':
                 $hiscoreList = Helper::listSkills();
-                array_push($hiscoreList, "total");
-                $hiscore = Skill::firstWhere('slug', $hiscoreName);
+                array_push($hiscoreList, 'total');
+
+                if ($hiscoreName != 'total') {
+                    $hiscore = Skill::firstWhere('slug', $hiscoreName);
+                } else {
+                    $hiscore = collect(new Skill);
+
+                    $hiscore->name = 'Total';
+                    $hiscore->slug = 'total';
+                }
                 break;
-            case "boss":
+            case 'boss':
                 $hiscoreList = Helper::listBosses();
                 $hiscore = Collection::firstWhere('slug', $hiscoreName);
                 break;
-            case "npc":
+            case 'npc':
                 $hiscoreList = Helper::listNpcs();
                 $hiscore = Collection::firstWhere('slug', $hiscoreName);
                 break;
-            case "clue":
+            case 'clue':
                 $hiscoreList = Helper::listClues();
                 $hiscore = Collection::firstWhere('slug', $hiscoreName);
                 break;
@@ -58,7 +66,7 @@ class PageController extends Controller
                 return abort(404);
         }
 
-        if (!$hiscore) {
+        if (!$hiscore && $hiscoreName != 'total') {
             return abort(404);
         }
 
