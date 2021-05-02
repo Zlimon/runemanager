@@ -27,21 +27,21 @@ Vue.use(require('advanced-laravel-vue-paginate'));
 Vue.use(require('vue-moment'));
 
 
-Vue.component('announcementall', require('./components/Notification/AnnouncementAll.vue').default);
-Vue.component('accountevent', require('./components/Notification/AccountEvent.vue').default);
-Vue.component('broadcast', require('./components/Notification/Broadcast.vue').default);
+Vue.component('announcementall', require('./components/notification/AnnouncementAll.vue').default);
+Vue.component('accountevent', require('./components/notification/AccountEvent.vue').default);
+Vue.component('broadcast', require('./components/notification/Broadcast.vue').default);
 
+Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default); // Fetch all skill hiscores
+Vue.component('collectionhiscore', require('./components/CollectionHiscore.vue').default); // Fetch all collection hiscores
 
-Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
-Vue.component('collectionhiscore', require('./components/CollectionHiscore.vue').default);
+Vue.component('accounthiscore', require('./components/AccountHiscore.vue').default); // Component to switch between account hiscores
+Vue.component('accountskillhiscore', require('./components/account/SkillHiscore.vue').default); // Fetch all account skill hiscores
+Vue.component('accountbosshiscore', require('./components/account/BossHiscore.vue').default); // Fetch all account boss hiscores
 
-Vue.component('accounthiscore', require('./components/AccountHiscore.vue').default);
-Vue.component('accountskillhiscore', require('./components/AccountSkillHiscore.vue').default);
-Vue.component('accountbosshiscore', require('./components/AccountBossHiscore.vue').default);
+Vue.component('equipment', require('./components/account/Equipment.vue').default);
+Vue.component('quests', require('./components/account/Quests.vue').default);
+Vue.component('bank', require('./components/account/Bank.vue').default);
 
-Vue.component('equipment', require('./components/Equipment.vue').default);
-Vue.component('bank', require('./components/Bank.vue').default);
-Vue.component('quests', require('./components/Quests.vue').default);
 Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
 
 Vue.component(
