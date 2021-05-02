@@ -18,7 +18,7 @@
 
             <div v-else>
                 <div class="d-flex flex-wrap justify-content-around">
-                    <div v-for="(hiscore, name) in meta.bossHiscores">
+                    <div v-for="(hiscore, name) in hiscores">
                         <div class="button-combat-style-narrow text-center button-small">
                             <div v-if="!showCollectionLog">
                                 <a :href="'/hiscore/boss/' + name">
@@ -125,7 +125,7 @@ export default {
             loading: true,
             errored: false,
             data: {},
-            meta: {},
+            hiscores: {},
             showCollectionLog: false
         }
     },
@@ -141,7 +141,7 @@ export default {
             .get('/api/account/' + this.account + '/boss')
             .then((response) => {
                 this.data = response.data.data;
-                this.meta = response.data.meta;
+                this.hiscores = response.data.meta.boss_hiscores;
             })
             .catch(error => {
                 console.log(error)

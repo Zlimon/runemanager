@@ -64,7 +64,7 @@ export default {
             .get('/api/account/' + this.account + '/skill')
             .then((response) => {
                 this.data = response.data.data;
-                this.hiscores = response.data.meta.skillHiscores;
+                this.hiscores = response.data.meta.skill_hiscores;
                 this.$emit('load', response.data.data)
             })
             .catch(error => {
