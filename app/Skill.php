@@ -10,6 +10,6 @@ class Skill extends Model
 
     public function getRouteKeyName()
     {
-        return 'name';
+        return 'slug';
     }
 }
