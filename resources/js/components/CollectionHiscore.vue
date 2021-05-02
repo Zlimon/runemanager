@@ -131,7 +131,7 @@ export default {
 
     mounted() {
         axios
-            .get('/api/hiscore/boss/' + this.boss)
+            .get('/api/hiscore/collection/' + this.boss)
             .then((response) => {
                 this.hiscores = response.data.data;
                 this.meta = response.data.meta;

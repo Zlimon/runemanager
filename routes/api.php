@@ -86,9 +86,7 @@ Route::prefix('/account')->group(function() {
 Route::prefix('/hiscore')->group(function() {
     Route::get('/skill/total', 'Api\HiscoreController@total')->name('hiscore-total-show');
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
-	Route::get('/boss/{collection}', 'Api\HiscoreController@collection')->name('hiscore-boss-show');
-    Route::get('/npc/{collection}', 'Api\HiscoreController@collection')->name('hiscore-npc-show');
-    Route::get('/clue/{collection}', 'Api\HiscoreController@collection')->name('hiscore-clue-show');
+	Route::get('/collection/{collection}', 'Api\HiscoreController@collection')->name('hiscore-boss-show');
 });
 
 Route::prefix('/collection')->group(function() {
