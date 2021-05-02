@@ -93,7 +93,7 @@
             @if ($hiscoreCategory == "skill")
                 <skillhiscore skill="{{ $hiscore->slug }}"></skillhiscore>
             @else
-                <bosshiscore boss="{{ $hiscore->slug }}"></bosshiscore>
+                <collectionhiscore boss="{{ $hiscore->slug }}"></collectionhiscore>
             @endif
         @else
             <div class="text-center py-5">
