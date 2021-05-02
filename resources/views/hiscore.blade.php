@@ -63,7 +63,7 @@
 				<span class="selection-top">
 					@foreach ($hiscoreListTop as $hiscoreTop)
                         <a href="{{ route('hiscore', [$hiscoreCategory, $hiscoreTop]) }}">
-                            <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.str_replace('-', '_', $hiscoreTop).'.png') }}"
+                            <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.$hiscoreTop.'.png') }}"
                                  class="icon"
                                  title="Click here to see {{ ucfirst($hiscoreTop) }} hiscores">
                         </a>
@@ -71,7 +71,7 @@
 				</span>
                 <div class="mid-part">
                     <h1 class="active middle-icon" style="display: inline-block;">
-                        <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.str_replace('-', '_', $hiscore->slug).'.png') }}"
+                        <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.$hiscore->slug.'.png') }}"
                             class="pixel icon">
                         <br>
                         <span>{{ $hiscore->name }}</span>
@@ -80,7 +80,7 @@
                 <span class="selection-bot">
 					@foreach ($hiscoreListBottom as $hiscoreBottom)
                         <a href="{{ route('hiscore', [$hiscoreCategory, $hiscoreBottom]) }}">
-                            <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.str_replace('-', '_', $hiscoreBottom).'.png') }}"
+                            <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.$hiscoreBottom.'.png') }}"
                                  class="icon"
                                  title="Click here to see {{ ucfirst($hiscoreBottom) }} hiscores">
                         </a>
