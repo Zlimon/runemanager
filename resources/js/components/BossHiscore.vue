@@ -19,7 +19,7 @@
             <div v-else>
                 <div class="d-flex flex-row">
                     <img :alt="meta.name + ' icon'"
-                         :src="'/images/boss/' + meta.slug + '.png'"
+                         :src="'/images/' + category + '/' + meta.slug + '.png'"
                          class="d-none d-md-inline pixel icon"
                          style="width: 7.5rem; height: 7.5rem;">
 
@@ -80,13 +80,13 @@
                                                  class="collection-log-item rounded background-world-map bg-dark p-4">
                                                 <div v-if="count === 1">
                                                     <img :alt="item + ' item icon'"
-                                                         :src="'/images/boss/' + meta.slug + '/' + item + '.png'"
+                                                         :src="'/images/' + category + '/' + meta.slug + '/' + item + '.png'"
                                                          :title="item.replaceAll('_', ' ') | capitalize"
                                                          class="pixel hiscore-icon">
                                                 </div>
                                                 <div v-else-if="count > 0">
                                                     <img :alt="item + ' item icon'"
-                                                         :src="'/images/boss/' + meta.slug + '/' + item + '.png'"
+                                                         :src="'/images/' + category + '/' + meta.slug + '/' + item + '.png'"
                                                          :title="item.replaceAll('_', ' ') | capitalize"
                                                          class="pixel hiscore-icon">
                                                     <span class="collection-log-item-counter runescape-progress">
@@ -95,7 +95,7 @@
                                                 </div>
                                                 <div v-else>
                                                     <img :alt="item + ' item icon'"
-                                                         :src="'/images/boss/' + meta.slug + '/' + item + '.png'"
+                                                         :src="'/images/' + category + '/' + meta.slug + '/' + item + '.png'"
                                                          :title="item.replaceAll('_', ' ') | capitalize"
                                                          class="pixel hiscore-icon faded">
                                                 </div>
@@ -124,6 +124,7 @@ export default {
             errored: false,
             hiscores: {},
             meta: {},
+            category: 'boss',
             total: 0
         }
     },
@@ -134,6 +135,7 @@ export default {
             .then((response) => {
                 this.hiscores = response.data.data;
                 this.meta = response.data.meta;
+                this.category = response.data.meta.category;
                 this.total = response.data.meta.total_uniques;
             })
             .catch(error => {

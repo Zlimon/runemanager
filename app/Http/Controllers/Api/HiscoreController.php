@@ -106,6 +106,7 @@ class HiscoreController extends Controller
                 'meta' => [
                     'name' => $collection->name,
                     'slug' => $collection->slug,
+                    'category' => $collection->category()->first()->category,
                     'total_kill_count' => number_format($collectionHiscore->sum('kill_count')),
                     'average_kill_count' => round($collectionHiscore->sum('kill_count') / $collectionHiscore->count()),
                     'total_uniques' => count($collectionUniques),
