@@ -35,6 +35,7 @@ Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
 Vue.component('collectionhiscore', require('./components/CollectionHiscore.vue').default); // Fetch all collection hiscores
 
 Vue.component('accounthiscore', require('./components/AccountHiscore.vue').default); // Component to switch between account hiscores
+
 Vue.component('accountskillhiscore', require('./components/account/SkillHiscore.vue').default); // Fetch all account skill hiscores
 Vue.component('accountbosshiscore', require('./components/account/BossHiscore.vue').default); // Fetch all account boss hiscores
 

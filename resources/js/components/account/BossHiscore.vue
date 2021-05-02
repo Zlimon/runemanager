@@ -22,21 +22,21 @@
                         <div class="button-combat-style-narrow text-center button-small">
                             <div v-if="!showCollectionLog">
                                 <a :href="'/hiscore/boss/' + name">
-                                    <img :alt="hiscore.alias + ' boss icon'"
-                                         :src="'/images/boss/' + name.replace(/ /g, '_') + '.png'"
-                                         :title="'Click here to visit ' + hiscore.alias + ' hiscores'"
+                                    <img :alt="name + ' boss icon'"
+                                         :src="'/images/boss/' + name + '.png'"
+                                         :title="'Click here to visit ' + name + ' hiscores'"
                                          class="hiscore-icon-small">
                                     <span>{{ hiscore.kill_count }}</span>
                                 </a>
                             </div>
 
                             <div v-else>
-                                <div :data-target="$idRef(name.replace(/ /g, '_'))" data-toggle="modal"
+                                <div :data-target="$idRef(name)" data-toggle="modal"
                                      style="cursor: pointer;">
                                     <p class="float-left" style="padding: 0; margin: 0;">
-                                        <img :alt="hiscore.alias + ' boss icon'"
-                                             :src="'/images/boss/' + name.replace(/ /g, '_') + '.png'"
-                                             :title="'Click here to visit ' + hiscore.alias + ' hiscores'"
+                                        <img :alt="name + ' boss icon'"
+                                             :src="'/images/boss/' + name + '.png'"
+                                             :title="'Click here to visit ' + name + ' hiscores'"
                                              class="hiscore-icon-small">
                                         <div v-if="(hiscore.obtained !== null ? hiscore.obtained : 0) === hiscore.total">
                                             <span class="runescape-success">
@@ -60,7 +60,7 @@
                                     </p>
                                 </div>
 
-                                <div :id="$id(name.replace(/ /g, '_'))" class="modal fade" role="dialog">
+                                <div :id="$id(name)" class="modal fade" role="dialog">
                                     <div class="modal-dialog">
                                         <div class="modal-content bg-dark">
                                             <div class="modal-body background-dialog-iron-rivets text-light">
@@ -72,13 +72,13 @@
                                                          class="collection-log-item background-world-map bg-dark p-4">
                                                         <div v-if="count === 1">
                                                             <img :alt="item + ' item icon'"
-                                                                 :src="'/images/boss/' + name.replace(/ /g, '_') + '/' + item + '.png'"
+                                                                 :src="'/images/boss/' + name + '/' + item + '.png'"
                                                                  :title="item.replaceAll('_', ' ') | capitalize"
                                                                  class="pixel hiscore-icon">
                                                         </div>
                                                         <div v-else-if="count > 0">
                                                             <img :alt="item + ' item icon'"
-                                                                 :src="'/images/boss/' + name.replace(/ /g, '_') + '/' + item + '.png'"
+                                                                 :src="'/images/boss/' + name + '/' + item + '.png'"
                                                                  :title="item.replaceAll('_', ' ') | capitalize"
                                                                  class="pixel hiscore-icon">
                                                             <span
@@ -88,7 +88,7 @@
                                                         </div>
                                                         <div v-else>
                                                             <img :alt="item + ' item icon'"
-                                                                 :src="'/images/boss/' + name.replace(/ /g, '_') + '/' + item + '.png'"
+                                                                 :src="'/images/boss/' + name + '/' + item + '.png'"
                                                                  :title="item.replaceAll('_', ' ') | capitalize"
                                                                  class="pixel hiscore-icon faded">
                                                         </div>
