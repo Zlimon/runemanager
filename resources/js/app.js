@@ -34,8 +34,6 @@ Vue.component('broadcast', require('./components/Notification/Broadcast.vue').de
 
 Vue.component('skillhiscore', require('./components/SkillHiscore.vue').default);
 Vue.component('bosshiscore', require('./components/BossHiscore.vue').default);
-Vue.component('npchiscore', require('./components/NpcHiscore.vue').default);
-Vue.component('cluehiscore', require('./components/ClueHiscore.vue').default);
 Vue.component('accounthiscore', require('./components/AccountHiscore.vue').default);
 Vue.component('accountskillhiscore', require('./components/AccountSkillHiscore.vue').default);
 Vue.component('accountbosshiscore', require('./components/AccountBossHiscore.vue').default);

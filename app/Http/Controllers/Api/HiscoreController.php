@@ -91,13 +91,24 @@ class HiscoreController extends Controller
             return response("There are no registered collections for " . $collection->slug, 404);
         }
 
+        $collectionUniques = array_diff_key($collectionHiscore[0]->attributesToArray(), [
+            "id" => 0,
+            "account_id" => 0,
+            "kill_count" => 0,
+            "rank" => 0,
+            "obtained" => 0,
+            "created_at" => 0,
+            "updated_at" => 0
+        ]);
+
         return HiscoreResource::collection($collectionHiscore)
             ->additional([
                 'meta' => [
                     'name' => $collection->name,
                     'slug' => $collection->slug,
-                    'total' => number_format($collectionHiscore->sum('kill_count')),
-                    'average' => round($collectionHiscore->sum('kill_count') / $collectionHiscore->count()),
+                    'total_kill_count' => number_format($collectionHiscore->sum('kill_count')),
+                    'average_kill_count' => round($collectionHiscore->sum('kill_count') / $collectionHiscore->count()),
+                    'total_uniques' => count($collectionUniques),
                 ]
             ]);
     }

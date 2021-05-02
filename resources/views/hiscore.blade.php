@@ -92,12 +92,8 @@
         @if ($accountCount > 0)
             @if ($hiscoreCategory == "skill")
                 <skillhiscore skill="{{ $hiscore->slug }}"></skillhiscore>
-            @elseif ($hiscoreCategory == "boss")
+            @else
                 <bosshiscore boss="{{ $hiscore->slug }}"></bosshiscore>
-            @elseif ($hiscoreCategory == "npc")
-                <npchiscore npc="{{ $hiscore->slug }}"></npchiscore>
-            @elseif ($hiscoreCategory == "clue")
-                <cluehiscore clue="{{ $hiscore->slug }}"></cluehiscore>
             @endif
         @else
             <div class="text-center py-5">

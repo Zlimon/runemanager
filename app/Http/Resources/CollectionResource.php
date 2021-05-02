@@ -15,9 +15,7 @@ class CollectionResource extends JsonResource
      */
     public function toArray($request)
     {
-        $collectionLog = $this->attributesToArray();
-
-        $collectionLog = array_diff_key($collectionLog, [
+        $collectionUniques = array_diff_key($this->attributesToArray(), [
             "id" => 0,
             "account_id" => 0,
             "kill_count" => 0,
@@ -31,8 +29,8 @@ class CollectionResource extends JsonResource
             'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
             'kill_count' => $this->kill_count,
             'obtained' => $this->obtained,
-            'total' => sizeof($collectionLog),
-            'log' => $collectionLog,
+            'total' => sizeof($collectionUniques),
+            'log' => $collectionUniques,
         ];
     }
 }
