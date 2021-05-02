@@ -54,7 +54,7 @@
                                 </div>
 
                                 <div class="text-center">
-                                    <small>Total value: {{ broadcast.log.total}} gp</small>
+                                    <small>Total value: {{ broadcast.log.total.toLocaleString() }} gp</small>
                                 </div>
                             </div>
                         </div>
