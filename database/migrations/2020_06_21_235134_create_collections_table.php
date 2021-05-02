@@ -138,20 +138,20 @@ class CreateCollectionsTable extends Migration
                     'category_id' => 2,
                     'order' => 15,
                     'name' => 'Dagannoth Prime',
-                    'slug' => 'dagannoth-rime',
+                    'slug' => 'dagannoth-prime',
                     'model' => 'App\Boss\DagannothPrime'
                 ],
                 [
                     'category_id' => 2,
                     'order' => 16,
                     'name' => 'Dagannoth Rex',
-                    'slug' => 'dagannoth-ex',
+                    'slug' => 'dagannoth-rex',
                     'model' => 'App\Boss\DagannothRex'
                 ],
                 [
                     'category_id' => 2,
                     'order' => 17,
-                    'name' => 'Dagannoth Surpeme',
+                    'name' => 'Dagannoth Supreme',
                     'slug' => 'dagannoth-supreme',
                     'model' => 'App\Boss\DagannothSupreme'
                 ],
