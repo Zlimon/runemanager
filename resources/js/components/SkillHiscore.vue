@@ -19,7 +19,7 @@
             <div v-else>
                 <div class="d-flex flex-row">
                     <img :alt="meta.name + ' icon'"
-                         :src="'/storage/resource-pack/skill/' + meta.skill + '.png'"
+                         :src="'/storage/resource-pack/skill/' + meta.slug + '.png'"
                          class="d-none d-md-inline pixel icon"
                          style="width: 7.5rem; height: 7.5rem;">
 
@@ -45,9 +45,9 @@
                     <tr v-for="(hiscore, index) in hiscores">
                         <td class="d-none d-md-table-cell">{{ index + 1 }}</td>
                         <td><a :href="'/account/' + hiscore.username">{{ hiscore.username }}</a></td>
-                        <td>{{ hiscore.level }}</td>
-                        <td>{{ hiscore.xp }}</td>
-                        <td>{{ hiscore.rank }}</td>
+                        <td>{{ hiscore.hiscore.level }}</td>
+                        <td>{{ hiscore.hiscore.xp }}</td>
+                        <td>{{ hiscore.hiscore.rank }}</td>
                     </tr>
                 </table>
             </div>

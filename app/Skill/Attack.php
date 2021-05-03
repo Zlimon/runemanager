@@ -7,5 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attack extends Model
 {
-    use HasFactory;
+    protected $table = 'attack';
+
+    protected $fillable = ['level'];
+
+    protected $hidden = ['user_id'];
+
+    public function account()
+    {
+        return $this->belongsTo(\App\Account::class);
+    }
 }

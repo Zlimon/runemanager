@@ -44,11 +44,40 @@ class Account extends Model
         'user_id', 'account_type', 'username', 'rank', 'level', 'xp'
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'username';
+    }
+
     public function user() {
         return $this->belongsTo(User::class);
     }
 
+    public function log() {
+        return $this->hasMany(Log::class);
+    }
+
+    public function logBroadcast() {
+        return $this->hasManyThrough(Broadcast::class, Log::class);
+    }
+
+    public function collection(Collection $collection) {
+        return $this->hasOne($collection->model);
+    }
+
+    public function skill(Skill $skill) {
+        return $this->hasOne($skill->model);
+    }
+
     public function equipment() {
         return $this->hasOne(Equipment::class);
+    }
+
+    public function bank() {
+        return $this->hasOne(Bank::class);
+    }
+
+    public function quest() {
+        return $this->hasOne(Quest::class);
     }
 }

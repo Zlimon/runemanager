@@ -23,18 +23,23 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Collection extends Model
 {
-    protected $fillable = ['category_id', 'name', 'alias', 'model'];
+    protected $fillable = ['category_id', 'order', 'name', 'slug', 'model'];
 
     public $timestamps = false;
 
-    public static function findByNameAndCategory($name, $category_id)
+    public function getRouteKeyName()
     {
-        return self::where([['name', $name], ['category_id', $category_id]])->first();
+        return 'slug';
+    }
+
+    public static function findByNameAndCategory($name, $categoryId)
+    {
+        return self::where([['name', $name], ['category_id', $categoryId]])->first();
     }
 
     public function category()
     {
-        return $this->hasOne(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function collection()

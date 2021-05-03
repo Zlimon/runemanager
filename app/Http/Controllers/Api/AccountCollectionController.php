@@ -4,98 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Account;
 use App\Collection;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AccountCollectionResource;
+use App\Http\Resources\CollectionResource;
 use App\Log;
 use Illuminate\Http\Request;
 
 class AccountCollectionController extends Controller
 {
-    // NOT IN USE ATM
-    public function index($accountUsername, $collectionType)
+    public function update(Account $account, Collection $collection, Request $request)
     {
-        $account = Account::where('username', $accountUsername)->first();
-
-        if ($account) {
-            if (in_array($collectionType, ['all', 'boss', 'raid', 'clue', 'minigame', 'other'], true)) {
-                if ($collectionType === "all") {
-                    $allCollections = Collection::select('name')->where('type', $collectionType)->get();
-                }
-                $allCollections = Collection::select('name')->where('type', $collectionType)->get();
-
-                // TODO create function
-                // This method create a migration file for each collection model in the collections table
-                // $listOfS = [];
-                // foreach ($allCollections as $key => $collection) {
-                // 	$collectionName = $collection->name;
-                // 	if ($collectionName[strlen($collectionName) - 1] == "s") {
-                // 		$listOfS[$key] = $collectionName;
-                // 		$command = "make:migration create_".str_replace(" ", "_", $collectionName)."_table";
-                // 	} else {
-                // 		$command = "make:migration create_".str_replace(" ", "_", $collectionName)."s_table";
-                // 	}
-
-                // 	$execute = Artisan::call($command);
-                // }
-
-                $allCollectionLoot = [];
-                foreach ($allCollections as $key => $collection) {
-                    $findCollection = Collection::where('name', $collection->name)->firstOrFail();
-
-                    $collectionLog = $findCollection->model::where('account_id', $account->id)->first();
-
-                    if (!$collectionLog) {
-                        return response()->json("This account does not have any registered loot for " . $collection->name,
-                            404);
-                    }
-
-                    $allCollectionLoot[$key] = $collectionLog;
-                }
-
-                return response()->json($allCollectionLoot, 200);
-            } else {
-                return response()->json("This collection type could not be found", 404);
-            }
-        } else {
-            return response()->json("This account could not be found", 404);
-        }
-    }
-
-    public function show($accountUsername, $collectionName)
-    {
-        $account = Account::where('username', $accountUsername)->first();
-
-        if ($account) {
-            $collection = Collection::where('alias', $collectionName)->firstOrFail();
-
-            if ($collection) {
-                $collectionLog = $collection->model::where('account_id', $account->id)->first();
-
-                if ($collectionLog) {
-                    return response()->json($collectionLog, 200);
-                } else {
-                    return response("This account does not have any registered loot for " . $collection->name, 404);
-                }
-            } else {
-                return response("This collection could not be found", 404);
-            }
-        } else {
-            return response("This account is not authenticated with " . auth()->user()->name, 401);
-        }
-    }
-
-    public function update($accountUsername, $collectionName, Request $request)
-    {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
-
-        $collection = Collection::where('alias', $collectionName)->first();
-        if (!$collection) {
-            return response($collectionName . " is not currently supported", 406);
-        }
-
-        $collectionLog = $collection->model::where('account_id', $account->id)->first();
+        $collectionLog = $account->collection($collection)->firstOrFail();
 
         // If account has no collection entry, create it
         if (is_null($collectionLog)) {
@@ -113,7 +33,7 @@ class AccountCollectionController extends Controller
         }
 
         if (!$collectionLog) {
-            return response($accountUsername . " does not have any registered collction log for " . $collection->alias, 404);
+            return response($account->username . " does not have any registered collction log for " . $collection->name, 404);
         }
 
         foreach ($request->all()["collectionLogItems"] as $lootItem) {
@@ -138,6 +58,6 @@ class AccountCollectionController extends Controller
 
         $log = Log::create($logData);
 
-        return response("Submitted " . $collection->alias . " collection log", 200);
+        return response("Submitted " . $collection->name . " collection log", 200);
     }
 }

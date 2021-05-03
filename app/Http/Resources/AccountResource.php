@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Collection;
 use App\Helpers\Helper;
+use App\Skill;
+use App\Collection;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\DB;
 
 class AccountResource extends JsonResource
 {
@@ -33,28 +33,22 @@ class AccountResource extends JsonResource
 
     public function with($request)
     {
-        $skills = Helper::listSkills();
-
         $skillHiscores = [];
 
-        foreach ($skills as $skillName) {
-            $skillHiscores[$skillName] = DB::table($skillName)->where('account_id', $this->id)->first();
+        foreach (Skill::get() as $skill) {
+            $skillHiscores[$skill->slug] = $skill->model::firstWhere('account_id', $this->id);
         }
 
-        $bosses = Helper::listBosses();
+        $collectionHiscore = [];
 
-        $bossHiscores = [];
-
-        foreach ($bosses as $bossName) {
-            $collection = Collection::where('name', $bossName)->firstOrFail();
-
-            $bossHiscores[$bossName] = $collection->model::first();
+        foreach (Collection::get() as $collection) {
+            $collectionHiscore[$collection->slug] = $collection->model::firstWhere('account_id', $this->id);
         }
 
         return [
             'meta' => [
-                'skillHiscores' => SkillResource::collection(collect($skillHiscores)),
-                'bossHiscores' => BossResource::collection(collect($bossHiscores)),
+                'skill_hiscores' => SkillResource::collection(collect($skillHiscores)),
+                'collection_hiscores' => CollectionResource::collection(collect($collectionHiscore)),
             ]
         ];
     }
