@@ -87,6 +87,16 @@ class User extends Authenticatable
         return $this->hasMany(Account::class);
     }
 
+    public function log()
+    {
+        return $this->hasMany(Log::class);
+    }
+
+    public function newspost()
+    {
+        return $this->hasMany(NewsPost::class);
+    }
+
     // TODO support multiple auth statuses?
     public function authStatus()
     {

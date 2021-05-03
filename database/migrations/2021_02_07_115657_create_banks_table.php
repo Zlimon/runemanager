@@ -15,7 +15,7 @@ class CreateBanksTable extends Migration
     {
         Schema::create('banks', function (Blueprint $table) {
             $table->id();
-            $table->integer('account_id')->unsigned();
+            $table->foreignId('account_id')->constrained();
             $table->text('data')->nullable();
             $table->integer('total')->nullable();
             $table->boolean('display')->default(false);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Account;
 use App\Equipment;
 use App\Events\AccountEquipment;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Log;
 use Carbon\Carbon;
@@ -12,31 +13,22 @@ use Illuminate\Http\Request;
 
 class AccountEquipmentController extends Controller
 {
-    public function show($accountUsername)
+    public function show(Account $account)
     {
-        $account = Account::where('username', $accountUsername)->pluck('id')->first();
+        $equipment = Equipment::where([
+            ['account_id', '=', $account->id],
+            ['display', '=', 1]
+        ])->first();
 
-        if ($account) {
-            $equipment = Equipment::where([
-                ['account_id', '=', $account],
-                ['display', '=', 1]
-            ])->first();
-
-            if ($equipment) {
-                return response()->json($equipment, 200);
-            } else {
-                return response("No equipment for " . $accountUsername . " were found!", 404);
-            }
+        if ($equipment) {
+            return response()->json($equipment, 200);
+        } else {
+            return response("No equipment for " . $account->username . " were found!", 404);
         }
     }
 
-    public function update($accountUsername, Request $request)
+    public function update(Account $account, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
-
         Equipment::updateOrInsert(
             ['account_id' => $account->id],
             [
@@ -60,20 +52,14 @@ class AccountEquipmentController extends Controller
 
         AccountEquipment::dispatch($equipment);
 
-        return response("Updated equipment for " . $accountUsername, 200);
+        return response("Updated equipment for " . $account->username, 200);
     }
 
-    public function updateDisplay($accountUsername)
+    public function updateDisplay(Account $account)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
-
         $equipment = Equipment::where('account_id', $account->id)->first();
-
         if (!$equipment) {
-            return response("No equipment for " . $accountUsername . " were found!", 404);
+            return response("No equipment for " . $account->username . " were found!", 404);
         }
 
         $equipment->display ^= 1;
@@ -82,6 +68,6 @@ class AccountEquipmentController extends Controller
 
         AccountEquipment::dispatch($equipment);
 
-        return response(($equipment->display === 1 ? "Displaying" : "No longer displaying") . " equipment for " . $accountUsername, 200);
+        return response(($equipment->display === 1 ? "Displaying" : "No longer displaying") . " equipment for " . $account->username, 200);
     }
 }

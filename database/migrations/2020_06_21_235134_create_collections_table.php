@@ -14,12 +14,12 @@ class CreateCollectionsTable extends Migration
     public function up()
     {
         Schema::create('collections', function (Blueprint $table) {
-                $table->id();
-                $table->integer('category_id')->unsigned();
-                $table->integer('order')->unsigned()->unique();
-                $table->string('name');
-                $table->string('alias')->unique();
-                $table->string('model');
+            $table->id();
+            $table->foreignId('category_id')->constrained();
+            $table->integer('order')->unsigned()->unique();
+            $table->string('name')->unique();
+            $table->string('slug');
+            $table->string('model');
         });
 
         /**
@@ -37,413 +37,413 @@ class CreateCollectionsTable extends Migration
         DB::table('collections')->insert(
             [
                 [
-                    "category_id" => 2,
-                    "order" => 1,
-                    "name" => "abyssal sire",
-                    "alias" => "Abyssal Sire",
-                    "model" => "App\Boss\AbyssalSire"
+                    'category_id' => 2,
+                    'order' => 1,
+                    'name' => 'Abyssal Sire',
+                    'slug' => 'abyssal-sire',
+                    'model' => 'App\Boss\AbyssalSire'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 2,
-                    "name" => "alchemical hydra",
-                    "alias" => "Alchemical Hydra",
-                    "model" => "App\Boss\AlchemicalHydra"
+                    'category_id' => 2,
+                    'order' => 2,
+                    'name' => 'Alchemical Hydra',
+                    'slug' => 'alchemical-hydra',
+                    'model' => 'App\Boss\AlchemicalHydra'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 3,
-                    "name" => "barrows chests",
-                    "alias" => "Barrows Chests",
-                    "model" => "App\Boss\BarrowsChests"
+                    'category_id' => 2,
+                    'order' => 3,
+                    'name' => 'Barrows Chests',
+                    'slug' => 'barrows-chests',
+                    'model' => 'App\Boss\BarrowsChests'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 4,
-                    "name" => "bryophyta",
-                    "alias" => "Bryophyta",
-                    "model" => "App\Boss\Bryophyta"
+                    'category_id' => 2,
+                    'order' => 4,
+                    'name' => 'Bryophyta',
+                    'slug' => 'bryophyta',
+                    'model' => 'App\Boss\Bryophyta'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 5,
-                    "name" => "callisto",
-                    "alias" => "Callisto",
-                    "model" => "App\Boss\Callisto"
+                    'category_id' => 2,
+                    'order' => 5,
+                    'name' => 'Callisto',
+                    'slug' => 'callisto',
+                    'model' => 'App\Boss\Callisto'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 6,
-                    "name" => "cerberus",
-                    "alias" => "Cerberus",
-                    "model" => "App\Boss\Cerberus"
+                    'category_id' => 2,
+                    'order' => 6,
+                    'name' => 'Cerberus',
+                    'slug' => 'cerberus',
+                    'model' => 'App\Boss\Cerberus'
                 ],
                 [
-                    "category_id" => 3,
-                    "order" => 7,
-                    "name" => "chambers of xeric",
-                    "alias" => "Chambers of Xeric",
-                    "model" => "App\Raid\ChambersOfXeric"
+                    'category_id' => 3,
+                    'order' => 7,
+                    'name' => 'Chambers of Xeric',
+                    'slug' => 'chambers-of-xeric',
+                    'model' => 'App\Raid\ChambersOfXeric'
                 ],
                 [
-                    "category_id" => 3,
-                    "order" => 8,
-                    "name" => "chambers of xeric challenge mode",
-                    "alias" => "CoX: Challenge Mode",
-                    "model" => "App\Raid\ChambersOfXericChallengeMode"
+                    'category_id' => 3,
+                    'order' => 8,
+                    'name' => 'CoX: Challenge Mode',
+                    'slug' => 'chambers-of-xeric-challenge-mode',
+                    'model' => 'App\Raid\ChambersOfXericChallengeMode'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 9,
-                    "name" => "chaos elemental",
-                    "alias" => "Chaos Elemental",
-                    "model" => "App\Boss\ChaosElemental"
+                    'category_id' => 2,
+                    'order' => 9,
+                    'name' => 'Chaos Elemental',
+                    'slug' => 'chaos-elemental',
+                    'model' => 'App\Boss\ChaosElemental'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 10,
-                    "name" => "chaos fanatic",
-                    "alias" => "Chaos Fanatic",
-                    "model" => "App\Boss\ChaosFanatic"
+                    'category_id' => 2,
+                    'order' => 10,
+                    'name' => 'Chaos Fanatic',
+                    'slug' => 'chaos-fanatic',
+                    'model' => 'App\Boss\ChaosFanatic'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 11,
-                    "name" => "commander zilyana",
-                    "alias" => "Commander Zilyana",
-                    "model" => "App\Boss\CommanderZilyana"
+                    'category_id' => 2,
+                    'order' => 11,
+                    'name' => 'Commander Zilyana',
+                    'slug' => 'commander-zilyana',
+                    'model' => 'App\Boss\CommanderZilyana'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 12,
-                    "name" => "corporeal beast",
-                    "alias" => "Corporeal Beast",
-                    "model" => "App\Boss\CorporealBeast"
+                    'category_id' => 2,
+                    'order' => 12,
+                    'name' => 'Corporeal Beast',
+                    'slug' => 'corporeal-beast',
+                    'model' => 'App\Boss\CorporealBeast'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 13,
-                    "name" => "crazy archaeologist",
-                    "alias" => "Crazy Archaeologist",
-                    "model" => "App\Boss\CrazyArchaeologist"
+                    'category_id' => 2,
+                    'order' => 13,
+                    'name' => 'Crazy Archaeologist',
+                    'slug' => 'crazy-archaeologist',
+                    'model' => 'App\Boss\CrazyArchaeologist'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 14,
-                    "name" => "dagannoth kings",
-                    "alias" => "Dagannoth Kings",
-                    "model" => "App\Boss\DagannothKings"
+                    'category_id' => 2,
+                    'order' => 14,
+                    'name' => 'Dagannoth Kings',
+                    'slug' => 'dagannoth-kings',
+                    'model' => 'App\Boss\DagannothKings'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 15,
-                    "name" => "dagannoth prime",
-                    "alias" => "Dagannoth Prime",
-                    "model" => "App\Boss\DagannothPrime"
+                    'category_id' => 2,
+                    'order' => 15,
+                    'name' => 'Dagannoth Prime',
+                    'slug' => 'dagannoth-prime',
+                    'model' => 'App\Boss\DagannothPrime'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 16,
-                    "name" => "dagannoth rex",
-                    "alias" => "Dagannoth Rex",
-                    "model" => "App\Boss\DagannothRex"
+                    'category_id' => 2,
+                    'order' => 16,
+                    'name' => 'Dagannoth Rex',
+                    'slug' => 'dagannoth-rex',
+                    'model' => 'App\Boss\DagannothRex'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 17,
-                    "name" => "dagannoth supreme",
-                    "alias" => "Dagannoth Surpeme",
-                    "model" => "App\Boss\DagannothSupreme"
+                    'category_id' => 2,
+                    'order' => 17,
+                    'name' => 'Dagannoth Supreme',
+                    'slug' => 'dagannoth-supreme',
+                    'model' => 'App\Boss\DagannothSupreme'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 18,
-                    "name" => "deranged archaeologist",
-                    "alias" => "Deranged Archaeologist",
-                    "model" => "App\Boss\DerangedArchaeologist"
+                    'category_id' => 2,
+                    'order' => 18,
+                    'name' => 'Deranged Archaeologist',
+                    'slug' => 'deranged-archaeologist',
+                    'model' => 'App\Boss\DerangedArchaeologist'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 19,
-                    "name" => "general graardor",
-                    "alias" => "General Graardor",
-                    "model" => "App\Boss\GeneralGraardor"
+                    'category_id' => 2,
+                    'order' => 19,
+                    'name' => 'General Graardor',
+                    'slug' => 'general-graardor',
+                    'model' => 'App\Boss\GeneralGraardor'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 20,
-                    "name" => "giant mole",
-                    "alias" => "Giant Mole",
-                    "model" => "App\Boss\GiantMole"
+                    'category_id' => 2,
+                    'order' => 20,
+                    'name' => 'Giant Mole',
+                    'slug' => 'giant-mole',
+                    'model' => 'App\Boss\GiantMole'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 21,
-                    "name" => "grotesque guardians",
-                    "alias" => "Grotesque Guardians",
-                    "model" => "App\Boss\GrotesqueGuardians"
+                    'category_id' => 2,
+                    'order' => 21,
+                    'name' => 'Grotesque Guardians',
+                    'slug' => 'grotesque-guardians',
+                    'model' => 'App\Boss\GrotesqueGuardians'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 22,
-                    "name" => "hespori",
-                    "alias" => "Hespori",
-                    "model" => "App\Boss\Hespori"
+                    'category_id' => 2,
+                    'order' => 22,
+                    'name' => 'Hespori',
+                    'slug' => 'hespori',
+                    'model' => 'App\Boss\Hespori'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 23,
-                    "name" => "kalphite queen",
-                    "alias" => "Kalphite Queen",
-                    "model" => "App\Boss\KalphiteQueen"
+                    'category_id' => 2,
+                    'order' => 23,
+                    'name' => 'Kalphite Queen',
+                    'slug' => 'kalphite-queen',
+                    'model' => 'App\Boss\KalphiteQueen'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 24,
-                    "name" => "king black dragon",
-                    "alias" => "King Black Dragon",
-                    "model" => "App\Boss\KingBlackDragon"
+                    'category_id' => 2,
+                    'order' => 24,
+                    'name' => 'King Black Dragon',
+                    'slug' => 'king-black-dragon',
+                    'model' => 'App\Boss\KingBlackDragon'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 25,
-                    "name" => "kraken",
-                    "alias" => "Kraken",
-                    "model" => "App\Boss\Kraken"
+                    'category_id' => 2,
+                    'order' => 25,
+                    'name' => 'Kraken',
+                    'slug' => 'kraken',
+                    'model' => 'App\Boss\Kraken'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 26,
-                    "name" => "kreearra",
-                    "alias" => "Kree'arra",
-                    "model" => "App\Boss\KreeArra"
+                    'category_id' => 2,
+                    'order' => 26,
+                    'name' => "Kree'arra",
+                    'slug' => 'kreearra',
+                    'model' => 'App\Boss\KreeArra'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 27,
-                    "name" => "kril tsutsaroth",
-                    "alias" => "K'ril Tsutsaroth",
-                    "model" => "App\Boss\KrilTsutsaroth"
+                    'category_id' => 2,
+                    'order' => 27,
+                    'name' => "K'ril Tsutsaroth",
+                    'slug' => 'kril-tsutsaroth',
+                    'model' => 'App\Boss\KrilTsutsaroth'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 28,
-                    "name" => "mimic",
-                    "alias" => "Mimic",
-                    "model" => "App\Boss\Mimic"
+                    'category_id' => 2,
+                    'order' => 28,
+                    'name' => 'Mimic',
+                    'slug' => 'mimic',
+                    'model' => 'App\Boss\Mimic'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 29,
-                    "name" => "the nightmare",
-                    "alias" => "Nightmare",
-                    "model" => "App\Boss\TheNightmare"
+                    'category_id' => 2,
+                    'order' => 29,
+                    'name' => 'Nightmare',
+                    'slug' => 'nightmare',
+                    'model' => 'App\Boss\Nightmare'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 30,
-                    "name" => "the nightmare",
-                    "alias" => "The Nightmare",
-                    "model" => "App\Boss\TheNightmare"
+                    'category_id' => 2,
+                    'order' => 30,
+                    'name' => 'The Nightmare',
+                    'slug' => 'nightmare',
+                    'model' => 'App\Boss\Nightmare'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 31,
-                    "name" => "obor",
-                    "alias" => "Obor",
-                    "model" => "App\Boss\Obor"
+                    'category_id' => 2,
+                    'order' => 31,
+                    'name' => 'Obor',
+                    'slug' => 'obor',
+                    'model' => 'App\Boss\Obor'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 32,
-                    "name" => "sarachnis",
-                    "alias" => "Sarachnis",
-                    "model" => "App\Boss\Sarachnis"
+                    'category_id' => 2,
+                    'order' => 32,
+                    'name' => 'Sarachnis',
+                    'slug' => 'sarachnis',
+                    'model' => 'App\Boss\Sarachnis'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 33,
-                    "name" => "scorpia",
-                    "alias" => "Scorpia",
-                    "model" => "App\Boss\Scorpia"
+                    'category_id' => 2,
+                    'order' => 33,
+                    'name' => 'Scorpia',
+                    'slug' => 'scorpia',
+                    'model' => 'App\Boss\Scorpia'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 34,
-                    "name" => "skotizo",
-                    "alias" => "Skotizo",
-                    "model" => "App\Boss\Skotizo"
+                    'category_id' => 2,
+                    'order' => 34,
+                    'name' => 'Skotizo',
+                    'slug' => 'skotizo',
+                    'model' => 'App\Boss\Skotizo'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 35,
-                    "name" => "tempoross",
-                    "alias" => "Tempoross",
-                    "model" => "App\Boss\Tempoross"
+                    'category_id' => 2,
+                    'order' => 35,
+                    'name' => 'Tempoross',
+                    'slug' => 'tempoross',
+                    'model' => 'App\Boss\Tempoross'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 36,
-                    "name" => "the gauntlet",
-                    "alias" => "The Gauntlet",
-                    "model" => "App\Boss\TheGauntlet"
+                    'category_id' => 2,
+                    'order' => 36,
+                    'name' => 'The Gauntlet',
+                    'slug' => 'the-gauntlet',
+                    'model' => 'App\Boss\TheGauntlet'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 37,
-                    "name" => "the corrupted gauntlet",
-                    "alias" => "The Corrupted Gauntlet",
-                    "model" => "App\Boss\TheCorruptedGauntlet"
+                    'category_id' => 2,
+                    'order' => 37,
+                    'name' => 'The Corrupted Gauntlet',
+                    'slug' => 'the-corrupted-gauntlet',
+                    'model' => 'App\Boss\TheCorruptedGauntlet'
                 ],
                 [
-                    "category_id" => 3,
-                    "order" => 38,
-                    "name" => "theatre of blood",
-                    "alias" => "Theatre of Blood",
-                    "model" => "App\Raid\TheatreOfBlood"
+                    'category_id' => 3,
+                    'order' => 38,
+                    'name' => 'Theatre of Blood',
+                    'slug' => 'theatre-of-blood',
+                    'model' => 'App\Raid\TheatreOfBlood'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 39,
-                    "name" => "thermonuclear smoke devil",
-                    "alias" => "Thermonuclear Smoke Devil",
-                    "model" => "App\Boss\ThermonuclearSmokeDevil"
+                    'category_id' => 2,
+                    'order' => 39,
+                    'name' => 'Thermonuclear Smoke Devil',
+                    'slug' => 'thermonuclear-smoke-devil',
+                    'model' => 'App\Boss\ThermonuclearSmokeDevil'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 40,
-                    "name" => "the inferno",
-                    "alias" => "The Inferno",
-                    "model" => "App\Boss\TheInferno"
+                    'category_id' => 2,
+                    'order' => 40,
+                    'name' => 'TzKal-Zuk',
+                    'slug' => 'tzkal-zuk',
+                    'model' => 'App\Boss\TzKalZuk'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 41,
-                    "name" => "the inferno",
-                    "alias" => "TzKal-Zuk",
-                    "model" => "App\Boss\TheInferno"
+                    'category_id' => 2,
+                    'order' => 41,
+                    'name' => 'The Inferno',
+                    'slug' => 'tzkal-zuk',
+                    'model' => 'App\Boss\TzKalZuk'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 42,
-                    "name" => "the fight caves",
-                    "alias" => "The Fight Caves",
-                    "model" => "App\Boss\TheFightCaves"
+                    'category_id' => 2,
+                    'order' => 42,
+                    'name' => 'TzTok-Jad',
+                    'slug' => 'tztok-jad',
+                    'model' => 'App\Boss\TzTokJad'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 43,
-                    "name" => "the fight caves",
-                    "alias" => "TzTok-Jad",
-                    "model" => "App\Boss\TheFightCaves"
+                    'category_id' => 2,
+                    'order' => 43,
+                    'name' => 'The Fight Caves',
+                    'slug' => 'tztok-jad',
+                    'model' => 'App\Boss\TzTokJad'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 44,
-                    "name" => "venenatis",
-                    "alias" => "Venenatis",
-                    "model" => "App\Boss\Venenatis"
+                    'category_id' => 2,
+                    'order' => 44,
+                    'name' => 'Venenatis',
+                    'slug' => 'venenatis',
+                    'model' => 'App\Boss\Venenatis'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 45,
-                    "name" => "vetion",
-                    "alias" => "Vet'ion",
-                    "model" => "App\Boss\Vetion"
+                    'category_id' => 2,
+                    'order' => 45,
+                    'name' => "Vet'ion",
+                    'slug' => 'vetion',
+                    'model' => 'App\Boss\VetIon'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 46,
-                    "name" => "vetion",
-                    "alias" => "Vet'ion Reborn",
-                    "model" => "App\Boss\Vetion"
+                    'category_id' => 2,
+                    'order' => 46,
+                    'name' => "Vet'ion Reborn",
+                    'slug' => 'vetion',
+                    'model' => 'App\Boss\Vetion'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 47,
-                    "name" => "vorkath",
-                    "alias" => "Vorkath",
-                    "model" => "App\Boss\Vorkath"
+                    'category_id' => 2,
+                    'order' => 47,
+                    'name' => 'Vorkath',
+                    'slug' => 'vorkath',
+                    'model' => 'App\Boss\Vorkath'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 48,
-                    "name" => "wintertodt",
-                    "alias" => "Wintertodt",
-                    "model" => "App\Boss\Wintertodt"
+                    'category_id' => 2,
+                    'order' => 48,
+                    'name' => 'Wintertodt',
+                    'slug' => 'wintertodt',
+                    'model' => 'App\Boss\Wintertodt'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 49,
-                    "name" => "zalcano",
-                    "alias" => "Zalcano",
-                    "model" => "App\Boss\Zalcano"
+                    'category_id' => 2,
+                    'order' => 49,
+                    'name' => 'Zalcano',
+                    'slug' => 'zalcano',
+                    'model' => 'App\Boss\Zalcano'
                 ],
                 [
-                    "category_id" => 2,
-                    "order" => 50,
-                    "name" => "zulrah",
-                    "alias" => "Zulrah",
-                    "model" => "App\Boss\Zulrah"
+                    'category_id' => 2,
+                    'order' => 50,
+                    'name' => 'Zulrah',
+                    'slug' => 'zulrah',
+                    'model' => 'App\Boss\Zulrah'
                 ],
 
                 [
-                    "category_id" => 5,
-                    "order" => 51,
-                    "name" => "all treasure trails",
-                    "alias" => "All Treasure Trails",
-                    "model" => "App\Clues\AllTreasureTrails"
+                    'category_id' => 5,
+                    'order' => 51,
+                    'name' => 'All Treasure Trails',
+                    'slug' => 'all-treasure-trails',
+                    'model' => 'App\Clues\AllTreasureTrails'
                 ],
                 [
-                    "category_id" => 5,
-                    "order" => 52,
-                    "name" => "beginner treasure trails",
-                    "alias" => "Clue scroll (beginner)",
-                    "model" => "App\Clues\BeginnerTreasureTrails"
+                    'category_id' => 5,
+                    'order' => 52,
+                    'name' => 'Clue scroll (beginner)',
+                    'slug' => 'beginner-treasure-trails',
+                    'model' => 'App\Clues\BeginnerTreasureTrails'
                 ],
                 [
-                    "category_id" => 5,
-                    "order" => 53,
-                    "name" => "easy treasure trails",
-                    "alias" => "Clue scroll (easy)",
-                    "model" => "App\Clues\EasyTreasureTrails"
+                    'category_id' => 5,
+                    'order' => 53,
+                    'name' => 'Clue scroll (easy)',
+                    'slug' => 'easy-treasure-trails',
+                    'model' => 'App\Clues\EasyTreasureTrails'
                 ],
                 [
-                    "category_id" => 5,
-                    "order" => 54,
-                    "name" => "medium treasure trails",
-                    "alias" => "Clue scroll (medium)",
-                    "model" => "App\Clues\MediumTreasureTrails"
+                    'category_id' => 5,
+                    'order' => 54,
+                    'name' => 'Clue scroll (medium)',
+                    'slug' => 'medium-treasure-trails',
+                    'model' => 'App\Clues\MediumTreasureTrails'
                 ],
                 [
-                    "category_id" => 5,
-                    "order" => 55,
-                    "name" => "hard treasure trails",
-                    "alias" => "Clue scroll (hard)",
-                    "model" => "App\Clues\HardTreasureTrails"
+                    'category_id' => 5,
+                    'order' => 55,
+                    'name' => 'Clue scroll (hard)',
+                    'slug' => 'hard-treasure-trails',
+                    'model' => 'App\Clues\HardTreasureTrails'
                 ],
                 [
-                    "category_id" => 5,
-                    "order" => 56,
-                    "name" => "elite treasure trails",
-                    "alias" => "Clue scroll (elite)",
-                    "model" => "App\Clues\EliteTreasureTrails"
+                    'category_id' => 5,
+                    'order' => 56,
+                    'name' => 'Clue scroll (elite)',
+                    'slug' => 'elite-treasure-trails',
+                    'model' => 'App\Clues\EliteTreasureTrails'
                 ],
                 [
-                    "category_id" => 5,
-                    "order" => 57,
-                    "name" => "master treasure trails",
-                    "alias" => "Clue scroll (master)",
-                    "model" => "App\Clues\MasterTreasureTrails"
+                    'category_id' => 5,
+                    'order' => 57,
+                    'name' => 'Clue scroll (master)',
+                    'slug' => 'master-treasure-trails',
+                    'model' => 'App\Clues\MasterTreasureTrails'
                 ],
 
                 [
                     // TODO remove later
-                    "category_id" => 4,
-                    "order" => 58,
-                    "name" => "goblin",
-                    "alias" => "Goblin",
-                    "model" => "App\Npc\Goblin"
+                    'category_id' => 4,
+                    'order' => 58,
+                    'name' => 'Goblin',
+                    'slug' => 'goblin',
+                    'model' => 'App\Npc\Goblin'
                 ]
             ]
         );

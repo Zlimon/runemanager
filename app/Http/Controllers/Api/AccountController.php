@@ -6,18 +6,17 @@ use App\Account;
 use App\AccountAuthStatus;
 use App\Broadcast;
 use App\Collection;
-use App\Events\AccountAll;
 use App\Events\AccountOnline;
-use App\Events\All;
 use App\Events\EventAll;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
+use App\Http\Resources\CollectionResource;
+use App\Http\Resources\SkillResource;
 use App\Log;
-use App\Notification;
-use Carbon\Carbon;
+use App\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -26,27 +25,6 @@ use Illuminate\Validation\Rule;
 class AccountController extends Controller
 {
     /**
-     * Show a specific account and skills data from a URL request.
-     *
-     * @param string $username
-     * @return
-     */
-    public function show($accountUsername)
-    {
-        return new AccountResource(Account::where('username', $accountUsername)->firstOrFail());
-    }
-
-    public function skill($accountUsername)
-    {
-        return new AccountSkillResource(Account::where('username', $accountUsername)->firstOrFail());
-    }
-
-    public function boss($accountUsername)
-    {
-        return new AccountBossResource(Account::where('username', $accountUsername)->firstOrFail());
-    }
-
-    /**
      * Create a new account instance after a valid registration.
      *
      * @param string $authCode
@@ -54,11 +32,14 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => ['required', 'string', 'min:1', 'max:13'],
-            'code' => ['required', 'string', 'min:1', 'max:8'],
-            'account_type' => ['required', Rule::in(Helper::listAccountTypes())],
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'username' => ['required', 'string', 'min:1', 'max:13'],
+                'code' => ['required', 'string', 'min:1', 'max:8'],
+                'account_type' => ['required', Rule::in(Helper::listAccountTypes())],
+            ]
+        );
 
         if ($validator->fails()) {
             foreach ($validator->messages()->all() as $value) {
@@ -78,16 +59,23 @@ class AccountController extends Controller
         }
 
         if (request('account_type') !== $authStatus->account_type) {
-            return response("This account is registered as " . lcfirst(Helper::formatAccountTypeName($authStatus->account_type)) . ", not " . request('account_type'),
-                    406);
+            return response(
+                "This account is registered as " . lcfirst(
+                    Helper::formatAccountTypeName($authStatus->account_type)
+                ) . ", not " . request('account_type'),
+                406
+            );
         }
 
         if (request('code') !== $authStatus->code) {
             return response("Invalid code", 406);
         }
 
-        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(' ',
-                '%20', $accountUsername);
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $accountUsername
+            );
 
         /* Get the $playerDataUrl file content. */
         $playerData = Helper::getPlayerData($playerDataUrl);
@@ -96,28 +84,41 @@ class AccountController extends Controller
             return response("Could not fetch player data from hiscores", 406);
         }
 
-        $account = Account::create([
-            'user_id' => $authStatus->user_id,
-            'account_type' => request('account_type'),
-            'username' => ucfirst($accountUsername),
-            'rank' => $playerData[0][0],
-            'level' => $playerData[0][1],
-            'xp' => $playerData[0][2]
-        ]);
+        DB::beginTransaction();
 
-        $skills = Helper::listSkills();
+        try {
+            $account = Account::create(
+                [
+                    'user_id' => $authStatus->user_id,
+                    'account_type' => request('account_type'),
+                    'username' => ucfirst($accountUsername),
+                    'rank' => $playerData[0][0],
+                    'level' => $playerData[0][1],
+                    'xp' => $playerData[0][2]
+                ]
+            );
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        $skills = Skill::get();
         $skillsCount = count($skills);
 
-        // TODO replace with Eloquent models
-        for ($i = 0; $i < $skillsCount; $i++) {
-            DB::table($skills[$i])->insert([
-                'account_id' => $account->id,
-                'rank' => ($playerData[$i + 1][0] >= 1 ? $playerData[$i + 1][0] : 0),
-                'level' => $playerData[$i + 1][1],
-                'xp' => ($playerData[$i + 1][2] >= 0 ? $playerData[$i + 1][2] : 0),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
+        foreach ($skills as $key => $skill) {
+            $skill = new $skill->model;
+
+            $skill->account_id = $account->id;
+            $skill->rank = ($playerData[$key + 1][0] >= 1 ? $playerData[$key + 1][0] : 0);
+            $skill->level = $playerData[$key + 1][1];
+            $skill->xp = ($playerData[$key + 1][2] >= 0 ? $playerData[$key + 1][2] : 0);
+
+            try {
+                $skill->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
         }
 
         $clues = Helper::listClueScrollTiers();
@@ -125,15 +126,20 @@ class AccountController extends Controller
         $cluesIndex = 0;
 
         for ($i = ($skillsCount + 3); $i < ($skillsCount + 3 + $cluesCount); $i++) {
-            $collection = Collection::where('name', $clues[$cluesIndex] . ' treasure trails')->firstOrFail();
+            $clueCollection = Collection::where('slug', $clues[$cluesIndex] . '-treasure-trails')->firstOrFail();
 
-            $clueLog = new $collection->model;
+            $clueCollection = new $clueCollection->model;
 
-            $clueLog->account_id = $account->id;
-            $clueLog->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-            $clueLog->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+            $clueCollection->account_id = $account->id;
+            $clueCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            $clueCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-            $clueLog->save();
+            try {
+                $clueCollection->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
 
             $cluesIndex++;
         }
@@ -145,20 +151,28 @@ class AccountController extends Controller
         $dksKillCount = 0;
 
         for ($i = ($skillsCount + $cluesCount + 5); $i < ($skillsCount + $cluesCount + 5 + count($bosses)); $i++) {
-            $collection = Collection::where('name', $bosses[$bossIndex])->firstOrFail();
+            $bossCollection = Collection::where('slug', $bosses[$bossIndex])->firstOrFail();
 
-            $collectionLog = new $collection->model;
+            $bossCollection = new $bossCollection->model;
 
-            $collectionLog->account_id = $account->id;
-            $collectionLog->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-            $collectionLog->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+            $bossCollection->account_id = $account->id;
+            $bossCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            $bossCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-            if (in_array($bosses[$bossIndex],
-                ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'], true)) {
+            if (in_array(
+                $bosses[$bossIndex],
+                ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'],
+                true
+            )) {
                 $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
             }
 
-            $collectionLog->save();
+            try {
+                $bossCollection->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
 
             $bossIndex++;
         }
@@ -175,35 +189,46 @@ class AccountController extends Controller
         $dks->account_id = $account->id;
         $dks->kill_count = $dksKillCount;
 
-        $dks->save();
+        try {
+            $dks->save();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
 
         $npcs = Helper::listNpcs();
 
         foreach ($npcs as $npc) {
-            $collection = Collection::findByNameAndCategory($npc, 4);
+            $npcCollection = Collection::findByNameAndCategory($npc, 4);
 
-            $collectionLog = new $collection->model;
+            $npcCollection = new $npcCollection->model;
 
-            $collectionLog->account_id = $account->id;
+            $npcCollection->account_id = $account->id;
 
-            $collectionLog->save();
+            try {
+                $npcCollection->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
         }
 
         $authStatus->status = "success";
 
-        $authStatus->save();
+        try {
+            $authStatus->save();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        DB::commit();
 
         return response("Account successfully authenticated!", 201);
     }
 
-    public function loginLogout($accountUsername, Request $request)
+    public function loginLogout(Account $account, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
-
         $account->online ^= 1;
 
         $account->save();
@@ -222,7 +247,7 @@ class AccountController extends Controller
             "log_id" => $log->id,
             "type" => "event",
             "icon" => auth()->user()->icon_id,
-            "message" => $accountUsername . " has logged " . ($account->online ? 'in' : 'out') . "!",
+            "message" => $account->username . " has logged " . ($account->online ? 'in' : 'out') . "!",
         ];
 
         $event = Broadcast::create($eventData);
@@ -231,6 +256,6 @@ class AccountController extends Controller
 
         AccountOnline::dispatch($account);
 
-        return response($accountUsername . " has been logged " . ($account->online ? 'in' : 'out') . " to RuneManager");
+        return response($account->username . " has been logged " . ($account->online ? 'in' : 'out') . " to RuneManager");
     }
 }

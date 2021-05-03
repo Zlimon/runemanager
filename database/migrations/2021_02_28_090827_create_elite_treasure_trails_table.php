@@ -15,7 +15,7 @@ class CreateEliteTreasureTrailsTable extends Migration
     {
         Schema::create('elite_treasure_trails', function (Blueprint $table) {
             $table->id();
-            $table->integer('account_id')->unsigned()->unique();
+            $table->foreignId('account_id')->constrained();
             $table->integer('kill_count')->default(0)->unsigned();
             $table->integer('rank')->default(0)->unsigned();
             $table->integer('obtained')->default(0)->unsigned();

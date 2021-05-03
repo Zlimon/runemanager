@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Account;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Broadcast;
 
@@ -15,17 +16,13 @@ class BroadcastController extends Controller
         return response()->json($broadcasts, 200);
     }
 
-    public function account($accountUsername, $broadcastType)
+    public function account(Account $account, $broadcastType)
     {
-        $account = Account::where('username', $accountUsername)->pluck('id')->first();
+        $broadcasts = Broadcast::with('log')->with('log.category')->where('message', 'NOT LIKE', '%logged%')->whereHas('log', function ($query) use($account) {
+            return $query->where('account_id', '=', $account->id);
+        })->where('type', $broadcastType)->orderByDesc('id')->paginate(10);
 
-        if ($account) {
-            $broadcasts = Broadcast::with('log')->with('log.category')->where('message', 'NOT LIKE', '%logged%')->whereHas('log', function ($query) use($account) {
-                return $query->where('account_id', '=', $account);
-            })->where('type', $broadcastType)->orderByDesc('id')->paginate(10);
-
-            return response()->json($broadcasts, 200);
-        }
+        return response()->json($broadcasts, 200);
     }
 
     public function recent($broadcastType)
@@ -34,7 +31,7 @@ class BroadcastController extends Controller
 
         $recentBroadcasts = [];
 
-        foreach ($broadcasts as $broadcast) {
+        foreach ($broadcasts->sortBy('id') as $broadcast) {
             if ($broadcast->created_at->diffInSeconds() <= 5) {
                 $recentBroadcasts[] = $broadcast->message;
             }

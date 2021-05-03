@@ -15,4 +15,9 @@ class Category extends Model
     {
         return $this->hasMany(Broadcast::class);
     }
+
+    public function log()
+    {
+        return $this->hasMany(Log::class);
+    }
 }

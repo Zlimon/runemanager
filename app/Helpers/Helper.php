@@ -2,7 +2,9 @@
 
 namespace App\Helpers;
 
+use App\Account;
 use App\Collection;
+use App\Skill;
 use DateTime;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -135,51 +137,39 @@ class Helper
 
     public static function listSkills()
     {
-        return [
-            "attack",
-            "defence",
-            "strength",
-            "hitpoints",
-            "ranged",
-            "prayer",
-            "magic",
-            "cooking",
-            "woodcutting",
-            "fletching",
-            "fishing",
-            "firemaking",
-            "crafting",
-            "smithing",
-            "mining",
-            "herblore",
-            "agility",
-            "thieving",
-            "slayer",
-            "farming",
-            "runecraft",
-            "hunter",
-            "construction"
-        ];
+        return Skill::pluck('slug')->toArray();
+    }
+
+    public static function listBosses($asCollection = false)
+    {
+        if ($asCollection) {
+            return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->get();
+        }
+
+        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('slug')->toArray();
+    }
+
+    public static function listNpcs($asCollection = false)
+    {
+        if ($asCollection) {
+            return Collection::where('category_id', 4)->get();
+        }
+
+        return Collection::where('category_id', 4)->pluck('slug')->toArray();
+    }
+
+    public static function listClues($asCollection = false)
+    {
+        if ($asCollection) {
+            return Collection::where('category_id', 5)->get();
+        }
+
+        return Collection::where('category_id', 5)->pluck('slug')->toArray();
     }
 
     public static function listClueScrollTiers()
     {
         return ["all", "beginner", "easy", "medium", "hard", "elite", "master"];
-    }
-
-    public static function listBosses()
-    {
-        return Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('name')->toArray();
-    }
-
-    public static function listNpcs()
-    {
-        return Collection::where('category_id', 4)->pluck('name')->toArray();
-    }
-
-    public static function listClues()
-    {
-        return Collection::where('category_id', 5)->pluck('name')->toArray();
     }
 
     public static function listAccountTypes()
@@ -252,5 +242,16 @@ class Helper
                 Storage::disk('items')->put('items/' . $imgName, file_get_contents($url));
             }
         }
+    }
+
+    public static function getCollectionModel(Account $account = null, Collection $collection, $categories = null)
+    {
+        if ($account) {
+            return $collection->model::firstWhere('account_id', $account->id);
+        }
+
+        $collection = $collection->model::first();
+
+	    return $collection;
     }
 }

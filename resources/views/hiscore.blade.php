@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('title')
-    {{ ucfirst((Helper::collectionAttribute($hiscoreName, "alias") ?: $hiscoreName)) }}
+    {{ $hiscore->name }}
 @endsection
 
 @section('content')
@@ -61,31 +61,28 @@
         <div id="highscore_top">
             <div class="highscore_selection">
 				<span class="selection-top">
-					@foreach ($hiscoreListTop as $hiscore)
-                        <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
+					@foreach ($hiscoreListTop as $hiscoreTop)
+                        <a href="{{ route('hiscore', [$hiscoreCategory, $hiscoreTop]) }}">
+                            <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.$hiscoreTop.'.png') }}"
                                  class="icon"
-                                 alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
-                                 title="Click here to see {{ ucfirst($hiscore) }} hiscores">
+                                 title="Click here to see {{ ucfirst($hiscoreTop) }} hiscores">
                         </a>
                     @endforeach
 				</span>
                 <div class="mid-part">
                     <h1 class="active middle-icon" style="display: inline-block;">
-                        <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscoreName).'.png') }}"
-                            class="pixel icon"
-                            alt="{{ ucfirst($hiscoreName) }} {{ $hiscoreType }} icon">
+                        <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.$hiscore->slug.'.png') }}"
+                            class="pixel icon">
                         <br>
-                        <span>{{ ucfirst(($hiscoreType === "boss" ? Helper::collectionAttribute($hiscoreName, "alias") : ($hiscoreName == "total" ? "total level" : $hiscoreName))) }}</span>
+                        <span>{{ $hiscore->name }}</span>
                     </h1>
                 </div>
                 <span class="selection-bot">
-					@foreach ($hiscoreListBottom as $hiscore)
-                        <a href="{{ route('hiscore', [$hiscoreType, $hiscore]) }}">
-                            <img src="{{ asset(($hiscoreType == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreType.'/'.Str::snake($hiscore).'.png') }}"
+					@foreach ($hiscoreListBottom as $hiscoreBottom)
+                        <a href="{{ route('hiscore', [$hiscoreCategory, $hiscoreBottom]) }}">
+                            <img src="{{ asset(($hiscoreCategory == "skill" ? "storage/resource-pack" : "images").'/'.$hiscoreCategory.'/'.$hiscoreBottom.'.png') }}"
                                  class="icon"
-                                 alt="{{ ucfirst($hiscore) }} {{ $hiscoreType }} icon"
-                                 title="Click here to see {{ ucfirst($hiscore) }} hiscores">
+                                 title="Click here to see {{ ucfirst($hiscoreBottom) }} hiscores">
                         </a>
                     @endforeach
 				</span>
@@ -93,14 +90,10 @@
         </div>
 
         @if ($accountCount > 0)
-            @if ($hiscoreType == "skill")
-                <skillhiscore skill="{{ $hiscoreName }}"></skillhiscore>
-            @elseif ($hiscoreType == "boss")
-                <bosshiscore boss="{{ $hiscoreName }}"></bosshiscore>
-            @elseif ($hiscoreType == "npc")
-                <npchiscore npc="{{ $hiscoreName }}"></npchiscore>
-            @elseif ($hiscoreType == "clue")
-                <cluehiscore clue="{{ $hiscoreName }}"></cluehiscore>
+            @if ($hiscoreCategory == "skill")
+                <skillhiscore skill="{{ $hiscore->slug }}"></skillhiscore>
+            @else
+                <collectionhiscore boss="{{ $hiscore->slug }}"></collectionhiscore>
             @endif
         @else
             <div class="text-center py-5">

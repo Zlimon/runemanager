@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Account;
 use App\Bank;
 use App\Events\AccountBank;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Log;
 use Carbon\Carbon;
@@ -12,34 +13,24 @@ use Illuminate\Http\Request;
 
 class AccountBankController extends Controller
 {
-    public function show($accountUsername)
+    public function show(Account $account)
     {
-        $account = Account::where('username', $accountUsername)->pluck('id')->first();
+        $bank = Bank::where([
+            ['account_id', '=', $account->id],
+            ['display', '=', 1]
+        ])->first();
 
-        if ($account) {
-            $bank = Bank::where([
-                ['account_id', '=', $account],
-                ['display', '=', 1]
-            ])->first();
-
-            if ($bank) {
-                return response()->json($bank, 200);
-            } else {
-                return response("No bank for " . $accountUsername . " were found!", 404);
-            }
+        if ($bank) {
+            return response()->json($bank, 200);
+        } else {
+            return response("No bank for " . $account->username . " were found!", 404);
         }
     }
 
-    public function update($accountUsername, Request $request)
+    public function update(Account $account, Request $request)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
-
-        // Check if someone has tried something funny
         if (sizeof($request->all()) > 816) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 406);
+            return response("Not funny", 406);
         }
 
         $totalBankValue = 0;
@@ -75,20 +66,14 @@ class AccountBankController extends Controller
 
         AccountBank::dispatch($account);
 
-        return response("Updated bank for " . $accountUsername, 200);
+        return response("Updated bank for " . $account->username, 200);
     }
 
-    public function updateDisplay($accountUsername)
+    public function updateDisplay(Account $account)
     {
-        $account = Account::where('user_id', auth()->user()->id)->where('username', $accountUsername)->first();
-        if (!$account) {
-            return response($accountUsername . " is not authenticated with " . auth()->user()->name, 401);
-        }
-
         $bank = Bank::where('account_id', $account->id)->first();
-
         if (!$bank) {
-            return response("No bank for " . $accountUsername . " were found!", 404);
+            return response("No bank for " . $account->username . " were found!", 404);
         }
 
         $bank->display ^= 1;
@@ -97,6 +82,6 @@ class AccountBankController extends Controller
 
         AccountBank::dispatch($account);
 
-        return response(($bank->display === 1 ? "Displaying" : "No longer displaying") . " bank for " . $accountUsername, 200);
+        return response(($bank->display === 1 ? "Displaying" : "No longer displaying") . " bank for " . $account->username, 200);
     }
 }

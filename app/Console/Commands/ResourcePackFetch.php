@@ -95,7 +95,13 @@ class ResourcePackFetch extends Command
                 $resourcePack->touch();
             }
         } else {
-            $this->info(sprintf("Something went wrong"));
+            $this->info(sprintf("Something went wrong. Most likely due to storage directory not existing"));
+
+            $this->info(sprintf("Executing storage:link..."));
+
+            Artisan::call("storage:link");
+
+            $this->info(sprintf("Completed. Try fetching again"));
 
             return 1;
         }

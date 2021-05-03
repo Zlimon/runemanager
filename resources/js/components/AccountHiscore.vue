@@ -74,8 +74,8 @@
 </template>
 
 <script>
-import AccountSkillHiscore from './AccountSkillHiscore.vue'
-import AccountBossHiscore from './AccountBossHiscore.vue'
+import AccountSkillHiscore from './account/SkillHiscore.vue'
+import AccountBossHiscore from './account/BossHiscore.vue'
 
 export default {
     props: {
