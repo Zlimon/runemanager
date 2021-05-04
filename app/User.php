@@ -45,6 +45,12 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUuid($value)
  * @mixin \Eloquent
+ * @property-read int|null $auth_status_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Log[] $log
+ * @property-read int|null $log_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\NewsPost[] $newspost
+ * @property-read int|null $newspost_count
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {

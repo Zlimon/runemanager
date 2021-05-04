@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereSraracha($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
  */
 class Sarachnis extends Model
 {
