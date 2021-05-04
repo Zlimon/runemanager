@@ -45,8 +45,8 @@ Route::get('/news', 'NewsController@index')->name('news');
 Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 
 /*==========Admin Controller=============*/
-	Route::group(['middleware' => ['permission:access admin']], function () {
-		Route::get('/admin', 'AdminController@index')->name('admin-index');
+//	Route::group(['middleware' => ['permission:access admin']], function () {
+		Route::get('/admin', 'Admin\AdminController@index')->name('admin-index');
 		/*==========News Controller=============*/
 		Route::get('/admin/news', 'AdminNewsController@index')->name('admin-news');
 		Route::get('/admin/news/create', 'AdminNewsController@create')->name('admin-create-newspost');
@@ -57,7 +57,7 @@ Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 		Route::delete('/admin/news/{id}/delete', 'AdminNewsController@destroy')->name('admin-delete-newspost');
 		//Route::resource('/admin/news', 'AdminNewsController');
 		/*==========User Controller=============*/
-		Route::get('/admin/user', 'AdminUserController@index')->name('admin-user');
+		Route::get('/admin/user', 'Admin\UserController@index')->name('admin-user');
 		Route::post('/admin/user', 'AdminUserController@search')->name('admin-search-user');
 		Route::get('/admin/user/{id}/show', 'AdminUserController@show')->name('admin-show-user');
 		Route::get('/admin/user/{id}/edit', 'AdminUserController@edit')->name('admin-edit-user');
@@ -71,6 +71,6 @@ Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 		Route::patch('/admin/member/{id}/show', 'AdminAccountController@update')->name('admin-update-member');
 		/*==========Rank Controller=============*/
 		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
-	});
+//	});
 
 Auth::routes();
