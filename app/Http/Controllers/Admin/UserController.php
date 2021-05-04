@@ -23,13 +23,13 @@ class UserController extends Controller
 
         $query = request('search');
 
-        $users = User::with('member')->where('name', 'LIKE', '%' . $query . '%')->paginate(10);
+        $users = User::with('account')->where('name', 'LIKE', '%' . $query . '%')->get();
 
-        if (count($users) === 0) {
+        if (!sizeof($users)) {
             return redirect(route('admin-user'))->withErrors(['No search results for "'.$query.'"!']);
-        } else {
-            return view('admin.user.index', compact('users', 'query'));
         }
+
+        return view('admin.user.index', compact('users', 'query'));
     }
 
     public function show($id) {
