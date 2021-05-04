@@ -102,11 +102,38 @@ class AccountController extends Controller
             throw $e;
         }
 
+        try {
+            $this->createOrUpdateAccountHiscores($account, $playerData);
+
+            $authStatus->status = "success";
+
+            try {
+                $authStatus->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        DB::commit();
+
+        return response("Account successfully authenticated!", 201);
+    }
+
+    public function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false)
+    {
         $skills = Skill::get();
         $skillsCount = count($skills);
 
         foreach ($skills as $key => $skill) {
-            $skill = new $skill->model;
+            if ($update) {
+                $skill = $account->skill($skill)->first();
+            } else {
+                $skill = new $skill->model;
+            }
 
             $skill->account_id = $account->id;
             $skill->rank = ($playerData[$key + 1][0] >= 1 ? $playerData[$key + 1][0] : 0);
@@ -126,9 +153,13 @@ class AccountController extends Controller
         $cluesIndex = 0;
 
         for ($i = ($skillsCount + 3); $i < ($skillsCount + 3 + $cluesCount); $i++) {
-            $clueCollection = Collection::where('slug', $clues[$cluesIndex] . '-treasure-trails')->firstOrFail();
+            $clueCollection = Collection::where('slug', $clues[$cluesIndex] . '-treasure-trails')->first();
 
-            $clueCollection = new $clueCollection->model;
+            if ($update) {
+                $clueCollection = $account->collection($clueCollection)->first();
+            } else {
+                $clueCollection = new $clueCollection->model;
+            }
 
             $clueCollection->account_id = $account->id;
             $clueCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
@@ -151,9 +182,13 @@ class AccountController extends Controller
         $dksKillCount = 0;
 
         for ($i = ($skillsCount + $cluesCount + 5); $i < ($skillsCount + $cluesCount + 5 + count($bosses)); $i++) {
-            $bossCollection = Collection::where('slug', $bosses[$bossIndex])->firstOrFail();
+            $bossCollection = Collection::where('slug', $bosses[$bossIndex])->first();
 
-            $bossCollection = new $bossCollection->model;
+            if ($update) {
+                $bossCollection = $account->collection($bossCollection)->first();
+            } else {
+                $bossCollection = new $bossCollection->model;
+            }
 
             $bossCollection->account_id = $account->id;
             $bossCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
@@ -184,7 +219,11 @@ class AccountController extends Controller
          * This might also happen with other bosses in the future
          * that share collection log entry, but have separate hiscores.
          */
-        $dks = new \App\Boss\DagannothKings;
+        if ($update) {
+            $dks = $account->collection(Collection::where('slug', 'dagannoth-kings')->first())->first();
+        } else {
+            $dks = new \App\Boss\DagannothKings;
+        }
 
         $dks->account_id = $account->id;
         $dks->kill_count = $dksKillCount;
@@ -201,7 +240,11 @@ class AccountController extends Controller
         foreach ($npcs as $npc) {
             $npcCollection = Collection::findByNameAndCategory($npc, 4);
 
-            $npcCollection = new $npcCollection->model;
+            if ($update) {
+                $npcCollection = $account->collection($npcCollection)->first();
+            } else {
+                $npcCollection = new $npcCollection->model;
+            }
 
             $npcCollection->account_id = $account->id;
 
@@ -213,18 +256,7 @@ class AccountController extends Controller
             }
         }
 
-        $authStatus->status = "success";
-
-        try {
-            $authStatus->save();
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-
-        DB::commit();
-
-        return response("Account successfully authenticated!", 201);
+        return true;
     }
 
     public function loginLogout(Account $account, Request $request)
