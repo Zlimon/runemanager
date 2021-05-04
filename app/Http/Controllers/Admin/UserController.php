@@ -33,11 +33,9 @@ class UserController extends Controller
     }
 
     public function show($id) {
-        $user = User::findOrFail($id);
+        $user = User::with('account')->findOrFail($id);
 
-        $accounts = Account::where('user_id', $id)->get();
-
-        return view('admin.user.show', compact('user', 'accounts'));
+        return view('admin.user.show', compact('user'));
     }
 
     public function edit($id) {
