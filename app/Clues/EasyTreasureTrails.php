@@ -4,6 +4,291 @@ namespace App\Clues;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Clues\EasyTreasureTrails
+ *
+ * @property int $id
+ * @property int $account_id
+ * @property int $kill_count
+ * @property int $rank
+ * @property int $obtained
+ * @property int $team_cape_zero
+ * @property int $team_cape_i
+ * @property int $team_cape_x
+ * @property int $cape_of_skulls
+ * @property int $golden_chefs_hat
+ * @property int $golden_apron
+ * @property int $wooden_shield_(g)
+ * @property int $black_full_helm_(t)
+ * @property int $black_platebody_(t)
+ * @property int $black_platelegs_(t)
+ * @property int $black_plateskirt_(t)
+ * @property int $black_kiteshield_(t)
+ * @property int $black_full_helm_(g)
+ * @property int $black_platebody_(g)
+ * @property int $black_platelegs_(g)
+ * @property int $black_plateskirt_(g)
+ * @property int $black_kiteshield_(g)
+ * @property int $black_shield_(h1)
+ * @property int $black_shield_(h2)
+ * @property int $black_shield_(h3)
+ * @property int $black_shield_(h4)
+ * @property int $black_shield_(h5)
+ * @property int $black_helm_(h1)
+ * @property int $black_helm_(h2)
+ * @property int $black_helm_(h3)
+ * @property int $black_helm_(h4)
+ * @property int $black_helm_(h5)
+ * @property int $black_platebody_(h1)
+ * @property int $black_platebody_(h2)
+ * @property int $black_platebody_(h3)
+ * @property int $black_platebody_(h4)
+ * @property int $black_platebody_(h5)
+ * @property int $steel_full_helm_(t)
+ * @property int $steel_platebody_(t)
+ * @property int $steel_platelegs_(t)
+ * @property int $steel_plateskirt_(t)
+ * @property int $steel_kiteshield_(t)
+ * @property int $steel_full_helm_(g)
+ * @property int $steel_platebody_(g)
+ * @property int $steel_platelegs_(g)
+ * @property int $steel_plateskirt_(g)
+ * @property int $steel_kiteshield_(g)
+ * @property int $iron_platebody_(t)
+ * @property int $iron_platelegs_(t)
+ * @property int $iron_plateskirt_(t)
+ * @property int $iron_kiteshield_(t)
+ * @property int $iron_full_helm_(t)
+ * @property int $iron_platebody_(g)
+ * @property int $iron_platelegs_(g)
+ * @property int $iron_plateskirt_(g)
+ * @property int $iron_kiteshield_(g)
+ * @property int $iron_full_helm_(g)
+ * @property int $bronze_platebody_(t)
+ * @property int $bronze_platelegs_(t)
+ * @property int $bronze_plateskirt_(t)
+ * @property int $bronze_kiteshield_(t)
+ * @property int $bronze_full_helm_(t)
+ * @property int $bronze_platebody_(g)
+ * @property int $bronze_platelegs_(g)
+ * @property int $bronze_plateskirt_(g)
+ * @property int $bronze_kiteshield_(g)
+ * @property int $bronze_full_helm_(g)
+ * @property int $studded_body_(g)
+ * @property int $studded_chaps_(g)
+ * @property int $studded_body_(t)
+ * @property int $studded_chaps_(t)
+ * @property int $leather_body_(g)
+ * @property int $leather_chaps_(g)
+ * @property int $blue_wizard_hat_(g)
+ * @property int $blue_wizard_robe_(g)
+ * @property int $blue_skirt_(g)
+ * @property int $blue_wizard_hat_(t)
+ * @property int $blue_wizard_robe_(t)
+ * @property int $blue_skirt_(t)
+ * @property int $black_wizard_hat_(g)
+ * @property int $black_wizard_robe_(g)
+ * @property int $black_skirt_(g)
+ * @property int $black_wizard_hat_(t)
+ * @property int $black_wizard_robe_(t)
+ * @property int $black_skirt_(t)
+ * @property int $monks_robe_top_(g)
+ * @property int $monks_robe_(g)
+ * @property int $saradomin_robe_top
+ * @property int $saradomin_robe_legs
+ * @property int $guthix_robe_top
+ * @property int $guthix_robe_legs
+ * @property int $zamorak_robe_top
+ * @property int $zamorak_robe_legs
+ * @property int $ancient_robe_top
+ * @property int $ancient_robe_legs
+ * @property int $armadyl_robe_top
+ * @property int $armadyl_robe_legs
+ * @property int $bandos_robe_top
+ * @property int $bandos_robe_legs
+ * @property int $bobs_red_shirt
+ * @property int $bobs_green_shirt
+ * @property int $bobs_blue_shirt
+ * @property int $bobs_black_shirt
+ * @property int $bobs_purple_shirt
+ * @property int $highwayman_mask
+ * @property int $blue_beret
+ * @property int $black_beret
+ * @property int $white_beret
+ * @property int $red_beret
+ * @property int $a_powdered_wig
+ * @property int $beanie
+ * @property int $imp_mask
+ * @property int $goblin_mask
+ * @property int $sleeping_cap
+ * @property int $flared_trousers
+ * @property int $pantaloons
+ * @property int $black_cane
+ * @property int $staff_of_bob_the_cat
+ * @property int $red_elegant_shirt
+ * @property int $red_elegant_blouse
+ * @property int $red_elegant_legs
+ * @property int $red_elegant_skirt
+ * @property int $green_elegant_shirt
+ * @property int $green_elegant_blouse
+ * @property int $green_elegant_legs
+ * @property int $green_elegant_skirt
+ * @property int $blue_elegant_shirt
+ * @property int $blue_elegant_blouse
+ * @property int $blue_elegant_legs
+ * @property int $blue_elegant_skirt
+ * @property int $amulet_of_magic_(t)
+ * @property int $amulet_of_power_(t)
+ * @property int $black_pickaxe
+ * @property int $ham_joint
+ * @property int $rain_bow
+ * @property int $willow_comp_bow
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Account $account
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails query()
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereAPowderedWig($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereAmuletOfMagic(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereAmuletOfPower(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereAncientRobeLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereAncientRobeTop($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereArmadylRobeLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereArmadylRobeTop($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBandosRobeLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBandosRobeTop($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBeanie($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackBeret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackCane($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackFullHelm(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackFullHelm(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackHelm(h1)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackHelm(h2)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackHelm(h3)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackHelm(h4)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackHelm(h5)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackKiteshield(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackKiteshield(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPickaxe($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatebody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatebody(h1)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatebody(h2)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatebody(h3)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatebody(h4)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatebody(h5)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatebody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatelegs(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlatelegs(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlateskirt(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackPlateskirt(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackShield(h1)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackShield(h2)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackShield(h3)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackShield(h4)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackShield(h5)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackSkirt(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackSkirt(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackWizardHat(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackWizardHat(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackWizardRobe(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlackWizardRobe(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueBeret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueElegantBlouse($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueElegantLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueElegantShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueElegantSkirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueSkirt(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueSkirt(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueWizardHat(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueWizardHat(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueWizardRobe(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBlueWizardRobe(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBobsBlackShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBobsBlueShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBobsGreenShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBobsPurpleShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBobsRedShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzeFullHelm(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzeFullHelm(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzeKiteshield(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzeKiteshield(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzePlatebody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzePlatebody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzePlatelegs(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzePlatelegs(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzePlateskirt(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereBronzePlateskirt(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereCapeOfSkulls($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereFlaredTrousers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGoblinMask($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGoldenApron($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGoldenChefsHat($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGreenElegantBlouse($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGreenElegantLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGreenElegantShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGreenElegantSkirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGuthixRobeLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereGuthixRobeTop($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereHamJoint($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereHighwaymanMask($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereImpMask($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronFullHelm(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronFullHelm(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronKiteshield(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronKiteshield(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronPlatebody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronPlatebody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronPlatelegs(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronPlatelegs(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronPlateskirt(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereIronPlateskirt(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereKillCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereLeatherBody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereLeatherChaps(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereMonksRobe(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereMonksRobeTop(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereObtained($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails wherePantaloons($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereRainBow($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereRank($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereRedBeret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereRedElegantBlouse($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereRedElegantLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereRedElegantShirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereRedElegantSkirt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSaradominRobeLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSaradominRobeTop($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSleepingCap($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereStaffOfBobTheCat($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelFullHelm(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelFullHelm(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelKiteshield(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelKiteshield(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelPlatebody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelPlatebody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelPlatelegs(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelPlatelegs(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelPlateskirt(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereSteelPlateskirt(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereStuddedBody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereStuddedBody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereStuddedChaps(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereStuddedChaps(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereTeamCapeI($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereTeamCapeX($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereTeamCapeZero($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereWhiteBeret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereWillowCompBow($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereWoodenShield(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereZamorakRobeLegs($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EasyTreasureTrails whereZamorakRobeTop($value)
+ * @mixin \Eloquent
+ */
 class EasyTreasureTrails extends Model
 {
     protected $table = 'easy_treasure_trails';

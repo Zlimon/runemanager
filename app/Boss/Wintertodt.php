@@ -46,6 +46,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereWarmGloves($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
  */
 class Wintertodt extends Model
 {
