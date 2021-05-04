@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereYoungllef($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
  */
 class TheGauntlet extends Model
 {

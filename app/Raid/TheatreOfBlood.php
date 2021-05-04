@@ -54,6 +54,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereVialOfBlood($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
  */
 class TheatreOfBlood extends Model
 {

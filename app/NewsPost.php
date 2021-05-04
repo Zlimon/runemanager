@@ -32,6 +32,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereUserId($value)
  * @mixin \Eloquent
+ * @property int $news_category_id
+ * @property-read int|null $user_count
+ * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereNewsCategoryId($value)
  */
 class NewsPost extends Model
 {

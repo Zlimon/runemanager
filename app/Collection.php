@@ -20,6 +20,15 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereType($value)
  * @mixin \Eloquent
+ * @property int $id
+ * @property int $category_id
+ * @property int $order
+ * @property string $slug
+ * @property-read \App\Category $category
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereSlug($value)
  */
 class Collection extends Model
 {
