@@ -11,13 +11,16 @@
     </button>
 @endsection
 
-<div class="content-body">
+<div class="content-body bg-dark p-4">
     <div class="text-center">
-        @if ($user->icon_id)<img class="pixel"
-                                 src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
-                                 width="175" alt="Profile icon">@endif
+        <img
+            src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
+            class="pixel icon"
+            alt="Profile icon"
+            style="width: 10rem; height: 10rem;">
+
         <h1>{{ $user->name }}</h1>
-        <h3>@role('admin') [Admin] @endrole</h3>
+{{--        <h3>@role('admin') [Admin] @endrole</h3>--}}
     </div>
 
     <form method="POST" action="{{ route('admin-edit-user', $user->id) }}">
@@ -91,10 +94,10 @@
             </div>
         </div>
 
-        @if (count($user->member) > 0)
+        @if (sizeof($user->account))
             <h5 class="text-center">Transfer ownership of OSRS accounts:</h5>
 
-            @foreach ($user->member as $accountNumber => $account)
+            @foreach ($user->account as $key => $account)
                 <div class="form-group row">
                     <label for="account[{{ $account->id }}]"
                            class="col-md-4 col-form-label text-md-right">{{ $account->username }}</label>
@@ -115,7 +118,7 @@
                     </div>
                 </div>
 
-                @php $accountNumber++ @endphp
+                @php $key++ @endphp
             @endforeach
         @endif
 
