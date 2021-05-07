@@ -43,10 +43,10 @@ class NewsPost extends Model
     ];
 
     public function user() {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function category() {
+    public function news_category() {
         return $this->belongsTo(NewsCategory::class);
     }
 

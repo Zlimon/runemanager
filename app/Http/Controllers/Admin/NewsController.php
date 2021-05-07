@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\NewsPost;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
 	public function index() {
-		$newsPosts = NewsPost::with('user')->with('category')->orderBy('created_at', 'DESC')->get();
+		$newsPosts = NewsPost::with('user')->with('news_category')->orderByDesc('created_at', )->get();
 
 		return view('admin.news.index', compact('newsPosts'));
 	}
