@@ -48,13 +48,13 @@ Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 //	Route::group(['middleware' => ['permission:access admin']], function () {
 		Route::get('/admin', 'Admin\AdminController@index')->name('admin-index');
 		/*==========News Controller=============*/
-		Route::get('/admin/news', 'AdminNewsController@index')->name('admin-news');
-		Route::get('/admin/news/create', 'AdminNewsController@create')->name('admin-create-newspost');
-		Route::post('/admin/news/create', 'AdminNewsController@store')->name('admin-store-newspost');
-		Route::get('/admin/news/{id}/show', 'AdminNewsController@show')->name('admin-show-newspost');
-		Route::get('/admin/news/{id}/edit', 'AdminNewsController@edit')->name('admin-edit-newspost');
-		Route::patch('/admin/news/{id}/edit', 'AdminNewsController@update')->name('admin-update-newspost');
-		Route::delete('/admin/news/{id}/delete', 'AdminNewsController@destroy')->name('admin-delete-newspost');
+		Route::get('/admin/news', 'Admin\NewsController@index')->name('admin-news');
+		Route::get('/admin/news/create', 'Admin\NewsController@create')->name('admin-create-newspost');
+		Route::post('/admin/news/create', 'Admin\NewsController@store')->name('admin-store-newspost');
+		Route::get('/admin/news/{id}/show', 'Admin\NewsController@show')->name('admin-show-newspost');
+		Route::get('/admin/news/{id}/edit', 'Admin\NewsController@edit')->name('admin-edit-newspost');
+		Route::patch('/admin/news/{id}/edit', 'Admin\NewsController@update')->name('admin-update-newspost');
+		Route::delete('/admin/news/{id}/delete', 'Admin\NewsController@destroy')->name('admin-delete-newspost');
 		//Route::resource('/admin/news', 'AdminNewsController');
 		/*==========User Controller=============*/
 		Route::get('/admin/user', 'Admin\UserController@index')->name('admin-user');
