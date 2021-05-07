@@ -29,7 +29,7 @@
                 <td>
                     <a class="btn btn-success mr-2" href="{{ route('admin-show-newspost', $news->id) }}">Show</a>
                     <a class="btn btn-primary mr-2" href="{{ route('admin-edit-newspost', $news->id) }}">Edit</a>
-                    <form method="POST" action="{{ route('admin-delete-newspost', $news->id) }}">
+                    <form method="POST" action="{{ route('admin-delete-newspost', $news) }}">
                         @method('DELETE')
                         @csrf
 

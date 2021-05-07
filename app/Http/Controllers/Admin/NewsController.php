@@ -14,10 +14,8 @@ class NewsController extends Controller
 		return view('admin.news.index', compact('newsPosts'));
 	}
 
-	public function show($newsPost) {
-		$post = NewsPost::findOrFail($newsPost);
-
-		return view('admin.news.show', compact('post'));
+	public function show(NewsPost $newsPost) {
+		return view('admin.news.show', compact('newsPost'));
 	}
 
 	public function create() {
@@ -144,8 +142,8 @@ class NewsController extends Controller
 		}
 	}
 
-	public function destroy(NewsPost $id) {
-		$id->delete();
+	public function destroy(NewsPost $newsPost) {
+		$newsPost->delete();
 
 		return redirect(route('admin-news'))->with('message', 'Newspost deleted!');
 	}
