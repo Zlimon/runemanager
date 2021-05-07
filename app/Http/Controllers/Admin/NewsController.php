@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\NewsCategory;
 use App\NewsPost;
 use Illuminate\Http\Request;
 
@@ -19,9 +20,9 @@ class NewsController extends Controller
 	}
 
 	public function create() {
-		$categories = Category::get();
+		$newsCategories = NewsCategory::get();
 
-		return view('admin.news.create', compact('categories'));
+		return view('admin.news.create', compact('newsCategories'));
 	}
 
 	public function imageUpload(Request $request) {
