@@ -23,7 +23,7 @@
 {{--        <h3>@role('admin') [Admin] @endrole</h3>--}}
     </div>
 
-    <form method="POST" action="{{ route('admin-edit-user', $user->id) }}">
+    <form method="POST" action="{{ route('admin-edit-user', $user) }}">
         @method('PATCH')
         @csrf
 

@@ -59,9 +59,9 @@ Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 		/*==========User Controller=============*/
 		Route::get('/admin/user', 'Admin\UserController@index')->name('admin-user');
 		Route::post('/admin/user', 'Admin\UserController@search')->name('admin-search-user');
-		Route::get('/admin/user/{id}/show', 'Admin\UserController@show')->name('admin-show-user');
-		Route::get('/admin/user/{id}/edit', 'Admin\UserController@edit')->name('admin-edit-user');
-		Route::patch('/admin/user/{id}/edit', 'AdminUserController@update')->name('admin-update-user');
+		Route::get('/admin/user/{user}/show', 'Admin\UserController@show')->name('admin-show-user');
+		Route::get('/admin/user/{user}/edit', 'Admin\UserController@edit')->name('admin-edit-user');
+		Route::patch('/admin/user/{user}/edit', 'Admin\UserController@update')->name('admin-update-user');
 		/*==========Member Controller=============*/
 		Route::get('/admin/member', 'AdminAccountController@index')->name('admin-member');
 		Route::post('/admin/member', 'AdminAccountController@search')->name('admin-search-member');
