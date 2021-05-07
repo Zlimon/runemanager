@@ -63,12 +63,12 @@ Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 		Route::get('/admin/user/{user}/edit', 'Admin\UserController@edit')->name('admin-edit-user');
 		Route::patch('/admin/user/{user}/edit', 'Admin\UserController@update')->name('admin-update-user');
 		/*==========Member Controller=============*/
-		Route::get('/admin/member', 'AdminAccountController@index')->name('admin-member');
-		Route::post('/admin/member', 'AdminAccountController@search')->name('admin-search-member');
-		Route::get('/admin/member/create', 'AdminAccountController@create')->name('admin-create-member');
-		Route::post('/admin/member/create', 'AdminAccountController@store')->name('admin-store-member');
-		Route::get('/admin/member/{id}/show', 'AdminAccountController@show')->name('admin-show-member');
-		Route::patch('/admin/member/{id}/show', 'AdminAccountController@update')->name('admin-update-member');
+		Route::get('/admin/account', 'Admin\AccountController@index')->name('admin-member');
+		Route::post('/admin/account', 'Admin\AccountController@search')->name('admin-search-member');
+		Route::get('/admin/account/create', 'Admin\AccountController@create')->name('admin-create-member');
+		Route::post('/admin/account/create', 'Admin\AccountController@store')->name('admin-store-member');
+		Route::get('/admin/account/{account}/show', 'Admin\AccountController@show')->name('admin-show-member');
+		Route::patch('/admin/account/{account}/show', 'Admin\AccountController@update')->name('admin-update-member');
 		/*==========Rank Controller=============*/
 		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
 //	});

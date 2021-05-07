@@ -21,7 +21,7 @@
 
         <div class="col-md-6 mb-2">
             <input id="search" type="text" class="form-control @error('search') is-invalid @enderror" name="search"
-                   value="{{ old('search') }}" placeholder="{{ $members->random()->username }}" autofocus required>
+                   value="{{ old('search') }}" placeholder="{{ $accounts->random()->username }}" autofocus required>
 
             @error('search')
             <span class="invalid-feedback" role="alert">
@@ -46,20 +46,26 @@
         <th>Registered</th>
         <th>Actions</th>
     </tr>
-    @foreach ($members as $member)
+    @foreach ($accounts as $account)
         <tr>
-            <td>{{ $member->id }}</td>
-            <td>{{ $member->username }}</td>
-            <td>{{ number_format($member->rank) }}</td>
-            <td>{{ $member->level }}</td>
-            <td>{{ number_format($member->xp) }}</td>
-            <td>@if ($member->user_id)<a
-                    href="{{ route('admin-show-user', $member->user_id) }}">@if ($member->user->icon_id)<img
+            <td>{{ $account->id }}</td>
+            <td>
+                @if ($account->account_type !== "normal")
+                    <img src="{{ asset('images/'.$account->account_type.'.png') }}"
+                         alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon">
+                @endif
+                {{ $account->username }}
+            </td>
+            <td>{{ number_format($account->rank) }}</td>
+            <td>{{ $account->level }}</td>
+            <td>{{ number_format($account->xp) }}</td>
+            <td>@if ($account->user_id)<a
+                    href="{{ route('admin-show-user', $account->user_id) }}">@if ($account->user->icon_id)<img
                         class="pixel"
-                        src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $member->user->icon_id }}.png" width="54"
-                        alt="Profile icon">@endif{{ $member->user_id }} - {{ $member->user->name }}</a>@endif</td>
-            <td>{{ \Carbon\Carbon::parse($member->created_at)->format('d. M Y H:i') }}</td>
-            <td><a class="btn btn-success mr-2" href="{{ route('admin-show-member', $member->id) }}">Show</a></td>
+                        src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="54"
+                        alt="Profile icon">@endif{{ $account->user_id }} - {{ $account->user->name }}</a>@endif</td>
+            <td>{{ \Carbon\Carbon::parse($account->created_at)->format('d. M Y H:i') }}</td>
+            <td><a class="btn btn-success mr-2" href="{{ route('admin-show-member', $account->id) }}">Show</a></td>
         </tr>
     @endforeach
 </table>
