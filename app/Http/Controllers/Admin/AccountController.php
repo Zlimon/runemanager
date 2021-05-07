@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Account;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -42,43 +46,80 @@ class AccountController extends Controller
 
     public function store(Request $request) {
         $request->validate([
-            'username' => ['required', 'string', 'min:1', 'max:13'],
+            'account' => ['required', 'string', 'min:1', 'max:13'],
+            'user' => ['max:255'],
         ]);
 
-        if (Account::where('username', request('username'))->first()) {
+        if (Account::where('username', request('account'))->first()) {
             return redirect(route('admin-create-member'))->withErrors('This account has already been registered!');
-        } else {
-            $account = Helper::registerAccount(request('username'));
-
-            if ($account) {
-                return redirect(route('admin-show-member', $account))->with('message', 'Old School RuneScape account "'.request('username').'" registered!');
-            } else {
-                return redirect(route('admin-create-member'))->withErrors('Could not find this Old School RuneScape account!');
-            }
         }
+
+        if (!request('user') && Auth::check()) {
+            $user = Auth::getUser();
+        } elseif (request('user')) {
+            $user = User::whereName(request('user'))->orWhere('id', request('user'))->first();
+
+            if (!$user) {
+                return redirect(route('admin-create-member'))->withErrors('This user does not exist!');
+            }
+        } else {
+            return redirect(route('admin-create-member'))->withErrors('This user does not exist!');
+        }
+
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                request('account')
+            );
+
+        /* Get the $playerDataUrl file content. */
+        $playerData = Helper::getPlayerData($playerDataUrl);
+
+        if (!$playerData) {
+            return redirect(route('admin-create-member'))->withErrors('Could not fetch player data from hiscores!');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $account = Account::create(
+                [
+                    'user_id' => $user->id,
+                    'account_type' => 'normal',
+                    'username' => request('account'),
+                    'rank' => $playerData[0][0],
+                    'level' => $playerData[0][1],
+                    'xp' => $playerData[0][2]
+                ]
+            );
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        try {
+            Helper::createOrUpdateAccountHiscores($account, $playerData);
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        DB::commit();
+
+        return redirect(route('admin-show-member', $account))->with('message', 'Old School RuneScape account "'.request('account').'" registered to user "'.$user->name.'"!');
     }
 
-    public function update(Account $id) {
-        $newOwner = User::where('name', request('user_id'))->first();
+    public function update(Account $account, Request $request) {
+        $newOwner = User::whereName(request('user'))->orWhere('id', request('user'))->first();
 
-        if ($newOwner) {
-            $id->update([
-                'user_id' => $newOwner->id
-            ]);
-
-            return redirect(route('admin-show-member', $id))->with('message', 'Account ownership transferred to "'.$newOwner->name.'"!');
-        } else {
-            $newOwner = User::find(request('user_id'));
-
-            if ($newOwner) {
-                $id->update([
-                    'user_id' => $newOwner->id
-                ]);
-
-                return redirect(route('admin-show-member', $id))->with('message', 'Account ownership transferred to "'.$newOwner->name.'"!');
-            } else {
-                return redirect(route('admin-show-member', $id))->withErrors(['This user does not exist!']);
-            }
+        if (!$newOwner) {
+            return redirect(route('admin-show-member', $account))->withErrors(['This user does not exist!']);
         }
+
+        $account->update([
+            'user_id' => $newOwner->id
+        ]);
+
+        return redirect(route('admin-show-member', $account))->with('message', 'Account ownership transferred to "'.$newOwner->name.'"!');
     }
 }

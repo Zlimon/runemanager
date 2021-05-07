@@ -12,12 +12,23 @@
     <form method="POST" action="{{ route('admin-create-member') }}">
         @csrf
 
-        <label for="username" class="col-form-label text-md-right">RuneScape username</label>
+        <label for="account" class="col-form-label text-md-right">RuneScape username</label>
 
-        <input id="username" type="text" class="form-control col-3 @error('username') is-invalid @enderror"
-               name="username" value="{{ old('username') }}" required autofocus>
+        <input id="account" type="text" class="form-control col-3 @error('account') is-invalid @enderror"
+               name="account" value="{{ old('account') }}" required autofocus>
 
-        @error('username')
+        @error('account')
+        <span class="invalid-feedback" role="alert">
+				<strong>{{ $message }}</strong>
+			</span>
+        @enderror
+
+        <label for="user" class="col-form-label text-md-right">RuneManager user username or ID</label>
+
+        <input id="user" type="text" class="form-control col-3 @error('user') is-invalid @enderror"
+               name="user" value="{{ old('user') }}">
+
+        @error('user')
         <span class="invalid-feedback" role="alert">
 				<strong>{{ $message }}</strong>
 			</span>
