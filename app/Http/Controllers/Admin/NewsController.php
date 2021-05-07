@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\NewsCategory;
 use App\NewsPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NewsController extends Controller
 {
@@ -28,99 +29,99 @@ class NewsController extends Controller
 	public function imageUpload(Request $request) {
 		$imageFile = $request->file('image');
 
-		if ($imageFile != null) {
-			$validator = Validator::make($request->all(), [
-				'image' => 'mimes:jpeg,bmp,png,gif',
-			]);
+		if ($imageFile == null) {
+            return 1;
+        }
 
-			if ($validator->fails()) {
-				return false;
-			} else {
-				$imageFileName = Str::uuid()->toString();
+        $validator = Validator::make($request->all(), [
+            'image' => 'mimes:jpeg,bmp,png,gif',
+        ]);
 
-				$image = Image::create([
-					'image_file_name' => $imageFileName,
-					'image_file_extension' => $imageFile->getClientOriginalExtension(),
-					'image_file_type' => $imageFile->getMimeType(),
-					'image_file_size' => $imageFile->getSize()
-				]);
+        if ($validator->fails()) {
+            return false;
+        }
 
-				if ($image) {
-					$imageFile->move('storage', $imageFileName.'.'.$imageFile->getClientOriginalExtension());
+        $imageFileName = Str::uuid()->toString();
 
-					return $image->id;
-				} else {
-					return redirect()->back()->withErrors(($image->errors()));
-				}
-			}
-		} else {
-			return 1;
-		}
+        $image = Image::create([
+            'image_file_name' => $imageFileName,
+            'image_file_extension' => $imageFile->getClientOriginalExtension(),
+            'image_file_type' => $imageFile->getMimeType(),
+            'image_file_size' => $imageFile->getSize()
+        ]);
+
+        if (!$image) {
+            return redirect()->back()->withErrors(($image->errors()));
+        }
+
+        $imageFile->move('storage', $imageFileName.'.'.$imageFile->getClientOriginalExtension());
+
+        return $image->id;
 	}
 
 	public function store(Request $request) {
 		$imageId = $this->imageUpload($request);
 
-		if ($imageId) {
-			request()->validate([
-				'category_id' => ['required', 'integer'],
-				'title' => ['required', 'string', 'min:1', 'max:75'],
-				'shortstory' => ['required', 'string', 'min:1', 'max:200'],
-				'longstory' => ['required', 'string', 'min:1', 'max:50000']
-			]);
+		if (!$imageId) {
+            return redirect(route('admin-create-newspost'))->withErrors(
+                ['The image must be a file of type: jpeg, bmp, png, gif.']
+            );
+        }
 
-			$newsPost = NewsPost::create([
-				'user_id' => Auth::user()->id,
-				'category_id' => request('category_id'),
-				'image_id' => $imageId,
-				'title' => request('title'),
-				'shortstory' => request('shortstory'),
-				'longstory' => request('longstory')
-			]);
+        request()->validate([
+            'category_id' => ['required', 'integer'],
+            'title' => ['required', 'string', 'min:1', 'max:75'],
+            'shortstory' => ['required', 'string', 'min:1', 'max:200'],
+            'longstory' => ['required', 'string', 'min:1', 'max:50000']
+        ]);
 
-			return redirect(route('admin-show-newspost', $newsPost->id))->with('message', 'Newspost "'.request('title').'" posted!');
-		} else {
-			return redirect(route('admin-create-newspost'))->withErrors(['The image must be a file of type: jpeg, bmp, png, gif.']);
-		}
+        $newsPost = NewsPost::create([
+            'user_id' => Auth::id(),
+            'category_id' => request('category_id'),
+            'image_id' => $imageId,
+            'title' => request('title'),
+            'shortstory' => request('shortstory'),
+            'longstory' => request('longstory')
+        ]);
+
+        return redirect(route('admin-show-newspost', $newsPost->id))->with('message', 'Newspost "'.request('title').'" posted!');
 	}
 
-	public function edit($id) {
-		$post = NewsPost::findOrFail($id);
+	public function edit(NewsPost $newsPost) {
+		$categories = NewsCategory::get();
 
-		$categories = Category::get();
-
-		return view('admin.news.edit', compact('post', 'categories'));
+		return view('admin.news.edit', compact('newsPost', 'categories'));
 	}
 
-	public function update(NewsPost $id, Request $request) {
+	public function update(NewsPost $newsPost, Request $request) {
 		$imageId = $this->imageUpload($request);
 
 		$newAuthor = User::where('name', request('user_id'))->first();
 
 		if ($newAuthor) {
-			$id->update(request()->validate([
+			$newsPost->update(request()->validate([
 				'category_id' => ['required', 'integer'],
 				'title' => ['required', 'string', 'min:1', 'max:75'],
 				'shortstory' => ['required', 'string', 'min:1', 'max:200'],
 				'longstory' => ['required', 'string', 'min:1', 'max:50000']
 			]));
 
-			$id->user_id = $newAuthor->id;
+			$newsPost->user_id = $newAuthor->id;
 
 			if (request('default')) {
-				$id->image_id = 1;
+				$newsPost->image_id = 1;
 			} elseif ($imageId != 1) {
-				$id->image_id = $imageId;
+				$newsPost->image_id = $imageId;
 			}
 
-			$id->save();
+			$newsPost->save();
 
-			return redirect(route('admin-edit-newspost', $id))->with('message', 'Newspost updated!');
+			return redirect(route('admin-edit-newspost', $newsPost))->with('message', 'Newspost updated!');
 		} else {
 			$newAuthor = User::find(request('user_id'));
 
 			if ($newAuthor) {
-				$id->update(request()->validate([
+				$newsPost->update(request()->validate([
 					'user_id' => ['required', 'integer'],
 					'category_id' => ['required', 'integer'],
 					'title' => ['required', 'string', 'min:1', 'max:75'],
@@ -129,16 +130,16 @@ class NewsController extends Controller
 				]));
 
 				if (request('default')) {
-					$id->image_id = 1;
+					$newsPost->image_id = 1;
 				} elseif ($imageId != 1) {
-					$id->image_id = $imageId;
+					$newsPost->image_id = $imageId;
 				}
 
-				$id->save();
+				$newsPost->save();
 
-				return redirect(route('admin-edit-newspost', $id))->with('message', 'Newspost updated!');
+				return redirect(route('admin-edit-newspost', $newsPost))->with('message', 'Newspost updated!');
 			} else {
-				return redirect(route('admin-edit-newspost', $id))->withErrors(['This user does not exist!']);
+				return redirect(route('admin-edit-newspost', $newsPost))->withErrors(['This user does not exist!']);
 			}
 		}
 	}
