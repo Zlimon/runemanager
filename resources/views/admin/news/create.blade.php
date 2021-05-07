@@ -40,7 +40,7 @@
 
             <div class="col-md-6">
                 <select id="category_id" class="form-control" name="category_id">
-                    @foreach ($categories as $category)
+                    @foreach ($newsCategories as $category)
                         <option value="{{ $category->id }}">{{ $category->category }}</option>
                     @endforeach
                 </select>
@@ -68,7 +68,7 @@
             </div>
         </div>
 
-        <textarea class="form-control" id="longstory" name="longstory"></textarea>
+        <editor></editor>
 
         @error('longstory')
         <span class="invalid-feedback" role="alert">
@@ -80,9 +80,4 @@
             <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">Post news</button>
         </div>
     </form>
-
-    <script src="{{ asset('vendor/unisharp/laravel-ckeditor/ckeditor.js') }}"></script>
-    <script>
-        CKEDITOR.replace('longstory');
-    </script>
 @endsection

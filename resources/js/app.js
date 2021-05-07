@@ -21,10 +21,12 @@ import Vue from 'vue'
 
 import UniqueId from 'vue-unique-id';
 import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css'
+import CKEditor from '@ckeditor/ckeditor5-vue2';
 
 Vue.use(UniqueId);
 Vue.use(require('advanced-laravel-vue-paginate'));
 Vue.use(require('vue-moment'));
+Vue.use( CKEditor );
 
 
 Vue.component('announcementall', require('./components/notification/AnnouncementAll.vue').default);
@@ -44,6 +46,8 @@ Vue.component('quests', require('./components/account/Quests.vue').default);
 Vue.component('bank', require('./components/account/Bank.vue').default);
 
 Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
+
+Vue.component('editor', require('./components/Editor.vue').default);
 
 Vue.component(
     'passport-clients',

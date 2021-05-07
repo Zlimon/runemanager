@@ -26,6 +26,8 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "@ckeditor/ckeditor5-build-classic": "^27.1.0",
+        "@ckeditor/ckeditor5-vue2": "^1.0.5",
         "advanced-laravel-vue-paginate": "^0.1.9",
         "vue-moment": "^4.1.0",
         "vue-unique-id": "^3.2.0"
