@@ -55,7 +55,7 @@
                                     <img src="{{ asset('images/'.$account->account_type.'.png') }}"
                                          alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon">
                                 @endif
-                                <a href="{{ route('admin-show-member', $account->id) }}">
+                                <a href="{{ route('admin-show-account', $account->id) }}">
                                     {{ $account->id }} - {{ $account->username }}
                                 </a>
                             </p>
@@ -64,7 +64,7 @@
                                 <img src="{{ asset('images/'.$account->account_type.'.png') }}"
                                      alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon">
                             @endif
-                            <a href="{{ route('admin-show-member', $account->id) }}">
+                            <a href="{{ route('admin-show-account', $account->id) }}">
                                 {{ $account->id }} - {{ $account->username }}
                             </a>
                         @endif

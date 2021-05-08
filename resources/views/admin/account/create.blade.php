@@ -9,7 +9,7 @@
     <p>If you want to preregister an OSRS account for future use / reference, you can do it here.</p>
     <p>This means this account will not be able to be linked for a new user, but have to be linked manually.</p>
 
-    <form method="POST" action="{{ route('admin-create-member') }}">
+    <form method="POST" action="{{ route('admin-create-account') }}">
         @csrf
 
         <label for="account" class="col-form-label text-md-right">RuneScape username</label>

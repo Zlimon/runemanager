@@ -13,7 +13,7 @@
         <div class="col-md-3 text-center">
             <h5>Transfer ownership of this account:</h5>
 
-            <form method="POST" action="{{ route('admin-update-member', $account) }}">
+            <form method="POST" action="{{ route('admin-update-account', $account) }}">
                 @method('PATCH')
                 @csrf
 

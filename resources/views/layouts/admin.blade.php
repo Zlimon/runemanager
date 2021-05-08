@@ -38,10 +38,10 @@
                         </ul> -->
                 </li>
                 <li>
-                    <a href="{{ route('admin-user') }}">Users (Profiles)</a>
+                    <a href="{{ route('admin-user') }}">Users</a>
                 </li>
                 <li>
-                    <a href="{{ route('admin-member') }}">Members (OSRS Accounts)</a>
+                    <a href="{{ route('admin-account') }}">Accounts</a>
                 </li>
                 <li>
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">News</a>

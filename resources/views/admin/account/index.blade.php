@@ -6,7 +6,7 @@
 
 @section('content')
 @section('navigation')
-    <a class="btn btn-success" href="{{ route('admin-create-member') }}">Register account</a>
+    <a class="btn btn-success" href="{{ route('admin-create-account') }}">Register account</a>
 @endsection
 
 <div class="content-body">
@@ -14,7 +14,7 @@
         <h1>Search for OSRS accounts</h1>
     </div>
 
-    <form class="form-group row" method="POST" action="{{ route('admin-search-member') }}">
+    <form class="form-group row" method="POST" action="{{ route('admin-search-account') }}">
         @csrf
 
         <div class="col-md-3"></div>
@@ -65,7 +65,7 @@
                         src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="54"
                         alt="Profile icon">@endif{{ $account->user_id }} - {{ $account->user->name }}</a>@endif</td>
             <td>{{ \Carbon\Carbon::parse($account->created_at)->format('d. M Y H:i') }}</td>
-            <td><a class="btn btn-success mr-2" href="{{ route('admin-show-member', $account->username) }}">Show</a></td>
+            <td><a class="btn btn-success mr-2" href="{{ route('admin-show-account', $account->username) }}">Show</a></td>
         </tr>
     @endforeach
 </table>

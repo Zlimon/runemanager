@@ -17,7 +17,7 @@ class AccountController extends Controller
 
         $query = null;
 
-        return view('admin.member.index', compact('accounts', 'query'));
+        return view('admin.account.index', compact('accounts', 'query'));
     }
 
     public function search() {
@@ -30,18 +30,18 @@ class AccountController extends Controller
         $accounts = Account::with('user')->where('username', 'LIKE', '%' . $query . '%')->get();
 
         if (count($accounts) === 0) {
-            return redirect(route('admin-member'))->withErrors(['No search results for "'.$query.'"!']);
+            return redirect(route('admin-account'))->withErrors(['No search results for "'.$query.'"!']);
         } else {
-            return view('admin.member.index', compact('accounts', 'query'));
+            return view('admin.account.index', compact('accounts', 'query'));
         }
     }
 
     public function show(Account $account) {
-        return view('admin.member.show', compact('account'));
+        return view('admin.account.show', compact('account'));
     }
 
     public function create() {
-        return view('admin.member.create');
+        return view('admin.account.create');
     }
 
     public function store(Request $request) {
@@ -51,7 +51,7 @@ class AccountController extends Controller
         ]);
 
         if (Account::where('username', request('account'))->first()) {
-            return redirect(route('admin-create-member'))->withErrors('This account has already been registered!');
+            return redirect(route('admin-create-account'))->withErrors('This account has already been registered!');
         }
 
         if (!request('user') && Auth::check()) {
@@ -60,10 +60,10 @@ class AccountController extends Controller
             $user = User::whereName(request('user'))->orWhere('id', request('user'))->first();
 
             if (!$user) {
-                return redirect(route('admin-create-member'))->withErrors('This user does not exist!');
+                return redirect(route('admin-create-account'))->withErrors('This user does not exist!');
             }
         } else {
-            return redirect(route('admin-create-member'))->withErrors('This user does not exist!');
+            return redirect(route('admin-create-account'))->withErrors('This user does not exist!');
         }
 
         $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
@@ -76,7 +76,7 @@ class AccountController extends Controller
         $playerData = Helper::getPlayerData($playerDataUrl);
 
         if (!$playerData) {
-            return redirect(route('admin-create-member'))->withErrors('Could not fetch player data from hiscores!');
+            return redirect(route('admin-create-account'))->withErrors('Could not fetch player data from hiscores!');
         }
 
         DB::beginTransaction();
@@ -106,20 +106,20 @@ class AccountController extends Controller
 
         DB::commit();
 
-        return redirect(route('admin-show-member', $account))->with('message', 'Old School RuneScape account "'.request('account').'" registered to user "'.$user->name.'"!');
+        return redirect(route('admin-show-account', $account))->with('message', 'Old School RuneScape account "'.request('account').'" registered to user "'.$user->name.'"!');
     }
 
     public function update(Account $account, Request $request) {
         $newOwner = User::whereName(request('user'))->orWhere('id', request('user'))->first();
 
         if (!$newOwner) {
-            return redirect(route('admin-show-member', $account))->withErrors(['This user does not exist!']);
+            return redirect(route('admin-show-account', $account))->withErrors(['This user does not exist!']);
         }
 
         $account->update([
             'user_id' => $newOwner->id
         ]);
 
-        return redirect(route('admin-show-member', $account))->with('message', 'Account ownership transferred to "'.$newOwner->name.'"!');
+        return redirect(route('admin-show-account', $account))->with('message', 'Account ownership transferred to "'.$newOwner->name.'"!');
     }
 }
