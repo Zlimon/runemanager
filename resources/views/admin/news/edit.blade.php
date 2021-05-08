@@ -6,7 +6,7 @@
 
 @section('content')
 @section('navigation')
-    <form method="POST" action="{{ route('admin-delete-newspost', $post->id) }}">
+    <form method="POST" action="{{ route('admin-delete-newspost', $newsPost) }}">
         @method('DELETE')
         @csrf
 
@@ -14,16 +14,16 @@
     </form>
 @endsection
 
-<h1>Update newspost "{{ $post->title }}"</h1>
+    <h1>Update newspost "{{ $newsPost->title }}"</h1>
 
 <div class="row">
     <div class="col-5">
-        <img src="{{ asset('storage') }}/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}"
-             alt="'{{ $post->title }}' news post image" width="100%">
+        <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
+             alt="'{{ $newsPost->title }}' news post image" width="100%">
     </div>
 
     <div class="col-7">
-        <form method="POST" action="{{ route('admin-edit-newspost', $post->id) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('admin-edit-newspost', $newsPost->id) }}" enctype="multipart/form-data">
             @method('PATCH')
             @csrf
 
@@ -32,7 +32,7 @@
 
                 <div class="col-md-6">
                     <input id="user_id" type="text" class="form-control @error('user_id') is-invalid @enderror"
-                           name="user_id" value="{{ $post->user->name }}">
+                           name="user_id" value="{{ $newsPost->user->name }}">
 
                     @error('user_id')
                     <span class="invalid-feedback" role="alert">
@@ -50,7 +50,7 @@
                         <input id="image" type="file"
                                class="form-control-file border rounded bg-white p-1 ml-3 @error('image') border-danger @enderror"
                                name="image" aria-describedby="imageTip" style="color: black;">
-                        <small id="imageTip" class="form-text ml-3">Current image ID: {{ $post->image_id }}</small>
+                        <small id="imageTip" class="form-text ml-3">Current image ID: {{ $newsPost->image_id }}</small>
                     </div>
 
                     <div class="col-md-6">
@@ -68,7 +68,7 @@
 
                 <div class="col-md-6">
                     <input id="title" type="text" class="form-control @error('title') is-invalid @enderror" name="title"
-                           value="{{ $post->title }}">
+                           value="{{ $newsPost->title }}">
 
                     @error('title')
                     <span class="invalid-feedback" role="alert">
@@ -83,8 +83,8 @@
 
                 <div class="col-md-6">
                     <select id="category_id" class="form-control" name="category_id">
-                        <option value="{{ $post->category_id }}">Currently: {{ $post->category->category }}</option>
-                        @foreach ($categories as $category)
+                        <option value="{{ $newsPost->news_category_id }}">Currently: {{ $newsPost->news_category->category }}</option>
+                        @foreach ($newsCategories as $category)
                             <option value="{{ $category->id }}">{{ $category->category }}</option>
                         @endforeach
                     </select>
@@ -102,7 +102,7 @@
 
                 <div class="col-md-11">
                     <input id="shortstory" type="text" class="form-control @error('shortstory') is-invalid @enderror"
-                           name="shortstory" value="{{ $post->shortstory }}">
+                           name="shortstory" value="{{ $newsPost->shortstory }}">
 
                     @error('shortstory')
                     <span class="invalid-feedback" role="alert">
@@ -112,7 +112,7 @@
                 </div>
             </div>
 
-            <textarea class="form-control" id="longstory" name="longstory">{{ $post->longstory }}</textarea>
+            <textarea class="form-control" id="longstory" name="longstory">{{ $newsPost->longstory }}</textarea>
 
             @error('longstory')
             <span class="invalid-feedback" role="alert">

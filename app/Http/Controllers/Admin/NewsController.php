@@ -60,20 +60,20 @@ class NewsController extends Controller
 	}
 
 	public function store(Request $request) {
-		$imageId = $this->imageUpload($request);
-
-		if (!$imageId) {
-            return redirect(route('admin-create-newspost'))->withErrors(
-                ['The image must be a file of type: jpeg, bmp, png, gif.']
-            );
-        }
-
         request()->validate([
             'category_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'min:1', 'max:75'],
             'shortstory' => ['required', 'string', 'min:1', 'max:200'],
             'longstory' => ['required', 'string', 'min:1', 'max:50000']
         ]);
+
+        $imageId = $this->imageUpload($request);
+
+		if (!$imageId) {
+            return redirect(route('admin-create-newspost'))->withErrors(
+                ['The image must be a file of type: jpeg, bmp, png, gif.']
+            );
+        }
 
         $newsPost = NewsPost::create([
             'user_id' => Auth::id(),
@@ -88,9 +88,9 @@ class NewsController extends Controller
 	}
 
 	public function edit(NewsPost $newsPost) {
-		$categories = NewsCategory::get();
+		$newsCategories = NewsCategory::get();
 
-		return view('admin.news.edit', compact('newsPost', 'categories'));
+		return view('admin.news.edit', compact('newsPost', 'newsCategories'));
 	}
 
 	public function update(NewsPost $newsPost, Request $request) {
