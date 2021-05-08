@@ -68,7 +68,7 @@ Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 		Route::get('/admin/account/{account}/show', 'Admin\AccountController@show')->name('admin-show-member');
 		Route::patch('/admin/account/{account}/show', 'Admin\AccountController@update')->name('admin-update-member');
 		/*==========Rank Controller=============*/
-		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
+//		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
 //	});
 
 Auth::routes();

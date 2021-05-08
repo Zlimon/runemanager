@@ -48,6 +48,7 @@ Vue.component('bank', require('./components/account/Bank.vue').default);
 Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
 
 Vue.component('newscreate', require('./components/NewsCreate.vue').default);
+Vue.component('newsupdate', require('./components/NewsUpdate.vue').default);
 
 Vue.component(
     'passport-clients',
