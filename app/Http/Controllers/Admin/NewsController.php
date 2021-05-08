@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class NewsController extends Controller
 {
 	public function index() {
-		$newsPosts = NewsPost::with('user')->with('news_category')->orderByDesc('created_at', )->get();
+		$newsPosts = NewsPost::with('user')->with('newsCategory')->orderByDesc('created_at', )->get();
 
 		return view('admin.news.index', compact('newsPosts'));
 	}
@@ -58,34 +58,6 @@ class NewsController extends Controller
         $imageFile->move('storage', $imageFileName.'.'.$imageFile->getClientOriginalExtension());
 
         return $image->id;
-	}
-
-	public function store(Request $request) {
-        request()->validate([
-            'news_category_id' => ['required', 'integer'],
-            'title' => ['required', 'string', 'min:1', 'max:75'],
-            'shortstory' => ['required', 'string', 'min:1', 'max:200'],
-            'longstory' => ['required', 'string', 'min:1', 'max:50000']
-        ]);
-
-        $imageId = $this->imageUpload($request); // Return 1 if empty
-
-		if (!$imageId) {
-            return redirect(route('admin-create-newspost'))->withErrors(
-                ['The image must be a file of type: jpeg, bmp, png, gif.']
-            );
-        }
-
-        $newsPost = NewsPost::create([
-            'user_id' => Auth::id(),
-            'news_category_id' => request('news_category_id'),
-            'image_id' => $imageId,
-            'title' => request('title'),
-            'shortstory' => request('shortstory'),
-            'longstory' => request('longstory')
-        ]);
-
-        return redirect(route('admin-show-newspost', $newsPost->id))->with('message', 'Newspost "'.request('title').'" posted!');
 	}
 
 	public function edit(NewsPost $newsPost) {

@@ -50,10 +50,8 @@ Route::get('/news/{id}', 'NewsController@show')->name('news-show');
 		/*==========News Controller=============*/
 		Route::get('/admin/news', 'Admin\NewsController@index')->name('admin-news');
 		Route::get('/admin/news/create', 'Admin\NewsController@create')->name('admin-create-newspost');
-		Route::post('/admin/news/create', 'Admin\NewsController@store')->name('admin-store-newspost');
 		Route::get('/admin/news/{newsPost}/show', 'Admin\NewsController@show')->name('admin-show-newspost');
 		Route::get('/admin/news/{newsPost}/edit', 'Admin\NewsController@edit')->name('admin-edit-newspost');
-		Route::patch('/admin/news/{newsPost}/edit', 'Admin\NewsController@update')->name('admin-update-newspost');
 		Route::delete('/admin/news/{newsPost}delete', 'Admin\NewsController@destroy')->name('admin-delete-newspost');
 		//Route::resource('/admin/news', 'AdminNewsController');
 		/*==========User Controller=============*/

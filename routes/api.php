@@ -98,3 +98,10 @@ Route::prefix('/broadcast')->group(function() {
 	Route::get('/account/{account}/{broadcastType}', 'Api\BroadcastController@account')->name('broadcast-account-show');
     Route::get('/recent/{broadcastType}', 'Api\BroadcastController@recent')->name('broadcast-recent-show');
 });
+
+Route::middleware('auth:api')->group(function() {
+    Route::prefix('/admin')->group(function() {
+        Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-store-newspost');
+        Route::patch('/news/{newsPost}/edit', 'Admin\Api\NewsController@update')->name('admin-update-newspost');
+    });
+});

@@ -23,7 +23,7 @@
                 <td>{{ $news->id }}</td>
                 <td>{{ $news->title }}</td>
                 <td>{{ $news->shortstory }}</td>
-                <td>{{ $news->news_category->category }}</td>
+                <td>{{ $news->newsCategory->category }}</td>
                 <td>{{ $news->user->name }}</td>
                 <td>{{ \Carbon\Carbon::parse($news->created_at)->format('d. M Y H:i') }}</td>
                 <td>

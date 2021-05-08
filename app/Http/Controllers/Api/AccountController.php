@@ -43,7 +43,7 @@ class AccountController extends Controller
 
         if ($validator->fails()) {
             foreach ($validator->messages()->all() as $value) {
-                return response($value, 406);
+                return response($value, 422);
             }
         }
 

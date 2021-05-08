@@ -12,7 +12,7 @@ class PageController extends Controller
 {
     public function index()
     {
-        $recentPosts = NewsPost::with('user')->with('category')->with('image')->limit(5)->orderByDesc('created_at')->get();
+        $recentPosts = NewsPost::with('user')->with('newsCategory')->with('image')->limit(5)->orderByDesc('created_at')->get();
 
         return view('index', compact('recentPosts'));
     }

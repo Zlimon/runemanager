@@ -4,11 +4,13 @@ namespace App\Helpers;
 
 use App\Account;
 use App\Collection;
+use App\Image;
 use App\Skill;
 use DateTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class Helper
@@ -391,4 +393,35 @@ class Helper
 
         return true;
     }
+
+    public static function imageUpload($imageFile) {
+		if ($imageFile == null) {
+            return 1;
+        }
+
+        $validator = Validator::make($imageFile, [
+            'image' => 'mimes:jpeg,bmp,png,gif',
+        ]);
+
+        if ($validator->fails()) {
+            return false;
+        }
+
+        $imageFileName = Str::uuid()->toString();
+
+        $image = Image::create([
+            'image_file_name' => $imageFileName,
+            'image_file_extension' => $imageFile->getClientOriginalExtension(),
+            'image_file_type' => $imageFile->getMimeType(),
+            'image_file_size' => $imageFile->getSize()
+        ]);
+
+        if (!$image) {
+            return false;
+        }
+
+        $imageFile->move('storage', $imageFileName.'.'.$imageFile->getClientOriginalExtension());
+
+        return $image->id;
+	}
 }
