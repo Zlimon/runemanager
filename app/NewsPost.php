@@ -39,7 +39,7 @@ use Illuminate\Database\Eloquent\Model;
 class NewsPost extends Model
 {
     protected $fillable = [
-        'user_id', 'category_id', 'image_id', 'title', 'shortstory', 'longstory',
+        'user_id', 'news_category_id', 'image_id', 'title', 'shortstory', 'longstory',
     ];
 
     public function user() {

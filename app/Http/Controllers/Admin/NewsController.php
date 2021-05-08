@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\NewsCategory;
 use App\NewsPost;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -61,13 +62,13 @@ class NewsController extends Controller
 
 	public function store(Request $request) {
         request()->validate([
-            'category_id' => ['required', 'integer'],
+            'news_category_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'min:1', 'max:75'],
             'shortstory' => ['required', 'string', 'min:1', 'max:200'],
             'longstory' => ['required', 'string', 'min:1', 'max:50000']
         ]);
 
-        $imageId = $this->imageUpload($request);
+        $imageId = $this->imageUpload($request); // Return 1 if empty
 
 		if (!$imageId) {
             return redirect(route('admin-create-newspost'))->withErrors(
@@ -77,7 +78,7 @@ class NewsController extends Controller
 
         $newsPost = NewsPost::create([
             'user_id' => Auth::id(),
-            'category_id' => request('category_id'),
+            'news_category_id' => request('news_category_id'),
             'image_id' => $imageId,
             'title' => request('title'),
             'shortstory' => request('shortstory'),
@@ -94,54 +95,40 @@ class NewsController extends Controller
 	}
 
 	public function update(NewsPost $newsPost, Request $request) {
-		$imageId = $this->imageUpload($request);
+		$newAuthor = User::whereName(request('user'))->orWhere('id', request('user'))->first();
 
-		$newAuthor = User::where('name', request('user_id'))->first();
+		if (!$newAuthor) {
+            return redirect(route('admin-edit-newspost', $newsPost))->withErrors(['This user does not exist!']);
+        }
+
+        $newsPost->update(request()->validate([
+            'news_category_id' => ['required', 'integer'],
+            'title' => ['required', 'string', 'min:1', 'max:75'],
+            'shortstory' => ['required', 'string', 'min:1', 'max:200'],
+            'longstory' => ['required', 'string', 'min:1', 'max:50000']
+        ]));
+
+        $imageId = $this->imageUpload($request);
+
+		if (!$imageId) {
+            return redirect(route('admin-create-newspost'))->withErrors(
+                ['The image must be a file of type: jpeg, bmp, png, gif.']
+            );
+        }
 
 		if ($newAuthor) {
-			$newsPost->update(request()->validate([
-				'category_id' => ['required', 'integer'],
-				'title' => ['required', 'string', 'min:1', 'max:75'],
-				'shortstory' => ['required', 'string', 'min:1', 'max:200'],
-				'longstory' => ['required', 'string', 'min:1', 'max:50000']
-			]));
+            $newsPost->user_id = $newAuthor->id;
+        }
 
-			$newsPost->user_id = $newAuthor->id;
+        if (request('default')) {
+            $newsPost->image_id = 1;
+        } elseif ($imageId != 1) {
+            $newsPost->image_id = $imageId;
+        }
 
-			if (request('default')) {
-				$newsPost->image_id = 1;
-			} elseif ($imageId != 1) {
-				$newsPost->image_id = $imageId;
-			}
+        $newsPost->save();
 
-			$newsPost->save();
-
-			return redirect(route('admin-edit-newspost', $newsPost))->with('message', 'Newspost updated!');
-		} else {
-			$newAuthor = User::find(request('user_id'));
-
-			if ($newAuthor) {
-				$newsPost->update(request()->validate([
-					'user_id' => ['required', 'integer'],
-					'category_id' => ['required', 'integer'],
-					'title' => ['required', 'string', 'min:1', 'max:75'],
-					'shortstory' => ['required', 'string', 'min:1', 'max:200'],
-					'longstory' => ['required', 'string', 'min:1', 'max:50000']
-				]));
-
-				if (request('default')) {
-					$newsPost->image_id = 1;
-				} elseif ($imageId != 1) {
-					$newsPost->image_id = $imageId;
-				}
-
-				$newsPost->save();
-
-				return redirect(route('admin-edit-newspost', $newsPost))->with('message', 'Newspost updated!');
-			} else {
-				return redirect(route('admin-edit-newspost', $newsPost))->withErrors(['This user does not exist!']);
-			}
-		}
+        return redirect(route('admin-edit-newspost', $newsPost))->with('message', 'Newspost updated!');
 	}
 
 	public function destroy(NewsPost $newsPost) {

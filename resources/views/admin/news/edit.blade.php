@@ -28,13 +28,13 @@
             @csrf
 
             <div class="form-group row">
-                <label for="user_id" class="col-md-1 col-form-label text-md-left">Author</label>
+                <label for="user" class="col-md-1 col-form-label text-md-left">Author</label>
 
                 <div class="col-md-6">
-                    <input id="user_id" type="text" class="form-control @error('user_id') is-invalid @enderror"
-                           name="user_id" value="{{ $newsPost->user->name }}">
+                    <input id="user" type="text" class="form-control @error('user') is-invalid @enderror"
+                           name="user" value="{{ $newsPost->user->name }}">
 
-                    @error('user_id')
+                    @error('user')
                     <span class="invalid-feedback" role="alert">
 								<strong>{{ $message }}</strong>
 							</span>
@@ -79,17 +79,17 @@
             </div>
 
             <div class="form-group row">
-                <label for="category_id" class="col-md-1 col-form-label text-md-left">Category</label>
+                <label for="news_category_id" class="col-md-1 col-form-label text-md-left">Category</label>
 
                 <div class="col-md-6">
-                    <select id="category_id" class="form-control" name="category_id">
+                    <select id="news_category_id" class="form-control" name="news_category_id">
                         <option value="{{ $newsPost->news_category_id }}">Currently: {{ $newsPost->news_category->category }}</option>
                         @foreach ($newsCategories as $category)
                             <option value="{{ $category->id }}">{{ $category->category }}</option>
                         @endforeach
                     </select>
 
-                    @error('category_id')
+                    @error('news_category_id')
                     <span class="invalid-feedback" role="alert">
 								<strong>{{ $message }}</strong>
 							</span>
@@ -113,6 +113,7 @@
             </div>
 
             <textarea class="form-control" id="longstory" name="longstory">{{ $newsPost->longstory }}</textarea>
+{{--            <editor></editor>--}}
 
             @error('longstory')
             <span class="invalid-feedback" role="alert">
@@ -125,10 +126,5 @@
             </div>
         </form>
     </div>
-
-    <script src="{{ asset('vendor/unisharp/laravel-ckeditor/ckeditor.js') }}"></script>
-    <script>
-        CKEDITOR.replace('longstory');
-    </script>
 </div>
 @endsection

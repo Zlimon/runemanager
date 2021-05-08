@@ -36,16 +36,16 @@
         </div>
 
         <div class="form-group row">
-            <label for="category_id" class="col-md-4 col-form-label text-md-right">Category</label>
+            <label for="news_category_id" class="col-md-4 col-form-label text-md-right">Category</label>
 
             <div class="col-md-6">
-                <select id="category_id" class="form-control" name="category_id">
+                <select id="news_category_id" class="form-control" name="news_category_id">
                     @foreach ($newsCategories as $category)
                         <option value="{{ $category->id }}">{{ $category->category }}</option>
                     @endforeach
                 </select>
 
-                @error('category_id')
+                @error('news_category_id')
                 <span class="invalid-feedback" role="alert">
 						<strong>{{ $message }}</strong>
 					</span>
@@ -68,7 +68,8 @@
             </div>
         </div>
 
-        <editor></editor>
+        <textarea class="form-control" id="longstory" name="longstory"></textarea>
+{{--        <editor></editor>--}}
 
         @error('longstory')
         <span class="invalid-feedback" role="alert">
