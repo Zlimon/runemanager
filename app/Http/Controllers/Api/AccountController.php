@@ -10,11 +10,6 @@ use App\Events\AccountOnline;
 use App\Events\EventAll;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\AccountBossResource;
-use App\Http\Resources\AccountResource;
-use App\Http\Resources\AccountSkillResource;
-use App\Http\Resources\CollectionResource;
-use App\Http\Resources\SkillResource;
 use App\Log;
 use App\Skill;
 use Illuminate\Http\Request;
@@ -130,18 +125,23 @@ class AccountController extends Controller
 
         foreach ($skills as $key => $skill) {
             if ($update) {
-                $skill = $account->skill($skill)->first();
+                $accountSkill = $account->skill($skill)->first();
+
+                // If account is missing the skill, create new
+                if (!$accountSkill) {
+                    $accountSkill = new $skill->model;
+                }
             } else {
-                $skill = new $skill->model;
+                $accountSkill = new $skill->model;
             }
 
-            $skill->account_id = $account->id;
-            $skill->rank = ($playerData[$key + 1][0] >= 1 ? $playerData[$key + 1][0] : 0);
-            $skill->level = $playerData[$key + 1][1];
-            $skill->xp = ($playerData[$key + 1][2] >= 0 ? $playerData[$key + 1][2] : 0);
+            $accountSkill->account_id = $account->id;
+            $accountSkill->rank = ($playerData[$key + 1][0] >= 1 ? $playerData[$key + 1][0] : 0);
+            $accountSkill->level = $playerData[$key + 1][1];
+            $accountSkill->xp = ($playerData[$key + 1][2] >= 0 ? $playerData[$key + 1][2] : 0);
 
             try {
-                $skill->save();
+                $accountSkill->save();
             } catch (\Exception $e) {
                 DB::rollback();
                 throw $e;
@@ -153,20 +153,25 @@ class AccountController extends Controller
         $cluesIndex = 0;
 
         for ($i = ($skillsCount + 3); $i < ($skillsCount + 3 + $cluesCount); $i++) {
-            $clueCollection = Collection::where('slug', $clues[$cluesIndex] . '-treasure-trails')->first();
+            $collection = Collection::where('slug', $clues[$cluesIndex] . '-treasure-trails')->first();
 
             if ($update) {
-                $clueCollection = $account->collection($clueCollection)->first();
+                $accountClueCollection = $account->collection($collection)->first();
+
+                // If account is missing the clue collection, create new
+                if (!$accountClueCollection) {
+                    $accountClueCollection = new $collection->model;
+                }
             } else {
-                $clueCollection = new $clueCollection->model;
+                $accountClueCollection = new $collection->model;
             }
 
-            $clueCollection->account_id = $account->id;
-            $clueCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-            $clueCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+            $accountClueCollection->account_id = $account->id;
+            $accountClueCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            $accountClueCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
             try {
-                $clueCollection->save();
+                $accountClueCollection->save();
             } catch (\Exception $e) {
                 DB::rollback();
                 throw $e;
@@ -182,17 +187,22 @@ class AccountController extends Controller
         $dksKillCount = 0;
 
         for ($i = ($skillsCount + $cluesCount + 5); $i < ($skillsCount + $cluesCount + 5 + count($bosses)); $i++) {
-            $bossCollection = Collection::where('slug', $bosses[$bossIndex])->first();
+            $collection = Collection::where('slug', $bosses[$bossIndex])->first();
 
             if ($update) {
-                $bossCollection = $account->collection($bossCollection)->first();
+                $accountBossCollection = $account->collection($collection)->first();
+
+                // If account is missing the boss collection, create new
+                if (!$accountBossCollection) {
+                    $accountBossCollection = new $collection->model;
+                }
             } else {
-                $bossCollection = new $bossCollection->model;
+                $accountBossCollection = new $collection->model;
             }
 
-            $bossCollection->account_id = $account->id;
-            $bossCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-            $bossCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+            $accountBossCollection->account_id = $account->id;
+            $accountBossCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            $accountBossCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
             if (in_array(
                 $bosses[$bossIndex],
@@ -203,7 +213,7 @@ class AccountController extends Controller
             }
 
             try {
-                $bossCollection->save();
+                $accountBossCollection->save();
             } catch (\Exception $e) {
                 DB::rollback();
                 throw $e;
@@ -238,18 +248,23 @@ class AccountController extends Controller
         $npcs = Helper::listNpcs();
 
         foreach ($npcs as $npc) {
-            $npcCollection = Collection::findByNameAndCategory($npc, 4);
+            $collection = Collection::findByNameAndCategory($npc, 4);
 
             if ($update) {
-                $npcCollection = $account->collection($npcCollection)->first();
+                $accountNpcCollection = $account->collection($collection)->first();
+
+                // If account is missing the NPC collection, create new
+                if (!$accountNpcCollection) {
+                    $accountNpcCollection = new $collection->model;
+                }
             } else {
-                $npcCollection = new $npcCollection->model;
+                $accountNpcCollection = new $collection->model;
             }
 
-            $npcCollection->account_id = $account->id;
+            $accountNpcCollection->account_id = $account->id;
 
             try {
-                $npcCollection->save();
+                $accountNpcCollection->save();
             } catch (\Exception $e) {
                 DB::rollback();
                 throw $e;
