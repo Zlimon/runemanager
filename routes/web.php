@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function() {
 		Route::get('/news/{newsPost}/show', 'Admin\NewsController@show')->name('admin-show-newspost');
 		Route::get('/news/{newsPost}/edit', 'Admin\NewsController@edit')->name('admin-edit-newspost');
 		Route::delete('/news/{newsPost}delete', 'Admin\NewsController@destroy')->name('admin-delete-newspost');
+
+		Route::post('/news/category/create', 'Admin\NewsController@createCategory')->name('admin-create-newspost-category');
 		//Route::resource('/admin/news', 'AdminNewsController');
 		/*==========User Controller=============*/
 		Route::get('/user', 'Admin\UserController@index')->name('admin-user');

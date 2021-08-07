@@ -5,7 +5,24 @@
 @endsection
 
 @section('content')
-    <h1>News</h1>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h1>News</h1>
+        </div>
+
+        <div>
+            <h5>Create new category</h5>
+
+            <form method="POST" action="{{ route('admin-create-newspost-category') }}" class="form-inline">
+                @csrf
+
+                <label class="sr-only" for="inlineFormInputName2">Name</label>
+                <input type="text" class="form-control mb-2 mr-sm-2 @error('category') is-invalid @enderror" name="category" id="category" value="{{ old('user') }}" placeholder="Category name">
+
+                <button type="submit" class="btn btn-primary mb-2">Submit</button>
+            </form>
+        </div>
+    </div>
 
     <table>
         <tr>

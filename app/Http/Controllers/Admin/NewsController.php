@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class NewsController extends Controller
 {
 	public function index() {
-		$newsPosts = NewsPost::with('user')->with('newsCategory')->orderByDesc('created_at', )->get();
+		$newsPosts = NewsPost::with('user')->with('newsCategory')->orderByDesc('created_at')->get();
 
 		return view('admin.news.index', compact('newsPosts'));
 	}
@@ -37,5 +37,20 @@ class NewsController extends Controller
 		$newsPost->delete();
 
 		return redirect(route('admin-news'))->with('message', 'Newspost deleted!');
+	}
+
+	public function createCategory(Request $request) {
+        $this->validate($request, [
+            'category' => ['required', 'string'],
+            ]
+        );
+
+        $newsCategory = new NewsCategory();
+
+        $newsCategory->category = $request->category;
+
+        $newsCategory->save();
+
+		return redirect(route('admin-news'))->with('message', 'Created news category!');
 	}
 }

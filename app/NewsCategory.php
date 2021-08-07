@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class NewsCategory extends Model
 {
+    public $timestamps = false;
+
     public function newsPost()
     {
         return $this->hasMany(NewsPost::class);
