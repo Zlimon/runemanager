@@ -19,7 +19,8 @@ class HiscoreCreate extends Command
      */
     protected $signature = 'hiscore:create
                             {type : Category type of new hiscore}
-                            {name : Name of new hiscore (must be in snake case)}';
+                            {name : Name of new hiscore (must be in snake case)}
+                            {--migrate= : Whether the hiscore should be migrated immediately or not}';
 
     /**
      * The console command description.
@@ -48,14 +49,10 @@ class HiscoreCreate extends Command
         $hiscoreType = $this->argument('type');
         $hiscoreName = $this->argument('name');
 
-        DB::beginTransaction();
-
         try {
             $makeModel = "make:model ".ucfirst($hiscoreType)."/".Str::studly($hiscoreName)."";
             Artisan::call($makeModel);
         } catch (\Exception $e) {
-            DB::rollback();
-
             $this->info(sprintf("Could not create model: '%s'", Str::studly($hiscoreName)));
             $this->info(sprintf("%s", $e->getMessage()));
 
@@ -66,8 +63,6 @@ class HiscoreCreate extends Command
             $makeMigration = "make:migration create_".Str::snake($hiscoreName)."_table";
             Artisan::call($makeMigration);
         } catch (\Exception $e) {
-            DB::rollback();
-
             $this->info(sprintf("Could not create migration: '%s'", Str::snake($hiscoreName)));
             $this->info(sprintf("%s", $e->getMessage()));
 
@@ -97,7 +92,9 @@ class HiscoreCreate extends Command
             File::makeDirectory($imageDirectoryPath);
         }
 
-        DB::commit();
+        if ($this->option('migrate') == "yes") {
+            Artisan::call("migrate");
+        }
 
         $this->info(sprintf("Successfully created model, migration, collection and image directory for %s hiscore: '%s'", $hiscoreType, Str::title(str_replace('_', ' ', $hiscoreName))));
 
