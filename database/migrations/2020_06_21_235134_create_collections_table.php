@@ -250,7 +250,7 @@ class CreateCollectionsTable extends Migration
                     'category_id' => 2,
                     'order' => 4100,
                     'name' => 'Phosani\'s Nightmare',
-                    'slug' => 'phosanis_nightmare',
+                    'slug' => 'phosanis-nightmare',
                     'model' => 'App\Boss\PhosaniSNightmare'
                 ],
                 [
