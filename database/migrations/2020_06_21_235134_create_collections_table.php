@@ -310,6 +310,13 @@ class CreateCollectionsTable extends Migration
                     'model' => 'App\Raid\TheatreOfBlood'
                 ],
                 [
+                    'category_id' => 3,
+                    'order' => 5000,
+                    'name' => 'ToB: Hard Mode',
+                    'slug' => 'theatre-of-blood-hard-mode',
+                    'model' => 'App\Raid\TheatreOfBloodHardMode'
+                ],
+                [
                     'category_id' => 2,
                     'order' => 5000,
                     'name' => 'Thermonuclear Smoke Devil',
