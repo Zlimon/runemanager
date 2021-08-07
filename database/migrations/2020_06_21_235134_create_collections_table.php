@@ -318,84 +318,84 @@ class CreateCollectionsTable extends Migration
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5000,
+                    'order' => 5100,
                     'name' => 'Thermonuclear Smoke Devil',
                     'slug' => 'thermonuclear-smoke-devil',
                     'model' => 'App\Boss\ThermonuclearSmokeDevil'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5100,
+                    'order' => 5200,
                     'name' => 'TzKal-Zuk',
                     'slug' => 'tzkal-zuk',
                     'model' => 'App\Boss\TzKalZuk'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5200,
+                    'order' => 5300,
                     'name' => 'The Inferno',
                     'slug' => 'tzkal-zuk',
                     'model' => 'App\Boss\TzKalZuk'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5300,
+                    'order' => 5400,
                     'name' => 'TzTok-Jad',
                     'slug' => 'tztok-jad',
                     'model' => 'App\Boss\TzTokJad'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5400,
+                    'order' => 5500,
                     'name' => 'The Fight Caves',
                     'slug' => 'tztok-jad',
                     'model' => 'App\Boss\TzTokJad'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5500,
+                    'order' => 5600,
                     'name' => 'Venenatis',
                     'slug' => 'venenatis',
                     'model' => 'App\Boss\Venenatis'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5600,
+                    'order' => 5700,
                     'name' => 'Vet\'ion',
                     'slug' => 'vetion',
                     'model' => 'App\Boss\VetIon'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5700,
+                    'order' => 5800,
                     'name' => 'Vet\'ion Reborn',
                     'slug' => 'vetion',
                     'model' => 'App\Boss\Vetion'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5800,
+                    'order' => 5900,
                     'name' => 'Vorkath',
                     'slug' => 'vorkath',
                     'model' => 'App\Boss\Vorkath'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 5900,
+                    'order' => 6000,
                     'name' => 'Wintertodt',
                     'slug' => 'wintertodt',
                     'model' => 'App\Boss\Wintertodt'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 6000,
+                    'order' => 6100,
                     'name' => 'Zalcano',
                     'slug' => 'zalcano',
                     'model' => 'App\Boss\Zalcano'
                 ],
                 [
                     'category_id' => 2,
-                    'order' => 6100,
+                    'order' => 6200,
                     'name' => 'Zulrah',
                     'slug' => 'zulrah',
                     'model' => 'App\Boss\Zulrah'
@@ -403,49 +403,49 @@ class CreateCollectionsTable extends Migration
 
                 [
                     'category_id' => 5,
-                    'order' => 6200,
+                    'order' => 6300,
                     'name' => 'All Treasure Trails',
                     'slug' => 'all-treasure-trails',
                     'model' => 'App\Clues\AllTreasureTrails'
                 ],
                 [
                     'category_id' => 5,
-                    'order' => 6300,
+                    'order' => 6400,
                     'name' => 'Clue scroll (beginner)',
                     'slug' => 'beginner-treasure-trails',
                     'model' => 'App\Clues\BeginnerTreasureTrails'
                 ],
                 [
                     'category_id' => 5,
-                    'order' => 6400,
+                    'order' => 6500,
                     'name' => 'Clue scroll (easy)',
                     'slug' => 'easy-treasure-trails',
                     'model' => 'App\Clues\EasyTreasureTrails'
                 ],
                 [
                     'category_id' => 5,
-                    'order' => 6500,
+                    'order' => 6600,
                     'name' => 'Clue scroll (medium)',
                     'slug' => 'medium-treasure-trails',
                     'model' => 'App\Clues\MediumTreasureTrails'
                 ],
                 [
                     'category_id' => 5,
-                    'order' => 6600,
+                    'order' => 6700,
                     'name' => 'Clue scroll (hard)',
                     'slug' => 'hard-treasure-trails',
                     'model' => 'App\Clues\HardTreasureTrails'
                 ],
                 [
                     'category_id' => 5,
-                    'order' => 6700,
+                    'order' => 6800,
                     'name' => 'Clue scroll (elite)',
                     'slug' => 'elite-treasure-trails',
                     'model' => 'App\Clues\EliteTreasureTrails'
                 ],
                 [
                     'category_id' => 5,
-                    'order' => 6800,
+                    'order' => 6900,
                     'name' => 'Clue scroll (master)',
                     'slug' => 'master-treasure-trails',
                     'model' => 'App\Clues\MasterTreasureTrails'
@@ -454,7 +454,7 @@ class CreateCollectionsTable extends Migration
                 [
                     // TODO remove later
                     'category_id' => 4,
-                    'order' => 6900,
+                    'order' => 7000,
                     'name' => 'Goblin',
                     'slug' => 'goblin',
                     'model' => 'App\Npc\Goblin'
