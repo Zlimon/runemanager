@@ -1,29 +1,108 @@
 <template>
-    <div class="col-12 col-md-8">
-        <FullCalendar :options="calendarOptions"/>
+    <div>
+        <div class="col-12 col-md-8">
+            <FullCalendar :options="calendarOptions"/>
 
-        <h2>Settings</h2>
+            <h2>Settings</h2>
 
-        <div class="row">
-            <div class="col-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="edit_mode">
-                    <label class="form-check-label" for="edit_mode">
-                        Edit mode
-                    </label>
-                    <p class="text-muted">Allows dragging and resizing events in the calender. Also enables editing events.</p>
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="edit_mode">
+                        <label class="form-check-label" for="edit_mode">
+                            Edit mode
+                        </label>
+                        <p class="text-muted">Allows dragging and resizing events in the calender. Also enables editing events.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="col-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="broadcast_changes">
-                    <label class="form-check-label" for="broadcast_changes">
-                        Broadcast changes
-                    </label>
-                    <p class="text-muted">This will broadcast changes in-game!</p>
+                <div class="col-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="broadcast_changes">
+                        <label class="form-check-label" for="broadcast_changes">
+                            Broadcast changes
+                        </label>
+                        <p class="text-muted">This will broadcast changes in-game!</p>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <b-modal ref="event" hide-footer :title="eventTitle">
+            <div v-if="selectedEvent">
+                <div class="d-flex">
+                    <div class="col-3 text-center">
+                        <img v-if="selectedEvent.icon_id !== null" :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + selectedEvent.icon_id + '.png'" class="pixel icon mb-2" alt="Event icon">
+                    </div>
+
+                    <div class="col">
+                        <p class="font-weight-bold text-left">{{ selectedEvent.description ? selectedEvent.description : '' }}</p>
+
+                        <hr>
+
+                        <div class="d-flex text-left">
+                            <div class="col-3 pl-0">
+                                <span class="font-weight-bold">Starts:</span>
+                                <br>
+                                <span class="font-weight-bold">{{ selectedEvent.end_date !== null ? 'Ends:' : '' }}</span>
+                            </div>
+                            <div class="col">
+                                <span>{{ selectedEvent.start_date | moment('ddd. Do MMMM HH:mm') }}</span>
+                                <br>
+                                <span v-if="selectedEvent.end_date !== null">{{ selectedEvent.end_date | moment('ddd. Do MMMM HH:mm') }}</span>
+                            </div>
+                        </div>
+
+                        <hr>
+                    </div>
+                </div>
+
+                <b-button class="mt-3" variant="outline-danger" block @click="deleteEvent(selectedEvent.id)">Delete event</b-button>
+            </div>
+        </b-modal>
+
+        <b-modal ref="eventCreate" hide-footer title="Create new event">
+            <div class="text-left">
+                <div class="form-group">
+                    <input v-model="fields.title" type="text" class="form-control" id="title" placeholder="Title" required>
+                </div>
+                <div class="form-group">
+                    <input v-model="fields.description" type="text" class="form-control" id="description" placeholder="Description (optional)">
+                </div>
+                <div class="form-group">
+                    <input v-model="fields.icon_id" type="text" class="form-control" id="icon_id" aria-describedby="icon_idHelp" placeholder="Icon ID (optional)">
+                    <div class="form-text">
+                        <small id="icon_idHelp" class="text-muted">Type in the ID of an icon you wish to display as an event icon</small><br>
+                        <small id="icon_idHelp" class="text-muted">Search icons <a target="_blank" rel="noopener noreferrer" href="https://www.osrsbox.com/tools/item-search/">here</a> </small>
+                    </div>
+                </div>
+                <div class="d-flex form-group">
+                    <label class="col-3 col-form-label pl-0" for="event_color">Event color</label>
+                    <input v-model="fields.event_color" type="color" class="form-control mx-sm-3 w-25" name="event_color" id="event_color">
+                </div>
+                <div class="d-flex form-group">
+                    <label class="col-3 col-form-label pl-0" for="start_time">Start date</label>
+                    <div class="d-flex">
+                        <div class="col col-form-label">
+                            <span class="text-muted">{{ this.fields.start_date | moment("DD.MM.YYYY") }}</span>
+                        </div>
+                        <div class="">
+                            <input v-model="fields.start_time" type="time" class="form-control" id="start_time" placeholder="Start time" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex form-group">
+                    <label class="col-3 col-form-label pl-0" for="end_date">End date</label>
+                    <input v-model="fields.end_date" type="datetime-local" class="form-control mx-sm-3 w-50" id="end_date" placeholder="End date">
+                </div>
+                <div class="form-check">
+                    <input v-model="fields.all_day" type="checkbox" class="form-check-input" id="all_day" true-value="yes" false-value="no">
+                    <label class="form-check-label" for="all_day">All-day event</label>
+                </div>
+                <input v-model="fields.start_date" type="hidden" id="start_date">
+            </div>
+
+            <b-button class="mt-3" variant="outline-success" block @click="createEvent()">Create event</b-button>
+        </b-modal>
     </div>
 </template>
 
@@ -31,69 +110,19 @@
 import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
+var moment = require('moment');
 
 export default {
     components: {FullCalendar},
 
     methods: {
-        handleEventClick: function (arg) {
-            var moment = require('moment');
-
+        handleEventClick(arg) {
             axios
                 .get('/api/calendar/' + arg.event.id + '/show')
                 .then((response) => {
-                    this.$swal.fire({
-                        title: response.data.title,
-                        html:
-                            (response.data.icon_id !== null ? `<img src="https://www.osrsbox.com/osrsbox-db/items-icons/${response.data.icon_id}.png" class="pixel icon mb-2" alt=""><br>` : '') +
-                            '<p class="font-weight-bold">' + (response.data.description ? response.data.description : '') + '</p>' +
-                            (response.data.end_date === null ? `<span class="font-weight-bold">When?</span> ${moment(response.data.start_date).format('ddd. Do MMMM')}` : `<span class="font-weight-bold">From:</span> ${moment(response.data.start_date).format('ddd. Do MMMM HH:mm')}`) +
-                            (response.data.end_date !== null ? `<br> <span class="font-weight-bold">To:</span> ${moment(response.data.end_date).format('ddd. Do MMMM HH:mm')}` : ''),
-                        showCloseButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: `Delete`,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            axios
-                                .post('/api/admin/calendar/' + arg.event.id + '/destroy', {
-                                    _method: 'delete',
-                                })
-                                .then(() => {
-                                    this.getEvents();
-
-                                    this.$swal.fire({
-                                        toast: true,
-                                        icon: 'success',
-                                        title: 'Success',
-                                        position: 'top-right',
-                                        iconColor: 'white',
-                                        customClass: {
-                                            popup: 'colored-toast'
-                                        },
-                                        showConfirmButton: false,
-                                        timer: 3000,
-                                        timerProgressBar: true
-                                    })
-                                })
-                                .catch(error => {
-                                    this.$swal.fire({
-                                        toast: true,
-                                        icon: 'error',
-                                        title: 'Error',
-                                        position: 'top-right',
-                                        iconColor: 'white',
-                                        customClass: {
-                                            popup: 'colored-toast'
-                                        },
-                                        showConfirmButton: false,
-                                        timer: 3000,
-                                        timerProgressBar: true
-                                    })
-
-                                    console.error(error.response.data)
-                                });
-                        }
-                    })
+                    this.selectedEvent = response.data;
+                    this.eventTitle = response.data.title;
+                    this.showModal('event');
                 })
                 .catch(error => {
                     console.error(error)
@@ -101,114 +130,14 @@ export default {
                 .finally(() => this.loading = false)
         },
 
-        handleDateClick: async function (arg) {
-            var moment = require('moment');
+        handleDateClick(arg) {
+            // TODO better handling of updating fields before showModal
+            this.fields.event_color = '#3490dc';
+            this.fields.start_date = moment(arg.dateStr).format('YYYY-MM-DD\\THH:mm');
+            this.fields.start_time = moment(new Date()).format('HH:mm');
+            this.fields.end_date = moment(arg.dateStr).format('YYYY-MM-DD\\THH:mm');
 
-            const {value: formValues} = await this.$swal({
-                title: `Create new event for <br>${moment(arg.dateStr).format('ddd. Do MMMM')}`,
-                html:
-                    '<div class="text-left">'+
-                        '<div class="form-group">' +
-                            '<input type="text" class="form-control" id="title" placeholder="Title" required>' +
-                        '</div>' +
-                        '<div class="form-group">' +
-                            '<input type="text" class="form-control" id="description" aria-describedby="descriptionHelp" placeholder="Description (optional)">' +
-                        '</div>' +
-                        '<div class="form-group">' +
-                            '<input type="text" class="form-control" id="icon_id" aria-describedby="icon_idHelp" placeholder="Icon ID (optional)">' +
-                            '<div class="form-text">' +
-                                '<small id="icon_idHelp" class="text-muted">Type in the ID of an icon you wish to display as an event icon</small><br>' +
-                                '<small id="icon_idHelp" class="text-muted">Search icons <a target="_blank" rel="noopener noreferrer" href="https://www.osrsbox.com/tools/item-search/">here</a> </small>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="d-flex form-group">' +
-                            '<label class="col-3 pl-0" for="event_color">Event color</label>' +
-                            '<input type="color" class="form-control mx-sm-3 w-25" name="event_color" id="event_color" value="#3490dc">' +
-                        '</div>' +
-                        '<div class="d-flex form-group">' +
-                            '<label class="col-3 pl-0" for="start_date">Start time</label>' +
-                            `<input type="time" class="form-control mx-sm-3" id="start_date" value="${moment(new Date()).format('HH:mm')}" placeholder="Start time">` +
-                        '</div>' +
-                        '<div class="d-flex form-group">' +
-                            '<label class="col-3 pl-0" for="end_date">End date</label>' +
-                            `<input type="datetime-local" class="form-control mx-sm-3" id="end_date" value="${moment(arg.dateStr).format('YYYY-MM-DD\\THH:mm')}" placeholder="End date">` +
-                        '</div>' +
-                        '<div class="form-check">' +
-                            '<input class="form-check-input" type="checkbox" id="all_day">' +
-                            '<label class="form-check-label" for="all_day">All-day event</label>' +
-                        '</div>' +
-                    '</div>',
-                focusConfirm: false,
-                showCancelButton: true,
-                showLoaderOnConfirm: true,
-                allowOutsideClick: () => !this.$swal.isLoading(),
-                preConfirm: () => {
-                    return [
-                        document.getElementById('title').value, // 0
-                        document.getElementById('description').value, // 1
-                        document.getElementById('icon_id').value, // 2
-                        document.getElementById('event_color').value, // 3
-                        document.getElementById('start_date').value, // 4
-                        document.getElementById('end_date').value, // 5
-                        document.getElementById('all_day').checked, // 6
-                    ]
-                }
-            })
-
-            if (formValues) {
-                const start = moment(arg.dateStr, 'YYYY-MM-DD\\THH:mm');
-
-                const hour = formValues[4].match(/(.*):/g).pop().replace(":", "");
-                const minute = formValues[4].match(/:(.*)/g).pop().replace(":", "");
-
-                start.set({h: hour, m: minute});
-
-                let payload = {
-                    'title': formValues[0],
-                    'description': formValues[1],
-                    'start_date': start.format('YYYY-MM-DD\\THH:mm'),
-                    'end_date': formValues[6] === false ? formValues[5] : null,
-                    'icon_id': formValues[2],
-                    'event_color': formValues[3],
-                }
-
-                axios
-                    .post('/api/admin/calendar/create', payload)
-                    .then(() => {
-                        this.getEvents();
-
-                        this.$swal.fire({
-                            toast: true,
-                            icon: 'success',
-                            title: 'Success',
-                            position: 'top-right',
-                            iconColor: 'white',
-                            customClass: {
-                                popup: 'colored-toast'
-                            },
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true
-                        })
-                    })
-                    .catch(error => {
-                        this.$swal.fire({
-                            toast: true,
-                            icon: 'error',
-                            title: 'Error',
-                            position: 'top-right',
-                            iconColor: 'white',
-                            customClass: {
-                                popup: 'colored-toast'
-                            },
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true
-                        })
-
-                        console.error(error.response.data)
-                    });
-            }
+            this.showModal('eventCreate')
         },
 
         handleEventDropOrResize(arg) {
@@ -235,43 +164,109 @@ export default {
                 .finally(() => this.loading = false)
         },
 
+        createEvent() {
+            const start = moment(this.fields.start_date, 'YYYY-MM-DD\\THH:mm');
+
+            const hour = this.fields.start_time.match(/(.*):/g).pop().replace(":", "");
+            const minute = this.fields.start_time.match(/:(.*)/g).pop().replace(":", "");
+
+            start.set({h: hour, m: minute});
+
+            let payload = {
+                'title': this.fields.title,
+                'description': this.fields.description,
+                'start_date': start.format('YYYY-MM-DD\\THH:mm'),
+                'end_date': this.fields.all_day === 'yes' ? null : this.fields.end_date,
+                'icon_id': this.fields.icon_id,
+                'event_color': this.fields.event_color,
+            }
+
+            axios
+                .post('/api/admin/calendar/create', payload)
+                .then(() => {
+                    this.getEvents();
+                    this.hideModal('eventCreate');
+                    this.toastSuccess();
+
+                    this.fields = {};
+                })
+                .catch(error => {
+                    console.error(error.response.data);
+                    this.toastError();
+                });
+        },
+
         scheduleEvent(eventId, payload) {
             axios
                 .post('/api/admin/calendar/' + eventId + '/schedule', payload)
                 .then(() => {
                     this.getEvents();
-
-                    this.$swal.fire({
-                        toast: true,
-                        icon: 'success',
-                        title: 'Success',
-                        position: 'top-right',
-                        iconColor: 'white',
-                        customClass: {
-                            popup: 'colored-toast'
-                        },
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    })
+                    this.toastSuccess();
                 })
                 .catch(error => {
-                    this.$swal.fire({
-                        toast: true,
-                        icon: 'error',
-                        title: 'Error',
-                        position: 'top-right',
-                        iconColor: 'white',
-                        customClass: {
-                            popup: 'colored-toast'
-                        },
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    })
-
-                    console.error(error.response.data)
+                    console.error(error.response.data);
+                    this.toastError();
                 });
+        },
+
+        deleteEvent(eventId) {
+            axios
+                .post('/api/admin/calendar/' + eventId + '/destroy', {
+                    _method: 'delete',
+                })
+                .then(() => {
+                    this.getEvents();
+                    this.hideModal('event');
+
+                    this.selectedEvent = null;
+                    this.eventTitle = '';
+
+                    this.toastSuccess();
+                })
+                .catch(error => {
+                    console.error(error.response.data);
+                    this.toastError();
+                });
+        },
+
+        showModal(modal) {
+            this.$refs[modal].show()
+        },
+
+        hideModal(modal) {
+            this.$refs[modal].hide()
+        },
+
+        toastSuccess() {
+            this.$swal.fire({
+                toast: true,
+                icon: 'success',
+                title: 'Success',
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
+        },
+
+        toastError() {
+            this.$swal.fire({
+                toast: true,
+                icon: 'error',
+                title: 'Error',
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
         },
     },
 
@@ -288,6 +283,15 @@ export default {
                 eventResize: this.handleEventDropOrResize,
                 events: [],
             },
+
+            fields: {
+                // event_color: '#3490dc',
+                // start_date: moment(new Date()).format('HH:mm'),
+                // end_date: moment(new Date()).format('YYYY-MM-DD\\THH:mm'),
+            },
+
+            selectedEvent: null,
+            eventTitle: '',
         }
     },
 
