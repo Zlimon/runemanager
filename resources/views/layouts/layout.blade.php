@@ -56,7 +56,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">
+                                    <a class="nav-link" href="{{ route('calendar') }}">
                                         <img src="{{ asset('images/calendar.png') }}"
                                              class="pixel mr-1"
                                              alt="Calendar page icon"

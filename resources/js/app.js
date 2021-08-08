@@ -56,6 +56,7 @@ Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
 Vue.component('newscreate', require('./components/NewsCreate.vue').default);
 Vue.component('newsupdate', require('./components/NewsUpdate.vue').default);
 
+Vue.component('calendar', require('./components/Calendar.vue').default);
 Vue.component('calendaredit', require('./components/CalendarEdit.vue').default);
 
 Vue.component(

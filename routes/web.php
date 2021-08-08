@@ -19,7 +19,7 @@ Route::get('/update-log', 'PageController@updateLog')->name('update-log');
 Route::get('/home', 'HomeController@index')->name('home');
 Route::post('/home/{accountUsername}', 'HomeController@forceLogout')->name('account-force-logout');
 Route::get('/hiscore/{hiscoreType}/{hiscoreName}', 'PageController@hiscore')->name('hiscore');
-//Route::get('/calendar', 'PageController@calendar')->name('calendar');
+Route::get('/calendar', 'PageController@calendar')->name('calendar');
 
 /*==========Member Controller=============*/
 Route::get('/account', 'AccountController@index')->name('account');
