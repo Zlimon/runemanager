@@ -22,12 +22,14 @@ import Vue from 'vue'
 import UniqueId from 'vue-unique-id';
 import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css'
 import CKEditor from '@ckeditor/ckeditor5-vue2';
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 Vue.use(UniqueId);
 Vue.use(require('advanced-laravel-vue-paginate'));
 Vue.use(require('vue-moment'));
 Vue.use( CKEditor );
-
+Vue.use(VueSweetalert2);
 
 Vue.component('announcementall', require('./components/notification/AnnouncementAll.vue').default);
 Vue.component('accountevent', require('./components/notification/AccountEvent.vue').default);
@@ -49,6 +51,8 @@ Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
 
 Vue.component('newscreate', require('./components/NewsCreate.vue').default);
 Vue.component('newsupdate', require('./components/NewsUpdate.vue').default);
+
+Vue.component('calendaredit', require('./components/CalendarEdit.vue').default);
 
 Vue.component(
     'passport-clients',

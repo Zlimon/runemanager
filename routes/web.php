@@ -19,6 +19,7 @@ Route::get('/update-log', 'PageController@updateLog')->name('update-log');
 Route::get('/home', 'HomeController@index')->name('home');
 Route::post('/home/{accountUsername}', 'HomeController@forceLogout')->name('account-force-logout');
 Route::get('/hiscore/{hiscoreType}/{hiscoreName}', 'PageController@hiscore')->name('hiscore');
+//Route::get('/calendar', 'PageController@calendar')->name('calendar');
 
 /*==========Member Controller=============*/
 Route::get('/account', 'AccountController@index')->name('account');
@@ -71,6 +72,9 @@ Route::middleware('auth')->group(function() {
 		Route::post('/account/create', 'Admin\AccountController@store')->name('admin-store-account');
 		Route::get('/account/{account}/show', 'Admin\AccountController@show')->name('admin-show-account');
 		Route::patch('/account/{account}/show', 'Admin\AccountController@update')->name('admin-update-account');
+		/*==========Calendar Controller=============*/
+		Route::get('/calendar', 'Admin\CalendarController@index')->name('admin-calendar');
+		Route::delete('/calendar/truncate', 'Admin\CalendarController@truncate')->name('admin-calendar-truncate');
 		/*==========Rank Controller=============*/
 //		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
 //	});

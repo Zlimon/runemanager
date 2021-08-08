@@ -99,9 +99,16 @@ Route::prefix('/broadcast')->group(function() {
     Route::get('/recent/{broadcastType}', 'Api\BroadcastController@recent')->name('broadcast-recent-show');
 });
 
+Route::get('/calendar', 'Admin\Api\CalendarController@index');
+Route::get('/calendar/{calendar}/show', 'Admin\Api\CalendarController@show');
+
 Route::middleware('auth:api')->group(function() {
     Route::prefix('/admin')->group(function() {
         Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-store-newspost');
         Route::patch('/news/{newsPost}/edit', 'Admin\Api\NewsController@update')->name('admin-update-newspost');
+
+        Route::post('/calendar/create', 'Admin\Api\CalendarController@store');
+        Route::patch('/calendar/{calendar}/schedule', 'Admin\Api\CalendarController@updateSchedule');
+        Route::delete('/calendar/{calendar}/destroy', 'Admin\Api\CalendarController@destroy');
     });
 });
