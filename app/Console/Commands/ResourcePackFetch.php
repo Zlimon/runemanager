@@ -77,7 +77,7 @@ class ResourcePackFetch extends Command
         );
 
         // Verify resource pack is correctly downloaded, and insert to database
-        if (!File::exists(public_path('storage/resource-packs-downloaded/'.$name.'.zip'))) {
+        if (!File::exists(public_path('storage/resource-packs-downloaded/' . $name . '.zip'))) {
             $this->info(sprintf('Something went wrong. Most likely due to storage directory not existing'));
 
             $this->info(sprintf('Executing storage:link...'));
@@ -96,7 +96,9 @@ class ResourcePackFetch extends Command
 
             $resourcePack = new ResourcePack();
 
-            $getProperties = Http::get('https://raw.githubusercontent.com/melkypie/resource-packs/' . $name . '/pack.properties');
+            $getProperties = Http::get(
+                'https://raw.githubusercontent.com/melkypie/resource-packs/' . $name . '/pack.properties'
+            );
 
             if ($getProperties->failed()) {
                 $this->info(sprintf('Could not fetch properties from GitHub. Using default values'));
@@ -111,9 +113,14 @@ class ResourcePackFetch extends Command
             }
 
             $resourcePack->name = $name;
-            $resourcePack->alias = isset($values['displayName']) ? $values['displayName'] : Str::replaceFirst(' ', '', Str::title(str_replace(['pack-', '-'], ' ', $name)));
-            $resourcePack->version = isset($values['compatibleVersion']) ? $values['compatibleVersion'] : '1.0.0';
-            $resourcePack->author = isset($values['author']) ? $values['author'] : '<unknown>';
+            $resourcePack->alias = $values['displayName'] ??
+                Str::replaceFirst(
+                    ' ',
+                    '',
+                    Str::title(str_replace(['pack-', '-'], ' ', $name))
+                );
+            $resourcePack->version = $values['compatibleVersion'] ?? '1.0.0';
+            $resourcePack->author = $values['author'] ?? '<unknown>';
             $resourcePack->url = $url;
 
             $resourcePack->save();
