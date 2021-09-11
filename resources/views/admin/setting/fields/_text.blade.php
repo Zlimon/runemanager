@@ -3,7 +3,7 @@
     <input type="{{ $field['type'] }}"
            name="{{ $field['key'] }}"
            value="{{ old($field['key']) ?: \App\Helpers\SettingHelper::getSetting($field['key']) }}"
-           class="form-control {{ $field['class'] }} {{ $errors->has($field['key']) ? 'is-invalid' : '' }}"
+           class="col-12 col-md-6 form-control {{ $field['class'] }} {{ $errors->has($field['key']) ? 'is-invalid' : '' }}"
            id="{{ $field['key'] }}"
            placeholder="{{ $field['label'] }}">
 

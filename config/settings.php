@@ -36,7 +36,7 @@ return [
                 'rules' => 'required|boolean',
                 'description' => 'Select which resource pack to use on the site.',
                 'class' => '',
-                'value' => '1',
+                'value' => '0',
                 'options' => [
                     '0' => 'pack 1',
                     '1' => 'pack 2'

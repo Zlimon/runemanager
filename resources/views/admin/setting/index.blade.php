@@ -5,47 +5,29 @@
 @endsection
 
 @section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <form method="post" action="{{ route('admin-settings-store') }}" class="form-horizontal" role="form">
-                    {!! csrf_field() !!}
+    @if (count(config('settings', [])) )
+        <form method="POST" action="{{ route('admin-settings-store') }}">
+            @csrf
 
-                    @if(count(config('settings', [])) )
-                        @foreach(config('settings') as $section => $fields)
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <h2><i class="{{ $fields['icon'] }}"></i> {{ $fields['title'] }}</h2>
-                                </div>
+            <div class="row flex-wrap">
+                @foreach(config('settings') as $section => $fields)
+                    <div class="col-12 col-md-6">
+                    <h2><i class="{{ $fields['icon'] }}"></i> {{ $fields['title'] }}</h2>
 
-                                <div class="panel-body">
-                                    <p class="text-muted">{{ $fields['desc'] }}</p>
-                                </div>
+                    <p class="text-muted">{{ $fields['desc'] }}</p>
 
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="col-md-7  col-md-offset-2">
-                                            @foreach($fields['elements'] as $field)
-                                                @includeIf('admin.setting.fields.' . $field['type'] )
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    @foreach($fields['elements'] as $field)
+                        @includeIf('admin.setting.fields.' . $field['type'] )
+                    @endforeach
 
-                            <hr>
-                        @endforeach
-                    @endif
-
-                    <div class="row m-b-md">
-                        <div class="col-md-12">
-                            <button class="btn-primary btn">
-                                Save Settings
-                            </button>
-                        </div>
+                    <hr>
                     </div>
-                </form>
+                @endforeach
             </div>
-        </div>
-    </div>
+
+            <div class="mt-2">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    @endif
 @endsection
