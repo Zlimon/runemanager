@@ -40,30 +40,35 @@ class ResourcePackSwitch extends Command
      */
     public function handle()
     {
-        if (!File::exists(public_path('storage/resource-packs-downloaded/'.$this->argument('name').'.zip'))) {
-            $this->info(sprintf("Resource pack '%s' does not exist!", $this->argument('name')));
+        $name = $this->argument('name');
+
+        if (!File::exists(public_path('storage/resource-packs-downloaded/' . $name . '.zip'))) {
+            $this->info(sprintf('Resource pack "%s" does not exist!', $name));
 
             return 1;
         }
 
-        $extractFrom = public_path('storage/resource-packs-downloaded/'.$this->argument('name').'.zip');
+        $extractFrom = public_path('storage/resource-packs-downloaded/' . $name . '.zip');
         $extractTo = public_path('storage/resource-pack-tmp');
 
         // Clean tmp dir
         File::cleanDirectory(public_path('storage/resource-pack-tmp'));
 
-        $unzipper  = new Unzip();
-        $filenames = $unzipper->extract($extractFrom, $extractTo);
+        $unZipper = new Unzip();
+        $filenames = $unZipper->extract($extractFrom, $extractTo);
 
-        $this->info(sprintf("Applying new textures"));
+        $this->info(sprintf('Applying new textures'));
 
         // Copy resource pack from parent dir in tmp dir, and extract files one level up
-        File::copyDirectory(public_path('storage/resource-pack-tmp/'.$filenames[0]), public_path('storage/resource-pack'));
+        File::copyDirectory(
+            public_path('storage/resource-pack-tmp/' . $filenames[0]),
+            public_path('storage/resource-pack')
+        );
 
         // Clean tmp dir
         File::cleanDirectory(public_path('storage/resource-pack-tmp'));
 
-        $this->info(sprintf("Finished!"));
+        $this->info(sprintf('Finished!'));
 
         return 0;
     }
