@@ -82,7 +82,7 @@ class ResourcePackFetch extends Command
 
             $this->info(sprintf('Executing storage:link...'));
 
-            Artisan::call('storage:link');
+            $this->call('storage:link');
 
             $this->info(sprintf('Completed. Try fetching again'));
 
@@ -133,7 +133,9 @@ class ResourcePackFetch extends Command
         if ($this->option('use') == 'yes') {
             $this->info(sprintf('Applying new textures'));
 
-            Artisan::call('resourcepack:switch ' . $name);
+            $this->call('resourcepack:switch', [
+                'name' => $name,
+            ]);
         }
 
         $this->info(sprintf('Finished!'));
