@@ -6,12 +6,8 @@
 
         <div class="row">
             <div class="col-md-5">
-                <div v-if="account">
+                <div v-if="account !== null">
                     <h1 class="text-center">{{ account.username }}</h1>
-
-                    <h3 class="text-center header-chatbox-sword">Equipment</h3>
-
-                    <equipment :account="account"></equipment>
 
                     <div class="mt-4">
                         <div v-if="skills">
@@ -45,6 +41,14 @@
                             <component v-bind:is="component" :account="account"/>
                         </keep-alive>
                     </div>
+
+                    <h3 class="text-center header-chatbox-sword">Equipment</h3>
+
+                    <equipment :account="account"></equipment>
+
+                    <h3 class="text-center header-chatbox-sword">Quests</h3>
+
+                    <quests :account="account"></quests>
                 </div>
             </div>
 
@@ -91,7 +95,7 @@ export default {
 
     data() {
         return {
-            account: {},
+            account: null,
             skills: true,
             component: AccountSkillHiscore,
         }
