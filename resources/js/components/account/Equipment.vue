@@ -12,7 +12,11 @@
             <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
                 <form>
                     <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="equipmentDisplayToggle" @change="updateDisplayEquipment()" :checked="display">
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               id="equipmentDisplayToggle"
+                               @change="updateDisplayEquipment()"
+                               :checked="display">
                         <label class="custom-control-label" for="equipmentDisplayToggle">Display equipment</label>
                     </div>
                 </form>
@@ -100,6 +104,19 @@ export default {
             return this.account.id === accountId;
         },
 
+        fetchAccountEquipment() {
+            axios
+                .get('/api/account/' + this.account.username + '/equipment')
+                .then((response) => {
+                    this.equipment = response.data.data;
+                    this.display = response.data.display !== 0;
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+                .finally(() => this.loading = false);
+        },
+
         updateDisplayEquipment() {
             axios
                 .post('/api/account/' + this.account.username + '/equipment', {
@@ -111,6 +128,13 @@ export default {
                 .catch(error => {
                     console.log(error)
                 });
+        },
+    },
+
+    watch: {
+        account(account) {
+            this.account = account;
+            this.fetchAccountEquipment();
         }
     },
 
@@ -124,25 +148,16 @@ export default {
     },
 
     mounted() {
+        this.fetchAccountEquipment();
+
         axios
             .get('/api/user')
             .then(response => {
                 this.user = response.data;
             })
             .catch(error => {
-
-            });
-
-        axios
-            .get('/api/account/' + this.account.username + '/equipment')
-            .then((response) => {
-                this.equipment = response.data.data;
-                this.display = response.data.display !== 0;
-            })
-            .catch(error => {
                 console.log(error)
-            })
-            .finally(() => this.loading = false);
+            });
     },
 
     created() {

@@ -59,6 +59,13 @@ Vue.component('newsupdate', require('./components/NewsUpdate.vue').default);
 Vue.component('calendar', require('./components/Calendar.vue').default);
 Vue.component('calendaredit', require('./components/CalendarEdit.vue').default);
 
+Vue.component('groupaccount', require('./components/group/Account').default);
+Vue.component('groupbank', require('./components/group/GroupBank').default);
+
+
+// Pages
+Vue.component('PageGroupShow', require('./pages/group/Show').default);
+
 Vue.component(
     'passport-clients',
     require('./components/passport/Clients.vue').default

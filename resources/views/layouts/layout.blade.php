@@ -75,6 +75,16 @@
                                         <span>Accounts</span>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('group') }}">
+                                        <img src="{{ asset('images/account.png') }}"
+                                             class="pixel mr-1"
+                                             alt="Group page icon"
+                                             title="Click here to browse through the registered groups"
+                                             style="width: 1.5rem;">
+                                        <span>Groups</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </nav>
