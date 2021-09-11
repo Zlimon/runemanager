@@ -66,17 +66,17 @@
 <script>
 export default {
     props: {
-        account: {required: true},
+        group: {required: true},
     },
 
     methods: {
         checkAccount(accountId) {
-            return this.account.id === accountId;
+            return this.account.id === 1;
         },
 
-        fetchAccountBank() {
+        fetchBank() {
             axios
-                .get('/api/account/' + this.account.username + '/bank')
+                .get('/api/group/' + this.group.name + '/bank')
                 .then((response) => {
                     this.bank = response.data.data;
                     this.total = response.data.total;
@@ -89,26 +89,6 @@ export default {
                 })
                 .finally(() => this.loading = false)
         },
-
-        updateDisplayBank() {
-            axios
-                .post('/api/account/' + this.account.username + '/bank', {
-                    _method: 'patch',
-                })
-                .then((response) => {
-                    console.log(response.data); // TODO local notification
-                })
-                .catch(error => {
-                    console.log(error)
-                });
-        }
-    },
-
-    watch: {
-        account(account) {
-            this.account = account;
-            this.fetchAccountBank();
-        }
     },
 
     data() {
@@ -129,19 +109,20 @@ export default {
                 this.user = response.data;
             })
             .catch(error => {
-                console.log(error)
+
             });
 
-        this.fetchAccountBank();
+        this.fetchBank();
     },
 
-    created() {
-        window.Echo.channel('account-bank')
-            .listen('AccountBank', (e) => {
-                if (this.checkAccount(e.account)) {
-                    this.fetchAccountBank();
-                }
-            });
-    },
+    // TODO
+    // created() {
+    //     window.Echo.channel('account-bank')
+    //         .listen('AccountBank', (e) => {
+    //             if (this.checkAccount(e.account)) {
+    //                 this.fetchBank();
+    //             }
+    //         });
+    // },
 }
 </script>

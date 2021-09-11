@@ -47,7 +47,32 @@
 <script>
 export default {
     props: {
-        account: {type: String, required: true},
+        account: {required: true},
+    },
+
+    methods: {
+        fetchAccountSkillHiscores() {
+            axios
+                .get('/api/account/' + this.account.username + '/skill')
+                .then((response) => {
+                    this.data = response.data.data;
+                    this.hiscores = response.data.meta.skill_hiscores;
+                    this.$emit('load', response.data.data)
+                    this.errored = false
+                })
+                .catch(error => {
+                    console.log(error)
+                    this.errored = true
+                })
+                .finally(() => this.loading = false)
+        }
+    },
+
+    watch: {
+        account(account) {
+            this.account = account;
+            this.fetchAccountSkillHiscores();
+        }
     },
 
     data() {
@@ -60,18 +85,7 @@ export default {
     },
 
     mounted() {
-        axios
-            .get('/api/account/' + this.account + '/skill')
-            .then((response) => {
-                this.data = response.data.data;
-                this.hiscores = response.data.meta.skill_hiscores;
-                this.$emit('load', response.data.data)
-            })
-            .catch(error => {
-                console.log(error)
-                this.errored = true
-            })
-            .finally(() => this.loading = false)
+        this.fetchAccountSkillHiscores();
     },
 
     filters: {

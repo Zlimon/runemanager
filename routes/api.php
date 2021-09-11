@@ -102,6 +102,11 @@ Route::prefix('/broadcast')->group(function() {
 Route::get('/calendar', 'Admin\Api\CalendarController@index');
 Route::get('/calendar/{calendar}/show', 'Admin\Api\CalendarController@show');
 
+Route::prefix('/group')->group(function() {
+    Route::get('/{group}', 'Api\GroupController@show');
+	Route::get('/{group}/bank', 'Api\GroupController@bank');
+});
+
 Route::middleware('auth:api')->group(function() {
     Route::prefix('/admin')->group(function() {
         Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-store-newspost');
