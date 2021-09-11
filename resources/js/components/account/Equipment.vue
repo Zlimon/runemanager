@@ -148,8 +148,6 @@ export default {
     },
 
     mounted() {
-        this.fetchAccountEquipment();
-
         axios
             .get('/api/user')
             .then(response => {
@@ -158,6 +156,8 @@ export default {
             .catch(error => {
                 console.log(error)
             });
+
+        this.fetchAccountEquipment();
     },
 
     created() {
