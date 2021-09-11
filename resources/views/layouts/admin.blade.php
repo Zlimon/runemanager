@@ -10,8 +10,6 @@
     <title>{{ config('app.name', 'RuneManager') }} | @yield('title')</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/button.css') }}" rel="stylesheet">
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
@@ -56,6 +54,9 @@
                 </li>
                 <li>
                     <a href="{{ route('admin-calendar') }}">Calendar</a>
+                </li>
+                <li>
+                    <a href="{{ route('admin-settings') }}">Settings</a>
                 </li>
                 <!-- <li>
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>

@@ -81,6 +81,9 @@ Route::middleware('auth')->group(function() {
 		/*==========Calendar Controller=============*/
 		Route::get('/calendar', 'Admin\CalendarController@index')->name('admin-calendar');
 		Route::delete('/calendar/truncate', 'Admin\CalendarController@truncate')->name('admin-calendar-truncate');
+		/*==========Settings Controller=============*/
+		Route::get('/settings', 'Admin\SettingsController@index')->name('admin-settings');
+		Route::post('/settings', 'Admin\SettingsController@store')->name('admin-settings-store');
 		/*==========Rank Controller=============*/
 //		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
 //	});
