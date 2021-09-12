@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
+use App\ResourcePack;
 use App\Setting;
 use Illuminate\Http\Request;
 
@@ -38,5 +40,18 @@ class SettingsController extends Controller
         }
 
         return view('admin.setting.index');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function resourcePack()
+    {
+        $resourcePacks = ResourcePack::all();
+        $currentResourcePack = ResourcePack::where('id', SettingHelper::getSetting('resource_pack_id'))->first();
+
+        return view('admin.setting.resourcepack', compact('resourcePacks', 'currentResourcePack'));
     }
 }

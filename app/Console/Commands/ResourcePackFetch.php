@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\ResourcePack;
-use Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
@@ -48,26 +47,28 @@ class ResourcePackFetch extends Command
     {
         $name = $this->argument('name');
 
-        if (File::exists(public_path('storage/resource-packs-downloaded/' . $name . '.zip'))) {
+        $resourcePack = ResourcePack::firstWhere('name', $name);
+
+        if ($resourcePack && File::exists(public_path('storage/resource-packs-downloaded/' . $name . '.zip'))) {
             if ($this->option('update') !== 'yes') {
                 $this->info(
-                    sprintf('Resource pack "%s" already exists! Use --update=yes to update it', $name)
+                    sprintf('Resource pack "%s" already exists!', $name)
                 );
 
                 return 1;
             }
         }
 
-        $this->info(sprintf('Downloading "%s"', $name));
+        $this->info(sprintf('Downloading "%s".', $name));
 
         $url = 'https://github.com/melkypie/resource-packs/archive/' . $name . '.zip';
         // Download resource pack
         $resourcePack = @file_get_contents($url);
 
         if ($resourcePack === false) {
-            $this->info(sprintf('Could not fetch "%s" from "%s"', $name, $url));
+            $this->info(sprintf('Could not fetch "%s" from "%s"!', $name, $url));
 
-            return 1;
+            return 2;
         }
 
         // Put resource pack file to download directory
@@ -78,21 +79,21 @@ class ResourcePackFetch extends Command
 
         // Verify resource pack is correctly downloaded, and insert to database
         if (!File::exists(public_path('storage/resource-packs-downloaded/' . $name . '.zip'))) {
-            $this->info(sprintf('Something went wrong. Most likely due to storage directory not existing'));
+            $this->info(sprintf('Failed! Most likely due to storage directory not existing.'));
 
-            $this->info(sprintf('Executing storage:link...'));
+            $this->info(sprintf('Executing storage:link'));
 
             $this->call('storage:link');
 
-            $this->info(sprintf('Completed. Try fetching again'));
+            $this->info(sprintf('Completed! Try fetching again.'));
 
-            return 1;
+            return 3;
         }
 
         $resourcePack = ResourcePack::firstWhere('name', $name);
 
         if (!$resourcePack) {
-            $this->info(sprintf('Inserting "%s" to database', $name));
+            $this->info(sprintf('Inserting "%s" to database.', $name));
 
             $resourcePack = new ResourcePack();
 
@@ -101,7 +102,7 @@ class ResourcePackFetch extends Command
             );
 
             if ($getProperties->failed()) {
-                $this->info(sprintf('Could not fetch properties from GitHub. Using default values'));
+                $this->info(sprintf('Could not fetch properties from GitHub! Using default values.'));
             } else {
                 $properties = preg_split('/\r\n|\n|\r/', trim($getProperties->body()));
 
@@ -125,20 +126,20 @@ class ResourcePackFetch extends Command
 
             $resourcePack->save();
         } else {
-            $this->info(sprintf('Updating "%s" in database', $name));
+            $this->info(sprintf('Updating "%s" in database.', $name));
 
             $resourcePack->touch();
         }
 
         if ($this->option('use') == 'yes') {
-            $this->info(sprintf('Applying new textures'));
-
             $this->call('resourcepack:switch', [
                 'name' => $name,
             ]);
+
+            return 0;
         }
 
-        $this->info(sprintf('Finished!'));
+        $this->info(sprintf('Finished! Resource pack "%s" is now ready for use.', $resourcePack->alias));
 
         return 0;
     }

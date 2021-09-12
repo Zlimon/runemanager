@@ -65,6 +65,7 @@ Vue.component('groupbank', require('./components/group/GroupBank').default);
 
 // Pages
 Vue.component('PageGroupShow', require('./pages/group/Show').default);
+Vue.component('PageAdminSettingResourcePack', require('./pages/admin/setting/ResourcePack').default);
 
 Vue.component(
     'passport-clients',
