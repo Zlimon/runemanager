@@ -6,7 +6,7 @@
 
 @section('content')
 @section('navigation')
-    <form method="POST" action="{{ route('admin-delete-newspost', $post->id) }}">
+    <form method="POST" action="{{ route('admin-delete-newspost', $newsPost) }}">
         @method('DELETE')
         @csrf
 
@@ -16,11 +16,11 @@
 
 <div class="content-body">
     <div class="text-center pb-3">
-        <img src="{{ asset('storage') }}/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}"
-             alt="'{{ $post->title }}' news post image" width="50%">
+        <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
+             alt="'{{ $newsPost->title }}' news post image" width="50%">
     </div>
-    <h1>{{ $post->title }}</h1>
-    <p class="text-center"><em>{{ $post->shortstory }}</em></p>
-    {!! $post->longstory !!}
+    <h1>{{ $newsPost->title }}</h1>
+    <p class="text-center"><em>{{ $newsPost->shortstory }}</em></p>
+    {!! $newsPost->longstory !!}
 </div>
 @endsection

@@ -9,11 +9,8 @@
 
     <title>{{ config('app.name', 'RuneManager') }} | @yield('title')</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
-
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/button.css') }}" rel="stylesheet">
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
@@ -39,19 +36,33 @@
                         </ul> -->
                 </li>
                 <li>
-                    <a href="{{ route('admin-user') }}">Users (Profiles)</a>
+                    <a href="{{ route('admin-user') }}">Users</a>
                 </li>
                 <li>
-                    <a href="{{ route('admin-member') }}">Members (OSRS Accounts)</a>
+                    <a href="{{ route('admin-account') }}">Accounts</a>
                 </li>
                 <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">News</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <a href="#news" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">News</a>
+                    <ul class="collapse list-unstyled" id="news">
                         <li>
                             <a href="{{ route('admin-news') }}">All news</a>
                         </li>
                         <li>
                             <a href="{{ route('admin-create-newspost') }}">Post news</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="{{ route('admin-calendar') }}">Calendar</a>
+                </li>
+                <li>
+                    <a href="#settings" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Settings</a>
+                    <ul class="collapse list-unstyled" id="settings">
+                        <li>
+                            <a href="{{ route('admin-settings') }}">All Settings</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin-settings-resourcepack') }}">Resource Packs</a>
                         </li>
                     </ul>
                 </li>
@@ -142,24 +153,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('#sidebarCollapse').on('click', function () {
-            $('#sidebar, #content').toggleClass('active');
-            $('.collapse.in').toggleClass('in');
-            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-        });
-    });
-</script>
-
-<script>
-    function back() {
-        window.history.back();
-    }
-</script>
+<!-- Scripts -->
+<script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

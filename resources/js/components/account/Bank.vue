@@ -74,7 +74,7 @@ export default {
             return this.account.id === accountId;
         },
 
-        fetchBank() {
+        fetchAccountBank() {
             axios
                 .get('/api/account/' + this.account.username + '/bank')
                 .then((response) => {
@@ -104,6 +104,13 @@ export default {
         }
     },
 
+    watch: {
+        account(account) {
+            this.account = account;
+            this.fetchAccountBank();
+        }
+    },
+
     data() {
         return {
             loading: true,
@@ -122,17 +129,17 @@ export default {
                 this.user = response.data;
             })
             .catch(error => {
-
+                console.log(error)
             });
 
-        this.fetchBank();
+        this.fetchAccountBank();
     },
 
     created() {
         window.Echo.channel('account-bank')
             .listen('AccountBank', (e) => {
                 if (this.checkAccount(e.account)) {
-                    this.fetchBank();
+                    this.fetchAccountBank();
                 }
             });
     },

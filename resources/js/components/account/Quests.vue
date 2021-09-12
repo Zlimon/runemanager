@@ -58,6 +58,21 @@ export default {
             return this.account.id === accountId;
         },
 
+        fetchAccountQuests() {
+            axios
+                .get('/api/account/' + this.account.username + '/quests')
+                .then((response) => {
+                    this.quests = response.data.data;
+                    this.display = response.data.display !== 0;
+                    this.errored = false
+                })
+                .catch(error => {
+                    console.log(error)
+                    this.errored = true
+                })
+                .finally(() => this.loading = false);
+        },
+
         updateDisplayQuests() {
             axios
                 .post('/api/account/' + this.account.username + '/quests', {
@@ -69,6 +84,13 @@ export default {
                 .catch(error => {
                     console.log(error)
                 });
+        }
+    },
+
+    watch: {
+        account(account) {
+            this.account = account;
+            this.fetchAccountQuests();
         }
     },
 
@@ -89,20 +111,10 @@ export default {
                 this.user = response.data;
             })
             .catch(error => {
-
+                console.log(error)
             });
 
-        axios
-            .get('/api/account/' + this.account.username + '/quests')
-            .then((response) => {
-                this.quests = response.data.data;
-                this.display = response.data.display !== 0;
-            })
-            .catch(error => {
-                console.log(error)
-                this.errored = true
-            })
-            .finally(() => this.loading = false);
+        this.fetchAccountQuests();
     },
 
     created() {

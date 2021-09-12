@@ -9,24 +9,24 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property int $user_id
- * @property int $category_id
+ * @property int $news_category_id
  * @property int $image_id
  * @property string $title
  * @property string $shortstory
  * @property string $longstory
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Category $category
  * @property-read \App\Image $image
+ * @property-read \App\NewsCategory $newsCategory
  * @property-read \App\User $user
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost query()
- * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereImageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereLongstory($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereNewsCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereShortstory($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsPost whereUpdatedAt($value)
@@ -36,14 +36,14 @@ use Illuminate\Database\Eloquent\Model;
 class NewsPost extends Model
 {
     protected $fillable = [
-        'user_id', 'category_id', 'image_id', 'title', 'shortstory', 'longstory',
+        'user_id', 'news_category_id', 'image_id', 'title', 'shortstory', 'longstory',
     ];
 
     public function user() {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function category() {
+    public function newsCategory() {
         return $this->belongsTo(NewsCategory::class);
     }
 

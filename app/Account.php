@@ -32,6 +32,15 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereXp($value)
  * @mixin \Eloquent
+ * @property int $online
+ * @property-read \App\Bank|null $bank
+ * @property-read \App\Equipment|null $equipment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Log[] $log
+ * @property-read int|null $log_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Broadcast[] $logBroadcast
+ * @property-read int|null $log_broadcast_count
+ * @property-read \App\Quest|null $quest
+ * @method static \Illuminate\Database\Eloquent\Builder|Account whereOnline($value)
  */
 class Account extends Model
 {
@@ -79,5 +88,9 @@ class Account extends Model
 
     public function quest() {
         return $this->hasOne(Quest::class);
+    }
+
+    public function group() {
+        return $this->belongsToMany(Group::class);
     }
 }

@@ -16,13 +16,19 @@
 <div class="row">
     <div class="col-md-3">
         <div class="bg-dark p-4">
-            @if ($user->icon_id)
-                <div class="text-center">
-                    <img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
-                         width="100" alt="Profile icon">
+            <div class="col-md-12">
+                <div class="row">
+                    <img
+                        src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
+                        class="pixel icon"
+                        alt="Profile icon"
+                        style="width: 7.5rem; height: 7.5rem;">
+
+                    <div class="col">
+                        <h1 class="text-center header-chatbox-sword">{{ $user->name }}</h1>
+                    </div>
                 </div>
-            @endif
-            <h1>{{ $user->name }}</h1>
+            </div>
             <p><strong>rank</strong></p>
 
             <h2>About</h2>
@@ -37,13 +43,13 @@
 
     <div class="col-md-9">
         <div class="bg-dark p-4">
-            <h1>OSRS accounts</h1>
+            <h1>Accounts</h1>
 
-            @foreach ($accounts as $amount => $account)
+            @foreach ($user->account as $key => $account)
                 <div class="row">
                     <div class="col-md-5">
                         <div class="p-3 mb-4" style="background: #6d7fcc;">
-                            <h2>@if (count($user->member) > 1) {{ ++$amount }} - @endif{{ $account->username }}</h2>
+                            <h2>@if (sizeof($user->account) > 1) {{ ++$key }} - @endif{{ $account->username }}</h2>
                             <p>
                                 <span><strong>Rank: </strong>{{ number_format($account->rank) }} |</span>
                                 <span><strong>Level: </strong>{{ $account->level }} |</span>
@@ -54,15 +60,7 @@
 
                     <div class="col-md-7 mb-4">
                         <div class="p-3" style="background: #6d7fcc;">
-                            @foreach (Helper::accountStats($account->id) as $skillId => $skill)
-                                <a href="{{ route('show-skill', Helper::listSkills()[$skillId]) }}">
-                                    <img class="pixel"
-                                         src="{{ asset('images/skills/') }}/{{ ucfirst(Helper::listSkills()[$skillId]) }}.png"
-                                         alt="{{ ucfirst(Helper::listSkills()[$skillId]) }} skill icon">
-
-                                    <span>{{ json_decode($skill[0]->level, true) }}</span>
-                                </a>
-                            @endforeach
+                            <accounthiscore account="{{ $account->username }}"></accounthiscore>
                         </div>
                     </div>
                 </div>

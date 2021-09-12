@@ -10,9 +10,14 @@ use App\Skill;
 
 class PageController extends Controller
 {
+    /**
+     * Show the main page
+     *
+     * @return
+     */
     public function index()
     {
-        $recentPosts = NewsPost::with('user')->with('category')->with('image')->limit(5)->orderByDesc('created_at')->get();
+        $recentPosts = NewsPost::with('user')->with('newsCategory')->with('image')->limit(5)->orderByDesc('created_at')->get();
 
         return view('index', compact('recentPosts'));
     }
@@ -30,7 +35,7 @@ class PageController extends Controller
     }
 
     /**
-     * Show the skill hiscores
+     * Show the hiscores
      *
      * @return
      */
@@ -83,5 +88,15 @@ class PageController extends Controller
         return view('hiscore',
             compact('hiscoreCategory', 'hiscore', 'hiscoreList', 'hiscoreListTop', 'hiscoreListBottom',
                 'accountCount'));
+    }
+
+    /**
+     * Show the calendar
+     *
+     * @return
+     */
+    public function calendar()
+    {
+        return view('calendar');
     }
 }

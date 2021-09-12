@@ -40,9 +40,9 @@
                                              class="hiscore-icon-small">
                                         <div v-if="(hiscore.obtained !== null ? hiscore.obtained : 0) === hiscore.total">
                                             <span class="runescape-success">
-                                                {{ (hiscore.obtained !== null ? hiscore.obtained : 0) }} / {{
-                                                    hiscore.total
-                                                }}
+                                                {{ (hiscore.obtained !== null ? hiscore.obtained : 0) }}
+                                                /
+                                                {{ hiscore.total }}
                                             </span>
                                         </div>
                                         <div v-else-if="hiscore.obtained > 0">
@@ -52,9 +52,9 @@
                                         </div>
                                         <div v-else>
                                             <span class="runescape-danger">
-                                                {{
-                                                    (hiscore.obtained !== null ? hiscore.obtained : 0)
-                                                }} / {{ hiscore.total }}
+                                                {{ (hiscore.obtained !== null ? hiscore.obtained : 0) }}
+                                                /
+                                                {{ hiscore.total }}
                                             </span>
                                         </div>
                                     </p>
@@ -101,7 +101,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="button-combat-style-narrow text-center button-small float-right" v-on:click="toggle"
+                    <div class="button-combat-style-narrow text-center button-small float-right" v-on:click="toggleCollectionLog"
                          style="cursor: pointer;">
                         <img title="Click here to switch between collection log mode"
                              alt="Collection log item icon"
@@ -117,7 +117,35 @@
 <script>
 export default {
     props: {
-        account: {type: String, required: true},
+        account: {required: true},
+    },
+
+    methods: {
+        toggleCollectionLog() {
+            this.showCollectionLog = this.showCollectionLog === false;
+        },
+
+        fetchAccountBossHiscores() {
+            axios
+                .get('/api/account/' + this.account.username + '/boss')
+                .then((response) => {
+                    this.data = response.data.data;
+                    this.hiscores = response.data.meta.boss_hiscores;
+                    this.errored = false
+                })
+                .catch(error => {
+                    console.log(error)
+                    this.errored = true
+                })
+                .finally(() => this.loading = false)
+        }
+    },
+
+    watch: {
+        account(account) {
+            this.account = account;
+            this.fetchAccountBossHiscores();
+        }
     },
 
     data() {
@@ -130,24 +158,8 @@ export default {
         }
     },
 
-    methods: {
-        toggle() {
-            this.showCollectionLog = this.showCollectionLog === false;
-        }
-    },
-
     mounted() {
-        axios
-            .get('/api/account/' + this.account + '/boss')
-            .then((response) => {
-                this.data = response.data.data;
-                this.hiscores = response.data.meta.boss_hiscores;
-            })
-            .catch(error => {
-                console.log(error)
-                this.errored = true
-            })
-            .finally(() => this.loading = false)
+        this.fetchAccountBossHiscores();
     },
 
     filters: {

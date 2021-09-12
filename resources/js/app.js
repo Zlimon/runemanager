@@ -19,13 +19,21 @@ import Vue from 'vue'
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import UniqueId from 'vue-unique-id';
-import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css'
+import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css';
+import CKEditor from '@ckeditor/ckeditor5-vue2';
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
+Vue.use(BootstrapVue)
 Vue.use(UniqueId);
 Vue.use(require('advanced-laravel-vue-paginate'));
 Vue.use(require('vue-moment'));
-
+Vue.use( CKEditor );
+Vue.use(VueSweetalert2);
 
 Vue.component('announcementall', require('./components/notification/AnnouncementAll.vue').default);
 Vue.component('accountevent', require('./components/notification/AccountEvent.vue').default);
@@ -44,6 +52,20 @@ Vue.component('quests', require('./components/account/Quests.vue').default);
 Vue.component('bank', require('./components/account/Bank.vue').default);
 
 Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
+
+Vue.component('newscreate', require('./components/NewsCreate.vue').default);
+Vue.component('newsupdate', require('./components/NewsUpdate.vue').default);
+
+Vue.component('calendar', require('./components/Calendar.vue').default);
+Vue.component('calendaredit', require('./components/CalendarEdit.vue').default);
+
+Vue.component('groupaccount', require('./components/group/Account').default);
+Vue.component('groupbank', require('./components/group/GroupBank').default);
+
+
+// Pages
+Vue.component('PageGroupShow', require('./pages/group/Show').default);
+Vue.component('PageAdminSettingResourcePack', require('./pages/admin/setting/ResourcePack').default);
 
 Vue.component(
     'passport-clients',
