@@ -60,7 +60,7 @@
 
             <hr>
 
-            <div style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">
+            <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
                 <div v-for="resourcePack in resourcePacks">
                     <div class="row">
                         <div class="col-9">
