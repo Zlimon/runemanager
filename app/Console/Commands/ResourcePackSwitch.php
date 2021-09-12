@@ -2,8 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\SettingHelper;
+use App\ResourcePack;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use VIPSoft\Unzip\Unzip;
 
 class ResourcePackSwitch extends Command
@@ -40,30 +43,50 @@ class ResourcePackSwitch extends Command
      */
     public function handle()
     {
-        if (!File::exists(public_path('storage/resource-packs-downloaded/'.$this->argument('name').'.zip'))) {
-            $this->info(sprintf("Resource pack '%s' does not exist!", $this->argument('name')));
+        $name = $this->argument('name');
+
+        $resourcePack = ResourcePack::firstWhere('name', $name);
+
+        if (!$resourcePack || !File::exists(public_path('storage/resource-packs-downloaded/' . $name . '.zip'))) {
+            $this->info(sprintf('Resource pack "%s" does not exist! Try downloading it again.', $name));
 
             return 1;
         }
 
-        $extractFrom = public_path('storage/resource-packs-downloaded/'.$this->argument('name').'.zip');
+        $extractFrom = public_path('storage/resource-packs-downloaded/' . $name . '.zip');
         $extractTo = public_path('storage/resource-pack-tmp');
 
         // Clean tmp dir
         File::cleanDirectory(public_path('storage/resource-pack-tmp'));
 
-        $unzipper  = new Unzip();
-        $filenames = $unzipper->extract($extractFrom, $extractTo);
+        $unZipper = new Unzip();
+        $filenames = $unZipper->extract($extractFrom, $extractTo);
 
-        $this->info(sprintf("Applying new textures"));
+        $this->info(sprintf('Applying new textures.'));
+
+        // Remove current icon image in case the new resource pack does not contain any icon image
+        File::delete(public_path('storage/resource-pack/icon.png'));
 
         // Copy resource pack from parent dir in tmp dir, and extract files one level up
-        File::copyDirectory(public_path('storage/resource-pack-tmp/'.$filenames[0]), public_path('storage/resource-pack'));
+        File::copyDirectory(
+            public_path('storage/resource-pack-tmp/' . $filenames[0]),
+            public_path('storage/resource-pack')
+        );
+
+        $resourcePack = ResourcePack::whereName($name)->first();
+        SettingHelper::getSetting(['resource_pack_id', $resourcePack->id]);
+
+        // Just display a default image if resource pack has no icon image
+        if (!File::exists(public_path('storage/resource-pack/icon.png'))) {
+            File::copy(public_path('images/background.png'), public_path('storage/resource-pack/icon.png'));
+        }
+
+        SettingHelper::getSetting(['site_hash', Str::random(20)]);
 
         // Clean tmp dir
         File::cleanDirectory(public_path('storage/resource-pack-tmp'));
 
-        $this->info(sprintf("Finished!"));
+        $this->info(sprintf('Finished! Resource pack "%s" is now ready for use.', $resourcePack->alias));
 
         return 0;
     }
