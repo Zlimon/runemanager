@@ -30,10 +30,9 @@
             </div>
             <small class="form-text text-muted">
                 Visit the
-                <a
-                    href="https://github.com/melkypie/resource-packs/wiki/Resource-packs-hub"
-                    target="_blank"
-                    rel="noopener noreferrer">
+                <a href="https://github.com/melkypie/resource-packs/wiki/Resource-packs-hub"
+                   target="_blank"
+                   rel="noopener noreferrer">
                     Resource packs hub
                 </a>
                 to browse through available resource packs!
@@ -42,13 +41,19 @@
             <b-modal ref="event" hide-footer title="test">
                 <pre>{{ artisanResponse }}</pre>
 
-                <div v-if="artisanStatus === 0" @click="switchResourcePack(downloadedResourcePack)" class="btn btn-primary">
+                <div v-if="artisanStatus === 0"
+                     @click="switchResourcePack(downloadedResourcePack)"
+                     class="btn btn-primary">
                     Switch to {{ downloadedResourcePack.alias }}
                 </div>
-                <div v-else-if="artisanStatus === 1" @click="switchResourcePack(downloadedResourcePack)" class="btn btn-primary">
+                <div v-else-if="artisanStatus === 1"
+                     @click="switchResourcePack(downloadedResourcePack)"
+                     class="btn btn-primary">
                     Switch to {{ downloadedResourcePack.alias }}
                 </div>
-                <div v-else-if="artisanStatus === 3" @click="searchResourcePack" class="btn btn-primary">
+                <div v-else-if="artisanStatus === 3"
+                     @click="searchResourcePack"
+                     class="btn btn-primary">
                     Try again
                 </div>
             </b-modal>
@@ -60,17 +65,26 @@
                     <div class="row">
                         <div class="col">
                             <p>
-                                <span>{{ resourcePack.alias }} <span class="badge badge-secondary">v.{{ resourcePack.version }}</span></span>
+                                <span>
+                                    {{ resourcePack.alias }}
+                                    <span class="badge badge-secondary">
+                                        v.{{ resourcePack.version }}
+                                    </span>
+                                </span>
                                 <br>
                                 <small class="text-muted">By {{ resourcePack.author }}</small>
                             </p>
                         </div>
 
                         <div class="col-3 mr-2">
-                            <div v-if="resourcePack.id !== currentResourcePack.id" @click="switchResourcePack(resourcePack)" class="btn btn-primary btn-block">
+                            <div v-if="resourcePack.id !== currentResourcePack.id"
+                                 @click="switchResourcePack(resourcePack)"
+                                 class="btn btn-primary btn-block">
                                 Use
                             </div>
-                            <div v-else @click="updateResourcePack(resourcePack)" class="btn btn-success btn-block">
+                            <div v-else
+                                 @click="updateResourcePack(resourcePack)"
+                                 class="btn btn-success btn-block">
                                 Update
                             </div>
                         </div>
@@ -91,12 +105,18 @@
                 </div>
 
                 <div class="col">
-                    <h5>{{ currentResourcePack.alias }} <span class="badge badge-secondary">v.{{ currentResourcePack.version }}</span></h5>
+                    <h5>
+                        {{ currentResourcePack.alias }}
+                        <span class="badge badge-secondary">
+                            v.{{ currentResourcePack.version }}
+                        </span>
+                    </h5>
                     <small class="text-muted">By {{ currentResourcePack.author }}</small>
                     <br>
                     <small class="text-muted">Last updated {{ currentResourcePack.updated_at }}</small>
 
-                    <div @click="updateResourcePack(currentResourcePack)" class="btn btn-success btn-block">
+                    <div @click="updateResourcePack(currentResourcePack)"
+                         class="btn btn-success btn-block">
                         Update
                     </div>
                 </div>
@@ -105,11 +125,11 @@
 
         <div class="col-8">
             <div class="text-center h-100 w-100">
-                <iframe :src="'http://runemanager.test' + '?' + Math.random()"
-                        title="Preview of RuneManager"
-                        height="750"
-                        width="1000">
-                </iframe>
+                <fieldset>
+                    <iframe :src="'http://runemanager.test' + '?' + Math.random()"
+                            title="Preview of RuneManager">
+                    </iframe>
+                </fieldset>
             </div>
         </div>
     </div>
@@ -120,8 +140,8 @@ export default {
     name: "ResourcePack",
 
     props: {
-        resourcePacks: {required: true},
-        currentResourcePack: {required: true},
+        resourcePacksProp: {required: true},
+        currentResourcePackProp: {required: true},
     },
 
     methods: {
@@ -229,6 +249,9 @@ export default {
 
     data() {
         return {
+            resourcePacks: this.resourcePacksProp,
+            currentResourcePack: this.currentResourcePackProp,
+
             fields: {
                 search: '',
             },
@@ -245,5 +268,15 @@ export default {
 </script>
 
 <style scoped>
+fieldset {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
 
+iframe {
+    width: 100%;
+    height: 750px;
+}
 </style>

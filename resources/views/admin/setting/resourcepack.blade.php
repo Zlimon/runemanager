@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-    <page-admin-setting-resource-pack :resource-packs="{{ $resourcePacks }}" :current-resource-pack="{{ $currentResourcePack }}"></page-admin-setting-resource-pack>
+    <page-admin-setting-resource-pack :resource-packs-prop="{{ $resourcePacks }}" :current-resource-pack-prop="{{ $currentResourcePack }}"></page-admin-setting-resource-pack>
 @endsection
