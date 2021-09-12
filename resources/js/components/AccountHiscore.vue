@@ -66,7 +66,7 @@
                 </div>
 
                 <keep-alive>
-                    <component v-bind:is="component" :account='account' @load="onLoadAccount"/>
+                    <component v-bind:is="component" :account="account"/>
                 </keep-alive>
             </div>
         </div>
@@ -79,16 +79,10 @@ import AccountBossHiscore from './account/BossHiscore.vue'
 
 export default {
     props: {
-        account: {type: String, required: true},
+        account: {required: true},
     },
 
     methods: {
-        onLoadAccount(account) {
-            this.accountData = account;
-            this.loading = false;
-            this.online = account.online;
-        },
-
         toggle() {
             if (this.component === AccountSkillHiscore) {
                 this.component = AccountBossHiscore;
@@ -129,5 +123,11 @@ export default {
                 }
             });
     },
+
+    mounted() {
+        this.accountData = this.account;
+        this.loading = false;
+        this.online = this.account.online;
+    }
 }
 </script>
