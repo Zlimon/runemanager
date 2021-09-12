@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-4">
+        <div class="col-12 col-md-4">
             <h1>Resource Packs</h1>
 
             <div class="form-row align-items-center">
@@ -63,7 +63,7 @@
             <div style="max-height: 700px; overflow-y: auto; overflow-x: hidden;">
                 <div v-for="resourcePack in resourcePacks">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-9">
                             <p>
                                 <span>
                                     {{ resourcePack.alias }}
@@ -76,7 +76,7 @@
                             </p>
                         </div>
 
-                        <div class="col-3 mr-2">
+                        <div class="col-3">
                             <div v-if="resourcePack.id !== currentResourcePack.id"
                                  @click="switchResourcePack(resourcePack)"
                                  class="btn btn-primary btn-block">
@@ -96,7 +96,7 @@
 
             <h2>Currently in use</h2>
 
-            <div class="row">
+            <div class="row mb-3">
                 <div class="col-7">
                     <img :src="'/storage/resource-pack/icon.png' + '?' + Math.random()"
                          class="w-100"
@@ -123,7 +123,7 @@
             </div>
         </div>
 
-        <div class="col-8">
+        <div class="col-12 col-md-8">
             <div class="text-center h-100 w-100">
                 <fieldset>
                     <iframe :src="'http://runemanager.test' + '?' + Math.random()"
