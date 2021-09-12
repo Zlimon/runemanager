@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function() {
 		/*==========Settings Controller=============*/
 		Route::get('/settings', 'Admin\SettingsController@index')->name('admin-settings');
 		Route::post('/settings', 'Admin\SettingsController@store')->name('admin-settings-store');
+		Route::get('/settings/resource-pack', 'Admin\SettingsController@resourcePack')->name('admin-settings-resourcepack');
 		/*==========Rank Controller=============*/
 //		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
 //	});

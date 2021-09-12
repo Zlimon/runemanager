@@ -42,8 +42,8 @@
                     <a href="{{ route('admin-account') }}">Accounts</a>
                 </li>
                 <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">News</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <a href="#news" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">News</a>
+                    <ul class="collapse list-unstyled" id="news">
                         <li>
                             <a href="{{ route('admin-news') }}">All news</a>
                         </li>
@@ -56,7 +56,15 @@
                     <a href="{{ route('admin-calendar') }}">Calendar</a>
                 </li>
                 <li>
-                    <a href="{{ route('admin-settings') }}">Settings</a>
+                    <a href="#settings" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Settings</a>
+                    <ul class="collapse list-unstyled" id="settings">
+                        <li>
+                            <a href="{{ route('admin-settings') }}">All Settings</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin-settings-resourcepack') }}">Resource Packs</a>
+                        </li>
+                    </ul>
                 </li>
                 <!-- <li>
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>

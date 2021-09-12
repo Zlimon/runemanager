@@ -29,20 +29,6 @@ return [
                 'value' => env("APP_NAME", "RuneManager"),
             ],
             [
-                'type' => 'select',
-                'data' => 'boolean',
-                'key' => 'resource_pack_id',
-                'label' => 'Resource pack',
-                'rules' => 'required|boolean',
-                'description' => 'Select which resource pack to use on the site.',
-                'class' => '',
-                'value' => '0',
-                'options' => [
-                    '0' => 'pack 1',
-                    '1' => 'pack 2'
-                ]
-            ],
-            [
                 'type' => 'number',
                 'data' => 'int',
                 'key' => 'skill_total_level_requirement',
