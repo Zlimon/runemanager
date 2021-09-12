@@ -6,6 +6,7 @@ use App\Helpers\SettingHelper;
 use App\ResourcePack;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use VIPSoft\Unzip\Unzip;
 
 class ResourcePackSwitch extends Command
@@ -79,6 +80,8 @@ class ResourcePackSwitch extends Command
         if (!File::exists(public_path('storage/resource-pack/icon.png'))) {
             File::copy(public_path('images/background.png'), public_path('storage/resource-pack/icon.png'));
         }
+
+        SettingHelper::getSetting(['site_hash', Str::random(20)]);
 
         // Clean tmp dir
         File::cleanDirectory(public_path('storage/resource-pack-tmp'));
