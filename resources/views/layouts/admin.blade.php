@@ -10,8 +10,6 @@
     <title>{{ config('app.name', 'RuneManager') }} | @yield('title')</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/button.css') }}" rel="stylesheet">
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
@@ -44,8 +42,8 @@
                     <a href="{{ route('admin-account') }}">Accounts</a>
                 </li>
                 <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">News</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <a href="#news" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">News</a>
+                    <ul class="collapse list-unstyled" id="news">
                         <li>
                             <a href="{{ route('admin-news') }}">All news</a>
                         </li>
@@ -56,6 +54,17 @@
                 </li>
                 <li>
                     <a href="{{ route('admin-calendar') }}">Calendar</a>
+                </li>
+                <li>
+                    <a href="#settings" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Settings</a>
+                    <ul class="collapse list-unstyled" id="settings">
+                        <li>
+                            <a href="{{ route('admin-settings') }}">All Settings</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin-settings-resourcepack') }}">Resource Packs</a>
+                        </li>
+                    </ul>
                 </li>
                 <!-- <li>
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>

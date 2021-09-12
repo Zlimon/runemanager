@@ -27,6 +27,12 @@ Route::post('/account', 'AccountController@search')->name('account-search');
 Route::get('/account/create', 'AccountController@create')->name('account-create');
 Route::get('/account/{accountUsername}', 'AccountController@show')->name('account-show');
 
+/*==========Group Controller=============*/
+Route::get('/group', 'GroupController@index')->name('group');
+Route::post('/group', 'GroupController@search')->name('group-search');
+Route::get('/group/create', 'GroupController@create')->name('group-create');
+Route::get('/group/{groupName}', 'GroupController@show')->name('group-show');
+
 Route::get('/authenticate', 'AccountAuthController@index')->name('account-auth-show');
 Route::post('/authenticate', 'AccountAuthController@create')->name('account-auth-create');
 Route::patch('/authenticate', 'AccountAuthController@updateAccountType')->name('account-auth-update');
@@ -75,6 +81,10 @@ Route::middleware('auth')->group(function() {
 		/*==========Calendar Controller=============*/
 		Route::get('/calendar', 'Admin\CalendarController@index')->name('admin-calendar');
 		Route::delete('/calendar/truncate', 'Admin\CalendarController@truncate')->name('admin-calendar-truncate');
+		/*==========Settings Controller=============*/
+		Route::get('/settings', 'Admin\SettingsController@index')->name('admin-settings');
+		Route::post('/settings', 'Admin\SettingsController@store')->name('admin-settings-store');
+		Route::get('/settings/resource-pack', 'Admin\SettingsController@resourcePack')->name('admin-settings-resourcepack');
 		/*==========Rank Controller=============*/
 //		Route::get('/admin/rank', 'AdminRoleController@index')->name('admin-rank');
 //	});

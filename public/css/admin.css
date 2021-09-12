@@ -173,6 +173,8 @@ a.article:hover {
     position: absolute;
     top: 0;
     right: 0;
+    background: #34424D;
+    color: white;
 }
 
 #content.active {

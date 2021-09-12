@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateResourcePacksTable extends Migration
+class CreateAccountGroupTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,10 @@ class CreateResourcePacksTable extends Migration
      */
     public function up()
     {
-        Schema::create('resource_packs', function (Blueprint $table) {
+        Schema::create('account_group', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('alias');
-            $table->string('version');
-            $table->string('author');
-            $table->string('url');
+            $table->foreignId('account_id')->constrained();
+            $table->foreignId('group_id')->constrained();
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ class CreateResourcePacksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('resource_packs');
+        Schema::dropIfExists('account_group');
     }
 }

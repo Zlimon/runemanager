@@ -89,4 +89,8 @@ class Account extends Model
     public function quest() {
         return $this->hasOne(Quest::class);
     }
+
+    public function group() {
+        return $this->belongsToMany(Group::class);
+    }
 }

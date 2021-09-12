@@ -2,9 +2,10 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class CreateResourcePacksTable extends Migration
+class CreateSettingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +14,11 @@ class CreateResourcePacksTable extends Migration
      */
     public function up()
     {
-        Schema::create('resource_packs', function (Blueprint $table) {
+        Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('alias');
-            $table->string('version');
-            $table->string('author');
-            $table->string('url');
+            $table->string('key');
+            $table->text('value');
+            $table->char('type', 20)->default('string');
             $table->timestamps();
         });
     }
@@ -31,6 +30,6 @@ class CreateResourcePacksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('resource_packs');
+        Schema::dropIfExists('settings');
     }
 }
