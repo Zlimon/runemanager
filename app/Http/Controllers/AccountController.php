@@ -90,4 +90,14 @@ class AccountController extends Controller
             return view('account.index', compact('accounts', 'query'));
         }
     }
+
+    /**
+     * Show the account comparison page
+     *
+     * @return
+     */
+    public function compare()
+    {
+        return view('account.compare');
+    }
 }

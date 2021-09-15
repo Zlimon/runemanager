@@ -25,6 +25,7 @@ Route::get('/calendar', 'PageController@calendar')->name('calendar');
 Route::get('/account', 'AccountController@index')->name('account');
 Route::post('/account', 'AccountController@search')->name('account-search');
 Route::get('/account/create', 'AccountController@create')->name('account-create');
+Route::get('/account/compare', 'AccountController@compare')->name('account-compare');
 Route::get('/account/{account}', 'AccountController@show')->name('account-show');
 
 /*==========Group Controller=============*/

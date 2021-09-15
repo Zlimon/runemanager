@@ -62,10 +62,10 @@ Vue.component('calendaredit', require('./components/CalendarEdit.vue').default);
 Vue.component('groupaccount', require('./components/group/Account').default);
 Vue.component('groupbank', require('./components/group/GroupBank').default);
 
-
 // Pages
 Vue.component('PageGroupShow', require('./pages/group/Show').default);
 Vue.component('PageAdminSettingResourcePack', require('./pages/admin/setting/ResourcePack').default);
+Vue.component('PageAccountCompare', require('./pages/account/AccountCompare').default);
 
 Vue.component(
     'passport-clients',
