@@ -35,6 +35,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereUpdatedAt($value)
  * @mixin \Eloquent
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
  */
 class Kraken extends Model
 {

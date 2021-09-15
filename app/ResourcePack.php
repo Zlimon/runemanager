@@ -24,6 +24,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUrl($value)
  * @mixin \Eloquent
+ * @property string $version
+ * @property string $author
+ * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereAuthor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereVersion($value)
  */
 class ResourcePack extends Model
 {
