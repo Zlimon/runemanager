@@ -134,7 +134,7 @@
                                 <span><a href="{{ route('news-show', $post->id) }}">{{ $post->title }}</a></span>
                             </div>
                             <div class="meta">
-                                <p>{{ $post->user->name }} | {{ $post->category->category }}</p>
+                                <p>{{ $post->user->name }} | {{ $post->newsCategory->category }}</p>
                             </div>
                             <div class="shortstory">
                                 <span>{{ $post->shortstory }}</span>

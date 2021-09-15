@@ -4,10 +4,13 @@ namespace App\Helpers;
 
 use App\Account;
 use App\Collection;
+use App\Image;
 use App\Skill;
 use DateTime;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class Helper
@@ -254,4 +257,171 @@ class Helper
 
 	    return $collection;
     }
+
+    public static function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false)
+    {
+        $skills = Skill::get();
+        $skillsCount = count($skills);
+
+        foreach ($skills as $key => $skill) {
+            if ($update) {
+                $skill = $account->skill($skill)->first();
+            } else {
+                $skill = new $skill->model;
+            }
+
+            $skill->account_id = $account->id;
+            $skill->rank = ($playerData[$key + 1][0] >= 1 ? $playerData[$key + 1][0] : 0);
+            $skill->level = $playerData[$key + 1][1];
+            $skill->xp = ($playerData[$key + 1][2] >= 0 ? $playerData[$key + 1][2] : 0);
+
+            try {
+                $skill->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
+        }
+
+        $clues = Helper::listClueScrollTiers();
+        $cluesCount = count($clues);
+        $cluesIndex = 0;
+
+        for ($i = ($skillsCount + 3); $i < ($skillsCount + 3 + $cluesCount); $i++) {
+            $clueCollection = Collection::where('slug', $clues[$cluesIndex] . '-treasure-trails')->first();
+
+            if ($update) {
+                $clueCollection = $account->collection($clueCollection)->first();
+            } else {
+                $clueCollection = new $clueCollection->model;
+            }
+
+            $clueCollection->account_id = $account->id;
+            $clueCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            $clueCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+
+            try {
+                $clueCollection->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
+
+            $cluesIndex++;
+        }
+
+        $bosses = Helper::listBosses();
+        array_splice($bosses, 13, 1);
+        $bossIndex = 0;
+
+        $dksKillCount = 0;
+
+        for ($i = ($skillsCount + $cluesCount + 5); $i < ($skillsCount + $cluesCount + 5 + count($bosses)); $i++) {
+            $bossCollection = Collection::where('slug', $bosses[$bossIndex])->first();
+
+            if ($update) {
+                $bossCollection = $account->collection($bossCollection)->first();
+            } else {
+                $bossCollection = new $bossCollection->model;
+            }
+
+            $bossCollection->account_id = $account->id;
+            $bossCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            $bossCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
+
+            if (in_array(
+                $bosses[$bossIndex],
+                ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'],
+                true
+            )) {
+                $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
+            }
+
+            try {
+                $bossCollection->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
+
+            $bossIndex++;
+        }
+
+        /**
+         * Since there are no official total kill count hiscore for
+         * DKS' and we are going to retrieve loot for them from the
+         * collection log, we have to manually create a table.
+         * This might also happen with other bosses in the future
+         * that share collection log entry, but have separate hiscores.
+         */
+        if ($update) {
+            $dks = $account->collection(Collection::where('slug', 'dagannoth-kings')->first())->first();
+        } else {
+            $dks = new \App\Boss\DagannothKings;
+        }
+
+        $dks->account_id = $account->id;
+        $dks->kill_count = $dksKillCount;
+
+        try {
+            $dks->save();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        $npcs = Helper::listNpcs();
+
+        foreach ($npcs as $npc) {
+            $npcCollection = Collection::findByNameAndCategory($npc, 4);
+
+            if ($update) {
+                $npcCollection = $account->collection($npcCollection)->first();
+            } else {
+                $npcCollection = new $npcCollection->model;
+            }
+
+            $npcCollection->account_id = $account->id;
+
+            try {
+                $npcCollection->save();
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
+        }
+
+        return true;
+    }
+
+    public static function imageUpload($imageFile) {
+		if ($imageFile == null) {
+            return 1;
+        }
+
+        $validator = Validator::make($imageFile, [
+            'image' => 'mimes:jpeg,bmp,png,gif',
+        ]);
+
+        if ($validator->fails()) {
+            return false;
+        }
+
+        $imageFileName = Str::uuid()->toString();
+
+        $image = Image::create([
+            'image_file_name' => $imageFileName,
+            'image_file_extension' => $imageFile->getClientOriginalExtension(),
+            'image_file_type' => $imageFile->getMimeType(),
+            'image_file_size' => $imageFile->getSize()
+        ]);
+
+        if (!$image) {
+            return false;
+        }
+
+        $imageFile->move('storage', $imageFileName.'.'.$imageFile->getClientOriginalExtension());
+
+        return $image->id;
+	}
 }

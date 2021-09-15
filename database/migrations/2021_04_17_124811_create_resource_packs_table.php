@@ -17,6 +17,8 @@ class CreateResourcePacksTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('alias');
+            $table->string('version');
+            $table->string('author');
             $table->string('url');
             $table->timestamps();
         });

@@ -31,8 +31,8 @@ html
 {
     font-family: sans-serif;
 
-    background: url('/images/background_3.png') no-repeat;
-    background-color: gray;
+    /*background: url('/images/background_3.png') no-repeat;*/
+    background: #34424D;
     background-attachment: fixed;
     background-position: center center;
 }

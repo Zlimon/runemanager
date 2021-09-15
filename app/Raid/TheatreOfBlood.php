@@ -56,6 +56,10 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
  */
 class TheatreOfBlood extends Model
 {

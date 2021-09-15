@@ -27,12 +27,19 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
+        $accounts = [];
+
+        // TODO probably better ways to do this
+        foreach ($user->account as $account) {
+            $accounts[] = $account::with('user')->where('id', $account->id)->first();
+        }
+
         if ($user->account == null || count($user->account) <= 0) {
             return redirect(route('account-create'))->withErrors(
                 ['You must link an Old School RuneScape account to access this feature!']
             );
         } else {
-            return view('home', compact('user'));
+            return view('home', compact('user', 'accounts'));
         }
     }
 

@@ -84,9 +84,11 @@ Route::prefix('/account')->group(function() {
 });
 
 Route::prefix('/hiscore')->group(function() {
+    Route::get('/{accountOne}/{accountTwo}/compare', 'Api\HiscoreController@compare')->name('hiscore-compare-show');
     Route::get('/skill/total', 'Api\HiscoreController@total')->name('hiscore-total-show');
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
 	Route::get('/collection/{collection}', 'Api\HiscoreController@collection')->name('hiscore-boss-show');
+
 });
 
 Route::prefix('/collection')->group(function() {
@@ -97,4 +99,27 @@ Route::prefix('/broadcast')->group(function() {
 	Route::get('/{broadcastType}', 'Api\BroadcastController@index')->name('broadcast-show-all');
 	Route::get('/account/{account}/{broadcastType}', 'Api\BroadcastController@account')->name('broadcast-account-show');
     Route::get('/recent/{broadcastType}', 'Api\BroadcastController@recent')->name('broadcast-recent-show');
+});
+
+Route::get('/calendar', 'Admin\Api\CalendarController@index');
+Route::get('/calendar/{calendar}/show', 'Admin\Api\CalendarController@show');
+
+Route::prefix('/group')->group(function() {
+    Route::get('/{group}', 'Api\GroupController@show');
+	Route::get('/{group}/bank', 'Api\GroupController@bank');
+});
+
+Route::middleware('auth:api')->group(function() {
+    Route::prefix('/admin')->group(function() {
+        Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-store-newspost');
+        Route::patch('/news/{newsPost}/edit', 'Admin\Api\NewsController@update')->name('admin-update-newspost');
+
+        Route::post('/calendar/create', 'Admin\Api\CalendarController@store');
+        Route::patch('/calendar/{calendar}/schedule', 'Admin\Api\CalendarController@updateSchedule');
+        Route::delete('/calendar/{calendar}/destroy', 'Admin\Api\CalendarController@destroy');
+
+		Route::post('/settings/resource-pack', 'Admin\Api\ResourcePackController@search')->name('admin-settings-resourcepack-search');
+		Route::patch('/settings/resource-pack/{resourcePack}/switch', 'Admin\Api\ResourcePackController@switch')->name('admin-settings-resourcepack-switch');
+		Route::patch('/settings/resource-pack/{resourcePack}/update', 'Admin\Api\ResourcePackController@update')->name('admin-settings-resourcepack-update');
+    });
 });
