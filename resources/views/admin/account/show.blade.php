@@ -7,7 +7,7 @@
 @section('content')
     <div class="row mb-4">
         <div class="col-md-9">
-            <accounthiscore account="{{ $account->username }}"></accounthiscore>
+            <accounthiscore :account="{{ $account }}"></accounthiscore>
         </div>
 
         <div class="col-md-3 text-center">

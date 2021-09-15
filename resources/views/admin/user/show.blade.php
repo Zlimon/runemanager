@@ -45,7 +45,7 @@
         <div class="bg-dark p-4">
             <h1>Accounts</h1>
 
-            @foreach ($user->account as $key => $account)
+            @foreach ($accounts as $key => $account)
                 <div class="row">
                     <div class="col-md-5">
                         <div class="p-3 mb-4" style="background: #6d7fcc;">
@@ -60,7 +60,7 @@
 
                     <div class="col-md-7 mb-4">
                         <div class="p-3" style="background: #6d7fcc;">
-                            <accounthiscore account="{{ $account->username }}"></accounthiscore>
+                            <accounthiscore :account="{{ $account }}"></accounthiscore>
                         </div>
                     </div>
                 </div>
