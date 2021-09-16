@@ -41,6 +41,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $log_broadcast_count
  * @property-read \App\Quest|null $quest
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereOnline($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Group[] $group
+ * @property-read int|null $group_count
  */
 class Account extends Model
 {

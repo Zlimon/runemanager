@@ -6,10 +6,9 @@ use App\Account;
 use App\Collection;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\BossHiscoreResource;
 use App\Http\Resources\HiscoreResource;
+use App\Http\Resources\SkillResource;
 use App\Skill;
-use Illuminate\Support\Str;
 
 class HiscoreController extends Controller
 {
@@ -112,5 +111,40 @@ class HiscoreController extends Controller
                     'total_uniques' => count($collectionUniques),
                 ]
             ]);
+    }
+
+    public function compare(Account $accountOne, Account $accountTwo)
+    {
+        $accOneHiscores = [];
+        $accTwoHiscores = [];
+        foreach (Helper::listSkills() as $skillName) {
+            $skill = Skill::where('name', $skillName)->firstOrFail();
+
+            $accOneHiscores[$skillName] = $skill->model::where('account_id', 1)->first();
+            $accTwoHiscores[$skillName] = $skill->model::where('account_id', 4)->first();
+        }
+
+        // Convert Collection to array
+        $accOneSkillHiscoreValues =  array_values(json_decode(json_encode(SkillResource::collection(collect($accOneHiscores))), true));
+        $accTwoSkillHiscoreValues =  array_values(json_decode(json_encode(SkillResource::collection(collect($accTwoHiscores))), true));
+
+        $count = count(Helper::listSkills()) - 1;
+        $comparison = [];
+        for ($i = 0; $i <= $count; $i++) {
+            $rank1 = (int)str_replace(',', '', $accOneSkillHiscoreValues[$i]['rank']);
+            $rank2 = (int)str_replace(',', '', $accTwoSkillHiscoreValues[$i]['rank']);
+
+            if (!$rank1) {
+                $comparison[] = false;
+            } elseif (!$rank2) {
+                $comparison[] = true;
+            } elseif ($rank1 > $rank2) {
+                $comparison[] = false;
+            } else {
+                $comparison[] = true;
+            }
+        }
+
+        return $comparison;
     }
 }

@@ -37,6 +37,8 @@ class AccountController extends Controller
     }
 
     public function show(Account $account) {
+        $account = $account::with('user')->where('id', $account->id)->first();
+
         return view('admin.account.show', compact('account'));
     }
 

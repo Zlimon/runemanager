@@ -49,9 +49,9 @@ class AccountController extends Controller
      * @param string $username
      * @return
      */
-    public function show($accountUsername)
+    public function show(Account $account)
     {
-        $account = Account::where('username', $accountUsername)->firstOrFail();
+        $account = $account::with('user')->first();
 
         return view('account.show', compact('account'));
     }
@@ -89,5 +89,15 @@ class AccountController extends Controller
         } else {
             return view('account.index', compact('accounts', 'query'));
         }
+    }
+
+    /**
+     * Show the account comparison page
+     *
+     * @return
+     */
+    public function compare()
+    {
+        return view('account.compare');
     }
 }

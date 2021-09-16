@@ -222,6 +222,16 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereUrisHat($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideBody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideBody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereDragonLegs/skirtOrnamentKit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideBody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideBody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereDragonLegs/skirtOrnamentKit($value)
  */
 class EliteTreasureTrails extends Model
 {

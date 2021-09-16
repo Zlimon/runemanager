@@ -36,7 +36,12 @@ class UserController extends Controller
     }
 
     public function show(User $user) {
-        return view('admin.user.show', compact('user'));
+        // TODO probably better ways to do this
+        foreach ($user->account as $account) {
+            $accounts[] = $account::with('user')->where('id', $account->id)->first();
+        }
+
+        return view('admin.user.show', compact('user', 'accounts'));
     }
 
     public function edit(User $user) {

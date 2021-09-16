@@ -214,6 +214,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereZamorakGodswordOrnamentKit($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereBucketHelm(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereObsidianCape(r)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereBucketHelm(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereObsidianCape(r)($value)
  */
 class MasterTreasureTrails extends Model
 {

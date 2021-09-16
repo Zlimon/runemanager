@@ -131,15 +131,15 @@
             </div>
         </div>
 
-        @foreach ($user->account as $account)
+        @foreach ($accounts as $account)
             <div class="py-2" style="clear: both;"></div>
             <div class="row">
                 <div class="col-md-8">
-                    <accounthiscore account="{{ $account->username }}"></accounthiscore>
+                    <accounthiscore :account="{{ $account }}"></accounthiscore>
                 </div>
 
                 <div class="col-md-4">
-                    <accountnotification :account="{{ $account }}"></accountnotification>
+{{--                    <accountnotification :account="{{ $account }}"></accountnotification>--}}
                 </div>
             </div>
         @endforeach
