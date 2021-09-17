@@ -16,7 +16,7 @@
                 </div>
             </div>
 
-            <div v-else class="d-flex flex-row flex-wrap">
+            <div v-else class="d-flex flex-row flex-wrap justify-content-between">
                 <div v-for="(hiscore, name) in hiscores">
                     <div class="btn bg-dark text-light button-small button-combat-style-narrow">
                         <div v-if="!showCollectionLog">
