@@ -19,7 +19,7 @@
         "laravel/framework": "^8.0",
         "laravel/passport": "^10.0",
         "laravel/tinker": "^2.0",
-        "laravel/ui": "^3.0",
+        "laravel/ui": "^3.3",
         "phpunit/phpunit": "^9.5",
         "pusher/pusher-php-server": "^4.1",
         "vipsoft/unzip": "^1.3"

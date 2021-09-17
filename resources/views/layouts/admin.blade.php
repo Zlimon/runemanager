@@ -10,7 +10,7 @@
     <title>{{ config('app.name', 'RuneManager') }} | @yield('title')</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/button.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
@@ -25,7 +25,7 @@
             </div>
 
             <ul class="list-unstyled components">
-                <p>Admin Panel</p>
+                <li><p>Admin Panel</p></li>
                 <li class="active">
                     <a href="{{ route('admin-index') }}">Dashboard</a>
                 <!-- <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Dashboard</a>

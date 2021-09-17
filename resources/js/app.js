@@ -4,9 +4,20 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
-
 import Vue from 'vue'
+
+import UniqueId from 'vue-unique-id';
+import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css';
+import CKEditor from '@ckeditor/ckeditor5-vue2';
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+Vue.use(require('./bootstrap')); // Load bootstrap.js
+Vue.use(UniqueId);
+Vue.use(require('advanced-laravel-vue-paginate'));
+Vue.use(require('vue-moment'));
+Vue.use( CKEditor );
+Vue.use(VueSweetalert2);
 
 /**
  * The following block of code may be used to automatically register your
@@ -18,22 +29,6 @@ import Vue from 'vue'
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-import UniqueId from 'vue-unique-id';
-import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css';
-import CKEditor from '@ckeditor/ckeditor5-vue2';
-import VueSweetalert2 from 'vue-sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
-
-Vue.use(BootstrapVue)
-Vue.use(UniqueId);
-Vue.use(require('advanced-laravel-vue-paginate'));
-Vue.use(require('vue-moment'));
-Vue.use( CKEditor );
-Vue.use(VueSweetalert2);
 
 Vue.component('announcementall', require('./components/notification/AnnouncementAll.vue').default);
 Vue.component('accountevent', require('./components/notification/AccountEvent.vue').default);
