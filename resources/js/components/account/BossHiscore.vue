@@ -67,13 +67,15 @@
                                                         <img :src="'/images/boss/' + name + '/' + item + '.png'"
                                                              class="pixel hiscore-icon"
                                                              :alt="item + ' item icon'"
-                                                             :title="item | capitalize">
+                                                             :title="item | capitalize"
+                                                             loading="lazy">
                                                     </div>
                                                     <div v-else-if="count > 0">
                                                         <img :src="'/images/boss/' + name + '/' + item + '.png'"
                                                              class="pixel hiscore-icon"
                                                              :alt="item + ' item icon'"
-                                                             :title="item | capitalize">
+                                                             :title="item | capitalize"
+                                                             loading="lazy">
                                                         <span class="collection-log-item-counter runescape-progress">
                                                             {{ count }}
                                                         </span>
@@ -82,7 +84,8 @@
                                                         <img :src="'/images/boss/' + name + '/' + item + '.png'"
                                                              class="pixel hiscore-icon faded"
                                                              :alt="item + ' item icon'"
-                                                             :title="item | capitalize">
+                                                             :title="item | capitalize"
+                                                             loading="lazy">
                                                     </div>
                                                 </div>
                                             </div>
