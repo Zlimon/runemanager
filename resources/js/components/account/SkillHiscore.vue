@@ -27,11 +27,11 @@
                         </a>
                     </div>
                 </div>
-                <div class="btn bg-dark text-light button-small button-combat-style-narrow ">
+                <div class="btn bg-dark text-light button-small button-combat-style-narrow">
                     <a :href="'/hiscore/skill/total'">
                         <img :src="'/storage/resource-pack/skill/total.png'"
-                             :alt="'Total level icon'"
-                             :title="'Click here to visit total level hiscores'">
+                             alt="Total level icon"
+                             title="Click here to visit total level hiscores">
                         <span>{{ data.level }}</span>
                     </a>
                 </div>
