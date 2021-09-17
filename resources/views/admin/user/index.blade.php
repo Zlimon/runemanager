@@ -10,23 +10,28 @@
             <h1>Search for users</h1>
         </div>
 
-        <form class="form-group row" method="POST" action="{{ route('admin-search-user') }}">
+        <form method="POST" action="{{ route('admin-search-user') }}"
+              class="row d-flex justify-content-center align-items-center">
             @csrf
 
-            <div class="col-md-3"></div>
-
-            <div class="col-md-6 mb-2">
-                <input id="search" type="text" class="form-control @error('search') is-invalid @enderror"
-                       name="search" value="{{ old('search') }}" placeholder="{{ $users->random()->name }}" autofocus required>
+            <div class="col-md-8">
+                <div class="search">
+                    <i class="fa fa-search"></i>
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           class="form-control @error('search') is-invalid @enderror"
+                           placeholder="{{ $users->random()->name }}"
+                           autofocus required>
+                    <button class="btn btn-primary">Search</button>
+                </div>
 
                 @error('search')
-                <span class="invalid-feedback" role="alert">
-						<strong>{{ $message }}</strong>
-					</span>
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
                 @enderror
             </div>
-
-            <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-search"></i></button>
         </form>
     </div>
 
@@ -44,7 +49,13 @@
         @foreach ($users as $user)
             <tr>
                 <td>{{ $user->id }}</td>
-                <td><img class="pixel" src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png" width="54" alt="Profile icon"> {{ $user->name }}</td>
+                <td>
+                    <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
+                         class="pixel"
+                         alt="Profile icon"
+                         width="54">
+                    {{ $user->name }}
+                </td>
                 <td>{{ $user->email }}</td>
                 <td>{{ ($user->private === 0 ? 'False' : 'True') }}</td>
                 <td>
@@ -80,3 +91,36 @@
         @endforeach
     </table>
 @endsection
+
+<style>
+    .search {
+        position: relative;
+        box-shadow: 0 0 40px rgba(51, 51, 51, .1);
+    }
+
+    .search input {
+        height: 60px;
+        text-indent: 25px;
+        border: 2px solid #d6d4d4;
+    }
+
+    .search input:focus {
+        box-shadow: none;
+        border: 2px solid blue;
+    }
+
+    .search .fa-search {
+        position: absolute;
+        top: 20px;
+        left: 16px;
+        color: black;
+    }
+
+    .search button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        height: 50px;
+        width: 110px;
+    }
+</style>
