@@ -12,6 +12,7 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}?ver={{ \App\Helpers\SettingHelper::getSetting('site_hash') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}?ver={{ \App\Helpers\SettingHelper::getSetting('site_hash') }}" rel="stylesheet">
+    <link href="{{ asset('css/resource-pack.css') }}?ver={{ \App\Helpers\SettingHelper::getSetting('site_hash') }}" rel="stylesheet">
     <link href="{{ asset('css/button.css') }}?ver={{ \App\Helpers\SettingHelper::getSetting('site_hash') }}" rel="stylesheet">
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
