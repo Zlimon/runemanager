@@ -42,3 +42,15 @@
         transform: translate3d(4px, 0, 0);
     }
 }
+
+.bg-admin-primary {
+  background-color: $admin-primary;
+}
+
+.bg-admin-secondary {
+  background-color: $admin-secondary;
+}
+
+.bg-admin-info {
+  background-color: $admin-info;
+}

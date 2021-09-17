@@ -11325,3 +11325,14 @@ textarea.form-control-lg {
     transform: translate3d(4px, 0, 0);
   }
 }
+.bg-admin-primary {
+  background-color: #34424D;
+}
+
+.bg-admin-secondary {
+  background-color: #47535F;
+}
+
+.bg-admin-info {
+  background-color: #6d7fcc;
+}
