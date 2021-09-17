@@ -15,7 +15,7 @@
 
 <div class="row">
     <div class="col-md-3">
-        <div class="bg-dark p-4">
+        <div class="bg-admin-dark p-4">
             <div class="col-md-12">
                 <div class="row">
                     <img
@@ -31,7 +31,6 @@
             </div>
             <p><strong>rank</strong></p>
 
-            <h2>About</h2>
             <p><strong>Email:</strong> {{ $user->email }}</p>
             <p><strong>Icon ID:</strong> {{ (is_null($user->icon_id)) ? 'None' : $user->icon_id }}</p>
             <p><strong>Private:</strong> {{ ($user->private === 0 ? 'False' : 'True') }}</p>
@@ -42,13 +41,13 @@
     </div>
 
     <div class="col-md-9">
-        <div class="bg-dark p-4">
+        <div class="bg-admin-dark p-4">
             <h1>Accounts</h1>
 
             @foreach ($accounts as $key => $account)
-                <div class="row">
+                <div class="row mb-4">
                     <div class="col-md-5">
-                        <div class="p-3 mb-4" style="background: #6d7fcc;">
+                        <div class="p-4 bg-admin-info">
                             <h2>@if (sizeof($user->account) > 1) {{ ++$key }} - @endif{{ $account->username }}</h2>
                             <p>
                                 <span><strong>Rank: </strong>{{ number_format($account->rank) }} |</span>
@@ -58,8 +57,8 @@
                         </div>
                     </div>
 
-                    <div class="col-md-7 mb-4">
-                        <div class="p-3" style="background: #6d7fcc;">
+                    <div class="col-md-7">
+                        <div class="p-4 bg-admin-info">
                             <accounthiscore :account="{{ $account }}"></accounthiscore>
                         </div>
                     </div>
