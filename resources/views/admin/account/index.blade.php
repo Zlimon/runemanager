@@ -5,66 +5,104 @@
 @endsection
 
 @section('content')
-@section('navigation')
-    <a class="btn btn-success" href="{{ route('admin-create-account') }}">Register account</a>
-@endsection
+    @section('navigation')
+        <a class="btn btn-success" href="{{ route('admin-create-account') }}">Register account</a>
+    @endsection
 
-<div class="text-center">
-    <h1>Search for OSRS accounts</h1>
-</div>
-
-<form class="form-group row" method="POST" action="{{ route('admin-search-account') }}">
-    @csrf
-
-    <div class="col-md-3"></div>
-
-    <div class="col-md-6 mb-2">
-        <input id="search" type="text" class="form-control @error('search') is-invalid @enderror" name="search"
-               value="{{ old('search') }}" placeholder="{{ $accounts->random()->username }}" autofocus required>
-
-        @error('search')
-        <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-        @enderror
+    <div class="text-center">
+        <h1>Search for accounts</h1>
     </div>
 
-    <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-search"></i></button>
-</form>
+    <form method="POST" action="{{ route('admin-search-account') }}"
+          class="row d-flex justify-content-center align-items-center">
+        @csrf
 
-@if ($query)<h3>Search results for "{{ $query }}"</h3>@endif
-<table>
-    <tr>
-        <th>Account ID</th>
-        <th>Username</th>
-        <th>Rank</th>
-        <th>Level</th>
-        <th>XP</th>
-        <th>Linked user</th>
-        <th>Registered</th>
-        <th>Actions</th>
-    </tr>
-    @foreach ($accounts as $account)
+        <div class="col-md-8">
+            <div class="search">
+                <i class="fa fa-search"></i>
+                <input type="text"
+                       id="search"
+                       name="search"
+                       class="form-control @error('search') is-invalid @enderror"
+                       placeholder="{{ $accounts->random()->username }}"
+                       autofocus required>
+                <button class="btn btn-primary">Search</button>
+            </div>
+
+            @error('search')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+    </form>
+
+    @if ($query)<h3>Search results for "{{ $query }}"</h3>@endif
+    <table>
         <tr>
-            <td>{{ $account->id }}</td>
-            <td>
-                @if ($account->account_type !== "normal")
-                    <img src="{{ asset('images/'.$account->account_type.'.png') }}"
-                         alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon">
-                @endif
-                {{ $account->username }}
-            </td>
-            <td>{{ number_format($account->rank) }}</td>
-            <td>{{ $account->level }}</td>
-            <td>{{ number_format($account->xp) }}</td>
-            <td>@if ($account->user_id)<a
-                    href="{{ route('admin-show-user', $account->user_id) }}">@if ($account->user->icon_id)<img
-                        class="pixel"
-                        src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="54"
-                        alt="Profile icon">@endif{{ $account->user_id }} - {{ $account->user->name }}</a>@endif</td>
-            <td>{{ \Carbon\Carbon::parse($account->created_at)->format('d. M Y H:i') }}</td>
-            <td><a class="btn btn-success mr-2" href="{{ route('admin-show-account', $account->username) }}">Show</a></td>
+            <th>Account ID</th>
+            <th>Username</th>
+            <th>Rank</th>
+            <th>Level</th>
+            <th>XP</th>
+            <th>Linked user</th>
+            <th>Registered</th>
+            <th>Actions</th>
         </tr>
-    @endforeach
-</table>
+        @foreach ($accounts as $account)
+            <tr>
+                <td>{{ $account->id }}</td>
+                <td>
+                    @if ($account->account_type !== "normal")
+                        <img src="{{ asset('images/'.$account->account_type.'.png') }}"
+                             alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon">
+                    @endif
+                    {{ $account->username }}
+                </td>
+                <td>{{ number_format($account->rank) }}</td>
+                <td>{{ $account->level }}</td>
+                <td>{{ number_format($account->xp) }}</td>
+                <td>@if ($account->user_id)<a
+                        href="{{ route('admin-show-user', $account->user_id) }}">@if ($account->user->icon_id)<img
+                            class="pixel"
+                            src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="54"
+                            alt="Profile icon">@endif{{ $account->user_id }} - {{ $account->user->name }}</a>@endif</td>
+                <td>{{ \Carbon\Carbon::parse($account->created_at)->format('d. M Y H:i') }}</td>
+                <td><a class="btn btn-success mr-2" href="{{ route('admin-show-account', $account->username) }}">Show</a></td>
+            </tr>
+        @endforeach
+    </table>
 @endsection
+
+<style>
+    .search {
+        position: relative;
+        box-shadow: 0 0 40px rgba(51, 51, 51, .1);
+    }
+
+    .search input {
+        height: 60px;
+        text-indent: 25px;
+        border: 2px solid #d6d4d4;
+    }
+
+    .search input:focus {
+        box-shadow: none;
+        border: 2px solid blue;
+    }
+
+    .search .fa-search {
+        position: absolute;
+        top: 20px;
+        left: 16px;
+        color: black;
+    }
+
+    .search button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        height: 50px;
+        width: 110px;
+    }
+</style>
