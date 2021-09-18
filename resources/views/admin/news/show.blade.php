@@ -18,11 +18,14 @@
         </form>
     @endsection
 
-    <div class="text-center pb-3">
-        <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
-             alt="'{{ $newsPost->title }}' news post image" width="50%">
+    <div class="bg-admin-dark p-4">
+        <div class="text-center pb-3">
+            <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
+                 class="w-50"
+                 alt="'{{ $newsPost->title }}' news post image">
+        </div>
+        <h1 class="text-center">{{ $newsPost->title }}</h1>
+        <p class="text-center"><em>{{ $newsPost->shortstory }}</em></p>
+        {!! $newsPost->longstory !!}
     </div>
-    <h1>{{ $newsPost->title }}</h1>
-    <p class="text-center"><em>{{ $newsPost->shortstory }}</em></p>
-    {!! $newsPost->longstory !!}
 @endsection
