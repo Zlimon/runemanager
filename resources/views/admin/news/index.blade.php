@@ -10,22 +10,30 @@
 
 @section('content')
     <div class="d-flex justify-content-between">
-        <div>
+        <div class="col">
             <h1>News</h1>
         </div>
 
-        <div>
-            <h5>Create new category</h5>
+        <form method="POST" action="{{ route('admin-create-newspost-category') }}" class="col-4">
+            @csrf
 
-            <form method="POST" action="{{ route('admin-create-newspost-category') }}" class="form-inline">
-                @csrf
+            <div class="search">
+                <i class="fa fa-newspaper"></i>
+                <input type="text"
+                       id="category"
+                       name="category"
+                       class="form-control @error('category') is-invalid @enderror"
+                       placeholder="Create new category"
+                       required>
+                <button class="btn btn-primary">Create</button>
+            </div>
 
-                <label class="sr-only" for="inlineFormInputName2">Name</label>
-                <input type="text" class="form-control mb-2 mr-sm-2 @error('category') is-invalid @enderror" name="category" id="category" value="{{ old('user') }}" placeholder="Category name">
-
-                <button type="submit" class="btn btn-primary mb-2">Submit</button>
-            </form>
-        </div>
+            @error('category')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </form>
     </div>
 
     <table>
@@ -61,3 +69,36 @@
         @endforeach
     </table>
 @endsection
+
+<style>
+    .search {
+        position: relative;
+        box-shadow: 0 0 40px rgba(51, 51, 51, .1);
+    }
+
+    .search input {
+        height: 60px;
+        text-indent: 25px;
+        border: 2px solid #d6d4d4;
+    }
+
+    .search input:focus {
+        box-shadow: none;
+        border: 2px solid blue;
+    }
+
+    .search .fa {
+        position: absolute;
+        top: 20px;
+        left: 16px;
+        color: black;
+    }
+
+    .search button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        height: 50px;
+        width: 110px;
+    }
+</style>
