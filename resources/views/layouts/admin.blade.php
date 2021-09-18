@@ -101,7 +101,7 @@
                 </div>
             </nav>
 
-            <main class="p-2 p-md-5">
+            <main class="p-2 p-md-4">
                 @if ($errors->any())
                     <div class="alert alert-danger col-md-4" style="margin: auto; margin-bottom: 1rem;">
                         @foreach ($errors->all() as $errorMessage)
