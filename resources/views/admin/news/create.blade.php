@@ -9,9 +9,5 @@
 @endsection
 
 @section('content')
-    <h1>Post news</h1>
-
-    <div class="bg-admin-dark p-4">
-        <newscreate :categories="{{ $newsCategories }}"></newscreate>
-    </div>
+    <newscreate :categories="{{ $newsCategories }}"></newscreate>
 @endsection
