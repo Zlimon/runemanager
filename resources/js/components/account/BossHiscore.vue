@@ -82,7 +82,7 @@
                                                     </div>
                                                     <div v-else>
                                                         <img :src="'/images/boss/' + name + '/' + item + '.png'"
-                                                             class="pixel hiscore-icon faded"
+                                                             class="pixel hiscore-icon opacity-25"
                                                              :alt="item + ' item icon'"
                                                              :title="item | capitalize"
                                                              loading="lazy">

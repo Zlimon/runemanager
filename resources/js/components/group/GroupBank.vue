@@ -53,7 +53,7 @@
                                     :alt="item.name + ' item icon'"
                                     :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + item.id + '.png'"
                                     :title="item.name + ' x ' + item.quantity"
-                                    class="hiscore-icon faded">
+                                    class="hiscore-icon opacity-25">
                             </div>
                         </div>
                     </div>
