@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-calendar')
+    active
+@endsection
+
 @section('content')
     @section('navigation')
         <form method="POST" action="{{ route('admin-calendar-truncate') }}">

@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-users')
+    active
+@endsection
+
 @section('content')
 @section('navigation')
     <a class="btn btn-primary mr-2" href="{{ route('admin-edit-user', $user->id) }}">Edit</a>

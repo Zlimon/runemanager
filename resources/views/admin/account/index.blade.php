@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-accounts')
+    active
+@endsection
+
 @section('content')
     @section('navigation')
         <a class="btn btn-success" href="{{ route('admin-create-account') }}">Register account</a>

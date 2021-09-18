@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-news')
+    active
+@endsection
+
 @section('content')
 @section('navigation')
     <form method="POST" action="{{ route('admin-delete-newspost', $newsPost) }}">

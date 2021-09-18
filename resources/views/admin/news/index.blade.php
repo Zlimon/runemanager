@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-news')
+    active
+@endsection
+
 @section('content')
     <div class="d-flex justify-content-between">
         <div>

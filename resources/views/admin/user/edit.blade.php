@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-users')
+    active
+@endsection
+
 @section('content')
 @section('navigation')
     <button type="button" class="btn btn-danger">

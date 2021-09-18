@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-accounts')
+    active
+@endsection
+
 @section('content')
     <h1>Register an OSRS account</h1>
     <p>If you want to preregister an OSRS account for future use / reference, you can do it here.</p>

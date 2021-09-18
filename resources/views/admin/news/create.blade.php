@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-news')
+    active
+@endsection
+
 @section('content')
     <h1>{{ __('title.create-newspost') }}</h1>
 

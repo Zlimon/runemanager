@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-settings')
+    active
+@endsection
+
 @section('content')
     @if (count(config('settings', [])) )
         <form method="POST" action="{{ route('admin-settings-store') }}">

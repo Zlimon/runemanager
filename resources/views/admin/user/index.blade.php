@@ -4,6 +4,10 @@
     TITLE
 @endsection
 
+@section('active-users')
+    active
+@endsection
+
 @section('content')
     <div class="text-center">
         <h1>Search for users</h1>
