@@ -10,23 +10,23 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-12 col-md-3 mb-2">
             <div class="bg-admin-dark p-4">
-                <div class="p-4 mb-4 bg-admin-info">
-                    <h1>Skills</h1>
+                <h1>Skills</h1>
 
+                <div class="p-4 mb-4 bg-admin-info">
                     <accountskillhiscore :account="{{ $account }}"></accountskillhiscore>
                 </div>
 
-                <div class="p-4 bg-admin-info">
-                    <h1>Bosses</h1>
+                <h1>Bosses</h1>
 
+                <div class="p-4 bg-admin-info">
                     <accountbosshiscore :account="{{ $account }}"></accountbosshiscore>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div class="col-12 col-md-4">
             <div class="bg-admin-dark p-4">
                 <h5>Transfer ownership of this account</h5>
 
