@@ -10,7 +10,9 @@
 
 @section('content')
     @section('navigation')
-        <a class="btn btn-success" href="{{ route('admin-create-account') }}">Register account</a>
+        <div class="p-2">
+            <a class="btn btn-success" href="{{ route('admin-create-account') }}">Register account</a>
+        </div>
     @endsection
 
     <div class="text-center">
