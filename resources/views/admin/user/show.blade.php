@@ -20,8 +20,8 @@
     @endsection
 
     <div class="row">
-        <div class="col-md-3">
-            <div class="bg-admin-dark p-4">
+        <div class="col-12 col-md-2 mb-2">
+            <div class="p-4 bg-admin-dark">
                 <div class="col-md-12">
                     <div class="row">
                         <img
@@ -46,18 +46,20 @@
             </div>
         </div>
 
-        <div class="col-md-9">
-            <div class="bg-admin-dark p-4">
+        <div class="col-12 col-md-5">
+            <div class="p-4 bg-admin-dark">
                 <h1>Accounts</h1>
 
                 @foreach ($accounts as $key => $account)
                     <div class="row mb-4">
-                        <div class="col-md-5">
+                        <div class="col-md-5 mb-4">
                             <div class="p-4 bg-admin-info">
                                 <h2>@if (sizeof($user->account) > 1) {{ ++$key }} - @endif{{ $account->username }}</h2>
                                 <p>
-                                    <span><strong>Rank: </strong>{{ number_format($account->rank) }} |</span>
-                                    <span><strong>Level: </strong>{{ $account->level }} |</span>
+                                    <span><strong>Rank: </strong>{{ number_format($account->rank) }}</span>
+                                    <br>
+                                    <span><strong>Level: </strong>{{ $account->level }}</span>
+                                    <br>
                                     <span><strong>Total XP:</strong> {{ number_format($account->xp) }}</span>
                                 </p>
                             </div>
