@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    <h1>{{ __('title.create-newspost') }}</h1>
+    <h1>Post news</h1>
 
     <newscreate :categories="{{ $newsCategories }}"></newscreate>
 @endsection

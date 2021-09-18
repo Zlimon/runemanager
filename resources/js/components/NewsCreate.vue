@@ -5,56 +5,51 @@
         </div>
 
         <form @submit.prevent="submit" enctype="multipart/form-data">
-            <div class="form-group row">
-                <label for="image" class="col-md-4 col-form-label text-md-right">Image file</label>
-
-                <div class="col-md-6">
-                    <input id="image" type="file"
-                           class="form-control-file border rounded bg-white p-1 "
-                           name="image" style="color: black;">
+            <div class="row mb-3">
+                <label for="image" class="col-sm-3 col-form-label">Image</label>
+                <div class="col-sm-9">
+                    <input type="file"
+                           id="image"
+                           name="image"
+                           class="form-control">
                 </div>
             </div>
 
-            <div class="form-group row">
-                <label for="title" class="col-md-4 col-form-label text-md-right">Title</label>
-
-                <div class="col-md-6">
-                    <input id="title" type="text" class="form-control" name="title"
-                           value="" v-model="fields.title" required autofocus>
-
-                    <div v-if="errors && errors.title" class="text-danger">
-                        <span class="invalid-feedback d-block" role="alert">
-                            <strong>{{ errors.title[0] }}</strong>
-                        </span>
-                    </div>
+            <div class="row mb-3">
+                <label for="title" class="col-sm-3 col-form-label">Title</label>
+                <div class="col-sm-9">
+                    <input v-model="fields.title"
+                           type="text"
+                           id="title"
+                           name="title"
+                           class="form-control"
+                           required autofocus>
                 </div>
             </div>
 
-            <div class="form-group row">
-                <label for="news_category_id" class="col-md-4 col-form-label text-md-right">Category</label>
-
-                <div class="col-md-6">
-                    <select id="news_category_id" class="form-control" name="news_category_id"
-                            v-model="fields.news_category_id">
-                        <option :value="category.id" v-for="category in categories">
+            <div class="row mb-3">
+                <label for="news_category_id" class="col-sm-3 col-form-label">Category</label>
+                <div class="col-sm-9">
+                    <select v-model="fields.news_category_id"
+                            id="news_category_id"
+                            name="news_category_id"
+                            class="form-select">
+                        <option v-for="category in categories" :value="category.id">
                             {{ category.category }}
                         </option>
                     </select>
                 </div>
             </div>
 
-            <div class="form-group row">
-                <label for="shortstory" class="col-md-4 col-form-label text-md-right">Shortstory</label>
-
-                <div class="col-md-6">
-                    <input id="shortstory" type="text" class="form-control"
-                           name="shortstory" value="" v-model="fields.shortstory" required>
-
-                    <div v-if="errors && errors.shortstory" class="text-danger">
-                        <span class="invalid-feedback d-block" role="alert">
-                            <strong>{{ errors.shortstory[0] }}</strong>
-                        </span>
-                    </div>
+            <div class="row mb-3">
+                <label for="shortstory" class="col-sm-3 col-form-label">Short story</label>
+                <div class="col-sm-9">
+                    <input v-model="fields.shortstory"
+                           type="text"
+                           id="shortstory"
+                           name="shortstory"
+                           class="form-control"
+                           required>
                 </div>
             </div>
 
@@ -64,7 +59,13 @@
                 </span>
             </div>
 
-            <ckeditor id="longstory" class="form-control" name="longstory" :editor="editor" v-model="fields.longstory" :config="editorConfig"></ckeditor>
+            <ckeditor v-model="fields.longstory"
+                      :editor="editor"
+                      :config="editorConfig"
+                      id="longstory"
+                      name="longstory"
+                      class="form-control"
+                      required></ckeditor>
 
             <div class="form-group row mb-0">
                 <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">Post news</button>
