@@ -27,7 +27,7 @@
                  alt="'{{ $newsPost->title }}' news post image">
         </div>
 
-        <div class="col-7">
+        <div class="col-7 bg-admin-dark p-4">
             <newsupdate :news-post="{{ $newsPost }}" :categories="{{ $newsCategories }}"></newsupdate>
         </div>
     </div>

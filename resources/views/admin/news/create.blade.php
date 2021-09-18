@@ -11,5 +11,7 @@
 @section('content')
     <h1>Post news</h1>
 
-    <newscreate :categories="{{ $newsCategories }}"></newscreate>
+    <div class="bg-admin-dark p-4">
+        <newscreate :categories="{{ $newsCategories }}"></newscreate>
+    </div>
 @endsection
