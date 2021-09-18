@@ -62,11 +62,17 @@
                 <td>{{ number_format($account->rank) }}</td>
                 <td>{{ $account->level }}</td>
                 <td>{{ number_format($account->xp) }}</td>
-                <td>@if ($account->user_id)<a
-                        href="{{ route('admin-show-user', $account->user_id) }}">@if ($account->user->icon_id)<img
-                            class="pixel"
-                            src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png" width="54"
-                            alt="Profile icon">@endif{{ $account->user_id }} - {{ $account->user->name }}</a>@endif</td>
+                <td>
+                    @if ($account->user_id)
+                        <a href="{{ route('admin-show-user', $account->user_id) }}">
+                            <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
+                                 class="pixel"
+                                 alt="Profile icon"
+                                 width="54">
+                            {{ $account->user_id }} - {{ $account->user->name }}
+                        </a>
+                    @endif
+                </td>
                 <td>{{ \Carbon\Carbon::parse($account->created_at)->format('d. M Y H:i') }}</td>
                 <td><a class="btn btn-success mr-2" href="{{ route('admin-show-account', $account->username) }}">Show</a></td>
             </tr>
