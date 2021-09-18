@@ -5,35 +5,33 @@
 @endsection
 
 @section('content')
-    <div class="content-body">
-        <div class="text-center">
-            <h1>Search for users</h1>
-        </div>
-
-        <form method="POST" action="{{ route('admin-search-user') }}"
-              class="row d-flex justify-content-center align-items-center">
-            @csrf
-
-            <div class="col-md-8">
-                <div class="search">
-                    <i class="fa fa-search"></i>
-                    <input type="text"
-                           id="search"
-                           name="search"
-                           class="form-control @error('search') is-invalid @enderror"
-                           placeholder="{{ $users->random()->name }}"
-                           autofocus required>
-                    <button class="btn btn-primary">Search</button>
-                </div>
-
-                @error('search')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                @enderror
-            </div>
-        </form>
+    <div class="text-center">
+        <h1>Search for users</h1>
     </div>
+
+    <form method="POST" action="{{ route('admin-search-user') }}"
+          class="row d-flex justify-content-center align-items-center">
+        @csrf
+
+        <div class="col-md-8">
+            <div class="search">
+                <i class="fa fa-search"></i>
+                <input type="text"
+                       id="search"
+                       name="search"
+                       class="form-control @error('search') is-invalid @enderror"
+                       placeholder="{{ $users->random()->name }}"
+                       autofocus required>
+                <button class="btn btn-primary">Search</button>
+            </div>
+
+            @error('search')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+    </form>
 
     @if ($query)<h3>Search results for "{{ $query }}"</h3>@endif
     <table>

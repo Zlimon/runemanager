@@ -9,30 +9,28 @@
     <a class="btn btn-success" href="{{ route('admin-create-account') }}">Register account</a>
 @endsection
 
-<div class="content-body">
-    <div class="text-center">
-        <h1>Search for OSRS accounts</h1>
+<div class="text-center">
+    <h1>Search for OSRS accounts</h1>
+</div>
+
+<form class="form-group row" method="POST" action="{{ route('admin-search-account') }}">
+    @csrf
+
+    <div class="col-md-3"></div>
+
+    <div class="col-md-6 mb-2">
+        <input id="search" type="text" class="form-control @error('search') is-invalid @enderror" name="search"
+               value="{{ old('search') }}" placeholder="{{ $accounts->random()->username }}" autofocus required>
+
+        @error('search')
+        <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+        @enderror
     </div>
 
-    <form class="form-group row" method="POST" action="{{ route('admin-search-account') }}">
-        @csrf
-
-        <div class="col-md-3"></div>
-
-        <div class="col-md-6 mb-2">
-            <input id="search" type="text" class="form-control @error('search') is-invalid @enderror" name="search"
-                   value="{{ old('search') }}" placeholder="{{ $accounts->random()->username }}" autofocus required>
-
-            @error('search')
-            <span class="invalid-feedback" role="alert">
-						<strong>{{ $message }}</strong>
-					</span>
-            @enderror
-        </div>
-
-        <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-search"></i></button>
-    </form>
-</div>
+    <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-search"></i></button>
+</form>
 
 @if ($query)<h3>Search results for "{{ $query }}"</h3>@endif
 <table>
