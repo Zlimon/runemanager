@@ -23,7 +23,8 @@
     <div class="row">
         <div class="col-5">
             <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
-                 alt="'{{ $newsPost->title }}' news post image" width="100%">
+                 class="w-100"
+                 alt="'{{ $newsPost->title }}' news post image">
         </div>
 
         <div class="col-7">
