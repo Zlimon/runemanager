@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-12 col-md-4">
-            <div class="bg-admin-dark p-4">
+            <div class="p-4 bg-admin-dark">
                 <h3>Install new Resource Pack</h3>
 
                 <div class="p-4 mb-4 bg-admin-info">

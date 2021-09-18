@@ -11,12 +11,12 @@
 @section('content')
     <div class="row">
         <div class="col-12 col-md-4">
-            <div class="bg-admin-dark p-4">
+            <div class="p-4 bg-admin-dark">
                 <h1>Reserve an OSRS account</h1>
                 <p>If you want to reserve an Old School RuneScape account for future use / prevent it being claimed, you can do it here.</p>
                 <p>To link the account to an user, visit the account page and fill the "Transfer ownership of this account" form.</p>
 
-                <div class="p-4 mb-4 bg-admin-info">
+                <div class="p-4 bg-admin-info">
                     <form method="POST" action="{{ route('admin-create-account') }}">
                         @csrf
 
