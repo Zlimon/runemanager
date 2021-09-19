@@ -1,128 +1,244 @@
 <template>
-    <div>
-        <div class="col-12 col-md-8">
-            <FullCalendar :options="calendarOptions"/>
-
-            <h2>Settings</h2>
-
-            <div class="row">
-                <div class="col-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="edit_mode">
-                        <label class="form-check-label" for="edit_mode">
-                            Edit mode
-                        </label>
-                        <p class="text-muted">Allows dragging and resizing events in the calender. Also enables editing events.</p>
-                    </div>
+    <div class="row">
+        <div class="col-12 col-md-6 mb-2">
+            <div class="bg-admin-dark p-4">
+                <div class="p-4 bg-admin-info">
+                    <FullCalendar :options="calendarOptions"/>
                 </div>
-                <div class="col-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="broadcast_changes">
-                        <label class="form-check-label" for="broadcast_changes">
-                            Broadcast changes
-                        </label>
-                        <p class="text-muted">This will broadcast changes in-game!</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="bg-admin-dark p-4">
+                <h2>Settings</h2>
+
+                <div class="p-4 mb-4 bg-admin-info">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input type="checkbox" id="edit_mode" name="edit_mode" class="form-check-input">
+                                <label for="edit_mode" class="form-check-label">
+                                    Edit mode
+                                </label>
+                                <p class="text-muted">
+                                    Allows dragging and resizing events in the calender. Also enables editing events.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input type="checkbox" id="broadcast_changes" name="broadcast_changes" class="form-check-input">
+                                <label for="broadcast_changes" class="form-check-label">
+                                    Broadcast changes
+                                </label>
+                                <p class="text-muted">
+                                    This will broadcast changes in-game!
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <b-modal ref="event" hide-footer :title="eventTitle">
-            <div v-if="selectedEvent">
-                <div class="d-flex">
-                    <div class="col-3 text-center">
-                        <img v-if="selectedEvent.icon_id !== null" :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + selectedEvent.icon_id + '.png'" class="pixel icon mb-2" alt="Event icon">
+        <div class="modal fade" ref="eventCreateModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-admin-dark">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create new event</h5>
+                        <button @click="eventCreateModal.hide()"
+                                type="button"
+                                class="btn-close">
+                        </button>
                     </div>
-
-                    <div class="col">
-                        <p class="font-weight-bold text-left">{{ selectedEvent.description ? selectedEvent.description : '' }}</p>
-
-                        <hr>
-
-                        <div class="d-flex text-left">
-                            <div class="col-3 pl-0">
-                                <span class="font-weight-bold">Starts:</span>
-                                <br>
-                                <span class="font-weight-bold">{{ selectedEvent.end_date !== null ? 'Ends:' : '' }}</span>
-                            </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
                             <div class="col">
-                                <span>{{ selectedEvent.start_date | moment('ddd. Do MMMM HH:mm') }}</span>
-                                <br>
-                                <span v-if="selectedEvent.end_date !== null">{{ selectedEvent.end_date | moment('ddd. Do MMMM HH:mm') }}</span>
+                                <input v-model="fields.title"
+                                       type="text"
+                                       id="title"
+                                       name="title"
+                                       class="form-control"
+                                       placeholder="Title"
+                                       required>
                             </div>
                         </div>
 
-                        <hr>
-                    </div>
-                </div>
-
-                <b-button class="mt-3" variant="outline-danger" block @click="deleteEvent(selectedEvent.id)">Delete event</b-button>
-            </div>
-        </b-modal>
-
-        <b-modal ref="eventCreate" hide-footer title="Create new event">
-            <div class="text-left">
-                <div class="form-group">
-                    <input v-model="fields.title" type="text" class="form-control" id="title" placeholder="Title" required>
-                </div>
-                <div class="form-group">
-                    <input v-model="fields.description" type="text" class="form-control" id="description" placeholder="Description (optional)">
-                </div>
-                <div class="form-group">
-                    <input v-model="fields.icon_id" type="text" class="form-control" id="icon_id" aria-describedby="icon_idHelp" placeholder="Icon ID (optional)">
-                    <div class="form-text">
-                        <small id="icon_idHelp" class="text-muted">Type in the ID of an icon you wish to display as an event icon</small><br>
-                        <small id="icon_idHelp" class="text-muted">Search icons <a target="_blank" rel="noopener noreferrer" href="https://www.osrsbox.com/tools/item-search/">here</a> </small>
-                    </div>
-                </div>
-                <div class="d-flex form-group">
-                    <label class="col-3 col-form-label pl-0" for="event_color">Event color</label>
-                    <input v-model="fields.event_color" type="color" class="form-control mx-sm-3 w-25" name="event_color" id="event_color">
-                </div>
-                <div class="d-flex form-group">
-                    <label class="col-3 col-form-label pl-0" for="start_time">Start date</label>
-                    <div class="d-flex">
-                        <div class="col col-form-label">
-                            <span class="text-muted">{{ this.fields.start_date | moment("DD.MM.YYYY") }}</span>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input v-model="fields.description"
+                                       type="text"
+                                       id="description"
+                                       name="description"
+                                       class="form-control"
+                                       placeholder="Description (optional)">
+                            </div>
                         </div>
-                        <div class="">
-                            <input v-model="fields.start_time" type="time" class="form-control" id="start_time" placeholder="Start time" required>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input v-model="fields.icon_id"
+                                       type="number"
+                                       id="icon_id"
+                                       name="icon_id"
+                                       class="form-control"
+                                       placeholder="Icon ID (optional)"
+                                       required>
+                                <div class="form-text">
+                                    <small>
+                                        Type in the ID of an in-game item you wish to display as the icon for this event.
+                                        <br>
+                                        Search icons
+                                        <a href="https://www.osrsbox.com/tools/item-search/"
+                                           class="link-primary"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            here
+                                        </a>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="event_color" class="col-sm-3 col-form-label">Event color</label>
+                            <div class="col-sm-9">
+                                <input v-model="fields.event_color"
+                                       type="color"
+                                       id="event_color"
+                                       name="event_color"
+                                       class="form-control form-control-color"
+                                       title="Choose your color">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="event_color" class="col-sm-3 col-form-label">Start date</label>
+                            <div class="col-sm-9">
+                                <input v-model="fields.start_time"
+                                       type="time"
+                                       id="start_time"
+                                       name="start_time"
+                                       class="form-control"
+                                       required>
+                                <div class="form-text">
+                                    <small>
+                                        {{ this.fields.start_date | moment("DD.MM.YYYY") }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="fields && fields.all_day === 'no'" class="row mb-3">
+                            <label for="event_color" class="col-sm-3 col-form-label">End date</label>
+                            <div class="col-sm-9">
+                                <input v-model="fields.end_date"
+                                       type="datetime-local"
+                                       id="end_date"
+                                       name="end_date"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-9">
+                                <div class="form-check">
+                                    <input v-model="fields.all_day"
+                                           type="checkbox"
+                                           id="all_day"
+                                           name="all_day"
+                                           class="form-check-input"
+                                           true-value="yes"
+                                           false-value="no">
+                                    <label for="all_day" class="form-check-label">
+                                        All-day event?
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input v-model="fields.start_date" type="hidden" id="start_date">
+                    </div>
+                    <div class="modal-footer">
+                        <div @click="createEvent()"
+                             class="btn btn-success">
+                            Create event
                         </div>
                     </div>
                 </div>
-                <div class="d-flex form-group">
-                    <label class="col-3 col-form-label pl-0" for="end_date">End date</label>
-                    <input v-model="fields.end_date" type="datetime-local" class="form-control mx-sm-3 w-50" id="end_date" placeholder="End date">
-                </div>
-                <div class="form-check">
-                    <input v-model="fields.all_day" type="checkbox" class="form-check-input" id="all_day" true-value="yes" false-value="no">
-                    <label class="form-check-label" for="all_day">All-day event</label>
-                </div>
-                <input v-model="fields.start_date" type="hidden" id="start_date">
             </div>
+        </div>
 
-            <b-button class="mt-3" variant="outline-success" block @click="createEvent()">Create event</b-button>
-        </b-modal>
+        <div class="modal fade" ref="eventShowModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-admin-dark">
+                    <div class="modal-header">
+                        <h5 v-if="selectedEvent && selectedEvent.title !== null" class="modal-title">{{ selectedEvent.title }}</h5>
+                        <button type="button" class="btn-close" @click="eventShowModal.hide()" aria-label="Close"></button>
+                    </div>
+                    <div v-if="selectedEvent" class="modal-body">
+                        <div class="row">
+                            <div class="col-3 text-center">
+                                <img v-if="selectedEvent.icon_id !== null" :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + selectedEvent.icon_id + '.png'" class="pixel icon" alt="Event icon">
+                            </div>
+
+                            <div class="col">
+                                <p class="fw-bold">{{ selectedEvent.description ? selectedEvent.description : '' }}</p>
+
+                                <hr>
+
+                                <div class="d-flex text-left">
+                                    <div class="col-3 pl-0">
+                                        <span class="fw-bold">Starts:</span>
+                                        <br>
+                                        <span class="fw-bold">{{ selectedEvent.end_date !== null ? 'Ends:' : '' }}</span>
+                                    </div>
+                                    <div class="col">
+                                        <span>{{ selectedEvent.start_date | moment('ddd. Do MMMM HH:mm') }}</span>
+                                        <br>
+                                        <span v-if="selectedEvent.end_date !== null">{{ selectedEvent.end_date | moment('ddd. Do MMMM HH:mm') }}</span>
+                                        <span v-else class="fst-italic">(all day event)</span>
+                                    </div>
+                                </div>
+
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div @click="deleteEvent(selectedEvent.id)"
+                             class="btn btn-danger">
+                            Delete event
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
+import {Modal} from 'bootstrap'
 import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
+
 var moment = require('moment');
 
 export default {
     components: {FullCalendar},
 
     methods: {
+        // Show event
         handleEventClick(arg) {
             axios
                 .get('/api/calendar/' + arg.event.id + '/show')
                 .then((response) => {
                     this.selectedEvent = response.data;
-                    this.eventTitle = response.data.title;
-                    this.showModal('event');
+
+                    if (this.selectedEvent) {
+                        this.eventShowModal.show();
+                    }
                 })
                 .catch(error => {
                     console.error(error)
@@ -130,6 +246,7 @@ export default {
                 .finally(() => this.loading = false)
         },
 
+        // Create event
         handleDateClick(arg) {
             // TODO better handling of updating fields before showModal
             this.fields.event_color = '#3490dc';
@@ -137,9 +254,10 @@ export default {
             this.fields.start_time = moment(new Date()).format('HH:mm');
             this.fields.end_date = moment(arg.dateStr).format('YYYY-MM-DD\\THH:mm');
 
-            this.showModal('eventCreate')
+            this.eventCreateModal.show();
         },
 
+        // Reschedule event
         handleEventDropOrResize(arg) {
             var moment = require('moment');
 
@@ -185,9 +303,8 @@ export default {
                 .post('/api/admin/calendar/create', payload)
                 .then(() => {
                     this.getEvents();
-                    this.hideModal('eventCreate');
+                    this.eventCreateModal.hide()
                     this.toastSuccess();
-
                     this.fields = {};
                 })
                 .catch(error => {
@@ -216,25 +333,14 @@ export default {
                 })
                 .then(() => {
                     this.getEvents();
-                    this.hideModal('event');
-
+                    this.eventShowModal.hide()
                     this.selectedEvent = null;
-                    this.eventTitle = '';
-
                     this.toastSuccess();
                 })
                 .catch(error => {
                     console.error(error.response.data);
                     this.toastError();
                 });
-        },
-
-        showModal(modal) {
-            this.$refs[modal].show()
-        },
-
-        hideModal(modal) {
-            this.$refs[modal].hide()
         },
 
         toastSuccess() {
@@ -272,6 +378,9 @@ export default {
 
     data() {
         return {
+            eventCreateModal: null,
+            eventShowModal: null,
+
             calendarOptions: {
                 plugins: [dayGridPlugin, interactionPlugin],
                 initialView: 'dayGridMonth',
@@ -285,18 +394,21 @@ export default {
             },
 
             fields: {
-                // event_color: '#3490dc',
-                // start_date: moment(new Date()).format('HH:mm'),
-                // end_date: moment(new Date()).format('YYYY-MM-DD\\THH:mm'),
+                event_color: '#3490dc',
+                start_date: moment(new Date()).format('HH:mm'),
+                end_date: moment(new Date()).format('YYYY-MM-DD\\THH:mm'),
+                all_day: 'no',
             },
 
             selectedEvent: null,
-            eventTitle: '',
         }
     },
 
     mounted() {
         this.getEvents();
+
+        this.eventCreateModal = new Modal(this.$refs.eventCreateModal)
+        this.eventShowModal = new Modal(this.$refs.eventShowModal)
     },
 }
 </script>
