@@ -77,6 +77,19 @@
                 </form>
             </div>
         </div>
+
+        <div class="col">
+            <div class="bg-admin-dark p-4">
+                <div class="text-center pb-3">
+                    <img :src="'/storage/default.png'"
+                         class="w-50"
+                         :alt="fields.title + ' news post image'">
+                </div>
+                <h1 class="text-center">{{ fields.title }}</h1>
+                <p class="text-center"><em>{{ fields.shortstory }}</em></p>
+                <div v-html="fields.longstory"></div>
+            </div>
+        </div>
     </div>
 </template>
 
