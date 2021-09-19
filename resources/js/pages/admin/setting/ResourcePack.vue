@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-4 mb-2">
             <div class="p-4 bg-admin-dark">
                 <h3>Install new Resource Pack</h3>
 
@@ -26,7 +26,7 @@
                             <small v-for="error in this.errors.search" class="text-danger">{{ error }}<br></small>
                         </div>
 
-                        <div class="text-dark">
+                        <div class="form-text text-dark">
                             Visit the
                             <a href="https://github.com/melkypie/resource-packs/wiki/Resource-packs-hub"
                                class="link-light"
@@ -41,45 +41,43 @@
 
                 <h3>Downloaded Resource Packs</h3>
 
-                <div class="p-4 mb-4 bg-admin-info">
-                    <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
-                        <div v-for="resourcePack in resourcePacks">
-                            <div class="row">
-                                <div class="col-9">
-                                    <p>
-                                        <span>
-                                            {{ resourcePack.alias }}
-                                            <span class="badge bg-dark">
-                                                v.{{ resourcePack.version }}
-                                            </span>
-                                        </span>
-                                        <br>
-                                        <small class="text-dark">By {{ resourcePack.author }}</small>
-                                    </p>
-                                </div>
+                <div class="pt-3 px-4 mb-4 bg-admin-info" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <div v-for="resourcePack in resourcePacks" class="row">
+                        <div class="col">
+                            <p>
+                                <span>
+                                    {{ resourcePack.alias }}
+                                    <span class="badge bg-dark">
+                                        v.{{ resourcePack.version }}
+                                    </span>
+                                </span>
+                                <br>
+                                <small class="text-dark">By {{ resourcePack.author }}</small>
+                            </p>
+                        </div>
 
-                                <div class="col-3">
-                                    <div v-if="resourcePack.id !== currentResourcePack.id"
-                                         @click="switchResourcePack(resourcePack)"
-                                         class="btn btn-primary btn-block">
-                                        Use
-                                    </div>
-                                    <div v-else
-                                         @click="updateResourcePack(resourcePack)"
-                                         class="btn btn-success btn-block">
-                                        Update
-                                    </div>
-                                </div>
+                        <div class="col text-end">
+                            <div v-if="resourcePack.id !== currentResourcePack.id"
+                                 @click="switchResourcePack(resourcePack)"
+                                 class="btn btn-primary btn-block">
+                                Use
+                            </div>
+                            <div v-else
+                                 @click="updateResourcePack(resourcePack)"
+                                 class="btn btn-success btn-block">
+                                Update
                             </div>
                         </div>
+
+                        <hr>
                     </div>
                 </div>
 
                 <h3>Currently in use</h3>
 
-                <div class="p-4 mb-4 bg-admin-info">
-                    <div class="row mb-3">
-                        <div class="col-7">
+                <div class="p-4 bg-admin-info">
+                    <div class="row">
+                        <div class="col-12 col-md-7 mb-2 mb-md-0">
                             <img :src="'/storage/resource-pack/icon.png' + '?' + Math.random()"
                                  class="w-100"
                                  alt="Resource Pack icon"
@@ -95,10 +93,10 @@
                             </h5>
                             <small class="text-dark">By {{ currentResourcePack.author }}</small>
                             <br>
-                            <small class="text-dark">Last updated {{ currentResourcePack.updated_at }}</small>
+                            <small class="text-dark">Updated {{ currentResourcePack.updated_at }}</small>
 
                             <div @click="updateResourcePack(currentResourcePack)"
-                                 class="btn btn-success btn-block">
+                                 class="btn btn-success d-block">
                                 Update
                             </div>
                         </div>
@@ -108,7 +106,7 @@
         </div>
 
         <div class="col-12 col-md-8">
-            <div class="text-center h-100 w-100 border border-dark border-5">
+            <div class="h-100 w-100 border border-dark border-5 text-center">
                 <fieldset>
                     <iframe :src="'http://runemanager.test' + '?' + Math.random()"
                             title="Preview of RuneManager">

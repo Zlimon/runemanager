@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-12 col-md-5">
+        <div class="col-12 col-md-5 mb-2">
             <div class="bg-admin-dark p-4">
                 <h1>Update newspost</h1>
 

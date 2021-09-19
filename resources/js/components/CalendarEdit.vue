@@ -1,10 +1,8 @@
 <template>
     <div class="row">
         <div class="col-12 col-md-6 mb-2">
-            <div class="bg-admin-dark p-4">
-                <div class="p-4 bg-admin-info">
-                    <FullCalendar :options="calendarOptions"/>
-                </div>
+            <div class="p-2 p-md-4 bg-admin-dark">
+                <FullCalendar :options="calendarOptions"/>
             </div>
         </div>
 
@@ -20,9 +18,10 @@
                                 <label for="edit_mode" class="form-check-label">
                                     Edit mode
                                 </label>
-                                <p class="text-muted">
+                                <br>
+                                <small class="form-text text-dark">
                                     Allows dragging and resizing events in the calender. Also enables editing events.
-                                </p>
+                                </small>
                             </div>
                         </div>
                         <div class="col-6">
@@ -31,9 +30,10 @@
                                 <label for="broadcast_changes" class="form-check-label">
                                     Broadcast changes
                                 </label>
-                                <p class="text-muted">
+                                <br>
+                                <small class="form-text text-dark">
                                     This will broadcast changes in-game!
-                                </p>
+                                </small>
                             </div>
                         </div>
                     </div>
