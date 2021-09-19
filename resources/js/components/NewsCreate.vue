@@ -2,10 +2,6 @@
     <div class="row">
         <div class="col-12 col-md-5">
             <div class="bg-admin-dark p-4">
-                <div v-if="success" class="alert alert-success mt-3">
-                    Newspost posted!
-                </div>
-
                 <h1>Post news</h1>
 
                 <form @submit.prevent="submit" enctype="multipart/form-data">
@@ -16,6 +12,9 @@
                                    id="image"
                                    name="image"
                                    class="form-control">
+                            <div v-if="this.errors && this.errors.image !== undefined">
+                                <small v-for="error in this.errors.image" class="text-danger">{{ error }}<br></small>
+                            </div>
                         </div>
                     </div>
 
@@ -28,6 +27,9 @@
                                    name="title"
                                    class="form-control"
                                    required autofocus>
+                            <div v-if="this.errors && this.errors.title !== undefined">
+                                <small v-for="error in this.errors.title" class="text-danger">{{ error }}<br></small>
+                            </div>
                         </div>
                     </div>
 
@@ -42,6 +44,9 @@
                                     {{ category.category }}
                                 </option>
                             </select>
+                            <div v-if="this.errors && this.errors.news_category_id !== undefined">
+                                <small v-for="error in this.errors.news_category_id" class="text-danger">{{ error }}<br></small>
+                            </div>
                         </div>
                     </div>
 
@@ -54,6 +59,9 @@
                                    name="shortstory"
                                    class="form-control"
                                    required>
+                            <div v-if="this.errors && this.errors.shortstory !== undefined">
+                                <small v-for="error in this.errors.shortstory" class="text-danger">{{ error }}<br></small>
+                            </div>
                         </div>
                     </div>
 
@@ -71,8 +79,13 @@
                               class="form-control"
                               required></ckeditor>
 
-                    <div class="form-group row mb-0">
-                        <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">Post news</button>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div @click="storeNewsPost"
+                                 class="btn btn-success d-block">
+                                Post newspost
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -101,43 +114,52 @@ export default {
         categories: {required: true},
     },
 
+    methods: {
+        storeNewsPost() {
+            axios
+                .post('/api/admin/news/create/', this.fields)
+                .then((response) => {
+                    this.errors = null;
+                    this.toastSuccess('Successfully updated ' + response.data.title);
+                })
+                .catch(error => {
+                    console.error(error.response.data);
+
+                    this.errors = error.response.data.errors;
+                });
+        },
+
+        toastSuccess(successMessage) {
+            this.$swal.fire({
+                toast: true,
+                icon: 'success',
+                title: 'Success',
+                text: successMessage,
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
+        },
+    },
+
     data() {
         return {
             fields: {},
-            errors: {},
-            success: false,
-            loaded: true,
 
             editor: ClassicEditor,
             editorData: '<p>Content of the editor.</p>',
             editorConfig: {
                 // The configuration of the editor.
-            }
-        };
-    },
+            },
 
-    methods: {
-        submit() {
-            if (this.loaded) {
-                this.loaded = false;
-                this.success = false;
-                this.errors = {};
-                axios
-                    .post('/api/admin/news/create/', this.fields)
-                    .then((response) => {
-                        console.log(response.data); // TODO local notification
-                        this.fields = {};
-                        this.loaded = true;
-                        this.success = true;
-                    })
-                    .catch(error => {
-                        this.loaded = true;
-                        if (error.response.status === 422) {
-                            this.errors = error.response.data.errors || {};
-                        }
-                    });
-            }
-        },
+            errored: false,
+            errors: null,
+        };
     },
 }
 </script>
