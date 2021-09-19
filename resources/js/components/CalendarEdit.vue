@@ -62,6 +62,9 @@
                                        placeholder="Title"
                                        required>
                             </div>
+                            <div v-if="this.errors && this.errors.title !== undefined">
+                                <small v-for="error in this.errors.title" class="text-danger">{{ error }}<br></small>
+                            </div>
                         </div>
 
                         <div class="row mb-3">
@@ -72,6 +75,9 @@
                                        name="description"
                                        class="form-control"
                                        placeholder="Description (optional)">
+                            </div>
+                            <div v-if="this.errors && this.errors.description !== undefined">
+                                <small v-for="error in this.errors.description" class="text-danger">{{ error }}<br></small>
                             </div>
                         </div>
 
@@ -84,19 +90,22 @@
                                        class="form-control"
                                        placeholder="Icon ID (optional)"
                                        required>
-                                <div class="form-text">
-                                    <small>
-                                        Type in the ID of an in-game item you wish to display as the icon for this event.
-                                        <br>
-                                        Search icons
-                                        <a href="https://www.osrsbox.com/tools/item-search/"
-                                           class="link-primary"
-                                           target="_blank"
-                                           rel="noopener noreferrer">
-                                            here
-                                        </a>
-                                    </small>
-                                </div>
+                            </div>
+                            <div v-if="this.errors && this.errors.icon_id !== undefined">
+                                <small v-for="error in this.errors.icon_id" class="text-danger">{{ error }}<br></small>
+                            </div>
+                            <div class="form-text">
+                                <small>
+                                    Type in the ID of an in-game item you wish to display as the icon for this event.
+                                    <br>
+                                    Search icons
+                                    <a href="https://www.osrsbox.com/tools/item-search/"
+                                       class="link-primary"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        here
+                                    </a>
+                                </small>
                             </div>
                         </div>
 
@@ -109,6 +118,9 @@
                                        name="event_color"
                                        class="form-control form-control-color"
                                        title="Choose your color">
+                            </div>
+                            <div v-if="this.errors && this.errors.event_color !== undefined">
+                                <small v-for="error in this.errors.event_color" class="text-danger">{{ error }}<br></small>
                             </div>
                         </div>
 
@@ -127,6 +139,9 @@
                                     </small>
                                 </div>
                             </div>
+                            <div v-if="this.errors && this.errors.start_date !== undefined">
+                                <small v-for="error in this.errors.start_date" class="text-danger">{{ error }}<br></small>
+                            </div>
                         </div>
 
                         <div v-if="fields && fields.all_day === 'no'" class="row mb-3">
@@ -137,6 +152,9 @@
                                        id="end_date"
                                        name="end_date"
                                        class="form-control">
+                            </div>
+                            <div v-if="this.errors && this.errors.end_date !== undefined">
+                                <small v-for="error in this.errors.end_date" class="text-danger">{{ error }}<br></small>
                             </div>
                         </div>
 
@@ -234,6 +252,7 @@ export default {
             axios
                 .get('/api/calendar/' + arg.event.id + '/show')
                 .then((response) => {
+                    this.errors = null;
                     this.selectedEvent = response.data;
 
                     if (this.selectedEvent) {
@@ -274,10 +293,14 @@ export default {
             axios
                 .get('/api/calendar')
                 .then((response) => {
+                    this.errors = null;
                     this.calendarOptions.events = response.data;
                 })
                 .catch(error => {
-                    console.error(error)
+                    console.error(error.response.data);
+
+                    this.toastError(error.response.data.message);
+                    this.errors = error.response.data.errors;
                 })
                 .finally(() => this.loading = false)
         },
@@ -302,6 +325,7 @@ export default {
             axios
                 .post('/api/admin/calendar/create', payload)
                 .then(() => {
+                    this.errors = null;
                     this.getEvents();
                     this.eventCreateModal.hide()
                     this.toastSuccess();
@@ -309,7 +333,9 @@ export default {
                 })
                 .catch(error => {
                     console.error(error.response.data);
-                    this.toastError();
+
+                    this.toastError(error.response.data.message);
+                    this.errors = error.response.data.errors;
                 });
         },
 
@@ -317,12 +343,15 @@ export default {
             axios
                 .post('/api/admin/calendar/' + eventId + '/schedule', payload)
                 .then(() => {
+                    this.errors = null;
                     this.getEvents();
                     this.toastSuccess();
                 })
                 .catch(error => {
                     console.error(error.response.data);
-                    this.toastError();
+
+                    this.toastError(error.response.data.message);
+                    this.errors = error.response.data.errors;
                 });
         },
 
@@ -332,6 +361,7 @@ export default {
                     _method: 'delete',
                 })
                 .then(() => {
+                    this.errors = null;
                     this.getEvents();
                     this.eventShowModal.hide()
                     this.selectedEvent = null;
@@ -339,7 +369,9 @@ export default {
                 })
                 .catch(error => {
                     console.error(error.response.data);
-                    this.toastError();
+
+                    this.toastError(error.response.data.message);
+                    this.errors = error.response.data.errors;
                 });
         },
 
@@ -359,11 +391,12 @@ export default {
             })
         },
 
-        toastError() {
+        toastError(errorMessage) {
             this.$swal.fire({
                 toast: true,
                 icon: 'error',
                 title: 'Error',
+                text: errorMessage,
                 position: 'top-right',
                 iconColor: 'white',
                 customClass: {
@@ -401,6 +434,9 @@ export default {
             },
 
             selectedEvent: null,
+
+            errored: false,
+            errors: null,
         }
     },
 
