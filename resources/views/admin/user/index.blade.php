@@ -14,26 +14,21 @@
     </div>
 
     <form method="POST" action="{{ route('admin-search-user') }}"
-          class="row d-flex justify-content-center align-items-center">
+          class="row d-flex justify-content-center mb-3">
         @csrf
 
-        <div class="col-md-8">
-            <div class="search">
-                <i class="fa fa-search"></i>
-                <input type="text"
-                       id="search"
-                       name="search"
-                       class="form-control @error('search') is-invalid @enderror"
-                       placeholder="{{ $users->random()->name }}"
-                       autofocus required>
-                <button class="btn btn-primary">Search</button>
+        <div class="col-6 col-md-4">
+            <div class="row">
+                <div class="input-group">
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           class="form-control @error('search') is-invalid @enderror"
+                           placeholder="{{ $users->random()->name }}"
+                           autofocus required>
+                    <button class="btn btn-primary">Search</button>
+                </div>
             </div>
-
-            @error('search')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
         </div>
     </form>
 
@@ -93,36 +88,3 @@
         @endforeach
     </table>
 @endsection
-
-<style>
-    .search {
-        position: relative;
-        box-shadow: 0 0 40px rgba(51, 51, 51, .1);
-    }
-
-    .search input {
-        height: 60px;
-        text-indent: 25px;
-        border: 2px solid #d6d4d4;
-    }
-
-    .search input:focus {
-        box-shadow: none;
-        border: 2px solid blue;
-    }
-
-    .search .fa-search {
-        position: absolute;
-        top: 20px;
-        left: 16px;
-        color: black;
-    }
-
-    .search button {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        height: 50px;
-        width: 110px;
-    }
-</style>
