@@ -212,10 +212,10 @@
                                         <span class="fw-bold">{{ selectedEvent.end_date !== null ? 'Ends:' : '' }}</span>
                                     </div>
                                     <div class="col">
-                                        <span>{{ selectedEvent.start_date | moment('ddd. Do MMMM HH:mm') }}</span>
+                                        <span>{{ selectedEvent.start_date | moment('ddd. Do MMM HH:mm') }}</span>
                                         <br>
-                                        <span v-if="selectedEvent.end_date !== null">{{ selectedEvent.end_date | moment('ddd. Do MMMM HH:mm') }}</span>
-                                        <span v-else class="fst-italic">(all day event)</span>
+                                        <span v-if="selectedEvent.end_date !== null">{{ selectedEvent.end_date | moment('ddd. Do MMM HH:mm') }}</span>
+                                        <span v-else class="fst-italic">(all-day event)</span>
                                     </div>
                                 </div>
 
