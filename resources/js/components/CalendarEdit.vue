@@ -158,7 +158,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="row">
                             <div class="col-sm-9">
                                 <div class="form-check">
                                     <input v-model="fields.all_day"
@@ -192,7 +192,10 @@
                 <div class="modal-content bg-admin-dark">
                     <div class="modal-header">
                         <h5 v-if="selectedEvent && selectedEvent.title !== null" class="modal-title">{{ selectedEvent.title }}</h5>
-                        <button type="button" class="btn-close" @click="eventShowModal.hide()" aria-label="Close"></button>
+                        <button @click="eventShowModal.hide()"
+                                type="button"
+                                class="btn-close">
+                        </button>
                     </div>
                     <div v-if="selectedEvent" class="modal-body">
                         <div class="row">
@@ -224,9 +227,151 @@
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <div @click="showEventChangeModal"
+                             class="btn btn-primary">
+                            Edit event
+                        </div>
                         <div @click="deleteEvent(selectedEvent.id)"
                              class="btn btn-danger">
                             Delete event
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" ref="eventEditModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-admin-dark">
+                    <div class="modal-header">
+                        <h5 v-if="selectedEvent && selectedEvent.title !== null" class="modal-title">Edit event '{{ selectedEvent.title }}'</h5>
+                        <button @click="eventEditModal.hide()"
+                                type="button"
+                                class="btn-close">
+                        </button>
+                    </div>
+                    <div v-if="selectedEvent" class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input v-model="selectedEvent.title"
+                                       type="text"
+                                       id="title"
+                                       name="title"
+                                       class="form-control"
+                                       placeholder="Title"
+                                       required>
+                            </div>
+                            <div v-if="this.errors && this.errors.title !== undefined">
+                                <small v-for="error in this.errors.title" class="text-danger">{{ error }}<br></small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input v-model="selectedEvent.description"
+                                       type="text"
+                                       id="description"
+                                       name="description"
+                                       class="form-control"
+                                       placeholder="Description (optional)">
+                            </div>
+                            <div v-if="this.errors && this.errors.description !== undefined">
+                                <small v-for="error in this.errors.description" class="text-danger">{{ error }}<br></small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input v-model="selectedEvent.icon_id"
+                                       type="number"
+                                       id="icon_id"
+                                       name="icon_id"
+                                       class="form-control"
+                                       placeholder="Icon ID (optional)"
+                                       required>
+                            </div>
+                            <div v-if="this.errors && this.errors.icon_id !== undefined">
+                                <small v-for="error in this.errors.icon_id" class="text-danger">{{ error }}<br></small>
+                            </div>
+                            <div class="form-text">
+                                <small>
+                                    Type in the ID of an in-game item you wish to display as the icon for this event.
+                                    <br>
+                                    Search icons
+                                    <a href="https://www.osrsbox.com/tools/item-search/"
+                                       class="link-primary"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        here
+                                    </a>
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="event_color" class="col-sm-3 col-form-label">Event color</label>
+                            <div class="col-sm-9">
+                                <input v-model="selectedEvent.event_color"
+                                       type="color"
+                                       id="event_color"
+                                       name="event_color"
+                                       class="form-control form-control-color"
+                                       title="Choose your color">
+                            </div>
+                            <div v-if="this.errors && this.errors.event_color !== undefined">
+                                <small v-for="error in this.errors.event_color" class="text-danger">{{ error }}<br></small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="event_color" class="col-sm-3 col-form-label">Start date</label>
+                            <div class="col-sm-9">
+                                <input v-model="selectedEvent.start_date"
+                                       type="datetime-local"
+                                       id="start_date"
+                                       name="start_date"
+                                       class="form-control">
+                            </div>
+                            <div v-if="this.errors && this.errors.start_date !== undefined">
+                                <small v-for="error in this.errors.start_date" class="text-danger">{{ error }}<br></small>
+                            </div>
+                        </div>
+
+                        <div v-if="selectedEvent && selectedEvent.all_day === 'no'" class="row mb-3">
+                            <label for="event_color" class="col-sm-3 col-form-label">End date</label>
+                            <div class="col-sm-9">
+                                <input v-model="selectedEvent.end_date"
+                                       type="datetime-local"
+                                       id="end_date"
+                                       name="end_date"
+                                       class="form-control">
+                            </div>
+                            <div v-if="this.errors && this.errors.end_date !== undefined">
+                                <small v-for="error in this.errors.end_date" class="text-danger">{{ error }}<br></small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <div class="form-check">
+                                    <input v-model="selectedEvent.all_day"
+                                           type="checkbox"
+                                           id="all_day"
+                                           name="all_day"
+                                           class="form-check-input"
+                                           true-value="yes"
+                                           false-value="no">
+                                    <label for="all_day" class="form-check-label">
+                                        All-day event?
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div @click="updateEvent()"
+                             class="btn btn-success">
+                            Update event
                         </div>
                     </div>
                 </div>
@@ -350,6 +495,49 @@ export default {
                 .catch(error => {
                     console.error(error.response.data);
 
+                    this.getEvents();
+
+                    this.toastError(error.response.data.message);
+                    this.errors = error.response.data.errors;
+                });
+        },
+
+        showEventChangeModal() {
+            this.eventShowModal.hide()
+
+            this.selectedEvent.start_date = moment(this.selectedEvent.start_date, 'YYYY-MM-DD\\THH:mm').format('YYYY-MM-DD\\THH:mm');
+
+            if (this.selectedEvent.end_date === null) {
+                this.selectedEvent.all_day = 'yes';
+            } else {
+                this.selectedEvent.end_date = moment(this.selectedEvent.end_date, 'YYYY-MM-DD\\THH:mm').format('YYYY-MM-DD\\THH:mm');
+                this.selectedEvent.all_day = 'no';
+            }
+
+            this.eventEditModal.show()
+        },
+
+        updateEvent() {
+            let payload = {
+                'title': this.selectedEvent.title,
+                'description': this.selectedEvent.description,
+                'start_date': this.selectedEvent.start_date,
+                'end_date': this.selectedEvent.all_day === 'yes' ? null : this.selectedEvent.end_date,
+                'icon_id': this.selectedEvent.icon_id,
+                'event_color': this.selectedEvent.event_color,
+            }
+
+            axios
+                .post('/api/admin/calendar/' +  this.selectedEvent.id + '/update', payload)
+                .then(() => {
+                    this.errors = null;
+                    this.getEvents();
+                    this.eventCreateModal.hide()
+                    this.toastSuccess();
+                })
+                .catch(error => {
+                    console.error(error.response.data);
+
                     this.toastError(error.response.data.message);
                     this.errors = error.response.data.errors;
                 });
@@ -413,6 +601,7 @@ export default {
         return {
             eventCreateModal: null,
             eventShowModal: null,
+            eventEditModal: null,
 
             calendarOptions: {
                 plugins: [dayGridPlugin, interactionPlugin],
@@ -445,6 +634,7 @@ export default {
 
         this.eventCreateModal = new Modal(this.$refs.eventCreateModal)
         this.eventShowModal = new Modal(this.$refs.eventShowModal)
+        this.eventEditModal = new Modal(this.$refs.eventEditModal)
     },
 }
 </script>

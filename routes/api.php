@@ -115,6 +115,7 @@ Route::middleware('auth:api')->group(function() {
         Route::patch('/news/{newsPost}/edit', 'Admin\Api\NewsController@update')->name('admin-update-newspost');
 
         Route::post('/calendar/create', 'Admin\Api\CalendarController@store');
+        Route::post('/calendar/{calendar}/update', 'Admin\Api\CalendarController@update');
         Route::patch('/calendar/{calendar}/schedule', 'Admin\Api\CalendarController@updateSchedule');
         Route::delete('/calendar/{calendar}/destroy', 'Admin\Api\CalendarController@destroy');
 
