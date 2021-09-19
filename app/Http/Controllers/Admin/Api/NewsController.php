@@ -9,39 +9,41 @@ use App\Rules\ValidateUser;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class NewsController extends Controller
 {
 	public function store(Request $request) {
         $this->validate($request, [
-            'title' => ['required', 'string', 'min:1', 'max:50'],
-            'shortstory' => ['required', 'string', 'min:1', 'max:200'],
-            'longstory' => ['required', 'string', 'min:1', 'max:50000']
+            'news_category_id' => ['required', 'integer', 'exists:news_categories,id'],
+            'title' => ['required', 'string', 'max:50'],
+            'shortstory' => ['required', 'string', 'max:200'],
+            'longstory' => ['required', 'string', 'max:50000']
             ]
         );
 
+        // TODO put in validator (needs proper file upload in Vue)
         $imageId = Helper::imageUpload($request->file('image')); // Return 1 / default image if empty
 
 		if (!$imageId) {
 		    return response()->json(['errors' => ['image' => ['The image must be a file of type: jpeg, bmp, png, gif!']]], 422);
         }
 
-        NewsPost::create([
+        $newsPost = NewsPost::create([
             'user_id' => Auth::id(),
-            'news_category_id' => (request('news_category_id') ? request('news_category_id') : 1),
-            'image_id' => $imageId,
-            'title' => request('title'),
-            'shortstory' => request('shortstory'),
-            'longstory' => request('longstory'),
+            'news_category_id' => $request->news_category_id,
+            'image_id' => 1, // TODO file upload
+            'title' => $request->title,
+            'shortstory' => $request->shortstory,
+            'longstory' => base64_encode($request->longstory),
         ]);
 
-        return response()->json('Newspost "'.request('title').'" posted!', 200);
+        return response($newsPost, 202);
 	}
 
 	public function update(NewsPost $newsPost, Request $request) {
         $this->validate($request, [
             'user_id' => ['required', new ValidateUser()],
+            'news_category_id' => ['required', 'integer', 'exists:news_categories,id'],
             'title' => ['required', 'string', 'max:50'],
             'shortstory' => ['required', 'string', 'max:200'],
             'longstory' => ['required', 'string', 'max:50000']
