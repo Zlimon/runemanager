@@ -127,16 +127,16 @@
                         <div class="row mb-3">
                             <label for="event_color" class="col-sm-3 col-form-label">Start date</label>
                             <div class="col-sm-9">
-                                <input v-model="fields.start_time"
-                                       type="time"
-                                       id="start_time"
-                                       name="start_time"
-                                       class="form-control"
-                                       required>
-                                <div class="form-text">
-                                    <small>
-                                        {{ this.fields.start_date | moment("DD.MM.YYYY") }}
-                                    </small>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        {{ this.fields.start_date | moment("ddd. Do MMM") }}
+                                    </span>
+                                    <input v-model="fields.start_time"
+                                           type="time"
+                                           id="start_time"
+                                           name="start_time"
+                                           class="form-control"
+                                           required>
                                 </div>
                             </div>
                             <div v-if="this.errors && this.errors.start_date !== undefined">
