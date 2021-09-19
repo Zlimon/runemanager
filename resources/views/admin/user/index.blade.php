@@ -40,7 +40,6 @@
                     <th>User ID</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th class="d-none d-md-table-cell">Private</th>
                     <th>Linked OSRS account</th>
                     <th class="d-none d-md-table-cell">Registered</th>
                     <th></th>
@@ -52,35 +51,34 @@
                     <tr>
                         <th scope="row">{{ $user->id }}</th>
                         <td>
-                            <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
-                                 class="pixel d-none d-md-table-cell"
-                                 alt="Profile icon"
-                                 width="54">
-                            {{ $user->name }}
+                            <div class="d-flex align-items-center">
+                                <div class="d-none d-md-table-cell">
+                                    <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $user->icon_id }}.png"
+                                         class="pixel"
+                                         alt="Profile icon"
+                                         width="35">
+                                </div>
+                                <span>{{ $user->name }}</span>
+                                @if ($user->private === 1)
+                                    <img src="/storage/resource-pack/bank/placeholders_lock.png"
+                                         class="pixel"
+                                         alt="Padlock icon"
+                                         title="User is private"
+                                         width="20">
+                                @endif
+                            </div>
                         </td>
                         <td>{{ $user->email }}</td>
-                        <td class="d-none d-md-table-cell">{{ ($user->private === 0 ? 'No' : 'Yes') }}</td>
                         <td>
                             @foreach ($user->account as $account)
-                                @if (count($user->account) > 1)
-                                    <p style="margin: 0;">
-                                        @if ($account->account_type !== "normal")
-                                            <img src="{{ asset('images/'.$account->account_type.'.png') }}"
-                                                 alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon">
-                                        @endif
-                                        <a href="{{ route('admin-show-account', $account->id) }}">
-                                            {{ $account->id }} - {{ $account->username }}
-                                        </a>
-                                    </p>
-                                @else
+                                <a href="{{ route('admin-show-account', $account->username) }}" class="link-primary">
                                     @if ($account->account_type !== "normal")
                                         <img src="{{ asset('images/'.$account->account_type.'.png') }}"
                                              alt="{{ Helper::formatAccountTypeName($account->account_type) }} icon">
                                     @endif
-                                    <a href="{{ route('admin-show-account', $account->id) }}">
-                                        {{ $account->id }} - {{ $account->username }}
-                                    </a>
-                                @endif
+                                    <span>{{ $account->id }} - {{ $account->username }}</span>
+                                </a>
+                                <br>
                             @endforeach
                         </td>
                         <td class="d-none d-md-table-cell">{{ \Carbon\Carbon::parse($user->created_at)->format('d. M Y H:i') }}</td>

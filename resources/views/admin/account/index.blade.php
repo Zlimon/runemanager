@@ -70,12 +70,23 @@
                         <td class="d-none d-md-table-cell">{{ number_format($account->xp) }}</td>
                         <td>
                             @if ($account->user_id)
-                                <a href="{{ route('admin-show-user', $account->user_id) }}">
-                                    <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
-                                         class="pixel d-none d-md-table-cell"
-                                         alt="Profile icon"
-                                         width="54">
-                                    {{ $account->user_id }} - {{ $account->user->name }}
+                                <a href="{{ route('admin-show-user', $account->user_id) }}" class="link-primary">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-none d-md-table-cell">
+                                            <img src="https://www.osrsbox.com/osrsbox-db/items-icons/{{ $account->user->icon_id }}.png"
+                                                 class="pixel"
+                                                 alt="Profile icon"
+                                                 width="35">
+                                        </div>
+                                        <span>{{ $account->user_id }} - {{ $account->user->name }}</span>
+                                        @if ($account->user->private === 1)
+                                            <img src="/storage/resource-pack/bank/placeholders_lock.png"
+                                                 class="pixel"
+                                                 alt="Padlock icon"
+                                                 title="User is private"
+                                                 width="20">
+                                        @endif
+                                    </div>
                                 </a>
                             @endif
                         </td>
