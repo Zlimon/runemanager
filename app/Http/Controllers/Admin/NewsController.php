@@ -18,6 +18,8 @@ class NewsController extends Controller
 	}
 
 	public function show(NewsPost $newsPost) {
+	    $newsPost->longstory = base64_decode($newsPost->longstory);
+
 		return view('admin.news.show', compact('newsPost'));
 	}
 
@@ -28,9 +30,12 @@ class NewsController extends Controller
 	}
 
 	public function edit(NewsPost $newsPost) {
+	    $users = User::all();
 		$newsCategories = NewsCategory::get();
 
-		return view('admin.news.edit', compact('newsPost', 'newsCategories'));
+		$newsPost->longstory = base64_decode($newsPost->longstory);
+
+		return view('admin.news.edit', compact('users','newsCategories', 'newsPost'));
 	}
 
 	public function destroy(NewsPost $newsPost) {
