@@ -87,12 +87,9 @@
                         </div>
                     </div>
 
-                    <div v-if="errors && errors.longstory" class="text-danger">
-                        <span class="invalid-feedback d-block" role="alert">
-                            <strong>{{ errors.longstory[0] }}</strong>
-                        </span>
+                    <div v-if="this.errors && this.errors.longstory !== undefined">
+                        <small v-for="error in this.errors.longstory" class="text-danger">{{ error }}<br></small>
                     </div>
-
                     <ckeditor v-model="newsPost.longstory"
                               :editor="editor"
                               :config="editorConfig"
