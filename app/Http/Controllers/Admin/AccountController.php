@@ -20,22 +20,6 @@ class AccountController extends Controller
         return view('admin.account.index', compact('accounts', 'query'));
     }
 
-    public function search() {
-        request()->validate([
-            'search' => ['required', 'string', 'min:1', 'max:13'],
-        ]);
-
-        $query = request('search');
-
-        $accounts = Account::with('user')->where('username', 'LIKE', '%' . $query . '%')->get();
-
-        if (count($accounts) === 0) {
-            return redirect(route('admin-account'))->withErrors(['No search results for "'.$query.'"!']);
-        } else {
-            return view('admin.account.index', compact('accounts', 'query'));
-        }
-    }
-
     public function show(Account $account) {
         $account = $account::with('user')->where('id', $account->id)->first();
 

@@ -23,7 +23,7 @@ Route::middleware('auth')->group(function() {
 		Route::patch('/user/{user}/edit', 'Admin\UserController@update')->name('admin-update-user');
 		/*==========Member Controller=============*/
 		Route::get('/account', 'Admin\AccountController@index')->name('admin-account');
-		Route::post('/account', 'Admin\AccountController@search')->name('admin-search-account');
+
 		Route::get('/account/create', 'Admin\AccountController@create')->name('admin-create-account');
 		Route::post('/account/create', 'Admin\AccountController@store')->name('admin-store-account');
 		Route::get('/account/{account}/show', 'Admin\AccountController@show')->name('admin-show-account');
