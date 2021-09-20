@@ -112,12 +112,15 @@ export default {
 
                         this.errors = error.response.data.errors;
                     });
+            } else {
+                this.loadedUsers = this.preLoadedUsers;
             }
         },
     },
 
     data() {
         return {
+            preLoadedUsers: this.users,
             loadedUsers: this.users,
 
             fields: {
