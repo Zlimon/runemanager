@@ -60,6 +60,7 @@ Vue.component('groupbank', require('./components/group/GroupBank').default);
 // Pages
 // PRE CLEANUP TEMPORARILY PLACEMENT
 Vue.component('PageAdminUserIndex', require('./pages/admin/user/Index').default);
+Vue.component('PageAdminAccountIndex', require('./pages/admin/account/Index').default);
 // PRE CLEANUP TEMPORARILY PLACEMENT
 
 Vue.component('PageGroupShow', require('./pages/group/Show').default);
