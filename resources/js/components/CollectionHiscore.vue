@@ -97,7 +97,7 @@
                                                     <img :alt="item + ' item icon'"
                                                          :src="'/images/' + category + '/' + meta.slug + '/' + item + '.png'"
                                                          :title="item.replaceAll('_', ' ') | capitalize"
-                                                         class="pixel hiscore-icon faded">
+                                                         class="pixel hiscore-icon opacity-25">
                                                 </div>
                                             </div>
                                         </div>

@@ -1,82 +1,62 @@
 <template>
     <div class="row">
-        <div class="col-12 col-md-4">
-            <h1>Resource Packs</h1>
+        <div class="col-12 col-md-4 mb-2">
+            <div class="p-4 bg-admin-dark">
+                <h3>Install new Resource Pack</h3>
 
-            <div class="form-row align-items-center">
-                <div class="col my-1">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">pack-</div>
+                <div class="p-4 mb-4 bg-admin-info">
+                    <div class="row">
+                        <div class="input-group">
+                            <span class="input-group-text">pack-</span>
+                            <input
+                                v-model="fields.search"
+                                v-bind:class="{ 'is-invalid' : this.errors && this.errors.search !== undefined }"
+                                type="text"
+                                id="search"
+                                name="search"
+                                class="form-control"
+                                placeholder=""
+                                required>
+                            <button @click="searchResourcePack" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
-                        <input
-                            v-model="fields.search"
-                            type="text"
-                            class="form-control"
-                            v-bind:class="{ 'is-invalid' : this.errors && this.errors.search !== undefined }"
-                            id="search"
-                            name="search"
-                            placeholder="Type the file name of the resource pack"
-                            autofocus required>
+
+                        <div v-if="this.errors && this.errors.search !== undefined">
+                            <small v-for="error in this.errors.search" class="text-danger">{{ error }}<br></small>
+                        </div>
+
+                        <div class="form-text text-dark">
+                            Visit the
+                            <a href="https://github.com/melkypie/resource-packs/wiki/Resource-packs-hub"
+                               class="link-light"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                Resource packs hub
+                            </a>
+                            to browse through available resource packs!
+                        </div>
                     </div>
                 </div>
-                <div class="col-auto my-1">
-                    <div @click="searchResourcePack" class="btn btn-primary"><i class="fas fa-search"></i></div>
-                </div>
-            </div>
 
-            <div v-if="this.errors && this.errors.search !== undefined">
-                <small v-for="error in this.errors.search" class="text-danger">{{ error }}<br></small>
-            </div>
-            <small class="form-text text-muted">
-                Visit the
-                <a href="https://github.com/melkypie/resource-packs/wiki/Resource-packs-hub"
-                   target="_blank"
-                   rel="noopener noreferrer">
-                    Resource packs hub
-                </a>
-                to browse through available resource packs!
-            </small>
+                <h3>Downloaded Resource Packs</h3>
 
-            <b-modal ref="event" hide-footer title="test">
-                <pre>{{ artisanResponse }}</pre>
-
-                <div v-if="artisanStatus === 0"
-                     @click="switchResourcePack(downloadedResourcePack)"
-                     class="btn btn-primary">
-                    Switch to {{ downloadedResourcePack.alias }}
-                </div>
-                <div v-else-if="artisanStatus === 1"
-                     @click="switchResourcePack(downloadedResourcePack)"
-                     class="btn btn-primary">
-                    Switch to {{ downloadedResourcePack.alias }}
-                </div>
-                <div v-else-if="artisanStatus === 3"
-                     @click="searchResourcePack"
-                     class="btn btn-primary">
-                    Try again
-                </div>
-            </b-modal>
-
-            <hr>
-
-            <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
-                <div v-for="resourcePack in resourcePacks">
-                    <div class="row">
-                        <div class="col-9">
+                <div class="pt-3 px-4 mb-4 bg-admin-info" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <div v-for="resourcePack in resourcePacks" class="row">
+                        <div class="col">
                             <p>
                                 <span>
                                     {{ resourcePack.alias }}
-                                    <span class="badge badge-secondary">
+                                    <span class="badge bg-dark">
                                         v.{{ resourcePack.version }}
                                     </span>
                                 </span>
                                 <br>
-                                <small class="text-muted">By {{ resourcePack.author }}</small>
+                                <small class="text-dark">By {{ resourcePack.author }}</small>
                             </p>
                         </div>
 
-                        <div class="col-3">
+                        <div class="col text-end">
                             <div v-if="resourcePack.id !== currentResourcePack.id"
                                  @click="switchResourcePack(resourcePack)"
                                  class="btn btn-primary btn-block">
@@ -88,43 +68,45 @@
                                 Update
                             </div>
                         </div>
+
+                        <hr>
                     </div>
                 </div>
-            </div>
 
-            <hr>
+                <h3>Currently in use</h3>
 
-            <h2>Currently in use</h2>
+                <div class="p-4 bg-admin-info">
+                    <div class="row">
+                        <div class="col-12 col-md-7 mb-2 mb-md-0">
+                            <img :src="'/storage/resource-pack/icon.png' + '?' + Math.random()"
+                                 class="w-100"
+                                 alt="Resource Pack icon"
+                                 :title="currentResourcePack.alias + ' by ' + currentResourcePack.author">
+                        </div>
 
-            <div class="row mb-3">
-                <div class="col-7">
-                    <img :src="'/storage/resource-pack/icon.png' + '?' + Math.random()"
-                         class="w-100"
-                         alt="Resource Pack icon"
-                         :title="currentResourcePack.alias + ' by ' + currentResourcePack.author">
-                </div>
+                        <div class="col">
+                            <h5>
+                                {{ currentResourcePack.alias }}
+                                <span class="badge bg-dark">
+                                    v.{{ currentResourcePack.version }}
+                                </span>
+                            </h5>
+                            <small class="text-dark">By {{ currentResourcePack.author }}</small>
+                            <br>
+                            <small class="text-dark">Updated {{ currentResourcePack.updated_at }}</small>
 
-                <div class="col">
-                    <h5>
-                        {{ currentResourcePack.alias }}
-                        <span class="badge badge-secondary">
-                            v.{{ currentResourcePack.version }}
-                        </span>
-                    </h5>
-                    <small class="text-muted">By {{ currentResourcePack.author }}</small>
-                    <br>
-                    <small class="text-muted">Last updated {{ currentResourcePack.updated_at }}</small>
-
-                    <div @click="updateResourcePack(currentResourcePack)"
-                         class="btn btn-success btn-block">
-                        Update
+                            <div @click="updateResourcePack(currentResourcePack)"
+                                 class="btn btn-success d-block">
+                                Update
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-12 col-md-8">
-            <div class="text-center h-100 w-100">
+            <div class="h-100 w-100 border border-dark border-5 text-center">
                 <fieldset>
                     <iframe :src="'http://runemanager.test' + '?' + Math.random()"
                             title="Preview of RuneManager">
@@ -132,10 +114,43 @@
                 </fieldset>
             </div>
         </div>
+
+        <div class="modal fade" ref="responseModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-admin-dark">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modal title</h5>
+                        <button type="button" class="btn-close" @click="modal.hide()" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <pre>{{ artisanResponse }}</pre>
+                    </div>
+                    <div class="modal-footer">
+                        <div v-if="artisanStatus === 0"
+                             @click="switchResourcePack(downloadedResourcePack)"
+                             class="btn btn-primary">
+                            Switch to {{ downloadedResourcePack.alias }}
+                        </div>
+                        <div v-else-if="artisanStatus === 1"
+                             @click="switchResourcePack(downloadedResourcePack)"
+                             class="btn btn-primary">
+                            Switch to {{ downloadedResourcePack.alias }}
+                        </div>
+                        <div v-else-if="artisanStatus === 3"
+                             @click="searchResourcePack"
+                             class="btn btn-primary">
+                            Try again
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
+import {Modal} from 'bootstrap'
+
 export default {
     name: "ResourcePack",
 
@@ -155,7 +170,7 @@ export default {
                     this.artisanStatus = response.data.status;
                     this.artisanResponse = response.data.message;
                     this.downloadedResourcePack = response.data.resourcePack;
-                    this.showModal();
+                    this.modal.show();
                 })
                 .catch(error => {
                     console.error(error.response.data);
@@ -165,7 +180,7 @@ export default {
         },
 
         switchResourcePack(resourcePack) {
-            this.$refs['event'].hide();
+            this.modal.hide();
 
             axios
                 .post('/api/admin/settings/resource-pack/' + resourcePack.id + '/switch', {
@@ -208,10 +223,6 @@ export default {
                 });
         },
 
-        showModal() {
-            this.$refs['event'].show()
-        },
-
         toastSuccess(successMessage) {
             this.$swal.fire({
                 toast: true,
@@ -249,6 +260,8 @@ export default {
 
     data() {
         return {
+            modal: null,
+
             resourcePacks: this.resourcePacksProp,
             currentResourcePack: this.currentResourcePackProp,
 
@@ -264,6 +277,10 @@ export default {
             errors: null,
         }
     },
+
+    mounted() {
+        this.modal = new Modal(this.$refs.responseModal)
+    },
 }
 </script>
 
@@ -277,6 +294,6 @@ fieldset {
 
 iframe {
     width: 100%;
-    height: 750px;
+    height: 100%;
 }
 </style>

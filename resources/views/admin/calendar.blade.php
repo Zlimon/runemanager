@@ -4,14 +4,20 @@
     TITLE
 @endsection
 
+@section('active-calendar')
+    active
+@endsection
+
 @section('content')
     @section('navigation')
-        <form method="POST" action="{{ route('admin-calendar-truncate') }}">
-            @method('DELETE')
-            @csrf
+        <div class="p-2">
+            <form method="POST" action="{{ route('admin-calendar-truncate') }}">
+                @method('DELETE')
+                @csrf
 
-            <button type="submit" class="btn btn-danger">Delete all events</button>
-        </form>
+                <button type="submit" class="btn btn-danger">Delete all events</button>
+            </form>
+        </div>
     @endsection
 
     <calendaredit></calendaredit>

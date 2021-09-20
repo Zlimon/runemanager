@@ -4,8 +4,10 @@
     TITLE
 @endsection
 
-@section('content')
-    <h1>{{ __('title.create-newspost') }}</h1>
+@section('active-news')
+    active
+@endsection
 
+@section('content')
     <newscreate :categories="{{ $newsCategories }}"></newscreate>
 @endsection
