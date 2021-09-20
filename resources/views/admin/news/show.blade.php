@@ -10,12 +10,18 @@
 
 @section('content')
     @section('navigation')
-        <form method="POST" action="{{ route('admin-delete-newspost', $newsPost) }}" class="p-2">
-            @method('DELETE')
-            @csrf
+        <div class="p-2">
+            <a class="btn btn-primary" href="{{ route('admin-edit-newspost', $newsPost->id) }}">Edit</a>
+        </div>
 
-            <button type="submit" class="btn btn-danger">Delete newspost</button>
-        </form>
+        <div class="p-2">
+            <form method="POST" action="{{ route('admin-delete-newspost', $newsPost) }}">
+                @method('DELETE')
+                @csrf
+
+                <button type="submit" class="btn btn-danger">Delete newspost</button>
+            </form>
+        </div>
     @endsection
 
     <div class="row">
