@@ -282,13 +282,20 @@
 
                         <div class="row mb-3">
                             <div class="col">
-                                <input v-model="selectedEvent.icon_id"
-                                       type="number"
-                                       id="icon_id"
-                                       name="icon_id"
-                                       class="form-control"
-                                       placeholder="Icon ID (optional)"
-                                       required>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <img :src="'https://www.osrsbox.com/osrsbox-db/items-icons/' + selectedEvent.icon_id + '.png'"
+                                             class="pixel"
+                                             alt="Event icon">
+                                    </span>
+                                    <input v-model="selectedEvent.icon_id"
+                                           type="number"
+                                           id="icon_id"
+                                           name="icon_id"
+                                           class="form-control"
+                                           placeholder="Icon ID (optional)"
+                                           required>
+                                </div>
                             </div>
                             <div v-if="this.errors && this.errors.icon_id !== undefined">
                                 <small v-for="error in this.errors.icon_id" class="text-danger">{{ error }}<br></small>
