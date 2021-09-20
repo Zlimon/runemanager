@@ -17,7 +17,7 @@ Route::middleware('auth')->group(function() {
 		//Route::resource('/admin/news', 'AdminNewsController');
 		/*==========User Controller=============*/
 		Route::get('/user', 'Admin\UserController@index')->name('admin-user');
-		Route::post('/user', 'Admin\UserController@search')->name('admin-search-user');
+
 		Route::get('/user/{user}/show', 'Admin\UserController@show')->name('admin-show-user');
 		Route::get('/user/{user}/edit', 'Admin\UserController@edit')->name('admin-edit-user');
 		Route::patch('/user/{user}/edit', 'Admin\UserController@update')->name('admin-update-user');

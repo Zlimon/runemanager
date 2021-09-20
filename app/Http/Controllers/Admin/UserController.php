@@ -19,22 +19,6 @@ class UserController extends Controller
         return view('admin.user.index', compact('users', 'query'));
     }
 
-    public function search() {
-        request()->validate([
-            'search' => ['required', 'string', 'min:1', 'max:13'],
-        ]);
-
-        $query = request('search');
-
-        $users = User::with('account')->where('name', 'LIKE', '%' . $query . '%')->get();
-
-        if (!sizeof($users)) {
-            return redirect(route('admin-user'))->withErrors(['No search results for "'.$query.'"!']);
-        }
-
-        return view('admin.user.index', compact('users', 'query'));
-    }
-
     public function show(User $user) {
         // TODO probably better ways to do this
         foreach ($user->account as $account) {
