@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function() {
 
 		Route::get('/user/{user}/show', 'Admin\UserController@show')->name('admin-show-user');
 		Route::get('/user/{user}/edit', 'Admin\UserController@edit')->name('admin-edit-user');
-		Route::patch('/user/{user}/edit', 'Admin\UserController@update')->name('admin-update-user');
+
 		/*==========Member Controller=============*/
 		Route::get('/account', 'Admin\AccountController@index')->name('admin-account');
 

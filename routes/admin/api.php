@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->group(function() {
     Route::prefix('/admin')->group(function() {
         Route::post('/user/search', 'Admin\Api\UserController@search')->name('admin-user-search');
+        Route::put('/user/{user}/update', 'Admin\Api\UserController@update')->name('admin-user-update');
+
         Route::post('/account/search', 'Admin\Api\AccountController@search')->name('admin-account-search');
 
         Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-store-newspost');
