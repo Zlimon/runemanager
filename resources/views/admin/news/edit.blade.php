@@ -21,6 +21,7 @@
 
                 <button type="submit" class="btn btn-danger">Delete newspost</button>
             </form>
+        </div>
     @endsection
 
     <page-admin-news-edit :users="{{ $users }}" :news-post="{{ $newsPost }}" :categories="{{ $newsCategories }}"></page-admin-news-edit>

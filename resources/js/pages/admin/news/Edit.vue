@@ -190,7 +190,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .ck-editor__editable {
     min-height: 500px;
     color: black;
