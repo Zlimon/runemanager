@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function() {
 		Route::get('/account/create', 'Admin\AccountController@create')->name('admin-create-account');
 		Route::post('/account/create', 'Admin\AccountController@store')->name('admin-store-account');
 		Route::get('/account/{account}/show', 'Admin\AccountController@show')->name('admin-show-account');
-		Route::patch('/account/{account}/show', 'Admin\AccountController@update')->name('admin-update-account');
+
 		/*==========Calendar Controller=============*/
 		Route::get('/calendar', 'Admin\CalendarController@index')->name('admin-calendar');
 		Route::delete('/calendar/truncate', 'Admin\CalendarController@truncate')->name('admin-calendar-truncate');

@@ -94,18 +94,4 @@ class AccountController extends Controller
 
         return redirect(route('admin-show-account', $account))->with('message', 'Old School RuneScape account "'.request('account').'" registered to user "'.$user->name.'"!');
     }
-
-    public function update(Account $account, Request $request) {
-        $newOwner = User::whereName(request('user'))->orWhere('id', request('user'))->first();
-
-        if (!$newOwner) {
-            return redirect(route('admin-show-account', $account))->withErrors(['This user does not exist!']);
-        }
-
-        $account->update([
-            'user_id' => $newOwner->id
-        ]);
-
-        return redirect(route('admin-show-account', $account))->with('message', 'Account ownership transferred to "'.$newOwner->name.'"!');
-    }
 }

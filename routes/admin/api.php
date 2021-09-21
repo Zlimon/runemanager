@@ -8,6 +8,7 @@ Route::middleware('auth:api')->group(function() {
         Route::put('/user/{user}/update', 'Admin\Api\UserController@update')->name('admin-user-update');
 
         Route::post('/account/search', 'Admin\Api\AccountController@search')->name('admin-account-search');
+        Route::put('/account/{account}/update', 'Admin\Api\AccountController@update')->name('admin-update-account');
 
         Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-store-newspost');
         Route::put('/news/{newsPost}/update', 'Admin\Api\NewsController@update')->name('admin-update-newspost');

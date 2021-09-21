@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Api;
 
 use App\Account;
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Http\Request;
 
 class AccountController extends Controller
@@ -68,9 +69,19 @@ class AccountController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Account $account)
     {
-        //
+        $user = User::whereName($request->user)->orWhere('id', $request->user)->first();
+
+        if (!$user) {
+            return response($account, 422);
+        }
+
+        $account->user_id = $request->user;
+
+        $account->save();
+
+        return response($account, 202);
     }
 
     /**
