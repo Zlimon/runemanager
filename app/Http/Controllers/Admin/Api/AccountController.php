@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Account;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -37,7 +40,68 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'account_username' => ['required', 'string', 'max:13'],
+            'user_name' => ['max:255'],
+        ]);
+
+        if (Account::where('username', $request->account_username)->first()) {
+            return response(['errors' => ['account_username' => ['This account has already been registered.']]], 422);
+        }
+
+        if (!$request->user_name && Auth::check()) {
+            $user = Auth::id();
+        } elseif ($request->user_name) {
+            $user = User::whereName($request->user_name)->orWhere('id', $request->user_name)->pluck('id')->first();
+
+            if (!$user) {
+                return response(['errors' => ['user_name' => ['This user could not be found.']]], 422);
+            }
+        } else {
+            return response(['errors' => ['user_name' => ['This user could not be found.']]], 422);
+        }
+
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $request->account_username
+            );
+
+        /* Get the $playerDataUrl file content. */
+        $playerData = Helper::getPlayerData($playerDataUrl);
+
+        if (!$playerData) {
+            return response(['errors' => ['account_username' => ['Could not fetch player data from hiscores.']]], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $account = new Account();
+
+            $account->user_id = $user;
+            $account->account_type = 'normal';
+            $account->username = $request->account_username;
+            $account->rank = $playerData[0][0];
+            $account->level = $playerData[0][1];
+            $account->xp = $playerData[0][2];
+
+            $account->save();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        try {
+            Helper::createOrUpdateAccountHiscores($account, $playerData);
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        DB::commit();
+
+        return response($account, 202);
     }
 
     /**
@@ -109,7 +173,7 @@ class AccountController extends Controller
             'search' => ['required', 'max:13'],
         ]);
 
-        $accounts = Account::with('user')->where('username', 'LIKE', '%' . $request->search . '%')->get();
+        $accounts = Account::with('user')->where('user_name', 'LIKE', '%' . $request->search . '%')->get();
 
         return response($accounts, 200);
     }

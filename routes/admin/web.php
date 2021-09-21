@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function() {
 		Route::get('/account', 'Admin\AccountController@index')->name('admin-account');
 
 		Route::get('/account/create', 'Admin\AccountController@create')->name('admin-create-account');
-		Route::post('/account/create', 'Admin\AccountController@store')->name('admin-store-account');
+		
 		Route::get('/account/{account}/show', 'Admin\AccountController@show')->name('admin-show-account');
 
 		/*==========Calendar Controller=============*/
