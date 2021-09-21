@@ -8,34 +8,37 @@
 
                 <div class="p-4 bg-admin-info">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Old School RuneScape username</label>
-                        <input v-model="fields.username"
+                        <label for="account_username" class="form-label">Old School RuneScape username</label>
+                        <input v-model="fields.account_username"
                                v-bind:class="{ 'is-invalid' : this.errors && this.errors.name !== undefined }"
                                type="text"
-                               id="username"
-                               name="username"
+                               id="account_username"
+                               name="account_username"
                                class="form-control"
                                required>
-                        <div v-if="this.errors && this.errors.username !== undefined">
-                            <small v-for="error in this.errors.username" class="text-danger">{{ error }}<br></small>
+                        <div v-if="this.errors && this.errors.account_username !== undefined">
+                            <small v-for="error in this.errors.account_username" class="text-danger">{{ error }}<br></small>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="name" class="form-label">RuneManager username or ID</label>
-                        <input v-model="fields.name"
+                        <label for="user_name" class="form-label">RuneManager username or ID</label>
+                        <input v-model="fields.user_name"
                                v-bind:class="{ 'is-invalid' : this.errors && this.errors.name !== undefined }"
                                type="text"
-                               id="name"
-                               name="name"
+                               id="user_name"
+                               name="user_name"
                                class="form-control"
                                required>
-                        <div v-if="this.errors && this.errors.name !== undefined">
-                            <small v-for="error in this.errors.name" class="text-danger">{{ error }}<br></small>
+                        <div v-if="this.errors && this.errors.user_name !== undefined">
+                            <small v-for="error in this.errors.user_name" class="text-danger">{{ error }}<br></small>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Register</button>
+                    <div @click="createAccount"
+                         class="btn btn-primary d-block">
+                        Reserve
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,7 +52,7 @@ export default {
     methods: {
         createAccount() {
             axios
-                .put('/api/admin/user/' + this.user.id + '/update', this.fields)
+                .post('/api/admin/account/store', this.fields)
                 .then((response) => {
                     this.errors = null;
                 })
