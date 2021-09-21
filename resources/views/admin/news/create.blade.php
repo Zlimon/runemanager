@@ -9,5 +9,5 @@
 @endsection
 
 @section('content')
-    <newscreate :categories="{{ $newsCategories }}"></newscreate>
+    <page-admin-news-create :categories="{{ $newsCategories }}"></page-admin-news-create>
 @endsection

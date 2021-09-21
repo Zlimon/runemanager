@@ -67,6 +67,7 @@ Vue.component('PageAdminAccountCreate', require('./pages/admin/account/Create').
 Vue.component('PageAdminAccountShow', require('./pages/admin/account/Show').default);
 
 Vue.component('PageAdminNewsIndex', require('./pages/admin/news/Index').default);
+Vue.component('PageAdminNewsCreate', require('./pages/admin/news/Create').default);
 Vue.component('PageAdminNewsShow', require('./pages/admin/news/Show').default);
 Vue.component('PageAdminNewsEdit', require('./pages/admin/news/Edit').default);
 // PRE CLEANUP TEMPORARILY PLACEMENT
