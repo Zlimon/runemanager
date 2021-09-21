@@ -129,6 +129,8 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 export default {
+    name: "PageAdminNewsEdit",
+
     props: {
         users: {required: true},
         newsPost: {required: true},
@@ -178,7 +180,6 @@ export default {
                 // The configuration of the editor.
             },
 
-            errored: false,
             errors: null,
         };
     },

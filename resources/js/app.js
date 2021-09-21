@@ -49,7 +49,6 @@ Vue.component('bank', require('./components/account/Bank.vue').default);
 Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
 
 Vue.component('newscreate', require('./components/NewsCreate.vue').default);
-Vue.component('newsupdate', require('./components/NewsUpdate.vue').default);
 
 Vue.component('calendar', require('./components/Calendar.vue').default);
 Vue.component('calendaredit', require('./components/CalendarEdit.vue').default);
@@ -69,6 +68,7 @@ Vue.component('PageAdminAccountShow', require('./pages/admin/account/Show').defa
 
 Vue.component('PageAdminNewsIndex', require('./pages/admin/news/Index').default);
 Vue.component('PageAdminNewsShow', require('./pages/admin/news/Show').default);
+Vue.component('PageAdminNewsEdit', require('./pages/admin/news/Edit').default);
 // PRE CLEANUP TEMPORARILY PLACEMENT
 
 Vue.component('PageGroupShow', require('./pages/group/Show').default);

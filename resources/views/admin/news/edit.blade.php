@@ -23,5 +23,5 @@
             </form>
     @endsection
 
-    <newsupdate :users="{{ $users }}" :news-post="{{ $newsPost }}" :categories="{{ $newsCategories }}"></newsupdate>
+    <page-admin-news-edit :users="{{ $users }}" :news-post="{{ $newsPost }}" :categories="{{ $newsCategories }}"></page-admin-news-edit>
 @endsection
