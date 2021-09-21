@@ -63,6 +63,7 @@ Vue.component('PageAdminUserIndex', require('./pages/admin/user/Index').default)
 Vue.component('PageAdminUserShow', require('./pages/admin/user/Show').default);
 Vue.component('PageAdminUserEdit', require('./pages/admin/user/Edit').default);
 Vue.component('PageAdminAccountIndex', require('./pages/admin/account/Index').default);
+Vue.component('PageAdminAccountShow', require('./pages/admin/account/Show').default);
 // PRE CLEANUP TEMPORARILY PLACEMENT
 
 Vue.component('PageGroupShow', require('./pages/group/Show').default);
