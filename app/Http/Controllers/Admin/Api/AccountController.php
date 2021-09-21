@@ -71,17 +71,21 @@ class AccountController extends Controller
      */
     public function update(Request $request, Account $account)
     {
-        $user = User::whereName($request->user)->orWhere('id', $request->user)->first();
+        $this->validate($request, [
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $user = User::whereName($request->name)->orWhere('id', $request->name)->pluck('id')->first();
 
         if (!$user) {
-            return response($account, 422);
+            return response(['errors' => ['name' => ['This user could not be found.']]], 422);
         }
 
-        $account->user_id = $request->user;
+        $account->user_id = $user;
 
         $account->save();
 
-        return response($account, 202);
+        return response($account->user, 202);
     }
 
     /**
