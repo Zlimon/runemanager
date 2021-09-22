@@ -191,9 +191,11 @@ export default {
                 .post('/api/admin/calendar/create', payload)
                 .then(() => {
                     this.errors = null;
-                    this.closeCreateModal();
+
+                    this.closeCreateModal(true);
                     this.eventCreateModal.hide()
                     this.toastSuccess();
+
                     this.loadedFields = {};
                 })
                 .catch(error => {
@@ -204,8 +206,8 @@ export default {
                 });
         },
 
-        closeCreateModal() {
-            this.$emit('close')
+        closeCreateModal(updateEvents = false) {
+            this.$emit('close', updateEvents)
         },
 
         toastSuccess() {
