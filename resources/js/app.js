@@ -99,6 +99,44 @@ Vue.component(
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+Vue.mixin({
+    methods: {
+        doSuccess(successMessage) {
+            this.$swal.fire({
+                toast: true,
+                icon: 'success',
+                title: 'Success',
+                text: successMessage,
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
+        },
+
+        doError(errorMessage) {
+            this.$swal.fire({
+                toast: true,
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
+        },
+    }
+})
+
 const app = new Vue({
     el: '#app',
 });
