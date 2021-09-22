@@ -61,6 +61,7 @@
 
 <script>
 import {Modal} from 'bootstrap'
+
 import AdminCalendarEdit from "./Edit";
 
 var moment = require('moment');
