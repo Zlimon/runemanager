@@ -20,5 +20,5 @@
         </div>
     @endsection
 
-    <calendaredit></calendaredit>
+    <page-admin-calendar></page-admin-calendar>
 @endsection

@@ -393,9 +393,12 @@ import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
+require('moment');
 var moment = require('moment');
 
 export default {
+    name: "PageAdminCalendar",
+
     components: {FullCalendar},
 
     methods: {
@@ -646,7 +649,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 a.fc-event {
     -webkit-transition: 0s;
     transition: 0s;
