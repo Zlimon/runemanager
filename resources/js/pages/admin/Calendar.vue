@@ -105,7 +105,7 @@ export default {
                 'end_date': (arg.event.endStr ? moment(arg.event.endStr).format('YYYY-MM-DD HH:mm:ss') : null),
             }
 
-            this.scheduleEvent(arg.event.id, payload);
+            this.scheduleEvent(arg.event, payload);
         },
 
         getEvents() {
@@ -125,14 +125,14 @@ export default {
                 .finally(() => this.loading = false)
         },
 
-        scheduleEvent(eventId, payload) {
+        scheduleEvent(event, payload) {
             axios
-                .post('/api/admin/calendar/' + eventId + '/schedule', payload)
+                .post('/api/admin/calendar/' + event.id + '/schedule', payload)
                 .then(() => {
                     this.errors = null;
 
                     this.getEvents();
-                    this.toastSuccess();
+                    this.doSuccess('Successfully rescheduled event "' + event.title + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);
@@ -152,22 +152,6 @@ export default {
         closeShowModal(updateEvents) {
             if (updateEvents === true) this.getEvents();
             this.showShowModal = false;
-        },
-
-        toastSuccess() {
-            this.$swal.fire({
-                toast: true,
-                icon: 'success',
-                title: 'Success',
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
 
         toastError(errorMessage) {

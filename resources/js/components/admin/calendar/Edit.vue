@@ -178,7 +178,7 @@ export default {
 
                     this.closeEditModal(true);
                     this.eventEditModal.hide()
-                    this.toastSuccess();
+                    this.doSuccess('Successfully updated event "' + this.loadedEvent.title + '".');
 
                     this.loadedEvent = {};
                 })
@@ -192,22 +192,6 @@ export default {
 
         closeEditModal(updateEvents = false) {
             this.$emit('close', updateEvents)
-        },
-
-        toastSuccess() {
-            this.$swal.fire({
-                toast: true,
-                icon: 'success',
-                title: 'Success',
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
 
         toastError(errorMessage) {

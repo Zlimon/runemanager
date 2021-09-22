@@ -194,7 +194,7 @@ export default {
 
                     this.closeCreateModal(true);
                     this.eventCreateModal.hide()
-                    this.toastSuccess();
+                    this.doSuccess('Successfully created event "' + this.loadedFields.title + '".');
 
                     this.loadedFields = {};
                 })
@@ -208,22 +208,6 @@ export default {
 
         closeCreateModal(updateEvents = false) {
             this.$emit('close', updateEvents)
-        },
-
-        toastSuccess() {
-            this.$swal.fire({
-                toast: true,
-                icon: 'success',
-                title: 'Success',
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
 
         toastError(errorMessage) {

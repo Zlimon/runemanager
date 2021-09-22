@@ -44,7 +44,7 @@
                                  class="btn btn-primary">
                                 Edit event
                             </div>
-                            <div @click="deleteEvent(event.id)"
+                            <div @click="deleteEvent(event)"
                                  class="btn btn-danger">
                                 Delete event
                             </div>
@@ -76,9 +76,9 @@ export default {
     },
 
     methods: {
-        deleteEvent(eventId) {
+        deleteEvent(event) {
             axios
-                .post('/api/admin/calendar/' + eventId + '/destroy', {
+                .post('/api/admin/calendar/' + event.id + '/destroy', {
                     _method: 'delete',
                 })
                 .then(() => {
@@ -86,8 +86,7 @@ export default {
 
                     this.fetchEvents = true;
                     this.eventShowModal.hide()
-                    this.selectedEvent = null;
-                    this.toastSuccess();
+                    this.doSuccess('Successfully deleted event "' + event.title + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);

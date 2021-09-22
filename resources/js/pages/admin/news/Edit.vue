@@ -143,30 +143,14 @@ export default {
                 .put('/api/admin/news/' + this.newsPost.id + '/update', this.fields)
                 .then((response) => {
                     this.errors = null;
-                    this.toastSuccess('Successfully updated ' + response.data.title);
+
+                    this.doSuccess('Successfully updated newspost "' + this.newsPost.title + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);
 
                     this.errors = error.response.data.errors;
                 });
-        },
-
-        toastSuccess(successMessage) {
-            this.$swal.fire({
-                toast: true,
-                icon: 'success',
-                title: 'Success',
-                text: successMessage,
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
     },
 

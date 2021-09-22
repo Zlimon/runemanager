@@ -192,7 +192,7 @@ export default {
                     this.artisanResponse = response.data.message;
                     this.currentResourcePack = response.data.resourcePack;
 
-                    this.toastSuccess('Successfully switched to ' + this.currentResourcePack.alias);
+                    this.doSuccess('Successfully switched to ' + this.currentResourcePack.alias);
                 })
                 .catch(error => {
                     console.error(error.response.data);
@@ -213,7 +213,7 @@ export default {
                     this.artisanResponse = response.data.message;
                     this.currentResourcePack = response.data.resourcePack;
 
-                    this.toastSuccess('Successfully updated ' + this.currentResourcePack.alias);
+                    this.doSuccess('Successfully updated resource pack "' + this.currentResourcePack.alias + "'.");
                 })
                 .catch(error => {
                     console.error(error.response.data);
@@ -221,23 +221,6 @@ export default {
                     this.toastError(error.response.data.errors.message);
                     this.errors = error.response.data.errors;
                 });
-        },
-
-        toastSuccess(successMessage) {
-            this.$swal.fire({
-                toast: true,
-                icon: 'success',
-                title: 'Success',
-                text: successMessage,
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
 
         toastError(errorMessage) {
