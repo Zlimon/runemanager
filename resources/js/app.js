@@ -71,10 +71,11 @@ Vue.component('PageAdminNewsShow', require('./pages/admin/news/Show').default);
 Vue.component('PageAdminNewsEdit', require('./pages/admin/news/Edit').default);
 
 Vue.component('PageAdminCalendar', require('./pages/admin/Calendar').default);
+
+Vue.component('PageAdminSettingResourcePack', require('./pages/admin/setting/ResourcePack').default);
 // PRE CLEANUP TEMPORARILY PLACEMENT
 
 Vue.component('PageGroupShow', require('./pages/group/Show').default);
-Vue.component('PageAdminSettingResourcePack', require('./pages/admin/setting/ResourcePack').default);
 Vue.component('PageAccountCompare', require('./pages/account/AccountCompare').default);
 
 Vue.component(
