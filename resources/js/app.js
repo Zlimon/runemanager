@@ -118,19 +118,40 @@ Vue.mixin({
             })
         },
 
-        doError(errorMessage) {
+        doError(errorMessage, errors = 'An unknown error occurred.') {
+            let errorList = document.createElement('ul');
+
+            if (typeof errors === 'object') {
+                // Create a readable list of the errors
+                for (const error in errors) {
+                    let li = document.createElement('li');
+                    errorList.appendChild(li);
+
+                    li.innerHTML += errors[error];
+                }
+
+                errorList = errorList.innerHTML;
+            } else {
+                // If errors is not a object, it's either the default error or a string
+                errorList = errors
+            }
+
             this.$swal.fire({
                 toast: true,
                 icon: 'error',
                 title: 'Error',
                 text: errorMessage,
+                html: `
+                    <p><b>${errorMessage}</b></p>
+                    ${errorList}
+                `,
                 position: 'top-right',
                 iconColor: 'white',
                 customClass: {
                     popup: 'colored-toast'
                 },
                 showConfirmButton: false,
-                timer: 3000,
+                // timer: 3000,
                 timerProgressBar: true
             })
         },

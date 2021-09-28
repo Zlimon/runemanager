@@ -119,8 +119,8 @@ export default {
                 .catch(error => {
                     console.error(error.response.data);
 
-                    this.toastError(error.response.data.message);
                     this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 })
                 .finally(() => this.loading = false)
         },
@@ -139,8 +139,8 @@ export default {
 
                     this.getEvents();
 
-                    this.toastError(error.response.data.message);
                     this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
         },
 
@@ -152,23 +152,6 @@ export default {
         closeShowModal(updateEvents) {
             if (updateEvents === true) this.getEvents();
             this.showShowModal = false;
-        },
-
-        toastError(errorMessage) {
-            this.$swal.fire({
-                toast: true,
-                icon: 'error',
-                title: 'Error',
-                text: errorMessage,
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
     },
 
