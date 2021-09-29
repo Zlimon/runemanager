@@ -173,7 +173,7 @@ class AccountController extends Controller
             'search' => ['required', 'max:13'],
         ]);
 
-        $accounts = Account::with('user')->where('user_name', 'LIKE', '%' . $request->search . '%')->get();
+        $accounts = Account::with('user')->where('username', 'LIKE', '%' . $request->search . '%')->get();
 
         return response($accounts, 200);
     }
