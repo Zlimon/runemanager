@@ -13,6 +13,7 @@ Route::middleware('auth:api')->group(function() {
 
         Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-newspost-store');
         Route::put('/news/{newsPost}/update', 'Admin\Api\NewsController@update')->name('admin-newspost-update');
+        Route::delete('/news/{newsPost}/destroy', 'Admin\Api\NewsController@destroy')->name('admin-newspost-destroy');
 
         Route::post('/calendar/create', 'Admin\Api\CalendarController@store')->name('admin-calendar');
         Route::post('/calendar/{calendar}/update', 'Admin\Api\CalendarController@update')->name('admin-calendar-update');

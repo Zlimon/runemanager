@@ -38,12 +38,6 @@ class NewsController extends Controller
 		return view('admin.news.edit', compact('users','newsCategories', 'newsPost'));
 	}
 
-	public function destroy(NewsPost $newsPost) {
-		$newsPost->delete();
-
-		return redirect(route('admin-newspost'))->with('message', 'Newspost deleted!');
-	}
-
 	public function createCategory(Request $request) {
         $this->validate($request, [
             'category' => ['required', 'string'],

@@ -18,7 +18,6 @@ Route::middleware('auth')->group(function() {
 		Route::get('/news/create', 'Admin\NewsController@create')->name('admin-newspost-create');
 		Route::get('/news/{newsPost}/show', 'Admin\NewsController@show')->name('admin-newspost-show');
 		Route::get('/news/{newsPost}/edit', 'Admin\NewsController@edit')->name('admin-newspost-edit');
-		Route::delete('/news/{newsPost}/destroy', 'Admin\NewsController@destroy')->name('admin-newspost-destroy');
 
 		Route::post('/news/category/create', 'Admin\NewsController@createCategory')->name('admin-newspost-category-create');
 

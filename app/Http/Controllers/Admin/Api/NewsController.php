@@ -72,4 +72,17 @@ class NewsController extends Controller
 
         return response($newsPost, 202);
 	}
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  NewsPost $newsPost
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(NewsPost $newsPost)
+    {
+        $newsPost->delete();
+
+        return response('', 202);
+    }
 }

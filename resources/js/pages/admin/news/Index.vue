@@ -43,7 +43,7 @@
                 </thead>
 
                 <tbody>
-                    <tr v-for="news in newsPosts">
+                    <tr v-for="(news, index) in loadedNewsPosts">
                         <th scope="row">{{ news.id }}</th>
                         <td>{{ news.title }}</td>
                         <td class="d-none d-md-table-cell">{{ news.shortstory }}</td>
@@ -54,7 +54,10 @@
                             <div class="d-flex justify-content-between">
                                 <a :href="'/admin/news/' + news.id + '/show'" class="btn btn-success">Show</a>
                                 <a :href="'/admin/news/' + news.id + '/edit'" class="btn btn-primary">Edit</a>
-                                <a :href="'/admin/news/' + news.id + '/destroy'" class="btn btn-danger">Delete</a>
+                                <div @click="deleteNewsPost(news, index)"
+                                     class="btn btn-danger">
+                                    Delete
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -72,6 +75,33 @@ export default {
 
     props: {
         newsPosts: {required: true},
+    },
+
+    methods: {
+        deleteNewsPost(newsPost, index) {
+            axios
+                .post('/api/admin/news/' + newsPost.id + '/destroy', {
+                    _method: 'delete',
+                })
+                .then(() => {
+                    this.errors = null;
+
+                    this.newsPosts.splice(index, 1);
+
+                    this.doSuccess('Successfully deleted newspost "' + newsPost.title + '".');
+                })
+                .catch(error => {
+                    console.error(error.response.data);
+
+                    this.errors = error.response.data.errors;
+                });
+        },
+    },
+
+    data() {
+        return {
+            loadedNewsPosts: this.newsPosts,
+        };
     },
 }
 </script>
