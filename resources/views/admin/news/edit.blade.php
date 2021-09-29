@@ -11,11 +11,11 @@
 @section('content')
     @section('navigation')
         <div class="p-2">
-            <a class="btn btn-success" href="{{ route('admin-show-newspost', $newsPost->id) }}">Show</a>
+            <a class="btn btn-success" href="{{ route('admin-newspost-show', $newsPost->id) }}">Show</a>
         </div>
 
         <div class="p-2">
-            <form method="POST" action="{{ route('admin-delete-newspost', $newsPost) }}">
+            <form method="POST" action="{{ route('admin-newspost-destroy', $newsPost) }}">
                 @method('DELETE')
                 @csrf
 

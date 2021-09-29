@@ -11,7 +11,7 @@
 @section('content')
     @section('navigation')
         <div class="p-2">
-            <a class="btn btn-primary" href="{{ route('admin-edit-user', $user->id) }}">Edit</a>
+            <a class="btn btn-primary" href="{{ route('admin-user-edit', $user->id) }}">Edit</a>
         </div>
 
         <div class="p-2">

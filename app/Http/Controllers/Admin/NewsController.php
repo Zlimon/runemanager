@@ -41,7 +41,7 @@ class NewsController extends Controller
 	public function destroy(NewsPost $newsPost) {
 		$newsPost->delete();
 
-		return redirect(route('admin-news'))->with('message', 'Newspost deleted!');
+		return redirect(route('admin-newspost'))->with('message', 'Newspost deleted!');
 	}
 
 	public function createCategory(Request $request) {
@@ -56,6 +56,6 @@ class NewsController extends Controller
 
         $newsCategory->save();
 
-		return redirect(route('admin-news'))->with('message', 'Created news category!');
+		return redirect(route('admin-newspost'))->with('message', 'Created news category!');
 	}
 }

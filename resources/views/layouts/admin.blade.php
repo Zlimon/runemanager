@@ -45,10 +45,10 @@
                     </a>
                     <ul class="collapse list-unstyled" id="news">
                         <li>
-                            <a href="{{ route('admin-news') }}">All news</a>
+                            <a href="{{ route('admin-newspost') }}">All news</a>
                         </li>
                         <li>
-                            <a href="{{ route('admin-create-newspost') }}">Post news</a>
+                            <a href="{{ route('admin-newspost-create') }}">Post news</a>
                         </li>
                     </ul>
                 </li>

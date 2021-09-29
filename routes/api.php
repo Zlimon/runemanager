@@ -2,26 +2,14 @@
 
 use App\Account;
 use App\Collection;
-use App\Http\Controllers\Api\HiscoreController;
+use App\Skill;
 use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountCollectionResource;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\AccountSkillResource;
 use App\Http\Resources\CollectionResource;
 use App\Http\Resources\SkillResource;
-use App\Skill;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
 Route::prefix('/user')->group(function() {
 	Route::post('/register', 'Api\UserController@register')->name('user-register');
@@ -88,7 +76,6 @@ Route::prefix('/hiscore')->group(function() {
     Route::get('/skill/total', 'Api\HiscoreController@total')->name('hiscore-total-show');
 	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
 	Route::get('/collection/{collection}', 'Api\HiscoreController@collection')->name('hiscore-boss-show');
-
 });
 
 Route::prefix('/collection')->group(function() {
