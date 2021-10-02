@@ -123,7 +123,7 @@
                         <button type="button" class="btn-close" @click="modal.hide()" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <pre>{{ artisanResponse }}</pre>
+                        <pre class="p-1" style="background-color: black; margin: 0;">{{ artisanResponse }}</pre>
                     </div>
                     <div class="modal-footer">
                         <div v-if="artisanStatus === 0"
@@ -161,6 +161,8 @@ export default {
 
     methods: {
         searchResourcePack() {
+            this.doPending('Searching for Resource Pack "' + this.fields.search + '"...');
+
             axios
                 .post('/api/admin/settings/resource-pack', this.fields)
                 .then(response => {
@@ -181,6 +183,8 @@ export default {
 
         switchResourcePack(resourcePack) {
             this.modal.hide();
+
+            this.doPending('Switching to Resource Pack  "' + resourcePack.alias + '".');
 
             axios
                 .post('/api/admin/settings/resource-pack/' + resourcePack.id + '/switch', {
@@ -203,6 +207,8 @@ export default {
         },
 
         updateResourcePack(resourcePack) {
+            this.doPending('Updating Resource Pack  "' + resourcePack.alias + '".');
+
             axios
                 .post('/api/admin/settings/resource-pack/' + resourcePack.id + '/update', {
                     _method: 'patch',

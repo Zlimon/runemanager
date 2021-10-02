@@ -161,13 +161,16 @@ export default {
         updateUser() {
             axios
                 .put('/api/admin/user/' + this.user.id + '/update', this.fields)
-                .then((response) => {
+                .then(() => {
                     this.errors = null;
+
+                    this.doSuccess('Successfully updated user "' + this.user.name + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);
 
                     this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
         },
     },

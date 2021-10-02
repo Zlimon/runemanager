@@ -26,7 +26,7 @@
                     <div class="col-sm-9">
                         <div class="input-group">
                             <input v-model="fields.search"
-                                   v-bind:class="{ 'is-invalid' : this.errors && this.errors.search !== undefined }"
+                                   v-bind:class="{ 'is-invalid' : this.errors && this.errors.name !== undefined }"
                                    @input="searchUser"
                                    @change="searchUser"
                                    type="text"
@@ -36,9 +36,9 @@
                                    list="users"
                                    required>
                             <div @click="transferAccountOwnership" class="btn btn-primary">Transfer</div>
-                            <div v-if="this.errors && this.errors.search !== undefined">
-                                <small v-for="error in this.errors.search" class="text-danger">{{ error }}<br></small>
-                            </div>
+                        </div>
+                        <div v-if="this.errors && this.errors.name !== undefined">
+                            <small v-for="error in this.errors.name" class="text-danger">{{ error }}<br></small>
                         </div>
                         <datalist id="users">
                             <option v-for="user in users" :value="user.name">
@@ -87,11 +87,14 @@ export default {
                     this.errors = null;
 
                     this.loadedAccount.user.name = response.data.name;
+
+                    this.doSuccess('Successfully transferred account "' + this.account.username + '" to user "' + this.fields.name + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);
 
                     this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
         },
     },
