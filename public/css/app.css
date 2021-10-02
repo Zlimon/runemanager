@@ -11325,6 +11325,74 @@ textarea.form-control-lg {
     transform: translate3d(4px, 0, 0);
   }
 }
+.pixel {
+  -ms-interpolation-mode: nearest-neighbor;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: pixelated;
+}
+
+.button-rectangle {
+  width: 15rem;
+  height: 5rem;
+}
+
+.button-rectangle-small {
+  width: 6rem;
+  height: 3rem;
+}
+
+.button-square {
+  width: 6.5rem;
+  height: 6.5rem;
+}
+
+.button-with-icon {
+  width: 12.5rem;
+  height: 5rem;
+}
+
+.button-small {
+  width: 70px;
+  height: 30px;
+  padding: 2px;
+  margin: 2px;
+}
+
+.icon {
+  width: 72px;
+  height: 64px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.icon-small {
+  width: 36px;
+  height: 32px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.broadcast-icon {
+  width: 60px;
+  height: 60px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.hiscore-icon {
+  width: 40px;
+  height: 40px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.hiscore-icon-small {
+  width: 25px;
+  height: 25px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
 .bg-admin-primary {
   background-color: #34424D;
 }
@@ -11335,4 +11403,8 @@ textarea.form-control-lg {
 
 .bg-admin-info {
   background-color: #6d7fcc;
+}
+
+.bg-admin-dark {
+  background-color: #212529;
 }

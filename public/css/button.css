@@ -77,30 +77,3 @@
     background: url('/storage/resource-pack/button/bottom_line_mode_window_close_hovered.png') no-repeat;
     background-position: center center;
 }
-
-.button-rectangle {
-    width: 15rem;
-    height: 5rem;
-}
-
-.button-rectangle-small {
-    width: 6rem;
-    height: 3rem;
-}
-
-.button-square {
-    width: 6.5rem;
-    height: 6.5rem;
-}
-
-.button-with-icon {
-    width: 12.5rem;
-    height: 5rem;
-}
-
-.button-small {
-    width: 66px;
-    height: 30px;
-    padding: 2px;
-    margin: 2px;
-}

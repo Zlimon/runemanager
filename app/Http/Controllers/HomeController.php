@@ -30,6 +30,7 @@ class HomeController extends Controller
         $accounts = [];
 
         // TODO probably better ways to do this
+        $account = [];
         foreach ($user->account as $account) {
             $accounts[] = $account::with('user')->where('id', $account->id)->first();
         }

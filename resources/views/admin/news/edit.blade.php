@@ -4,26 +4,25 @@
     TITLE
 @endsection
 
-@section('content')
-@section('navigation')
-    <form method="POST" action="{{ route('admin-delete-newspost', $newsPost) }}">
-        @method('DELETE')
-        @csrf
-
-        <button type="submit" class="btn btn-danger">Delete newspost</button>
-    </form>
+@section('active-news')
+    active
 @endsection
 
-    <h1>Update newspost "{{ $newsPost->title }}"</h1>
+@section('content')
+    @section('navigation')
+        <div class="p-2">
+            <a class="btn btn-success" href="{{ route('admin-newspost-show', $newsPost->id) }}">Show</a>
+        </div>
 
-<div class="row">
-    <div class="col-5">
-        <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
-             alt="'{{ $newsPost->title }}' news post image" width="100%">
-    </div>
+        <div class="p-2">
+            <form method="POST" action="{{ route('admin-newspost-destroy', $newsPost) }}">
+                @method('DELETE')
+                @csrf
 
-    <div class="col-7">
-        <newsupdate :news-post="{{ $newsPost }}" :categories="{{ $newsCategories }}"></newsupdate>
-    </div>
-</div>
+                <button type="submit" class="btn btn-danger">Delete newspost</button>
+            </form>
+        </div>
+    @endsection
+
+    <page-admin-news-edit :users="{{ $users }}" :news-post="{{ $newsPost }}" :categories="{{ $newsCategories }}"></page-admin-news-edit>
 @endsection

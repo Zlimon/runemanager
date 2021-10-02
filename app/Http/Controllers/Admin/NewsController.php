@@ -18,6 +18,8 @@ class NewsController extends Controller
 	}
 
 	public function show(NewsPost $newsPost) {
+	    $newsPost->longstory = base64_decode($newsPost->longstory);
+
 		return view('admin.news.show', compact('newsPost'));
 	}
 
@@ -28,15 +30,12 @@ class NewsController extends Controller
 	}
 
 	public function edit(NewsPost $newsPost) {
+	    $users = User::all();
 		$newsCategories = NewsCategory::get();
 
-		return view('admin.news.edit', compact('newsPost', 'newsCategories'));
-	}
+		$newsPost->longstory = base64_decode($newsPost->longstory);
 
-	public function destroy(NewsPost $newsPost) {
-		$newsPost->delete();
-
-		return redirect(route('admin-news'))->with('message', 'Newspost deleted!');
+		return view('admin.news.edit', compact('users','newsCategories', 'newsPost'));
 	}
 
 	public function createCategory(Request $request) {
@@ -51,6 +50,6 @@ class NewsController extends Controller
 
         $newsCategory->save();
 
-		return redirect(route('admin-news'))->with('message', 'Created news category!');
+		return redirect(route('admin-newspost'))->with('message', 'Created news category!');
 	}
 }

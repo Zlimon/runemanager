@@ -7,7 +7,7 @@
            id="{{ $field['key'] }}"
            @if (old($field['key'], \App\Helpers\SettingHelper::getSetting($field['key']))) checked="checked" @endif>
     <label class="form-check-label" for="{{ $field['key'] }}">{{ $field['label'] }}</label>
-
-    @if ($errors->has($field['key'])) <small class="text-danger">{{ $errors->first($field['key']) }}</small> @endif
-    <small class="form-text text-muted">{!! $field['description'] !!}</small>
+    <br>
+    @if ($errors->has($field['key'])) <small class="form-text text-danger">{{ $errors->first($field['key']) }}</small><br> @endif
+    <small class="form-text text-dark">{!! $field['description'] !!}</small>
 </div>

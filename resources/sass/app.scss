@@ -43,6 +43,67 @@
     }
 }
 
+.pixel {
+    image-rendering: pixelated;
+}
+
+.button-rectangle {
+    width: 15rem;
+    height: 5rem;
+}
+
+.button-rectangle-small {
+    width: 6rem;
+    height: 3rem;
+}
+
+.button-square {
+    width: 6.5rem;
+    height: 6.5rem;
+}
+
+.button-with-icon {
+    width: 12.5rem;
+    height: 5rem;
+}
+
+.button-small {
+    width: 70px;
+    height: 30px;
+    padding: 2px;
+    margin: 2px;
+}
+
+.icon {
+    width: 72px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.icon-small {
+    width: 36px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.broadcast-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.hiscore-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.hiscore-icon-small {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+}
+
 .bg-admin-primary {
   background-color: $admin-primary;
 }
@@ -53,4 +114,8 @@
 
 .bg-admin-info {
   background-color: $admin-info;
+}
+
+.bg-admin-dark {
+  background-color: $admin-dark;
 }
