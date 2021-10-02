@@ -9,5 +9,7 @@
 @endsection
 
 @section('content')
-    <page-admin-account-create></page-admin-account-create>
+    <div class="col-12 col-md-4">
+        <page-admin-account-create></page-admin-account-create>
+    </div>
 @endsection

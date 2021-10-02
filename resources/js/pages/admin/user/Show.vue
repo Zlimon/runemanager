@@ -25,32 +25,37 @@
             <div class="px-4 pt-4 pb-2 bg-admin-dark">
                 <h1>Accounts</h1>
 
-                <div v-for="account in user.account" class="row mb-4">
-                    <div class="col-md-5 mb-4">
-                        <div class="p-4 bg-admin-info">
-                            <h2>
-                                <img v-if="account.account_type !== 'normal'"
-                                     :src="'/images/' + account.account_type + '.png'"
-                                     class="pixel"
-                                     :alt="account.account_type + ' icon'"
-                                     style="height: 1em; width: 1em;">
-                                {{ account.username }}
-                            </h2>
-                            <p>
-                                <span><strong>Rank: </strong>{{ account.rank }}</span>
-                                <br>
-                                <span><strong>Level: </strong>{{ account.level }}</span>
-                                <br>
-                                <span><strong>Total XP:</strong> {{ account.xp }}</span>
-                            </p>
+                <div v-if="user.account.length > 0">
+                    <div v-for="account in user.account" class="row mb-4">
+                        <div class="col-md-5 mb-4">
+                            <div class="p-4 bg-admin-info">
+                                <h2>
+                                    <img v-if="account.account_type !== 'normal'"
+                                         :src="'/images/' + account.account_type + '.png'"
+                                         class="pixel"
+                                         :alt="account.account_type + ' icon'"
+                                         style="height: 1em; width: 1em;">
+                                    {{ account.username }}
+                                </h2>
+                                <p>
+                                    <span><strong>Rank: </strong>{{ account.rank }}</span>
+                                    <br>
+                                    <span><strong>Level: </strong>{{ account.level }}</span>
+                                    <br>
+                                    <span><strong>Total XP:</strong> {{ account.xp }}</span>
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-7">
-                        <div class="p-4 bg-admin-info">
-                            <accounthiscore :account="account"></accounthiscore>
+                        <div class="col-md-7">
+                            <div class="p-4 bg-admin-info">
+                                <accounthiscore :account="account"></accounthiscore>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div v-else>
+                    <page-admin-account-create></page-admin-account-create>
                 </div>
             </div>
         </div>
@@ -66,6 +71,10 @@ export default {
     props: {
         user: {required: true},
     },
+
+    mounted() {
+        console.log(this.user.account.length)
+    }
 }
 </script>
 
