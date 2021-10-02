@@ -101,6 +101,22 @@ Vue.component(
 
 Vue.mixin({
     methods: {
+        doPending(pendingMessage) {
+            this.$swal.fire({
+                toast: true,
+                icon: 'info',
+                text: pendingMessage,
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
+        },
+
         doSuccess(successMessage) {
             this.$swal.fire({
                 toast: true,
