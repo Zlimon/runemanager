@@ -107,6 +107,8 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 export default {
+    name: "PageAdminNewsCreate",
+
     props: {
         categories: {required: true},
     },
@@ -117,7 +119,8 @@ export default {
                 .post('/api/admin/news/create/', this.fields)
                 .then((response) => {
                     this.errors = null;
-                    this.doSuccess('Successfully updated ' + response.data.title);
+
+                    this.doSuccess('Successfully posted newspost "' + this.fields.title + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);
@@ -137,14 +140,13 @@ export default {
                 // The configuration of the editor.
             },
 
-            errored: false,
             errors: null,
         };
     },
 }
 </script>
 
-<style>
+<style scoped>
 .ck-editor__editable {
     min-height: 500px;
     color: black;

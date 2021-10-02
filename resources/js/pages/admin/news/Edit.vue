@@ -129,6 +129,8 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 export default {
+    name: "PageAdminNewsEdit",
+
     props: {
         users: {required: true},
         newsPost: {required: true},
@@ -141,30 +143,14 @@ export default {
                 .put('/api/admin/news/' + this.newsPost.id + '/update', this.fields)
                 .then((response) => {
                     this.errors = null;
-                    this.toastSuccess('Successfully updated ' + response.data.title);
+
+                    this.doSuccess('Successfully updated newspost "' + this.newsPost.title + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);
 
                     this.errors = error.response.data.errors;
                 });
-        },
-
-        toastSuccess(successMessage) {
-            this.$swal.fire({
-                toast: true,
-                icon: 'success',
-                title: 'Success',
-                text: successMessage,
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
     },
 
@@ -178,7 +164,6 @@ export default {
                 // The configuration of the editor.
             },
 
-            errored: false,
             errors: null,
         };
     },
@@ -189,7 +174,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .ck-editor__editable {
     min-height: 500px;
     color: black;

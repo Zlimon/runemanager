@@ -123,7 +123,7 @@
                         <button type="button" class="btn-close" @click="modal.hide()" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <pre>{{ artisanResponse }}</pre>
+                        <pre class="p-1" style="background-color: black; margin: 0;">{{ artisanResponse }}</pre>
                     </div>
                     <div class="modal-footer">
                         <div v-if="artisanStatus === 0"
@@ -161,6 +161,8 @@ export default {
 
     methods: {
         searchResourcePack() {
+            this.doPending('Searching for Resource Pack "' + this.fields.search + '"...');
+
             axios
                 .post('/api/admin/settings/resource-pack', this.fields)
                 .then(response => {
@@ -182,6 +184,8 @@ export default {
         switchResourcePack(resourcePack) {
             this.modal.hide();
 
+            this.doPending('Switching to Resource Pack  "' + resourcePack.alias + '".');
+
             axios
                 .post('/api/admin/settings/resource-pack/' + resourcePack.id + '/switch', {
                     _method: 'patch',
@@ -192,17 +196,19 @@ export default {
                     this.artisanResponse = response.data.message;
                     this.currentResourcePack = response.data.resourcePack;
 
-                    this.toastSuccess('Successfully switched to ' + this.currentResourcePack.alias);
+                    this.doSuccess('Successfully switched to ' + this.currentResourcePack.alias);
                 })
                 .catch(error => {
                     console.error(error.response.data);
 
-                    this.toastError(error.response.data.errors.message);
                     this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
         },
 
         updateResourcePack(resourcePack) {
+            this.doPending('Updating Resource Pack  "' + resourcePack.alias + '".');
+
             axios
                 .post('/api/admin/settings/resource-pack/' + resourcePack.id + '/update', {
                     _method: 'patch',
@@ -213,48 +219,14 @@ export default {
                     this.artisanResponse = response.data.message;
                     this.currentResourcePack = response.data.resourcePack;
 
-                    this.toastSuccess('Successfully updated ' + this.currentResourcePack.alias);
+                    this.doSuccess('Successfully updated resource pack "' + this.currentResourcePack.alias + "'.");
                 })
                 .catch(error => {
                     console.error(error.response.data);
 
-                    this.toastError(error.response.data.errors.message);
                     this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
-        },
-
-        toastSuccess(successMessage) {
-            this.$swal.fire({
-                toast: true,
-                icon: 'success',
-                title: 'Success',
-                text: successMessage,
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
-        },
-
-        toastError(errorMessage) {
-            this.$swal.fire({
-                toast: true,
-                icon: 'error',
-                title: 'Error',
-                text: errorMessage,
-                position: 'top-right',
-                iconColor: 'white',
-                customClass: {
-                    popup: 'colored-toast'
-                },
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            })
         },
     },
 
