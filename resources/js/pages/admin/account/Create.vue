@@ -20,21 +20,32 @@
             </div>
 
             <div class="mb-3">
-                <label for="user_name" class="form-label">RuneManager username or ID</label>
-                <input v-model="fields.user_name"
+                <label for="search" class="form-label">RuneManager username or ID</label>
+                <input v-model="fields.search"
                        v-bind:class="{ 'is-invalid' : this.errors && this.errors.name !== undefined }"
+                       @input="searchUser"
+                       @change="searchUser"
                        type="text"
-                       id="user_name"
-                       name="user_name"
+                       id="search"
+                       name="search"
                        class="form-control"
+                       list="users"
                        required>
+                <div class="form-text text-dark">
+                    Leaving this field empty will reserve the account to your user.
+                </div>
                 <div v-if="this.errors && this.errors.user_name !== undefined">
                     <small v-for="error in this.errors.user_name" class="text-danger">{{ error }}<br></small>
                 </div>
+                <datalist id="users">
+                    <option v-for="user in users" :value="user.name">
+                        {{ user.email }}
+                    </option>
+                </datalist>
             </div>
 
             <div @click="createAccount"
-                 class="btn btn-primary d-block">
+                 class="btn btn-success d-block">
                 Reserve
             </div>
         </div>
@@ -46,16 +57,40 @@ export default {
     name: "PageAdminAccountCreate",
 
     methods: {
+        searchUser() {
+            if (this.fields.search !== '') {
+                axios
+                    .post('/api/admin/user/search', this.fields)
+                    .then(response => {
+                        this.errors = null;
+
+                        this.users = response.data;
+                    })
+                    .catch(error => {
+                        console.error(error.response.data);
+
+                        this.errors = error.response.data.errors;
+                    });
+            }
+        },
+
         createAccount() {
+            this.fields.user_name = this.fields.search;
+
+            this.doPending('Fetching hiscores for account "' + this.fields.account_username + '".');
+
             axios
                 .post('/api/admin/account/store', this.fields)
-                .then((response) => {
+                .then(() => {
                     this.errors = null;
+
+                    this.doSuccess('Successfully reserved account "' + this.fields.account_username + '".');
                 })
                 .catch(error => {
                     console.error(error.response.data);
 
                     this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
         },
     },
@@ -63,6 +98,7 @@ export default {
     data() {
         return {
             fields: {},
+            users: [],
 
             errors: null,
         }

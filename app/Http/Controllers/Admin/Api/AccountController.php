@@ -46,7 +46,16 @@ class AccountController extends Controller
         ]);
 
         if (Account::where('username', $request->account_username)->first()) {
-            return response(['errors' => ['account_username' => ['This account has already been registered.']]], 422);
+            $errors = [
+                'message' => 'Could not reserve account.',
+                'errors' => [
+                    'account_username' => [
+                        'Account "' . $request->account_username . '" has already been registered.'
+                    ],
+                ],
+            ];
+
+            return response($errors, 422);
         }
 
         if (!$request->user_name && Auth::check()) {
@@ -55,10 +64,28 @@ class AccountController extends Controller
             $user = User::whereName($request->user_name)->orWhere('id', $request->user_name)->pluck('id')->first();
 
             if (!$user) {
-                return response(['errors' => ['user_name' => ['This user could not be found.']]], 422);
+                $errors = [
+                    'message' => 'Could not reserve account.',
+                    'errors' => [
+                        'user_name' => [
+                            'User "' . $request->user_name . '" does not exist.'
+                        ],
+                    ],
+                ];
+
+                return response($errors, 404);
             }
         } else {
-            return response(['errors' => ['user_name' => ['This user could not be found.']]], 422);
+            $errors = [
+                'message' => 'Could not reserve account.',
+                'errors' => [
+                    'user_name' => [
+                        'No user name was provided, and could not use the current logged in user.'
+                    ],
+                ],
+            ];
+
+            return response($errors, 500);
         }
 
         $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
@@ -71,7 +98,16 @@ class AccountController extends Controller
         $playerData = Helper::getPlayerData($playerDataUrl);
 
         if (!$playerData) {
-            return response(['errors' => ['account_username' => ['Could not fetch player data from hiscores.']]], 422);
+            $errors = [
+                'message' => 'Could not fetch player data from hiscores.',
+                'errors' => [
+                    'account_username' => [
+                        'Account "' . $request->account_username . '" does not exist in the official hiscores.'
+                    ],
+                ],
+            ];
+
+            return response($errors, 404);
         }
 
         DB::beginTransaction();
