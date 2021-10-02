@@ -5,73 +5,84 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\NewsPost;
+use App\Rules\ValidateUser;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class NewsController extends Controller
 {
 	public function store(Request $request) {
         $this->validate($request, [
-            'title' => ['required', 'string', 'min:1', 'max:50'],
-            'shortstory' => ['required', 'string', 'min:1', 'max:200'],
-            'longstory' => ['required', 'string', 'min:1', 'max:50000']
+            'news_category_id' => ['required', 'integer', 'exists:news_categories,id'],
+            'title' => ['required', 'string', 'max:50'],
+            'shortstory' => ['required', 'string', 'max:200'],
+            'longstory' => ['required', 'string', 'max:50000']
             ]
         );
 
+        // TODO put in validator (needs proper file upload in Vue)
         $imageId = Helper::imageUpload($request->file('image')); // Return 1 / default image if empty
 
 		if (!$imageId) {
 		    return response()->json(['errors' => ['image' => ['The image must be a file of type: jpeg, bmp, png, gif!']]], 422);
         }
 
-        NewsPost::create([
+        $newsPost = NewsPost::create([
             'user_id' => Auth::id(),
-            'news_category_id' => (request('news_category_id') ? request('news_category_id') : 1),
-            'image_id' => $imageId,
-            'title' => request('title'),
-            'shortstory' => request('shortstory'),
-            'longstory' => request('longstory'),
+            'news_category_id' => $request->news_category_id,
+            'image_id' => 1, // TODO file upload
+            'title' => $request->title,
+            'shortstory' => $request->shortstory,
+            'longstory' => base64_encode($request->longstory),
         ]);
 
-        return response()->json('Newspost "'.request('title').'" posted!', 200);
+        return response($newsPost, 202);
 	}
 
 	public function update(NewsPost $newsPost, Request $request) {
-		$author = User::whereName(request('user_id'))->orWhere('id', request('user_id'))->first();
-
-		if (!$author) {
-            return response()->json(['errors' => ['user_id' => ['This user does not exist!']]], 422);
-        }
-
         $this->validate($request, [
-            'title' => ['required', 'string', 'min:1', 'max:50'],
-            'shortstory' => ['required', 'string', 'min:1', 'max:200'],
-            'longstory' => ['required', 'string', 'min:1', 'max:50000']
+            'user_id' => ['required', new ValidateUser()],
+            'news_category_id' => ['required', 'integer', 'exists:news_categories,id'],
+            'title' => ['required', 'string', 'max:50'],
+            'shortstory' => ['required', 'string', 'max:200'],
+            'longstory' => ['required', 'string', 'max:50000']
             ]
         );
 
+        // TODO put in validator (needs proper file upload in Vue)
         $imageId = Helper::imageUpload($request->file('image')); // Return 1 / default image if empty
 
 		if (!$imageId) {
 		    return response()->json(['errors' => ['image' => ['The image must be a file of type: jpeg, bmp, png, gif!']]], 422);
         }
 
-        $newsPost->update(request()->except(['image']));
-
+		$author = User::whereName($request->user_id)->orWhere('id', $request->user_id)->pluck('id')->first();
 		if ($author) {
-            $newsPost->user_id = $author->id;
+            $newsPost->user_id = $author;
         }
 
-        if (request('default')) {
-            $newsPost->image_id = 1;
-        } elseif ($imageId != 1) {
-            $newsPost->image_id = $imageId;
-        }
+		$newsPost->news_category_id = $request->news_category_id;
+		$newsPost->image_id = 1; // TODO file upload
+		$newsPost->title = $request->title;
+		$newsPost->shortstory = $request->shortstory;
+		$newsPost->longstory = base64_encode($request->longstory);
 
-        $newsPost->save();
+        $newsPost->update();
 
-        return response()->json('Newspost "'.$newsPost->title.'" updated!', 200);
+        return response($newsPost, 202);
 	}
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  NewsPost $newsPost
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(NewsPost $newsPost)
+    {
+        $newsPost->delete();
+
+        return response('', 202);
+    }
 }

@@ -111,6 +111,37 @@ class CalendarController extends Controller
      * @param  Calendar $calendar
      * @return \Illuminate\Http\Response
      */
+    public function update(Request $request, Calendar $calendar)
+    {
+        $this->validate($request, [
+            'title' => ['required', 'string', 'max:50'],
+            'description' => ['nullable', 'string', 'max:200'],
+            'start_date' => ['required', 'date', 'after:yesterday'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'icon_id' => ['nullable', 'integer', new ValidateIconId()],
+            'event_color' => ['nullable', 'string', 'max:7'],
+        ]);
+
+        $calendar->user_id = 1;
+        $calendar->title = $request->title;
+        $calendar->description = $request->description;
+        $calendar->start_date = $request->start_date;
+        $calendar->end_date = $request->end_date;
+        $calendar->icon_id = $request->icon_id;
+        $calendar->event_color = $request->event_color;
+
+        $calendar->save();
+
+        return response($calendar, 202);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  Calendar $calendar
+     * @return \Illuminate\Http\Response
+     */
     public function updateSchedule(Request $request, Calendar $calendar)
     {
         $this->validate($request, [

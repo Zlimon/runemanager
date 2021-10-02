@@ -10,15 +10,15 @@
                     </div>
 
                     <div class="col">
-                        <p class="font-weight-bold text-left">{{ selectedEvent.description ? selectedEvent.description : '' }}</p>
+                        <p class="fw-bold text-left">{{ selectedEvent.description ? selectedEvent.description : '' }}</p>
 
                         <hr>
 
                         <div class="d-flex text-left">
                             <div class="col-3 pl-0">
-                                <span class="font-weight-bold">Starts:</span>
+                                <span class="fw-bold">Starts:</span>
                                 <br>
-                                <span class="font-weight-bold">{{ selectedEvent.end_date !== null ? 'Ends:' : '' }}</span>
+                                <span class="fw-bold">{{ selectedEvent.end_date !== null ? 'Ends:' : '' }}</span>
                             </div>
                             <div class="col">
                                 <span>{{ selectedEvent.start_date | moment('ddd. Do MMMM HH:mm') }}</span>

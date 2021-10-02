@@ -34,6 +34,7 @@ class ResourcePackController extends Controller
 
         if ($getProperties->failed()) {
             $errors = [
+                'message' => 'No search results.',
                 'errors' => [
                     'search' => [
                         0 => 'Could not find any resource packs with the name "' . $query . '"!',
@@ -77,8 +78,9 @@ class ResourcePackController extends Controller
 
         if ($status !== 0) {
             $errors = [
+                'message' => 'Could not switch resource pack.',
                 'errors' => [
-                    'message' => Artisan::output(),
+                    'resource_pack' => Artisan::output(),
                 ],
             ];
 
@@ -112,8 +114,9 @@ class ResourcePackController extends Controller
 
         if ($status !== 0) {
             $errors = [
+                'message' => 'Could not update resource pack.',
                 'errors' => [
-                    'message' => Artisan::output(),
+                    'resource_pack' => Artisan::output(),
                 ],
             ];
 

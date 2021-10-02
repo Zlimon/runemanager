@@ -4,9 +4,20 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
-
 import Vue from 'vue'
+
+import UniqueId from 'vue-unique-id';
+import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css';
+import CKEditor from '@ckeditor/ckeditor5-vue2';
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+Vue.use(require('./bootstrap')); // Load bootstrap.js
+Vue.use(UniqueId);
+Vue.use(require('advanced-laravel-vue-paginate'));
+Vue.use(require('vue-moment'));
+Vue.use( CKEditor );
+Vue.use(VueSweetalert2);
 
 /**
  * The following block of code may be used to automatically register your
@@ -18,22 +29,6 @@ import Vue from 'vue'
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-import UniqueId from 'vue-unique-id';
-import 'advanced-laravel-vue-paginate/dist/advanced-laravel-vue-paginate.css';
-import CKEditor from '@ckeditor/ckeditor5-vue2';
-import VueSweetalert2 from 'vue-sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
-
-Vue.use(BootstrapVue)
-Vue.use(UniqueId);
-Vue.use(require('advanced-laravel-vue-paginate'));
-Vue.use(require('vue-moment'));
-Vue.use( CKEditor );
-Vue.use(VueSweetalert2);
 
 Vue.component('announcementall', require('./components/notification/AnnouncementAll.vue').default);
 Vue.component('accountevent', require('./components/notification/AccountEvent.vue').default);
@@ -54,17 +49,33 @@ Vue.component('bank', require('./components/account/Bank.vue').default);
 Vue.component('onlinestatus', require('./components/OnlineStatus.vue').default);
 
 Vue.component('newscreate', require('./components/NewsCreate.vue').default);
-Vue.component('newsupdate', require('./components/NewsUpdate.vue').default);
 
 Vue.component('calendar', require('./components/Calendar.vue').default);
-Vue.component('calendaredit', require('./components/CalendarEdit.vue').default);
 
 Vue.component('groupaccount', require('./components/group/Account').default);
 Vue.component('groupbank', require('./components/group/GroupBank').default);
 
 // Pages
-Vue.component('PageGroupShow', require('./pages/group/Show').default);
+// PRE CLEANUP TEMPORARILY PLACEMENT
+Vue.component('PageAdminUserIndex', require('./pages/admin/user/Index').default);
+Vue.component('PageAdminUserShow', require('./pages/admin/user/Show').default);
+Vue.component('PageAdminUserEdit', require('./pages/admin/user/Edit').default);
+
+Vue.component('PageAdminAccountIndex', require('./pages/admin/account/Index').default);
+Vue.component('PageAdminAccountCreate', require('./pages/admin/account/Create').default);
+Vue.component('PageAdminAccountShow', require('./pages/admin/account/Show').default);
+
+Vue.component('PageAdminNewsIndex', require('./pages/admin/news/Index').default);
+Vue.component('PageAdminNewsCreate', require('./pages/admin/news/Create').default);
+Vue.component('PageAdminNewsShow', require('./pages/admin/news/Show').default);
+Vue.component('PageAdminNewsEdit', require('./pages/admin/news/Edit').default);
+
+Vue.component('PageAdminCalendar', require('./pages/admin/Calendar').default);
+
 Vue.component('PageAdminSettingResourcePack', require('./pages/admin/setting/ResourcePack').default);
+// PRE CLEANUP TEMPORARILY PLACEMENT
+
+Vue.component('PageGroupShow', require('./pages/group/Show').default);
 Vue.component('PageAccountCompare', require('./pages/account/AccountCompare').default);
 
 Vue.component(
@@ -87,6 +98,81 @@ Vue.component(
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
+Vue.mixin({
+    methods: {
+        doPending(pendingMessage) {
+            this.$swal.fire({
+                toast: true,
+                icon: 'info',
+                text: pendingMessage,
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
+        },
+
+        doSuccess(successMessage) {
+            this.$swal.fire({
+                toast: true,
+                icon: 'success',
+                title: 'Success',
+                text: successMessage,
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            })
+        },
+
+        doError(errorMessage, errors = 'An unknown error occurred.') {
+            let errorList = document.createElement('ul');
+
+            if (typeof errors === 'object') {
+                // Create a readable list of the errors
+                for (const error in errors) {
+                    let li = document.createElement('li');
+                    errorList.appendChild(li);
+
+                    li.innerHTML += errors[error];
+                }
+
+                errorList = errorList.innerHTML;
+            } else {
+                // If errors is not a object, it's either the default error or a string
+                errorList = errors
+            }
+
+            this.$swal.fire({
+                toast: true,
+                icon: 'error',
+                title: 'Error',
+                text: errorMessage,
+                html: `
+                    <p><b>${errorMessage}</b></p>
+                    ${errorList}
+                `,
+                position: 'top-right',
+                iconColor: 'white',
+                customClass: {
+                    popup: 'colored-toast'
+                },
+                showConfirmButton: false,
+                // timer: 3000,
+                timerProgressBar: true
+            })
+        },
+    }
+})
 
 const app = new Vue({
     el: '#app',

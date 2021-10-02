@@ -46,15 +46,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Account extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'user_id', 'account_type', 'username', 'rank', 'level', 'xp'
-    ];
-
     public function getRouteKeyName()
     {
         return 'username';
