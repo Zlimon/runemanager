@@ -75,7 +75,9 @@
                         </td>
                         <td class="d-none d-md-table-cell">{{ account.created_at | moment('ddd. Do MMM HH:mm') }}</td>
                         <td>
-                            <a :href="'/admin/account/' + account.username + '/show'" class="btn btn-success">Show</a>
+                            <div class="d-flex flex-column">
+                                <a :href="'/admin/account/' + account.username + '/show'" class="btn btn-success d-block">Show</a>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

@@ -74,10 +74,10 @@
                         </td>
                         <td class="d-none d-md-table-cell">{{ user.created_at | moment('ddd. Do MMM HH:mm') }}</td>
                         <td>
-                            <div class="d-flex justify-content-between">
-                                <a :href="'/admin/user/' + user.id + '/show'" class="btn btn-success">Show</a>
-                                <a :href="'/admin/user/' + user.id + '/edit'" class="btn btn-primary">Edit</a>
-                                <a :href="'/admin/user/' + user.id + '/ban'" class="btn btn-danger">Ban</a>
+                            <div class="d-flex flex-column">
+                                <a :href="'/admin/user/' + user.id + '/show'" class="btn btn-success d-block mb-2">Show</a>
+                                <a :href="'/admin/user/' + user.id + '/edit'" class="btn btn-primary d-block mb-2">Edit</a>
+                                <a :href="'/admin/user/' + user.id + '/ban'" class="btn btn-danger d-block">Ban</a>
                             </div>
                         </td>
                     </tr>

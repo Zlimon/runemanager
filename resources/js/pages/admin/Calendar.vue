@@ -10,7 +10,7 @@
             <div class="bg-admin-dark p-4">
                 <h2>Settings</h2>
 
-                <div class="p-4 mb-4 bg-admin-info">
+                <div class="p-4 bg-admin-info">
                     <div class="row">
                         <div class="col-6">
                             <div class="form-check">

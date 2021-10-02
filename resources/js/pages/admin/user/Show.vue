@@ -16,8 +16,8 @@
                 <p><strong>Icon ID:</strong> {{ user.icon_id }}</p>
                 <p><strong>Private:</strong> {{ (user.private === 1 ? 'Yes' : 'No') }}</p>
                 <p><strong>User ID:</strong> {{ user.id }}</p>
-                <p><strong>Joined:</strong> {{ user.created_at | moment('d. M Y H:i') }}</p>
-                <p><strong>Updated:</strong> {{ user.updated_at | moment('d. M Y H:i')  }}</p>
+                <p><strong>Joined:</strong> {{ user.created_at | moment('ddd. Do MMM HH:mm') }}</p>
+                <p><strong>Updated:</strong> {{ user.updated_at | moment('ddd. Do MMM HH:mm') }}</p>
             </div>
         </div>
 

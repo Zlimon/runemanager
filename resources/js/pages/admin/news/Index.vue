@@ -51,11 +51,11 @@
                         <td>{{ news.user.name }}</td>
                         <td class="d-none d-md-table-cell">{{ news.created_at | moment('ddd. Do MMM HH:mm') }}</td>
                         <td>
-                            <div class="d-flex justify-content-between">
-                                <a :href="'/admin/news/' + news.id + '/show'" class="btn btn-success">Show</a>
-                                <a :href="'/admin/news/' + news.id + '/edit'" class="btn btn-primary">Edit</a>
+                            <div class="d-flex flex-column">
+                                <a :href="'/admin/news/' + news.id + '/show'" class="btn btn-success d-block mb-2">Show</a>
+                                <a :href="'/admin/news/' + news.id + '/edit'" class="btn btn-primary d-block mb-2">Edit</a>
                                 <div @click="deleteNewsPost(news, index)"
-                                     class="btn btn-danger">
+                                     class="btn btn-danger d-block">
                                     Delete
                                 </div>
                             </div>
