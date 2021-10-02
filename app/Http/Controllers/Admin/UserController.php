@@ -21,6 +21,7 @@ class UserController extends Controller
 
     public function show(User $user) {
         // TODO probably better ways to do this
+        $account = [];
         foreach ($user->account as $userAccount) {
             $account[] = $userAccount::with('user')->where('id', $userAccount->id)->first();
         }
