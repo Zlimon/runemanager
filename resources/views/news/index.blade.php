@@ -36,7 +36,7 @@
                                 </div>
                             </div>
                             <div class="card-footer text-muted text-end">
-                                <a class="btn button-combat-style-narrow" href="{{ route('news') }}">
+                                <a class="btn button-combat-style-narrow" href="{{ route('news-show', $post->id) }}">
                                     Read more <i class="fas fa-long-arrow-alt-right"></i>
                                 </a>
                             </div>
