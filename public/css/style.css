@@ -11,7 +11,7 @@ h1,
 h2,
 h3
 {
-    font-family: 'runescape-large', sans-serif;
+    font-family: 'runescape-smooth', sans-serif;
 }
 
 h1
@@ -98,6 +98,11 @@ table th
 .runescape-large
 {
     font-family: 'runescape-large', sans-serif;
+}
+
+.runescape-smooth
+{
+    font-family: 'runescape-smooth', sans-serif;
 }
 
 .font-small
