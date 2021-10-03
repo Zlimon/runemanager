@@ -6,6 +6,7 @@
 
 @section('content')
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/news.css') }}" rel="stylesheet">
 
     <div class="row">
         <div class="jumbotron d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center mb-3"
@@ -163,7 +164,7 @@
 
         <div class="col d-none d-md-block">
             <div class="card bg-dark background-dialog-panel">
-                <div id="category">{{ $recentPosts[0]->newsCategory->category }}</div>
+                <div class="category">{{ $recentPosts[0]->newsCategory->category }}</div>
                 <img src="{{ asset('storage') }}/{{ $recentPosts[0]->image->image_file_name }}.{{ $recentPosts[0]->image->image_file_extension }}"
                      class="card-img-top"
                      alt="'{{ $recentPosts[0]->title }}' news post image"
