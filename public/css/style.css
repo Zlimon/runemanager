@@ -1,9 +1,8 @@
 body,
 html
 {
-    /*background: url('/images/background_3.png') no-repeat;*/
-    background: #34424D;
-    background-attachment: fixed;
+    background-color: #121e24;
+    background-image: url('/images/background-main.jpg') ;
     background-position: center center;
 }
 
