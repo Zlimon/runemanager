@@ -158,40 +158,49 @@
                             </div>
                         @endif
                     @endforeach
+                @else
+                    <div class="text-center py-5">
+                        <img src="{{ asset('images/ignore.png') }}"
+                             class="pixel icon"
+                             alt="Sad face">
+                        <h1>Nothing interesting is happening</h1>
+                    </div>
                 @endif
             </div>
         </div>
 
-        <div class="col d-none d-md-block">
-            <div class="card bg-dark background-dialog-panel">
-                <div class="category">{{ $recentPosts[0]->newsCategory->category }}</div>
-                <img src="{{ asset('storage') }}/{{ $recentPosts[0]->image->image_file_name }}.{{ $recentPosts[0]->image->image_file_extension }}"
-                     class="card-img-top"
-                     alt="'{{ $recentPosts[0]->title }}' news post image"
-                     style="max-height: 15rem; object-fit: cover;">
+        @if ($recentPosts->isNotEmpty())
+            <div class="col d-none d-md-block">
+                <div class="card bg-dark background-dialog-panel">
+                    <div class="category">{{ $recentPosts[0]->newsCategory->category }}</div>
+                    <img src="{{ asset('storage') }}/{{ $recentPosts[0]->image->image_file_name }}.{{ $recentPosts[0]->image->image_file_extension }}"
+                         class="card-img-top"
+                         alt="'{{ $recentPosts[0]->title }}' news post image"
+                         style="max-height: 15rem; object-fit: cover;">
 
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title">{{ $recentPosts[0]->title }}</h5>
-                            <p class="card-text"><em>{{ $recentPosts[0]->shortstory }}</em></p>
-                        </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">{{ $recentPosts[0]->title }}</h5>
+                                <p class="card-text"><em>{{ $recentPosts[0]->shortstory }}</em></p>
+                            </div>
 
-                        <div class="date text-center">
-                            <span class="month">{{ \Carbon\Carbon::parse($recentPosts[0]->created_at)->format('M') }}</span>
-                            <br>
-                            <span class="day">{{ \Carbon\Carbon::parse($recentPosts[0]->created_at)->format('d') }}</span>
+                            <div class="date text-center">
+                                <span class="month">{{ \Carbon\Carbon::parse($recentPosts[0]->created_at)->format('M') }}</span>
+                                <br>
+                                <span class="day">{{ \Carbon\Carbon::parse($recentPosts[0]->created_at)->format('d') }}</span>
+                            </div>
                         </div>
+                        <div class="text-break">{{ $recentPosts[0]->longstory }}</div>
                     </div>
-                    <div class="text-break">{{ $recentPosts[0]->longstory }}</div>
-                </div>
-                <div class="card-footer text-muted text-end">
-                    <a class="btn button-combat-style-narrow" href="{{ route('news-show', $recentPosts[0]->id) }}">
-                        Read more <i class="fas fa-long-arrow-alt-right"></i>
-                    </a>
+                    <div class="card-footer text-muted text-end">
+                        <a class="btn button-combat-style-narrow" href="{{ route('news-show', $recentPosts[0]->id) }}">
+                            Read more <i class="fas fa-long-arrow-alt-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 @endsection
 
