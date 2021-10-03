@@ -13,10 +13,11 @@ class NewsController extends Controller
         return view('news.index', compact('newsPosts'));
     }
 
-    public function show($newsPost)
-    {
-        $post = NewsPost::findOrFail($newsPost);
+	public function show(NewsPost $newsPost) {
+        $newsPost = $newsPost->with('newsCategory')->with('image')->first();
 
-        return view('news.show', compact('post'));
-    }
+	    $newsPost->longstory = base64_decode($newsPost->longstory);
+
+		return view('news.show', compact('newsPost'));
+	}
 }
