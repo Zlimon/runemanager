@@ -1,5 +1,14 @@
 <template>
     <div>
+        <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
+            <input @change="updateDisplayEquipment()"
+                   type="checkbox"
+                   id="equipmentDisplayToggle"
+                   class="custom-control-input"
+                   :checked="display">
+            <label for="equipmentDisplayToggle">Display equipment</label>
+        </div>
+
         <div v-if="loading">
             <div class="d-flex justify-content-center">
                 <div class="spinner-border" role="status">
@@ -9,15 +18,6 @@
         </div>
 
         <div v-else>
-            <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
-                <input @change="updateDisplayEquipment()"
-                       type="checkbox"
-                       id="equipmentDisplayToggle"
-                       class="custom-control-input"
-                       :checked="display">
-                <label for="equipmentDisplayToggle">Display equipment</label>
-            </div>
-
             <div style="background-image: url('/images/equipment_slots.png'); background-repeat: no-repeat; background-position: center;  width: 168px; margin: 0 auto;">
                 <div class="d-flex justify-content-center">
                     <img :src="(typeof equipment[0] !== 'undefined' ? equipment[0].id : 0) > 0 ? 'https://www.osrsbox.com/osrsbox-db/items-icons/' + equipment[0].id  + '.png' : '/storage/resource-pack/equipment/slot_head.png'"
@@ -96,7 +96,7 @@ export default {
                     this.display = response.data.display !== 0;
                 })
                 .catch(error => {
-                    console.log(error)
+                    console.error(error.response.data);
                 })
                 .finally(() => this.loading = false);
         },
@@ -110,7 +110,10 @@ export default {
                     console.log(response.data); // TODO local notification
                 })
                 .catch(error => {
-                    console.error(error)
+                    console.error(error.response.data);
+
+                    this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
         },
     },
@@ -138,7 +141,7 @@ export default {
                 this.user = response.data;
             })
             .catch(error => {
-                console.log(error)
+                console.error(error.response.data);
             });
 
         this.fetchAccountEquipment();
