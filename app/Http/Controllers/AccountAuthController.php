@@ -88,7 +88,7 @@ class AccountAuthController extends Controller
 
                     $authStatus->save();
 
-                    return redirect(route('account-auth-show'))->with('message', 'Account type updated!');
+                    return redirect(route('account-auth'))->with('message', 'Account type updated!');
                 } else {
                     return redirect()->back()->withErrors('Could not find this Old School RuneScape account! Did you pick correct account type?');
                 }
