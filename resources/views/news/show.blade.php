@@ -1,40 +1,36 @@
 @extends('layouts.layout')
 
 @section('title')
-    {{ $post->title }}
+    {{ $newsPost->title }}
 @endsection
 
 @section('content')
     <link href="{{ asset('css/news.css') }}" rel="stylesheet">
 
-    <div class="news-post mb-3">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('news') }}">News</a></li>
-                <li class="breadcrumb-item"><a href="#">{{ $post->category->category }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ $post->title }}</li>
-            </ol>
-        </nav>
-
-        <img class="img-fluid rounded mx-auto d-block w-50"
-             src="{{ asset('storage') }}/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}"
-             alt="'{{ $post->title }}' news post image">
-
-        <h1>{{ $post->title }}</h1>
-
-        <div class="text-center mx-auto w-50">
-            <p><em>{{ $post->shortstory }}</em></p>
+    <div class="row mb-3">
+        <div class="col-3 d-none d-md-block">
+            <div class="bg-dark background-dialog-panel p-3">
+                <h2 class="text-center header-chatbox-sword">Notifications</h2>
+                <announcementall></announcementall>
+            </div>
         </div>
 
-        {!! $post->longstory !!}
+        <div class="col">
+            <div class="bg-dark background-dialog-panel p-3">
+                <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
+                     class="float-end"
+                     alt="'{{ $newsPost->title }}' news post image">
 
-        <div class="row pt-5">
-            <div class="col-6">
-                <p class="float-left"><em>- {{ $post->user->name }}</em></p>
-            </div>
+                <h1>{{ $newsPost->title }}</h1>
+                <p><em>{{ $newsPost->shortstory }}</em></p>
 
-            <div class="col-6">
-                <p class="float-right">{{ $post->created_at }}</p>
+                <hr>
+
+                <p class="float-end">{{ $newsPost->created_at }}</p>
+
+                {!! $newsPost->longstory !!}
+
+                <p class="float-left"><em>- {{ $newsPost->user->name }}</em></p>
             </div>
         </div>
     </div>
