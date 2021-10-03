@@ -171,7 +171,10 @@
 
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title">{{ $recentPosts[0]->title }}</h5>
+                        <div>
+                            <h5 class="card-title">{{ $recentPosts[0]->title }}</h5>
+                            <p class="card-text"><em>{{ $recentPosts[0]->shortstory }}</em></p>
+                        </div>
 
                         <div class="date text-center">
                             <span class="month">{{ \Carbon\Carbon::parse($recentPosts[0]->created_at)->format('M') }}</span>
@@ -179,7 +182,6 @@
                             <span class="day">{{ \Carbon\Carbon::parse($recentPosts[0]->created_at)->format('d') }}</span>
                         </div>
                     </div>
-                    <p class="card-text"><em>{{ $recentPosts[0]->shortstory }}</em></p>
                     <div class="text-break">{{ $recentPosts[0]->longstory }}</div>
                 </div>
                 <div class="card-footer text-muted text-end">
