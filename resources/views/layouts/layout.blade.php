@@ -138,7 +138,7 @@
             </div>
         </nav>
 
-        <div class="container mt-5 text-light">
+        <div class="container text-light" style="margin-top: 5rem;">
             @yield('content')
         </div>
     </main>
