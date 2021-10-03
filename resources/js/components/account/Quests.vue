@@ -1,14 +1,5 @@
 <template>
     <div>
-        <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
-            <form>
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="questDisplayToggle" @change="updateDisplayQuests()" :checked="display">
-                    <label class="custom-control-label" for="questDisplayToggle">Display quests</label>
-                </div>
-            </form>
-        </div>
-
         <div v-if="errored" class="text-center py-5">
             <img src="/images/ignore.png"
                  class="pixel icon"
@@ -26,7 +17,16 @@
             </div>
 
             <div v-else>
-                <div class="background-dialog-iron-rivets p-1 mb-1 pl-2" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;">
+                <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
+                    <input @change="updateDisplayQuests()"
+                           type="checkbox"
+                           id="questDisplayToggle"
+                           class="custom-control-input"
+                           :checked="display">
+                    <label for="questDisplayToggle">Display quests</label>
+                </div>
+
+                <div class="bg-dark background-dialog-iron-rivets p-3" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;">
                     <div v-for="(questCategories, index) in quests">
                         <p class="runescape-normal" style="margin: 0; font-size: 1.25rem;">{{ (index === 0 ? "Free Quests" : index === 1 ? "Members" : index === 2 ? "Miniquests" : "Secret :o") }}</p>
                         <div v-for="(quest, index) in questCategories">
@@ -67,7 +67,7 @@ export default {
                     this.errored = false
                 })
                 .catch(error => {
-                    console.log(error)
+                    console.error(error)
                     this.errored = true
                 })
                 .finally(() => this.loading = false);
@@ -82,7 +82,7 @@ export default {
                     console.log(response.data); // TODO local notification
                 })
                 .catch(error => {
-                    console.log(error)
+                    console.error(error)
                 });
         }
     },

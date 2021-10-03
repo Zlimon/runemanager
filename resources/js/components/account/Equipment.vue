@@ -10,14 +10,12 @@
 
         <div v-else>
             <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
-                <div class="custom-control custom-switch">
-                    <input @change="updateDisplayEquipment()"
-                           type="checkbox"
-                           id="equipmentDisplayToggle"
-                           class="custom-control-input"
-                           :checked="display">
-                    <label for="equipmentDisplayToggle">Display equipment</label>
-                </div>
+                <input @change="updateDisplayEquipment()"
+                       type="checkbox"
+                       id="equipmentDisplayToggle"
+                       class="custom-control-input"
+                       :checked="display">
+                <label for="equipmentDisplayToggle">Display equipment</label>
             </div>
 
             <div style="background-image: url('/images/equipment_slots.png'); background-repeat: no-repeat; background-position: center;  width: 168px; margin: 0 auto;">
