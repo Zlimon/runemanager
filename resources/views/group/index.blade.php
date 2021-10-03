@@ -7,7 +7,7 @@
 @section('content')
     <link href="{{ asset('css/search.css') }}" rel="stylesheet">
 
-    <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
+    <div class="bg-dark background-dialog-panel p-3">
         @if ($groups->isNotEmpty())
             <h1 class="text-center header-chatbox-sword">Search for groups</h1>
 
@@ -18,35 +18,29 @@
                     <div class="inner-form">
                         <div class="basic-search">
                             <div class="input-group mb-2">
-                                <div class="input-group-prepend">
-                                    <button class="btn btn-dark" type="button" data-toggle="collapse"
-                                            data-target="#collapseExample" aria-expanded="false"
-                                            aria-controls="collapseExample">
-                                        <img src="{{ asset('images/settings.png') }}"
-                                             class=""
-                                             alt="Settings icon"
-                                             title="Click here for advanced search">
-                                    </button>
-                                </div>
+                                <a class="btn btn-dark" data-bs-toggle="collapse" href="#advancedSearch" role="button" aria-expanded="true" aria-controls="advancedSearch">
+                                    <img src="{{ asset('images/settings.png') }}"
+                                         class="pixel"
+                                         alt="Profile icon"
+                                         title="Click here for advanced search">
+                                </a>
                                 <input id="search" type="text"
                                        class="form-control @error('search') is-invalid @enderror"
                                        name="search" value="{{ old('search') }}"
                                        placeholder="{{ $groups->random()->name }}"
                                        autofocus>
-                                <div class="input-group-prepend">
-                                    <button class="btn btn-primary rounded-right" type="submit"><i
-                                            class="fas fa-search"></i>
-                                    </button>
+                                <div class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="collapse advance-search background-dialog-iron-rivets" id="collapseExample">
+                        <div class="collapse advance-search background-dialog-iron-rivets" id="advancedSearch">
                             <h2 class="text-center header-chatbox-sword desc">Advanced search</h2>
-                            <div class="form-row">
+
+                            <div class="row mb-3">
                                 <div class="col">
                                     <label for="account_type">Account type</label>
-                                    <select class="form-control" name="account_type" id="account_type"
-                                            data-trigger="">
+                                    <select id="account_type" name="account_type" class="form-control">
                                         <option value selected>Any</option>
                                         <option value="normal">Normal</option>
                                         <option value="ironman">Ironman</option>
@@ -56,8 +50,7 @@
                                 </div>
                                 <div class="col">
                                     <label for="order_by">Order by</label>
-                                    <select class="form-control" name="order_by" id="order_by"
-                                            data-trigger="">
+                                    <select class="form-control" name="order_by" id="order_by">
                                         <option value="level" selected>Total level</option>
                                         <option value="xp">XP</option>
                                         <option value="rank">Rank</option>
@@ -67,20 +60,17 @@
                                 </div>
                                 <div class="col">
                                     <label for="order_by_order">Order</label>
-                                    <select class="form-control" name="order_by_order" id="order_by_order"
-                                            data-trigger="">
+                                    <select class="form-control" name="order_by_order" id="order_by_order">
                                         <option value="asc">Ascending</option>
                                         <option value="desc" selected>Descending</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="form-row second">
+                            <div class="row mb-3">
                                 <div class="col">
                                     <label for="total_level_between_from">Min. total level</label>
-                                    <select class="form-control" name="total_level_between_from"
-                                            id="total_level_between_from"
-                                            data-trigger="">
+                                    <select id="total_level_between_from" name="total_level_between_from" class="form-control">
                                         <option value="0" selected>0</option>
                                         <option value="500">500</option>
                                         <option value="750">750</option>
@@ -94,9 +84,7 @@
                                 </div>
                                 <div class="col">
                                     <label for="total_level_between_to">Max. total level</label>
-                                    <select class="form-control" name="total_level_between_to"
-                                            id="total_level_between_to"
-                                            data-trigger="">
+                                    <select id="total_level_between_to" name="total_level_between_to" class="form-control">
                                         <option value="500">500</option>
                                         <option value="750">750</option>
                                         <option value="1250">1250</option>
@@ -114,7 +102,7 @@
                                     <div class="result-count">
                                         <span>{{ $groups->count() }}</span> results
                                     </div>
-                                    <div class="group-btn">
+                                    <div>
                                         <button class="btn btn-lg button-combat-style-narrow button-rectangle-small">
                                             <span>Reset</span>
                                         </button>
@@ -141,28 +129,23 @@
                         <div class="btn button-rectangle background-world-map mb-2">
                             <div class="row align-items-center mb-2">
                                 <div class="col-4">
-                                    <img
-                                        src="custom_group_icon.png"
-                                        class="pixel icon"
-                                        alt="Profile icon"
-                                        title="Click here to visit this group">
+                                    <img src="https://www.osrsbox.com/osrsbox-db/items-icons/12810.png"
+                                         class="pixel icon"
+                                         alt="Group icon"
+                                         title="Click here to visit this group">
                                 </div>
 
                                 <div class="col">
                                     <div class="text-left">
                                         <span>
-{{--                                            @if ($group->account_type !== "normal")--}}
-{{--                                                <img src="{{ asset('images/'.$group->account_type.'.png') }}"--}}
-{{--                                                     alt="{{ Helper::formatAccountTypeName($group->account_type) }} icon">--}}
-{{--                                            @endif--}}
                                             {{ $group->name }}
                                         </span>
                                         <br>
                                         <span class="font-small">
-                                            <img class="pixel"
-                                                 src="{{ asset('images/skill/total.png') }}"
+                                            <img src="{{ asset('images/skill/total.png') }}"
+                                                 class="pixel"
                                                  alt="Total level icon">
-{{--                                            {{ $group->level }}--}}
+                                            484
                                         </span>
                                     </div>
                                 </div>
