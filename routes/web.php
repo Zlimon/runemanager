@@ -18,7 +18,7 @@ Route::get('/account', 'AccountController@index')->name('account');
 Route::post('/account', 'AccountController@search')->name('account-search');
 Route::get('/account/create', 'AccountController@create')->name('account-create');
 Route::get('/account/compare', 'AccountController@compare')->name('account-compare');
-Route::get('/account/{account}', 'AccountController@show')->name('account-show');
+Route::get('/account/{account}/show', 'AccountController@show')->name('account-show');
 
 Route::get('/group', 'GroupController@index')->name('group');
 Route::post('/group/search', 'GroupController@search')->name('group-search');
