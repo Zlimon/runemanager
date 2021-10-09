@@ -117,7 +117,7 @@
                         <article class="row">
                             <div class="col-4 d-none d-md-block">
                                 <a href="{{ route('news-show', $post->id) }}">
-                                    <img src="{{ asset('storage') }}/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}"
+                                    <img src="{{ asset('storage') }}/newspost/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}"
                                          class="img-fluid w-100"
                                          alt="'{{ $post->title }}' news post image"
                                          title="Click here to read about '{{ $post->title }}'">
@@ -173,7 +173,7 @@
             <div class="col d-none d-md-block">
                 <div class="card bg-dark background-dialog-panel">
                     <div class="category">{{ $recentPosts[0]->newsCategory->category }}</div>
-                    <img src="{{ asset('storage') }}/{{ $recentPosts[0]->image->image_file_name }}.{{ $recentPosts[0]->image->image_file_extension }}"
+                    <img src="{{ asset('storage') }}/newspost/{{ $recentPosts[0]->image->image_file_name }}.{{ $recentPosts[0]->image->image_file_extension }}"
                          class="card-img-top"
                          alt="'{{ $recentPosts[0]->title }}' news post image"
                          style="max-height: 15rem; object-fit: cover;">

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -35,6 +36,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class NewsPost extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id', 'news_category_id', 'image_id', 'title', 'shortstory', 'longstory',
     ];

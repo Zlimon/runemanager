@@ -16,7 +16,7 @@
                     <div class="col">
                         <div class="card bg-dark background-dialog-panel">
                             <div class="category">{{ $post->newsCategory->category }}</div>
-                            <img src="{{ asset('storage') }}/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}"
+                            <img src="{{ asset('storage') }}/newspost/{{ $post->image->image_file_name }}.{{ $post->image->image_file_extension }}"
                                  class="card-img-top"
                                  alt="'{{ $post->title }}' news post image"
                                  style="max-height: 15rem; object-fit: cover;">

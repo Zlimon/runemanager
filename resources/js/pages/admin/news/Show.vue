@@ -3,7 +3,7 @@
         <div class="col-12 col-md-6">
             <div class="p-4 bg-admin-dark">
                 <div class="text-center pb-3">
-                    <img :src="'/storage/default.png'"
+                    <img :src="'/storage/newspost/newspost_default.png'"
                          class="w-50"
                          :alt="newsPost.title + ' news post image'">
                 </div>
