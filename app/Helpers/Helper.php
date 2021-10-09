@@ -258,6 +258,13 @@ class Helper
 	    return $collection;
     }
 
+    /**
+     * @param $accountUsername
+     * @param $accountType
+     * @param $userId
+     * @return string
+     * @throws \Throwable
+     */
     public static function createOrUpdateAccount($accountUsername, $accountType, $userId) {
         $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
                 ' ',
@@ -272,29 +279,25 @@ class Helper
             return 'Could not fetch account "'.$accountUsername.'" data from hiscores';
         }
 
-        DB::beginTransaction();
-
         $account = self::createAccount($accountUsername, $accountType, $playerData, $userId);
 
         self::createOrUpdateAccountHiscores($account, $playerData);
-
-        DB::commit();
 
         return 'Successfully created account "'.$accountUsername.'".';
     }
 
     public static function createAccount($accountUsername, $accountType, $playerData, $userId) {
         try {
-            $account = Account::create(
-                [
-                    'user_id' => $userId,
-                    'account_type' => $accountType,
-                    'username' => $accountUsername,
-                    'rank' => $playerData[0][0],
-                    'level' => $playerData[0][1],
-                    'xp' => $playerData[0][2]
-                ]
-            );
+            $account = new Account();
+
+            $account->user_id = $userId;
+            $account->account_type = $accountType;
+            $account->username = $accountUsername;
+            $account->rank = $playerData[0][0];
+            $account->level = $playerData[0][1];
+            $account->xp = $playerData[0][2];
+
+            $account->save();
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
