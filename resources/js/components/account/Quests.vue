@@ -1,12 +1,12 @@
 <template>
     <div>
         <div v-if="typeof user.user !== 'undefined' && account.user_id === user.user.id" class="text-center">
-            <form>
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="questDisplayToggle" @change="updateDisplayQuests()" :checked="display">
-                    <label class="custom-control-label" for="questDisplayToggle">Display quests</label>
-                </div>
-            </form>
+            <input @change="updateDisplayQuests()"
+                   type="checkbox"
+                   id="questDisplayToggle"
+                   class="custom-control-input"
+                   :checked="display">
+            <label for="questDisplayToggle">Display quests</label>
         </div>
 
         <div v-if="errored" class="text-center py-5">
@@ -25,20 +25,18 @@
                 </div>
             </div>
 
-            <div v-else>
-                <div class="background-dialog-iron-rivets p-1 mb-1 pl-2" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;">
-                    <div v-for="(questCategories, index) in quests">
-                        <p class="runescape-normal" style="margin: 0; font-size: 1.25rem;">{{ (index === 0 ? "Free Quests" : index === 1 ? "Members" : index === 2 ? "Miniquests" : "Secret :o") }}</p>
-                        <div v-for="(quest, index) in questCategories">
-                            <div v-if="quest.status === 'completed'">
-                                <p class="runescape-success" style="margin: 0; font-weight: normal;">{{ quest.quest }}</p>
-                            </div>
-                            <div v-else-if="quest.status === 'in_progress'">
-                                <p class="runescape-progress" style="margin: 0; font-weight: normal;">{{ quest.quest }}</p>
-                            </div>
-                            <div v-else-if="quest.status === 'not_started'">
-                                <p class="runescape-danger" style="margin: 0; font-weight: normal;">{{ quest.quest }}</p>
-                            </div>
+            <div v-else class="bg-dark background-dialog-iron-rivets p-3" style="max-height: 15rem; overflow: scroll; overflow-x: hidden;">
+                <div v-for="(questCategories, index) in quests">
+                    <p class="runescape-normal" style="margin: 0; font-size: 1.25rem;">{{ (index === 0 ? "Free Quests" : index === 1 ? "Members" : index === 2 ? "Miniquests" : "Secret :o") }}</p>
+                    <div v-for="(quest, index) in questCategories">
+                        <div v-if="quest.status === 'completed'">
+                            <p class="runescape-success" style="margin: 0; font-weight: normal;">{{ quest.quest }}</p>
+                        </div>
+                        <div v-else-if="quest.status === 'in_progress'">
+                            <p class="runescape-progress" style="margin: 0; font-weight: normal;">{{ quest.quest }}</p>
+                        </div>
+                        <div v-else-if="quest.status === 'not_started'">
+                            <p class="runescape-danger" style="margin: 0; font-weight: normal;">{{ quest.quest }}</p>
                         </div>
                     </div>
                 </div>
@@ -67,7 +65,8 @@ export default {
                     this.errored = false
                 })
                 .catch(error => {
-                    console.log(error)
+                    console.error(error.response.data);
+
                     this.errored = true
                 })
                 .finally(() => this.loading = false);
@@ -82,7 +81,10 @@ export default {
                     console.log(response.data); // TODO local notification
                 })
                 .catch(error => {
-                    console.log(error)
+                    console.error(error.response.data);
+
+                    this.errors = error.response.data.errors;
+                    this.doError(error.response.data.message, error.response.data.errors);
                 });
         }
     },
@@ -111,7 +113,7 @@ export default {
                 this.user = response.data;
             })
             .catch(error => {
-                console.log(error)
+                console.error(error.response.data);
             });
 
         this.fetchAccountQuests();

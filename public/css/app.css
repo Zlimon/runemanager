@@ -13,6 +13,13 @@
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: "runescape-smooth";
+  src: url("/css/fonts/runescape-smooth/runescape-smooth.eot");
+  src: url("/css/fonts/runescape-smooth/runescape-smooth.eot?#iefix") format("embedded-opentype"), url("/css/fonts/runescape-smooth/runescape-smooth.woff") format("woff"), url("/css/fonts/runescape-smooth/runescape-smooth.ttf") format("truetype"), url("/css/fonts/runescape-smooth/runescape-smooth.svg#runescape-smooth") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
 /*!
  * Bootstrap v5.1.1 (https://getbootstrap.com/)
  * Copyright 2011-2021 The Bootstrap Authors

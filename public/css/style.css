@@ -1,17 +1,16 @@
 body,
 html
 {
-    /*background: url('/images/background_3.png') no-repeat;*/
-    background: #34424D;
+    background: #121e24 url('/images/background-main.jpg') no-repeat;
     background-attachment: fixed;
-    background-position: center center;
+    background-size: cover;
 }
 
 h1,
 h2,
 h3
 {
-    font-family: 'runescape-large', sans-serif;
+    font-family: 'runescape-smooth', sans-serif;
 }
 
 h1
@@ -98,6 +97,11 @@ table th
 .runescape-large
 {
     font-family: 'runescape-large', sans-serif;
+}
+
+.runescape-smooth
+{
+    font-family: 'runescape-smooth', sans-serif;
 }
 
 .font-small

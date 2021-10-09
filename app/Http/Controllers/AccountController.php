@@ -34,7 +34,7 @@ class AccountController extends Controller
         if (Auth::check()) {
             if (AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first()) {
                 // TODO limit amount of account links setting
-                return redirect(route('account-auth-show'))->withErrors('You already have a pending status! You have to link this Old School RuneScape account to your RuneManager user before you can access this feature.');
+                return redirect(route('account-auth'))->withErrors('You already have a pending status! You have to link this Old School RuneScape account to your RuneManager user before you can access this feature.');
             } else {
                 return view('account.create');
             }

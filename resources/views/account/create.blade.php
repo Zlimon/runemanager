@@ -5,69 +5,62 @@
 @endsection
 
 @section('content')
-    <div class="col-md-12 bg-dark text-light background-dialog-panel py-3 mb-3">
-        <h1 class="text-center header-chatbox-sword">Link account</h1>
-
-        <form method="POST" action="{{ route('account-auth-create') }}">
-            @csrf
-
-            <div class="form-group row">
-                <label for="username" class="col-md-4 col-form-label text-md-right">RuneScape username</label>
-
-                <div class="col-md-6">
-                    <input id="username" type="text" class="form-control @error('username') is-invalid @enderror"
-                           name="username" value="{{ old('username') }}" required autocomplete="username" autofocus>
-
-                    @error('username')
-                    <span class="invalid-feedback" role="alert">
-							<strong>{{ $message }}</strong>
-						</span>
-                    @enderror
-                </div>
+    <link href="{{ asset('css/resource-pack.css') }}" rel="stylesheet">
+    <div class="row mb-3">
+        <div class="col-3 d-none d-md-block">
+            <div class="bg-dark background-dialog-panel p-3">
+                <h2 class="text-center header-chatbox-sword">Notifications</h2>
+                <announcementall></announcementall>
             </div>
+        </div>
 
-            <div class="form-group row">
-                <label for="account_type" class="col-md-4 col-form-label text-md-right">Account type</label>
+        <div class="col">
+            <div class="bg-dark background-dialog-panel p-3">
+                <h1 class="text-center header-chatbox-sword">Link account</h1>
 
-                <div class="col-md-6" style="margin-top: .5rem;">
-                    @foreach (Helper::listAccountTypes() as $accountType)
-                        @if ($accountType === 'normal')
-                            <div class="form-check" style="margin-left: .4rem;">
-                                <label class="form-check-label" for="normal">
-                                    <input id="{{ $accountType }}" type="radio"
-                                           class="form-check-input @error('account_type') is-invalid @enderror"
-                                           name="account_type" value="{{ $accountType }}" checked>
-                                    <span>Normal</span>
-                                </label>
+                <div class="d-flex justify-content-center">
+                    <div class="col-12 col-md-5">
+                        <div class="row mb-3">
+                            <label for="username" class="col-5 col-form-label">RuneScape username</label>
+                            <div class="col-7">
+                                <input type="text" id="username" class="form-control" required autofocus>
                             </div>
-                        @else
-                            <div class="icon-radio">
-                                <label class="icon-radio form-check-label" for="{{ $accountType }}">
-                                    <input id="{{ $accountType }}" type="radio"
-                                           class="form-check-input @error('account_type') is-invalid @enderror"
-                                           name="account_type" value="{{ $accountType }}">
-                                    <img src="{{ asset('images/'.$accountType.'.png') }}"
-                                         alt="{{ Helper::formatAccountTypeName($accountType) }} icon"
-                                         title="Click here to select {{ Helper::formatAccountTypeName($accountType) }} account type for your account">
-                                    <span>{{ Helper::formatAccountTypeName($accountType) }}</span>
-                                </label>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="account_type" class="col-5 col-form-label">Account type</label>
+
+                            <div class="col-7" style="margin-top: .5rem;">
+                                @foreach (Helper::listAccountTypes() as $accountType)
+                                    @if ($accountType === 'normal')
+                                        <div class="form-check" style="margin-left: .4rem;">
+                                            <input type="radio" id="{{ $accountType }}" name="account_type" class="form-check-input" value="{{ $accountType }}" checked>
+                                            <label class="form-check-label" for="{{ $accountType }}">
+                                                Normal
+                                            </label>
+                                        </div>
+                                    @else
+                                        <div class="icon-radio">
+                                            <label class="form-check-label" for="{{ $accountType }}">
+                                                <input type="radio" id="{{ $accountType }}" name="account_type" class="form-check-input" value="{{ $accountType }}">
+                                                <img src="{{ asset('images/'.$accountType.'.png') }}"
+                                                     alt="{{ Helper::formatAccountTypeName($accountType) }} icon"
+                                                     title="Click here to select {{ Helper::formatAccountTypeName($accountType) }} as account type for this account">
+                                                <span>{{ Helper::formatAccountTypeName($accountType) }}</span>
+                                            </label>
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
-                        @endif
-                    @endforeach
-
-                    @error('accountType')
-                    <span class="invalid-feedback" role="alert">
-							<strong>{{ $message }}</strong>
-						</span>
-                    @enderror
+                        </div>
+                        <div class="row mb-3">
+                            <span class="col-5"></span>
+                            <div class="col-7">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="form-group row mb-0">
-                <div class="col-md-8 offset-md-4">
-                    <button type="submit" class="btn btn-primary">Link</button>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
 @endsection

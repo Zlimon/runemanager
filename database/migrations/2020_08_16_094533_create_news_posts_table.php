@@ -16,10 +16,10 @@ class CreateNewsPostsTable extends Migration
         Schema::create('news_posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('news_category_id')->constrained();
-            $table->foreignId('image_id')->constrained()->default('1');
-            $table->string('title');
-            $table->string('shortstory');
+            $table->foreignId('news_category_id')->constrained()->default(1);
+            $table->foreignId('image_id')->constrained()->default(1);
+            $table->string('title', 50);
+            $table->string('shortstory', 100);
             $table->longText('longstory');
             $table->timestamps();
         });
