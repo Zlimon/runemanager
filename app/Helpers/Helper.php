@@ -259,13 +259,14 @@ class Helper
     }
 
     /**
-     * @param $accountUsername
-     * @param $accountType
-     * @param $userId
+     * @param String $accountUsername
+     * @param String $accountType
+     * @param int $userId
+     * @param bool $update
      * @return Account|string
      * @throws \Throwable
      */
-    public static function createOrUpdateAccount($accountUsername, $accountType, $userId): Account|string
+    public static function createOrUpdateAccount(String $accountUsername, String $accountType, int $userId, $update = false): Account|string
     {
         $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
                 ' ',
@@ -280,32 +281,37 @@ class Helper
         }
 
         try {
-            $account = self::createAccount($accountUsername, $accountType, $playerData, $userId);
+            $account = self::createOrUpdateAccountt($accountUsername, $accountType, $playerData, $userId, $update);
         } catch (\Exception $e) {
-            return 'Could not create account "'.$accountUsername.'" due to an unknown error.';
+            return 'Could not '.($update ? 'update' : 'create').' account "'.$accountUsername.'" due to an unknown error.';
         }
 
         try {
             self::createOrUpdateAccountHiscores($account, $playerData);
         } catch (\Exception $e) {
-            return 'Could not create account hiscores "'.$accountUsername.'" due to an unknown error.';
+            return 'Could not '.($update ? 'update' : 'create').' account hiscores "'.$accountUsername.'" due to an unknown error.';
         }
 
         return $account;
     }
 
     /**
-     * @param $accountUsername
-     * @param $accountType
-     * @param $playerData
+     * @param String $accountUsername
+     * @param String $accountType
+     * @param array $playerData
      * @param $userId
+     * @param bool $update
      * @return Account
      * @throws \Throwable
      */
-    public static function createAccount($accountUsername, $accountType, $playerData, $userId): Account
+    public static function createOrUpdateAccountt(String $accountUsername, String $accountType, array $playerData, $userId, $update = false): Account
     {
         try {
-            $account = new Account();
+            if ($update) {
+                $account = Account::whereUsername($accountUsername)->firstOrFail();
+            } else {
+                $account = new Account();
+            }
 
             $account->user_id = $userId;
             $account->account_type = $accountType;
@@ -325,12 +331,12 @@ class Helper
 
     /**
      * @param Account $account
-     * @param $playerData
+     * @param array $playerData
      * @param false $update
      * @return Account
      * @throws \Throwable
      */
-    public static function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false): Account
+    public static function createOrUpdateAccountHiscores(Account $account, array $playerData, $update = false): Account
     {
         $skills = Skill::get();
         $skillsCount = count($skills);
