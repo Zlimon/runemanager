@@ -17,7 +17,7 @@
 
         <div class="col">
             <div class="bg-dark background-dialog-panel p-3">
-                <img src="{{ asset('storage') }}/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
+                <img src="{{ asset('storage') }}/newspost/{{ $newsPost->image->image_file_name }}.{{ $newsPost->image->image_file_extension }}"
                      class="float-end"
                      alt="'{{ $newsPost->title }}' news post image">
 

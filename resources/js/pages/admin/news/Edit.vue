@@ -113,7 +113,7 @@
         <div class="col">
             <div class="bg-admin-dark p-4">
                 <div class="text-center pb-3">
-                    <img :src="'/storage/default.png'"
+                    <img :src="'/storage/newspost/newspost_default.png'"
                          class="w-50"
                          :alt="fields.title + ' news post image'">
                 </div>
