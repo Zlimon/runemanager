@@ -17,9 +17,11 @@ class PageController extends Controller
      */
     public function index()
     {
-        $recentPosts = NewsPost::with('user')->with('newsCategory')->with('image')->limit(5)->orderByDesc('created_at')->get();
+        $newsPosts = NewsPost::with('user')->with('newsCategory')->with('image')->limit(5)->orderByDesc('created_at')->get();
 
-        return view('index', compact('recentPosts'));
+        $accounts = Account::get();
+
+        return view('index', compact('accounts', 'newsPosts'));
     }
 
     /**
