@@ -15,14 +15,15 @@ class AccountUpdate extends Command
      *
      * @var string
      */
-    protected $signature = 'account:update';
+    protected $signature = 'account:update
+                            {--username= : Update only this account}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Fetches up-to-date data (account level, xp and skill) from Old School RuneScape hiscores';
+    protected $description = 'Fetches up-to-date account data from Old School RuneScape hiscores';
 
     /**
      * Create a new command instance.
@@ -41,65 +42,48 @@ class AccountUpdate extends Command
      */
     public function handle()
     {
-        foreach (Account::get() as $account) {
+        $accounts = [];
+
+        $username = $this->option('username');
+        if (!is_null($username)) {
+            $account = Account::whereUsername($username)->first();
+
+            if (!$account) {
+                // TODO this will cause trouble if two or more accounts has the "same" name, but differentiate them using _ or -
+                // TLDR Command argument needs to support spaces
+                $username = str_replace(['_', '-'], ' ', $username);
+                $account = Account::whereUsername($username)->first();
+
+                if (!$account) {
+                    $this->info(sprintf('Could not find any existing account with username "%s".', $username));
+
+                    return 1;
+                }
+            }
+
+            $accounts[] = $account;
+        } else {
+            $accounts = Account::get();
+        }
+
+        foreach ($accounts as $account) {
             if ($account->online !== 0) {
-                $this->info(sprintf("%s is logged in to the game! Not updating", $account->username));
+                $this->info(sprintf('"%s" is logged in to the game! Not updating.', $account->username));
 
                 continue;
             }
-
-            $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
-                    ' ',
-                    '%20',
-                    $account->username
-                );
-
-            /* Get the $playerDataUrl file content. */
-            $playerData = Helper::getPlayerData($playerDataUrl);
-
-            if (!$playerData) {
-                $this->info(
-                    sprintf("Could not fetch player data for %s from hiscores! Not updating", $account->username)
-                );
-
-                continue;
-            }
-
-            if ($account->xp == $playerData[0][2] && $account->xp != 4600000000) {
-                $this->info(sprintf("No outdated data for %s! Not updating", $account->username));
-
-                continue;
-            }
-
-            $this->info(sprintf("Found outdated data for %s!", $account->username));
 
             DB::beginTransaction();
 
-            $account->rank = $playerData[0][0];
-            $account->level = $playerData[0][1];
-            $account->xp = $playerData[0][2];
+            $account = Helper::createOrUpdateAccount($account->username, $account->account_type, $account->user_id, true);
 
-            try {
-                $account->update();
-            } catch (\Exception $e) {
-                DB::rollback();
-                throw $e;
+            if ($account instanceof Account) {
+                $this->info(sprintf('Successfully updated account "%s".', $account->username));
+            } else {
+                $this->info(sprintf($account));
+
+                continue;
             }
-
-            try {
-                $accountController = new AccountController();
-
-                $accountController->createOrUpdateAccountHiscores(
-                    $account,
-                    $playerData,
-                    true
-                );
-            } catch (\Exception $e) {
-                DB::rollback();
-                throw $e;
-            }
-
-            $this->info(sprintf("Updated %s", $account->username));
 
             DB::commit();
         }

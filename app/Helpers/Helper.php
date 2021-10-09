@@ -258,7 +258,85 @@ class Helper
 	    return $collection;
     }
 
-    public static function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false)
+    /**
+     * @param String $accountUsername
+     * @param String $accountType
+     * @param int $userId
+     * @param bool $update
+     * @return Account|string
+     * @throws \Throwable
+     */
+    public static function createOrUpdateAccount(String $accountUsername, String $accountType, int $userId, $update = false): Account|string
+    {
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $accountUsername
+            );
+
+        $playerData = Helper::getPlayerData($playerDataUrl);
+
+        if (!$playerData) {
+            return 'Account "'.$accountUsername.'" does not exist in the official hiscores.';
+        }
+
+        try {
+            $account = self::createOrUpdateAccountt($accountUsername, $accountType, $playerData, $userId, $update);
+        } catch (\Exception $e) {
+            return 'Could not '.($update ? 'update' : 'create').' account "'.$accountUsername.'" due to an unknown error.';
+        }
+
+        try {
+            self::createOrUpdateAccountHiscores($account, $playerData);
+        } catch (\Exception $e) {
+            return 'Could not '.($update ? 'update' : 'create').' account hiscores "'.$accountUsername.'" due to an unknown error.';
+        }
+
+        return $account;
+    }
+
+    /**
+     * @param String $accountUsername
+     * @param String $accountType
+     * @param array $playerData
+     * @param $userId
+     * @param bool $update
+     * @return Account
+     * @throws \Throwable
+     */
+    public static function createOrUpdateAccountt(String $accountUsername, String $accountType, array $playerData, $userId, $update = false): Account
+    {
+        try {
+            if ($update) {
+                $account = Account::whereUsername($accountUsername)->firstOrFail();
+            } else {
+                $account = new Account();
+            }
+
+            $account->user_id = $userId;
+            $account->account_type = $accountType;
+            $account->username = $accountUsername;
+            $account->rank = $playerData[0][0];
+            $account->level = $playerData[0][1];
+            $account->xp = $playerData[0][2];
+
+            $account->save();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        return $account;
+    }
+
+    /**
+     * @param Account $account
+     * @param array $playerData
+     * @param false $update
+     * @return Account
+     * @throws \Throwable
+     */
+    public static function createOrUpdateAccountHiscores(Account $account, array $playerData, $update = false): Account
     {
         $skills = Skill::get();
         $skillsCount = count($skills);
@@ -391,7 +469,7 @@ class Helper
             }
         }
 
-        return true;
+        return $account;
     }
 
     public static function imageUpload($imageFile) {
