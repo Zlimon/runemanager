@@ -276,14 +276,22 @@ class Helper
         $playerData = Helper::getPlayerData($playerDataUrl);
 
         if (!$playerData) {
-            return 'Could not fetch account "'.$accountUsername.'" data from hiscores';
+            return 'Account "'.$accountUsername.'" does not exist in the official hiscores.';
         }
 
-        $account = self::createAccount($accountUsername, $accountType, $playerData, $userId);
+        try {
+            $account = self::createAccount($accountUsername, $accountType, $playerData, $userId);
+        } catch (\Exception $e) {
+            return 'Could not create account "'.$accountUsername.'" due to an unknown error.';
+        }
 
-        self::createOrUpdateAccountHiscores($account, $playerData);
+        try {
+            self::createOrUpdateAccountHiscores($account, $playerData);
+        } catch (\Exception $e) {
+            return 'Could not create account "'.$accountUsername.'" due to an unknown error.';
+        }
 
-        return 'Successfully created account "'.$accountUsername.'".';
+        return $account;
     }
 
     public static function createAccount($accountUsername, $accountType, $playerData, $userId) {
