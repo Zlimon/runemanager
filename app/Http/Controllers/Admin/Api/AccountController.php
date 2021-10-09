@@ -88,51 +88,21 @@ class AccountController extends Controller
             return response($errors, 500);
         }
 
-        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
-                ' ',
-                '%20',
-                $request->account_username
-            );
+        DB::beginTransaction();
 
-        /* Get the $playerDataUrl file content. */
-        $playerData = Helper::getPlayerData($playerDataUrl);
+        $account = Helper::createOrUpdateAccount($request->account_username, 'normal', $user);
 
-        if (!$playerData) {
+        if (!$account instanceof Account) {
             $errors = [
-                'message' => 'Could not fetch player data from hiscores.',
+                'message' => 'Could not reserve account.',
                 'errors' => [
                     'account_username' => [
-                        'Account "' . $request->account_username . '" does not exist in the official hiscores.'
+                        $account
                     ],
                 ],
             ];
 
-            return response($errors, 404);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            $account = new Account();
-
-            $account->user_id = $user;
-            $account->account_type = 'normal';
-            $account->username = $request->account_username;
-            $account->rank = $playerData[0][0];
-            $account->level = $playerData[0][1];
-            $account->xp = $playerData[0][2];
-
-            $account->save();
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-
-        try {
-            Helper::createOrUpdateAccountHiscores($account, $playerData);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+            return response($errors, 500);
         }
 
         DB::commit();

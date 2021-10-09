@@ -258,6 +258,62 @@ class Helper
 	    return $collection;
     }
 
+    /**
+     * @param $accountUsername
+     * @param $accountType
+     * @param $userId
+     * @return string
+     * @throws \Throwable
+     */
+    public static function createOrUpdateAccount($accountUsername, $accountType, $userId) {
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $accountUsername
+            );
+
+        /* Get the $playerDataUrl file content. */
+        $playerData = Helper::getPlayerData($playerDataUrl);
+
+        if (!$playerData) {
+            return 'Account "'.$accountUsername.'" does not exist in the official hiscores.';
+        }
+
+        try {
+            $account = self::createAccount($accountUsername, $accountType, $playerData, $userId);
+        } catch (\Exception $e) {
+            return 'Could not create account "'.$accountUsername.'" due to an unknown error.';
+        }
+
+        try {
+            self::createOrUpdateAccountHiscores($account, $playerData);
+        } catch (\Exception $e) {
+            return 'Could not create account "'.$accountUsername.'" due to an unknown error.';
+        }
+
+        return $account;
+    }
+
+    public static function createAccount($accountUsername, $accountType, $playerData, $userId) {
+        try {
+            $account = new Account();
+
+            $account->user_id = $userId;
+            $account->account_type = $accountType;
+            $account->username = $accountUsername;
+            $account->rank = $playerData[0][0];
+            $account->level = $playerData[0][1];
+            $account->xp = $playerData[0][2];
+
+            $account->save();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        return $account;
+    }
+
     public static function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false)
     {
         $skills = Skill::get();
