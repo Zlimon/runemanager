@@ -15,14 +15,15 @@ class AccountUpdate extends Command
      *
      * @var string
      */
-    protected $signature = 'account:update';
+    protected $signature = 'account:update
+                            {--username= : Update only this account}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Fetches up-to-date data (account level, xp and skill) from Old School RuneScape hiscores';
+    protected $description = 'Fetches up-to-date data (account level, xp and skill) from Old School RuneScape hiscores, and updated an existing account';
 
     /**
      * Create a new command instance.
@@ -41,7 +42,30 @@ class AccountUpdate extends Command
      */
     public function handle()
     {
-        foreach (Account::get() as $account) {
+        $accounts = [];
+
+        $username = $this->option('username');
+        if (!is_null($username)) {
+            $account = Account::whereUsername($username)->first();
+
+            if (!$account) {
+                // TODO this will cause trouble if two or more accounts has the "same" name, but differentiate them using _ or -
+                // TLDR Command argument needs to support spaces
+                $account = Account::whereUsername(str_replace(['_', '-'], ' ', $username))->first();
+
+                if (!$account) {
+                    $this->info(sprintf("Could not find any existing account with username '%s'", $username));
+
+                    return 1;
+                }
+            }
+
+            $accounts[] = $account;
+        } else {
+            $accounts = Account::get();
+        }
+
+        foreach ($accounts as $account) {
             if ($account->online !== 0) {
                 $this->info(sprintf("%s is logged in to the game! Not updating", $account->username));
 
@@ -59,19 +83,19 @@ class AccountUpdate extends Command
 
             if (!$playerData) {
                 $this->info(
-                    sprintf("Could not fetch player data for %s from hiscores! Not updating", $account->username)
+                    sprintf("Could not fetch player data for '%s' from hiscores! Not updating", $account->username)
                 );
 
                 continue;
             }
 
             if ($account->xp == $playerData[0][2] && $account->xp != 4600000000) {
-                $this->info(sprintf("No outdated data for %s! Not updating", $account->username));
+                $this->info(sprintf("No outdated data for '%s'! Not updating", $account->username));
 
                 continue;
             }
 
-            $this->info(sprintf("Found outdated data for %s!", $account->username));
+            $this->info(sprintf("Found outdated data for '%s'!", $account->username));
 
             DB::beginTransaction();
 
@@ -99,7 +123,7 @@ class AccountUpdate extends Command
                 throw $e;
             }
 
-            $this->info(sprintf("Updated %s", $account->username));
+            $this->info(sprintf("Updated '%s'", $account->username));
 
             DB::commit();
         }
