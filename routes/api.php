@@ -18,6 +18,8 @@ Route::prefix('/user')->group(function() {
 
 Route::middleware('auth:api')->group(function() {
 	Route::get('/user', 'Api\UserController@user')->name('user-show');
+	Route::put('/user/update', 'Api\UserController@update')->name('user-update');
+
 	Route::post('/authenticate', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
 
 	Route::prefix('/account')->middleware('user.account')->group(function() {

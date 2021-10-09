@@ -31,6 +31,5 @@ Route::patch('/authenticate/update', 'AccountAuthController@updateAccountType')-
 Route::delete('/authenticate/delete', 'AccountAuthController@delete')->name('account-auth-delete');
 
 Route::get('/user/edit', 'UserController@edit')->name('user-edit');
-Route::patch('/user/update', 'UserController@update')->name('user-update');
 
 Auth::routes();
