@@ -21,7 +21,6 @@ class AccountController extends Controller
 {
     public function authenticate(Request $request)
     {
-        dd(Auth::user());
         $request->validate([
             'account_username' => ['required', 'string', 'max:13'],
             'authentication_code' => ['required', 'string', 'min:8', 'max:8'],
