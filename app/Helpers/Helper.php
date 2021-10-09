@@ -258,6 +258,51 @@ class Helper
 	    return $collection;
     }
 
+    public static function createOrUpdateAccount($accountUsername, $accountType, $userId) {
+        $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
+                ' ',
+                '%20',
+                $accountUsername
+            );
+
+        /* Get the $playerDataUrl file content. */
+        $playerData = Helper::getPlayerData($playerDataUrl);
+
+        if (!$playerData) {
+            return 'Could not fetch account "'.$accountUsername.'" data from hiscores';
+        }
+
+        DB::beginTransaction();
+
+        $account = self::createAccount($accountUsername, $accountType, $playerData, $userId);
+
+        self::createOrUpdateAccountHiscores($account, $playerData);
+
+        DB::commit();
+
+        return 'Successfully created account "'.$accountUsername.'".';
+    }
+
+    public static function createAccount($accountUsername, $accountType, $playerData, $userId) {
+        try {
+            $account = Account::create(
+                [
+                    'user_id' => $userId,
+                    'account_type' => $accountType,
+                    'username' => $accountUsername,
+                    'rank' => $playerData[0][0],
+                    'level' => $playerData[0][1],
+                    'xp' => $playerData[0][2]
+                ]
+            );
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+
+        return $account;
+    }
+
     public static function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false)
     {
         $skills = Skill::get();
