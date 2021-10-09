@@ -262,17 +262,17 @@ class Helper
      * @param $accountUsername
      * @param $accountType
      * @param $userId
-     * @return string
+     * @return Account|string
      * @throws \Throwable
      */
-    public static function createOrUpdateAccount($accountUsername, $accountType, $userId) {
+    public static function createOrUpdateAccount($accountUsername, $accountType, $userId): Account|string
+    {
         $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
                 ' ',
                 '%20',
                 $accountUsername
             );
 
-        /* Get the $playerDataUrl file content. */
         $playerData = Helper::getPlayerData($playerDataUrl);
 
         if (!$playerData) {
@@ -288,13 +288,22 @@ class Helper
         try {
             self::createOrUpdateAccountHiscores($account, $playerData);
         } catch (\Exception $e) {
-            return 'Could not create account "'.$accountUsername.'" due to an unknown error.';
+            return 'Could not create account hiscores "'.$accountUsername.'" due to an unknown error.';
         }
 
         return $account;
     }
 
-    public static function createAccount($accountUsername, $accountType, $playerData, $userId) {
+    /**
+     * @param $accountUsername
+     * @param $accountType
+     * @param $playerData
+     * @param $userId
+     * @return Account
+     * @throws \Throwable
+     */
+    public static function createAccount($accountUsername, $accountType, $playerData, $userId): Account
+    {
         try {
             $account = new Account();
 
@@ -314,7 +323,14 @@ class Helper
         return $account;
     }
 
-    public static function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false)
+    /**
+     * @param Account $account
+     * @param $playerData
+     * @param false $update
+     * @return Account
+     * @throws \Throwable
+     */
+    public static function createOrUpdateAccountHiscores(Account $account, $playerData, $update = false): Account
     {
         $skills = Skill::get();
         $skillsCount = count($skills);
@@ -447,7 +463,7 @@ class Helper
             }
         }
 
-        return true;
+        return $account;
     }
 
     public static function imageUpload($imageFile) {
