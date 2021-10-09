@@ -16,8 +16,8 @@ class CreateCalendarsTable extends Migration
         Schema::create('calendars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->string('title');
-            $table->string('description')->nullable();
+            $table->string('title', 50);
+            $table->string('description', 100)->nullable();
             $table->dateTime('start_date');
             $table->dateTime('end_date')->nullable();
             $table->integer('icon_id')->nullable();
