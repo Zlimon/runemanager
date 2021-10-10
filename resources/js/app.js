@@ -42,6 +42,8 @@ Vue.component('accounthiscore', require('./components/AccountHiscore.vue').defau
 Vue.component('accountskillhiscore', require('./components/account/SkillHiscore.vue').default); // Fetch all account skill hiscores
 Vue.component('accountbosshiscore', require('./components/account/BossHiscore.vue').default); // Fetch all account boss hiscores
 
+Vue.component('AccountSkillHiscoreTable', require('./components/TableHiscoreSkill.vue').default);
+
 Vue.component('equipment', require('./components/account/Equipment.vue').default);
 Vue.component('quests', require('./components/account/Quests.vue').default);
 Vue.component('bank', require('./components/account/Bank.vue').default);

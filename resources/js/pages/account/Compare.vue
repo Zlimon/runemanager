@@ -12,7 +12,7 @@
                 <h1 class="text-center">Compare</h1>
 
                 <div class="d-flex justify-content-center">
-                    <div class="col-2 me-1">
+                    <div class="col-3 me-1">
                         <div class="input-group">
                             <input v-model="accountOne.username"
                                    v-bind:class="{ 'is-invalid' : this.errors && this.errors.accountOne !== undefined }"
@@ -31,7 +31,7 @@
                         </div>
                     </div>
 
-                    <div class="col-2 ms-1">
+                    <div class="col-3 ms-1">
                         <div class="input-group">
                             <span v-if="accountTwo.account !== undefined && accountTwo.account.account_type !== 'normal'" class="input-group-text">
                                 <img :src="'/images/' + accountTwo.account.account_type +'.png'"
@@ -65,41 +65,8 @@
                     </div>
 
                     <div v-else class="d-flex justify-content-center">
-                        <div v-if="accountOne.hiscore !== undefined" class="col">
-                            <table class="table-responsive">
-                                <tr>
-                                    <th class="d-none d-md-table-cell">Name</th>
-                                    <th>Rank</th>
-                                    <th>Level</th>
-                                    <th>XP</th>
-                                    <th></th>
-                                </tr>
-
-                                <tr class="bg-dark text-light background-dialog-panel">
-                                    <td class="d-none d-md-table-cell ps-2">Overall</td>
-                                    <td>{{ accountOne.account.rank }}</td>
-                                    <td>{{ accountOne.account.level }}</td>
-                                    <td>{{ accountOne.account.xp }}</td>
-                                    <td>
-                                        <img :src="'/storage/resource-pack/skill/total.png'"
-                                             :alt="'Total level icon'"
-                                             :title="'Click here to visit total level hiscores'">
-                                    </td>
-                                </tr>
-
-                                <tr v-for="(hiscore, name) in accountOne.hiscore"
-                                    class="bg-dark text-light background-dialog-panel">
-                                    <td class="d-none d-md-table-cell text-capitalize ps-2">{{ name }}</td>
-                                    <td class="ps-2 ps-md-0">{{ hiscore.rank }}</td>
-                                    <td>{{ hiscore.level }}</td>
-                                    <td>{{ hiscore.xp }}</td>
-                                    <td>
-                                        <img :src="'/storage/resource-pack/skill/' + name + '.png'"
-                                             :alt="name + ' skill icon'"
-                                             :title="'Click here to visit ' + name + ' hiscores'">
-                                    </td>
-                                </tr>
-                            </table>
+                        <div v-if="accountOne.hiscore !== undefined && accountOne.hiscore.skill !== undefined" class="col">
+                            <table-hiscore-skill :account="accountOne"></table-hiscore-skill>
                         </div>
                         <div v-else-if="this.errors && this.errors.accountOne !== undefined" class="col-5 text-center py-5">
                             <img :src="'/images/ignore.png'"
@@ -145,43 +112,8 @@
                             </table>
                         </div>
 
-                        <div v-if="accountTwo.hiscore !== undefined" class="col">
-                            <table class="table-responsive">
-                                <tr>
-                                    <th></th>
-                                    <th class="d-none d-md-table-cell">Name</th>
-                                    <th>Rank</th>
-                                    <th>Level</th>
-                                    <th>XP</th>
-                                </tr>
-
-                                <tr class="bg-dark text-light background-dialog-panel">
-                                    <td>
-                                        <img :src="'/storage/resource-pack/skill/total.png'"
-                                             class="ps-1"
-                                             :alt="'Total level icon'"
-                                             :title="'Click here to visit total level hiscores'">
-                                    </td>
-                                    <td class="d-none d-md-table-cell">Overall</td>
-                                    <td>{{ accountTwo.account.rank }}</td>
-                                    <td>{{ accountTwo.account.level }}</td>
-                                    <td>{{ accountTwo.account.xp }}</td>
-                                </tr>
-
-                                <tr v-for="(hiscore, name) in accountTwo.hiscore"
-                                    class="bg-dark text-light background-dialog-panel">
-                                    <td>
-                                        <img :src="'/storage/resource-pack/skill/' + name + '.png'"
-                                             class="ps-1"
-                                             :alt="name + ' skill icon'"
-                                             :title="'Click here to visit ' + name + ' hiscores'">
-                                    </td>
-                                    <td class="d-none d-md-table-cell text-capitalize">{{ name }}</td>
-                                    <td>{{ hiscore.rank }}</td>
-                                    <td>{{ hiscore.level }}</td>
-                                    <td>{{ hiscore.xp }}</td>
-                                </tr>
-                            </table>
+                        <div v-if="accountTwo.hiscore !== undefined && accountTwo.hiscore.skill !== undefined" class="col">
+                            <table-hiscore-skill :account="accountTwo"></table-hiscore-skill>
                         </div>
                         <div v-else-if="this.errors && this.errors.accountTwo !== undefined" class="col-5 text-center py-5">
                             <img :src="'/images/ignore.png'"
@@ -197,8 +129,12 @@
 </template>
 
 <script>
+import TableHiscoreSkill from "../../components/TableHiscoreSkill";
+
 export default {
     name: "PageHiscoreCompare",
+
+    components: {TableHiscoreSkill},
 
     props: {
         accountOneUsername: {required: false},
@@ -221,19 +157,30 @@ export default {
             axios
                 .get('/api/account/' + account + '/skill')
                 .then((response) => {
-
-                    this.errors.accountOne = undefined;
-
                     this.accountOne.account = response.data.data;
-                    this.accountOne.hiscore = response.data.meta.skill_hiscores;
+                    this.accountOne.hiscore.skill = response.data.meta.skill_hiscores;
 
-                    console.log(this.accountOne.account)
-                    console.log(this.accountOne.hiscore)
+                    axios
+                        .get('/api/account/' + account + '/boss')
+                        .then((response) => {
+                            this.errors.accountOne = undefined;
+
+                            this.accountOne.account = response.data.data;
+                            this.accountOne.hiscore.boss = response.data.meta.boss_hiscores;
+
+                        })
+                        .catch(error => {
+                            console.error(error)
+
+                            this.accountOne.hiscore.boss = undefined;
+                            this.comparisons = null;
+                            this.errors.accountOne = 'Could not load account "' + account + '"';
+                        })
                 })
                 .catch(error => {
                     console.error(error)
 
-                    this.accountOne.hiscore = undefined;
+                    this.accountOne.hiscore.skill = undefined;
                     this.comparisons = null;
                     this.errors.accountOne = 'Could not load account "' + account + '"';
                 })
@@ -243,15 +190,30 @@ export default {
             axios
                 .get('/api/account/' + account + '/skill')
                 .then((response) => {
-                    this.errors.accountTwo = undefined;
-
                     this.accountTwo.account = response.data.data;
-                    this.accountTwo.hiscore = response.data.meta.skill_hiscores;
+                    this.accountTwo.hiscore.skill = response.data.meta.skill_hiscores;
+
+                    axios
+                        .get('/api/account/' + account + '/boss')
+                        .then((response) => {
+                            this.errors.accountTwo = undefined;
+
+                            this.accountTwo.account = response.data.data;
+                            this.accountTwo.hiscore.boss = response.data.meta.boss_hiscores;
+
+                        })
+                        .catch(error => {
+                            console.error(error)
+
+                            this.accountTwo.hiscore.boss = undefined;
+                            this.comparisons = null;
+                            this.errors.accountTwo = 'Could not load account "' + account + '"';
+                        })
                 })
                 .catch(error => {
                     console.error(error)
 
-                    this.accountTwo.hiscore = undefined;
+                    this.accountTwo.hiscore.skill = undefined;
                     this.comparisons = null;
                     this.errors.accountTwo = 'Could not load account "' + account + '"';
                 })
@@ -277,12 +239,18 @@ export default {
             accountOne: {
                 username: this.accountOneUsername,
                 account: undefined,
-                hiscore: undefined,
+                hiscore: {
+                    skill: undefined,
+                    boss: undefined,
+                },
             },
             accountTwo: {
                 username: this.accountTwoUsername,
                 account: undefined,
-                hiscore: undefined,
+                hiscore: {
+                    skill: undefined,
+                    boss: undefined,
+                },
             },
 
             comparisons: null,
