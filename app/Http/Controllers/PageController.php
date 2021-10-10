@@ -104,7 +104,7 @@ class PageController extends Controller
             $accountTwoUsername = $accountTwo->username;
         } else {
             $accountOneUsername = Account::inRandomOrder()->pluck('username')->first();
-            $accountTwoUsername = Account::inRandomOrder()->pluck('username')->first();
+            $accountTwoUsername = Account::whereNotIn('username', [$accountOneUsername])->inRandomOrder()->pluck('username')->first();
         }
 
         return view('account.compare', compact('accountOneUsername', 'accountTwoUsername'));
