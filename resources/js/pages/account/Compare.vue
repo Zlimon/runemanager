@@ -11,13 +11,13 @@
             <div class="bg-dark background-dialog-panel p-3">
                 <h1 class="text-center">Compare</h1>
 
-                <div class="row">
-                    <div class="col-6">
+                <div class="d-flex justify-content-center">
+                    <div class="col-2 me-1">
                         <div class="input-group">
                             <input v-model="accountOne.username"
                                    v-bind:class="{ 'is-invalid' : this.errors && this.errors.accountOne !== undefined }"
                                    type="text"
-                                   class="form-control"
+                                   class="form-control text-end"
                                    id="account_one"
                                    name="account_one"
                                    placeholder="Type a player username"
@@ -31,7 +31,7 @@
                         </div>
                     </div>
 
-                    <div class="col-6">
+                    <div class="col-2 ms-1">
                         <div class="input-group">
                             <span v-if="accountTwo.account !== undefined && accountTwo.account.account_type !== 'normal'" class="input-group-text">
                                 <img :src="'/images/' + accountTwo.account.account_type +'.png'"
