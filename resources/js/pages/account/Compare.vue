@@ -14,12 +14,6 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="input-group">
-                            <span v-if="accountOne.account !== undefined && accountOne.account.account_type !== 'normal'" class="input-group-text">
-                                <img :src="'/images/' + accountOne.account.account_type +'.png'"
-                                     class="pixel"
-                                     alt="Account type icon"
-                                     style="width: 1rem;">
-                            </span>
                             <input v-model="accountOne.username"
                                    v-bind:class="{ 'is-invalid' : this.errors && this.errors.accountOne !== undefined }"
                                    type="text"
@@ -28,6 +22,12 @@
                                    name="account_one"
                                    placeholder="Type a player username"
                                    required>
+                            <span v-if="accountOne.account !== undefined && accountOne.account.account_type !== 'normal'" class="input-group-text">
+                                <img :src="'/images/' + accountOne.account.account_type +'.png'"
+                                     class="pixel"
+                                     alt="Account type icon"
+                                     style="width: 1rem;">
+                            </span>
                         </div>
                     </div>
 
