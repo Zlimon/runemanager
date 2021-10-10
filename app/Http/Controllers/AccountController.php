@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Account;
 use App\AccountAuthStatus;
 use App\Helpers\Helper;
+use App\Helpers\SettingHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
@@ -31,16 +32,21 @@ class AccountController extends Controller
      */
     public function create()
     {
-        if (Auth::check()) {
-            if (AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first()) {
-                // TODO limit amount of account links setting
-                return redirect(route('account-auth'))->withErrors('You already have a pending status! You have to link this Old School RuneScape account to your RuneManager user before you can access this feature.');
-            } else {
-                return view('account.create');
-            }
-        } else {
-            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
+        if (AccountAuthStatus::whereUserId(Auth::user()->id)->where('status', '!=', 'success')->first()) {
+            return redirect(route('account-auth'))->withErrors(
+                'You already have a pending status! You have to link this Old School RuneScape account to your RuneManager user before you can access this feature.'
+            );
         }
+
+        if (AccountAuthStatus::whereUserId(Auth::user()->id)->where('status', '!=', 'pending')->count() >= SettingHelper::getSetting('maximum_linked_accounts_per_user')) {
+            return redirect(route('account-auth'))->withErrors(
+                'You have reached the maximum number of linked accounts allowed for this user!'
+            );
+        }
+
+        $accountTypes = Helper::listAccountTypes();
+
+        return view('account.create', compact('accountTypes'));
     }
 
     /**

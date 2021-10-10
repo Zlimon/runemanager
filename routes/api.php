@@ -21,6 +21,7 @@ Route::middleware('auth:api')->group(function() {
 	Route::put('/user/update', 'Api\UserController@update')->name('user-update');
 
 	Route::post('/authenticate', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
+    Route::post('/authenticate/create', 'Api\AccountAuthController@create')->name('account-auth-create');
 
 	Route::prefix('/account')->middleware('user.account')->group(function() {
         Route::put('/{account}/login', 'Api\AccountController@loginLogout')->name('account-login'); // Make account online

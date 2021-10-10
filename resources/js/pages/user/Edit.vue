@@ -121,8 +121,7 @@
                             </div>
                         </div>
 
-                        <div @click="updateUser"
-                             class="btn btn-success d-block">
+                        <div @click="updateUser" class="btn btn-success d-block">
                             Update
                         </div>
                     </div>

@@ -26,7 +26,6 @@ Route::get('/group/create', 'GroupController@create')->name('group-create');
 Route::get('/group/{groupName}/show', 'GroupController@show')->name('group-show');
 
 Route::get('/authenticate', 'AccountAuthController@index')->name('account-auth');
-Route::post('/authenticate/create', 'AccountAuthController@create')->name('account-auth-create');
 Route::patch('/authenticate/update', 'AccountAuthController@updateAccountType')->name('account-auth-update');
 Route::delete('/authenticate/delete', 'AccountAuthController@delete')->name('account-auth-delete');
 
