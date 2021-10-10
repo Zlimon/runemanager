@@ -20,8 +20,13 @@ Route::middleware('auth:api')->group(function() {
 	Route::get('/user', 'Api\UserController@user')->name('user-show');
 	Route::put('/user/update', 'Api\UserController@update')->name('user-update');
 
-	Route::post('/authenticate', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
-    Route::post('/authenticate/create', 'Api\AccountAuthController@create')->name('account-auth-create');
+	Route::post('/account/auth/create', 'Api\AccountAuthController@create')->name('account-auth-create');
+	// TODO rework auth process
+    Route::post('/account/auth/auth', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
+	Route::prefix('/account/auth')->middleware('user.accountAuthStatus')->group(function() {
+        Route::patch('/{accountAuthStatus}/update', 'Api\AccountAuthController@updateAccountType')->name('account-auth-update');
+        Route::delete('/{accountAuthStatus}/destroy', 'Api\AccountAuthController@delete')->name('account-auth-delete');
+    });
 
 	Route::prefix('/account')->middleware('user.account')->group(function() {
         Route::put('/{account}/login', 'Api\AccountController@loginLogout')->name('account-login'); // Make account online

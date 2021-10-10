@@ -101,7 +101,7 @@
 <!--                            @endforeach-->
 
                             <div class="text-center">
-                                <a :href="'/account/create'">
+                                <a :href="'/account/auth/create'">
                                     <div class="btn btn-lg button-combat-style-thin">
                                         <span>Link account</span>
                                     </div>

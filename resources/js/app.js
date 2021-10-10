@@ -59,8 +59,11 @@ Vue.component('groupbank', require('./components/group/GroupBank').default);
 // PRE CLEANUP TEMPORARILY PLACEMENT
 Vue.component('PageIndex', require('./pages/Index').default);
 Vue.component('PageHome', require('./pages/Home').default);
+
 Vue.component('PageUserEdit', require('./pages/user/Edit').default);
-Vue.component('PageAccountCreate', require('./pages/account/Create').default);
+
+Vue.component('PageAccountAuthCreate', require('./pages/account/auth/Create').default);
+Vue.component('PageAccountAuthIndex', require('./pages/account/auth').default);
 
 Vue.component('PageAdminUserIndex', require('./pages/admin/user/Index').default);
 Vue.component('PageAdminUserShow', require('./pages/admin/user/Show').default);
