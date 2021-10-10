@@ -32,24 +32,58 @@ class AccountController extends Controller
 
         $authStatus = AccountAuthStatus::where('username', $accountUsername)->where('status', 'pending')->first();
         if (!$authStatus) {
-            return response($accountUsername.' has no pending status.');
+            $errors = [
+                'message' => 'Could not authenticate account.',
+                'errors' => [['"'.$accountUsername.'" has no pending status.'],
+                ],
+            ];
+
+            return response($errors, 404);
         }
 
         if ($authStatus->user_id !== Auth::id()) {
-            return response($accountUsername.' is not linked to your user.', 403);
+            $errors = [
+                'message' => 'Could not authenticate account.',
+                'errors' => [['"'.$accountUsername.'" is not linked to user "'.Auth::user()->name.'"."'],
+                ],
+            ];
+
+            return response($errors, 403);
         }
 
         if ($accountType !== $authStatus->account_type) {
-            return response('This account is registered as "'.lcfirst(Helper::formatAccountTypeName($authStatus->account_type)).'", not "'.$accountType.'".',406);
+            $errors = [
+                'message' => 'Could not authenticate account.',
+                'errors' => [['"'.$accountUsername.'" is registered as a "'.ucwords(Helper::formatAccountTypeName($authStatus->account_type)).'" account, not "'.ucwords(Helper::formatAccountTypeName($accountType)).'". Account type can be updated on the authentication page.'],
+                ],
+            ];
+
+            return response($errors, 422);
         }
 
         if ($request->authentication_code !== $authStatus->code) {
-            return response('Invalid authentication code.', 406);
+            $errors = [
+                'message' => 'Could not authenticate account.',
+                'errors' => [['Invalid authentication code.'],
+                ],
+            ];
+
+            return response($errors, 406);
         }
 
         DB::beginTransaction();
 
-        Helper::createOrUpdateAccount($accountUsername, $accountType, Auth::id());
+        $account = Helper::createOrUpdateAccount($accountUsername, $accountType, Auth::id());
+
+        if (!$account instanceof Account) {
+            $errors = [
+                'message' => 'Could not authenticate account.',
+                'errors' => [[$account],
+                ],
+            ];
+
+            return response($errors, 500);
+        }
 
         $authStatus->status = 'success';
 
@@ -57,7 +91,13 @@ class AccountController extends Controller
 
         DB::commit();
 
-        return response('Account '.$accountUsername.' successfully authenticated to user '.Auth::user()->name.'!', 201);
+        $success = [
+            'message' => 'Successfully authenticated account to user.',
+            'errors' => [['Account "'.$accountUsername.'" successfully authenticated to user "'.Auth::user()->name.'".'],
+            ],
+        ];
+
+        return response($success, 201);
     }
 
     public function loginLogout(Account $account, Request $request)

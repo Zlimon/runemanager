@@ -22,7 +22,7 @@ Route::middleware('auth:api')->group(function() {
 
 	Route::post('/account/auth/create', 'Api\AccountAuthController@store')->name('account-auth-create');
 	// TODO rework auth process
-    Route::post('/account/auth/auth', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
+    Route::post('/account/auth/authenticate', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
 	Route::prefix('/account/auth')->middleware('user.accountAuthStatus')->group(function() {
         Route::patch('/{accountAuthStatus}/update', 'Api\AccountAuthController@updateAccountType')->name('account-auth-update');
         Route::delete('/{accountAuthStatus}/destroy', 'Api\AccountAuthController@delete')->name('account-auth-delete');
