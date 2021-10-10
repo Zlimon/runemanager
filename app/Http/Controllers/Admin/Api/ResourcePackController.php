@@ -11,12 +11,6 @@ use Illuminate\Support\Str;
 
 class ResourcePackController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function search(Request $request)
     {
         $this->validate(
@@ -37,12 +31,12 @@ class ResourcePackController extends Controller
                 'message' => 'No search results.',
                 'errors' => [
                     'search' => [
-                        0 => 'Could not find any resource packs with the name "' . $query . '"!',
-                    ],
+                        'Could not find any resource packs with the name "'.$query.'".',
+                    ]
                 ],
             ];
 
-            return response()->json($errors, 404);
+            return response($errors, 404);
         }
 
         $status = Artisan::call(
@@ -59,14 +53,9 @@ class ResourcePackController extends Controller
             'resourcePack' => ResourcePack::whereName($query)->first(),
         ];
 
-        return response()->json($return, 200);
+        return response($return, 200);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function switch(ResourcePack $resourcePack)
     {
         $status = Artisan::call(
