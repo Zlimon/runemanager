@@ -146,9 +146,17 @@ class AccountController extends Controller
         ]);
 
         $user = User::whereName($request->name)->orWhere('id', $request->name)->pluck('id')->first();
-
         if (!$user) {
-            return response(['errors' => ['name' => ['This user could not be found.']]], 422);
+            $errors = [
+                'message' => 'Could not transfer account.',
+                'errors' => [
+                    'search' => [
+                        'This user could not be found.',
+                    ]
+                ],
+            ];
+
+            return response($errors, 404);
         }
 
         $account->user_id = $user;
