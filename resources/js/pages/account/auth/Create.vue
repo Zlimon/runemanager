@@ -67,7 +67,7 @@
                         </div>
 
                         <div @click="createAccountAuthStatus" class="btn btn-primary d-block">
-                            Update
+                            Create
                         </div>
                     </div>
                 </div>
@@ -87,13 +87,13 @@ export default {
     methods: {
         createAccountAuthStatus() {
             axios
-                .post('/api/authenticate/create', this.fields)
+                .post('/api/account/auth/create', this.fields)
                 .then(() => {
                     this.errors = null;
 
                     this.doSuccess('Successfully started authentication process for account "' + this.fields.account_username + '".');
 
-                    window.location.href = '/authenticate';
+                    window.location.href = '/account/auth';
                 })
                 .catch(error => {
                     console.error(error.response.data);

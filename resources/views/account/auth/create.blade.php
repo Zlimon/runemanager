@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-    <page-account-create :account-types="{{ json_encode($accountTypes) }}"></page-account-create>
+    <page-account-auth-create :account-types="{{ json_encode($accountTypes) }}"></page-account-auth-create>
 @endsection
