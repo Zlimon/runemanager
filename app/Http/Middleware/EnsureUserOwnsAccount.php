@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Account;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EnsureUserOwnsAccount
 {
@@ -19,10 +20,16 @@ class EnsureUserOwnsAccount
     {
         $account = $request->route('account');
 
-        $hasOwnership = Account::where('user_id', auth()->user()->id)->where('username', $account->username)->first();
+        $hasOwnership = Account::whereUserId(Auth::id())->where('username', $account->username)->first();
 
         if (!$hasOwnership) {
-            return response($account->username." is not authenticated with ".auth()->user()->name, 401);
+            $errors = [
+                'message' => 'The application has encountered an error.',
+                'errors' => [['Account "'.$account->username.'" is not authenticated to user "'.Auth::user()->name.'".',]
+                ],
+            ];
+
+            return response($errors, 401);
         }
 
         return $next($request);
