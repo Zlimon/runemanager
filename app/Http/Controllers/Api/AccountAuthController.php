@@ -95,11 +95,11 @@ class AccountAuthController extends Controller
     public function delete(Request $request, AccountAuthStatus $accountAuthStatus)
     {
         if ($accountAuthStatus->status === 'success') {
-            return response('', 202);
+            return response('', 204);
         }
 
         $accountAuthStatus->delete();
 
-        return response('', 202);
+        return response('', 204);
     }
 }

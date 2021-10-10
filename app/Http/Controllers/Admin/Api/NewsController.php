@@ -83,6 +83,6 @@ class NewsController extends Controller
     {
         $newsPost->delete();
 
-        return response('', 202);
+        return response('', 204);
     }
 }

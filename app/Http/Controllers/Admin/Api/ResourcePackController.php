@@ -13,12 +13,9 @@ class ResourcePackController extends Controller
 {
     public function search(Request $request)
     {
-        $this->validate(
-            $request,
-            [
-                'search' => ['required', 'string', 'min:1', 'max:100'],
-            ]
-        );
+        $request->validate([
+            'search' => ['required', 'max:50'],
+        ]);
 
         $query = Str::slug(strtolower('pack-' . str_replace('pack-', '', request('search'))), '-');
 
@@ -53,7 +50,7 @@ class ResourcePackController extends Controller
             'resourcePack' => ResourcePack::whereName($query)->first(),
         ];
 
-        return response($return, 200);
+        return response($return, 201);
     }
 
     public function switch(ResourcePack $resourcePack)
@@ -73,7 +70,7 @@ class ResourcePackController extends Controller
                 ],
             ];
 
-            return response()->json($errors, 404);
+            return response($errors, 500);
         }
 
         $return = [
@@ -82,14 +79,9 @@ class ResourcePackController extends Controller
             'resourcePack' => $resourcePack,
         ];
 
-        return response()->json($return, 200);
+        return response($return, 200);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(ResourcePack $resourcePack)
     {
         $status = Artisan::call(
@@ -109,7 +101,7 @@ class ResourcePackController extends Controller
                 ],
             ];
 
-            return response()->json($errors, 404);
+            return response($errors, 500);
         }
 
         $return = [
@@ -118,6 +110,6 @@ class ResourcePackController extends Controller
             'resourcePack' => $resourcePack,
         ];
 
-        return response()->json($return, 200);
+        return response($return, 200);
     }
 }

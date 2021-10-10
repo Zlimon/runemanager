@@ -37,7 +37,7 @@ class CalendarController extends Controller
             unset($event->end_date);
         }
 
-        return $calendar;
+        return response($calendar, 200);
     }
 
     /**
@@ -79,7 +79,7 @@ class CalendarController extends Controller
 
         $calendar->save();
 
-        return response($calendar, 202);
+        return response($calendar, 201);
     }
 
     /**
@@ -132,7 +132,7 @@ class CalendarController extends Controller
 
         $calendar->save();
 
-        return response($calendar, 202);
+        return response($calendar, 200);
     }
 
     /**
@@ -154,7 +154,7 @@ class CalendarController extends Controller
 
         $calendar->save();
 
-        return response($calendar, 202);
+        return response($calendar, 200);
     }
 
     /**
@@ -167,6 +167,6 @@ class CalendarController extends Controller
     {
         $calendar->delete();
 
-        return response('', 202);
+        return response('', 204);
     }
 }
