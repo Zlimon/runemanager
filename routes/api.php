@@ -20,7 +20,7 @@ Route::middleware('auth:api')->group(function() {
 	Route::get('/user', 'Api\UserController@user')->name('user-show');
 	Route::put('/user/update', 'Api\UserController@update')->name('user-update');
 
-	Route::post('/account/auth/create', 'Api\AccountAuthController@create')->name('account-auth-create');
+	Route::post('/account/auth/create', 'Api\AccountAuthController@store')->name('account-auth-create');
 	// TODO rework auth process
     Route::post('/account/auth/auth', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
 	Route::prefix('/account/auth')->middleware('user.accountAuthStatus')->group(function() {
