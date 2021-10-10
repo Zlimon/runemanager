@@ -99,12 +99,12 @@ class PageController extends Controller
      */
     public function compare(Account $accountOne = null, Account $accountTwo = null)
     {
-        if (!is_null($accountOne) || !is_null($accountTwo)) {
-            $accountOneUsername = $accountOne->username;
-            $accountTwoUsername = $accountTwo->username;
-        } else {
+        if (is_null($accountOne) || is_null($accountTwo)) {
             $accountOneUsername = Account::inRandomOrder()->pluck('username')->first();
             $accountTwoUsername = Account::whereNotIn('username', [$accountOneUsername])->inRandomOrder()->pluck('username')->first();
+        } else {
+            $accountOneUsername = $accountOne->username;
+            $accountTwoUsername = $accountTwo->username;
         }
 
         return view('account.compare', compact('accountOneUsername', 'accountTwoUsername'));
