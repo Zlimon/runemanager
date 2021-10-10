@@ -65,6 +65,10 @@ Vue.component('PageUserEdit', require('./pages/user/Edit').default);
 Vue.component('PageAccountAuthCreate', require('./pages/account/auth/Create').default);
 Vue.component('PageAccountAuthIndex', require('./pages/account/auth').default);
 
+Vue.component('PageAccountCompare', require('./pages/account/Compare').default);
+
+
+
 Vue.component('PageAdminUserIndex', require('./pages/admin/user/Index').default);
 Vue.component('PageAdminUserShow', require('./pages/admin/user/Show').default);
 Vue.component('PageAdminUserEdit', require('./pages/admin/user/Edit').default);
@@ -84,7 +88,6 @@ Vue.component('PageAdminSettingResourcePack', require('./pages/admin/setting/Res
 // PRE CLEANUP TEMPORARILY PLACEMENT
 
 Vue.component('PageGroupShow', require('./pages/group/Show').default);
-Vue.component('PageAccountCompare', require('./pages/account/AccountCompare').default);
 
 Vue.component(
     'passport-clients',

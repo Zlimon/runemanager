@@ -93,6 +93,24 @@ class PageController extends Controller
     }
 
     /**
+     * Show the account comparison page
+     *
+     * @return
+     */
+    public function compare(Account $accountOne = null, Account $accountTwo = null)
+    {
+        if (!is_null($accountOne) || !is_null($accountTwo)) {
+            $accountOneUsername = $accountOne->username;
+            $accountTwoUsername = $accountTwo->username;
+        } else {
+            $accountOneUsername = Account::inRandomOrder()->pluck('username')->first();
+            $accountTwoUsername = Account::inRandomOrder()->pluck('username')->first();
+        }
+
+        return view('account.compare', compact('accountOneUsername', 'accountTwoUsername'));
+    }
+
+    /**
      * Show the calendar
      *
      * @return

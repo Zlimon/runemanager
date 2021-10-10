@@ -120,8 +120,8 @@ class HiscoreController extends Controller
         foreach (Helper::listSkills() as $skillName) {
             $skill = Skill::where('name', $skillName)->firstOrFail();
 
-            $accOneHiscores[$skillName] = $skill->model::where('account_id', 1)->first();
-            $accTwoHiscores[$skillName] = $skill->model::where('account_id', 4)->first();
+            $accOneHiscores[$skillName] = $skill->model::where('account_id', $accountOne->id)->first();
+            $accTwoHiscores[$skillName] = $skill->model::where('account_id', $accountTwo->id)->first();
         }
 
         // Convert Collection to array

@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-    <page-account-compare></page-account-compare>
+    <page-account-compare account-one-username="{{ $accountOneUsername }}" account-two-username="{{ $accountTwoUsername }}"></page-account-compare>
 @endsection
