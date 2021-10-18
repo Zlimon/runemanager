@@ -2,6 +2,20 @@
 
 use App\Account;
 use App\Collection;
+use App\Http\Controllers\Admin\Api\CalendarController;
+use App\Http\Controllers\Api\AccountAuthController;
+use App\Http\Controllers\Api\AccountBankController;
+use App\Http\Controllers\Api\AccountCollectionController;
+use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\AccountEquipmentController;
+use App\Http\Controllers\Api\AccountLootController;
+use App\Http\Controllers\Api\AccountQuestController;
+use App\Http\Controllers\Api\AccountSkillController;
+use App\Http\Controllers\Api\BroadcastController;
+use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\Api\HiscoreController;
+use App\Http\Controllers\Api\UserController;
 use App\Skill;
 use App\Http\Resources\AccountBossResource;
 use App\Http\Resources\AccountCollectionResource;
@@ -17,37 +31,34 @@ Route::prefix('/user')->group(function() {
 });
 
 Route::middleware('auth:api')->group(function() {
-    Route::get('/user', [
-        \App\Http\Controllers\Api\UserController::class, 'user'
-    ]);
+    Route::get('/user', [UserController::class, 'user'])->name('user');
+    Route::put('/user/update', [UserController::class, 'update'])->name('user-update');
 
-	Route::put('/user/update', 'Api\UserController@update')->name('user-update');
-
-	Route::post('/account/auth/create', 'Api\AccountAuthController@store')->name('account-auth-create');
+    Route::post('/account/auth/create', [AccountAuthController::class, 'store'])->name('account-auth-create');
 	// TODO rework auth process
-    Route::post('/account/auth/authenticate', 'Api\AccountController@authenticate')->name('authenticate'); // Authenticate user
+    Route::post('/account/auth/authenticate', [AccountController::class, 'authenticate'])->name('account-authenticate');
 	Route::prefix('/account/auth')->middleware('user.accountAuthStatus')->group(function() {
-        Route::patch('/{accountAuthStatus}/update', 'Api\AccountAuthController@updateAccountType')->name('account-auth-update');
-        Route::delete('/{accountAuthStatus}/destroy', 'Api\AccountAuthController@delete')->name('account-auth-delete');
+        Route::patch('/{accountAuthStatus}/update', [AccountAuthController::class, 'updateAccountType'])->name('account-auth-update-account-type');
+        Route::delete('/{accountAuthStatus}/destroy', [AccountAuthController::class, 'delete'])->name('account-auth-delete');
     });
 
 	Route::prefix('/account')->middleware('user.account')->group(function() {
-        Route::put('/{account}/login', 'Api\AccountController@loginLogout')->name('account-login'); // Make account online
-        Route::put('/{account}/logout', 'Api\AccountController@loginLogout')->name('account-logout'); // Make account offline
+        Route::put('/{account}/login', [AccountController::class, 'loginLogout'])->name('account-login');
+        Route::put('/{account}/logout', [AccountController::class, 'loginLogout'])->name('account-logout');
 
-		Route::put('/{account}/loot/{collection}', 'Api\AccountLootController@update')->name('account-loot-update'); // Put loot data - updates collection model
-		Route::post('/{account}/collection/{collection}', 'Api\AccountCollectionController@update')->name('account-collection-update'); // Post collection data - replaces collection model
+        Route::put('/{account}/loot/{collection}', [AccountLootController::class, 'update'])->name('account-loot-update');
+        Route::post('/{account}/collection/{collection}', [AccountCollectionController::class, 'update'])->name('account-collection-update');
 
-        Route::post('/{account}/skill/{skill}', 'Api\AccountSkillController@update')->name('account-skill-update');
+        Route::post('/{account}/skill/{skill}', [AccountSkillController::class, 'update'])->name('account-skill-update');
 
-        Route::post('/{account}/equipment', 'Api\AccountEquipmentController@update')->name('account-equipment-update');
-        Route::patch('/{account}/equipment', 'Api\AccountEquipmentController@updateDisplay')->name('account-equipment-update-display');
+        Route::post('/{account}/equipment', [AccountEquipmentController::class, 'update'])->name('account-equipment-update');
+        Route::patch('/{account}/equipment', [AccountEquipmentController::class, 'updateDisplay'])->name('account-equipment-update-display');
 
-        Route::post('/{account}/bank', 'Api\AccountBankController@update')->name('account-bank-update');
-        Route::patch('/{account}/bank', 'Api\AccountBankController@updateDisplay')->name('account-bank-update-display');
+        Route::post('/{account}/bank', [AccountBankController::class, 'update'])->name('account-bank-update');
+        Route::patch('/{account}/bank', [AccountBankController::class, 'updateDisplay'])->name('account-bank-update-display');
 
-        Route::post('/{account}/quests', 'Api\AccountQuestController@update')->name('account-quests-update');
-        Route::patch('/{account}/quests', 'Api\AccountQuestController@updateDisplay')->name('account-quests-update-display');
+        Route::post('/{account}/quests', [AccountQuestController::class, 'update'])->name('account-quests-update');
+        Route::patch('/{account}/quests', [AccountQuestController::class, 'updateDisplay'])->name('account-quests-update-display');
     });
 });
 
@@ -77,32 +88,34 @@ Route::prefix('/account')->group(function() {
 	    return new CollectionResource($account->collection($collection)->firstOrFail());
     })->name('account-collection-show');
 
-    Route::get('/{account}/equipment', 'Api\AccountEquipmentController@show')->name('account-equipment-show');
-    Route::get('/{account}/bank', 'Api\AccountBankController@show')->name('account-bank-show');
-    Route::get('/{account}/quests', 'Api\AccountQuestController@show')->name('account-quests-show');
+    Route::get('/{account}/equipment', [AccountEquipmentController::class, 'show'])->name('account-equipment-show');
+    Route::get('/{account}/bank', [AccountBankController::class, 'show'])->name('account-bank-show');
+    Route::get('/{account}/quests', [AccountQuestController::class, 'show'])->name('account-quests-show');
 });
 
 Route::prefix('/hiscore')->group(function() {
-    Route::get('/{accountOne}/{accountTwo}/compare', 'Api\HiscoreController@compare')->name('hiscore-compare-show');
-    Route::get('/skill/total', 'Api\HiscoreController@total')->name('hiscore-total-show');
-	Route::get('/skill/{skill}', 'Api\HiscoreController@skill')->name('hiscore-skill-show');
-	Route::get('/collection/{collection}', 'Api\HiscoreController@collection')->name('hiscore-boss-show');
+    Route::get('/{accountOne}/{accountTwo}/compare', [HiscoreController::class, 'compare'])->name('hiscore-compare');
+    Route::get('/skill/total', [HiscoreController::class, 'total'])->name('hiscore-total');
+    Route::get('/skill/{skill}', [HiscoreController::class, 'skill'])->name('hiscore-skill');
+    Route::get('/collection/{collection}', [HiscoreController::class, 'collection'])->name('hiscore-boss');
 });
 
 Route::prefix('/collection')->group(function() {
-	Route::get('/{collectionCategory}', 'Api\CollectionController@index');
+    Route::get('/{collectionCategory}', [CollectionController::class, 'index'])->name('hiscore');
 });
 
 Route::prefix('/broadcast')->group(function() {
-	Route::get('/{broadcastType}', 'Api\BroadcastController@index')->name('broadcast-show-all');
-	Route::get('/account/{account}/{broadcastType}', 'Api\BroadcastController@account')->name('broadcast-account-show');
-    Route::get('/recent/{broadcastType}', 'Api\BroadcastController@recent')->name('broadcast-recent-show');
+    Route::get('/{broadcastType}', [BroadcastController::class, 'index'])->name('broadcast');
+
+    Route::get('/account/{account}/{broadcastType}', [BroadcastController::class, 'account'])->name('broadcast-account');
+    Route::get('/recent/{broadcastType}', [BroadcastController::class, 'recent'])->name('broadcast-recent');
 });
 
-Route::get('/calendar', 'Admin\Api\CalendarController@index');
-Route::get('/calendar/{calendar}/show', 'Admin\Api\CalendarController@show');
+// TODO move out of Admin
+Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+Route::get('/calendar/{calendar}/show', [CalendarController::class, 'show'])->name('calendar-show');
 
 Route::prefix('/group')->group(function() {
-    Route::get('/{group}', 'Api\GroupController@show');
-	Route::get('/{group}/bank', 'Api\GroupController@bank');
+    Route::get('/{group}', [GroupController::class, 'index'])->name('group');
+    Route::get('/{group}/bank', [GroupController::class, 'bank'])->name('group-bank');
 });
