@@ -12,6 +12,11 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function user()
+    {
+        return response(Auth::user(), 200);
+    }
+
     public function register(Request $request)
     {
         $request->validate([
@@ -26,9 +31,9 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $accessToken = $user->createToken('accessToken')->accessToken;
+        $accessToken = $user->createToken('authToken')->accessToken;
 
-        return response()->json(['accessToken' => $accessToken], 200);
+        return response(['user' => Auth::user(), 'access_token' => $accessToken], 201);
     }
 
     public function login(Request $request)
@@ -39,17 +44,17 @@ class UserController extends Controller
         ]);
 
         if (!Auth::attempt($login)) {
-            return response()->json('These credentials do not match our records.', 401);
+            $errors = [
+                'message' => 'Could not log in.',
+                'errors' => [['These credentials do not match our records..',]],
+            ];
+
+            return response($errors, 401);
         }
 
         $accessToken = Auth::user()->createToken('authToken')->accessToken;
 
-        return response()->json($accessToken, 200);
-    }
-
-    public function user()
-    {
-        return response()->json(['user' => auth()->user()], 200);
+        return response(['user' => Auth::user(), 'access_token' => $accessToken], 200);
     }
 
     public function update(Request $request)
@@ -74,6 +79,6 @@ class UserController extends Controller
 
         $user->save();
 
-        return response($user, 202);
+        return response($user, 200);
     }
 }

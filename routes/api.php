@@ -17,7 +17,10 @@ Route::prefix('/user')->group(function() {
 });
 
 Route::middleware('auth:api')->group(function() {
-	Route::get('/user', 'Api\UserController@user')->name('user-show');
+    Route::get('/user', [
+        \App\Http\Controllers\Api\UserController::class, 'user'
+    ]);
+
 	Route::put('/user/update', 'Api\UserController@update')->name('user-update');
 
 	Route::post('/account/auth/create', 'Api\AccountAuthController@store')->name('account-auth-create');
