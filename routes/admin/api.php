@@ -1,27 +1,44 @@
 <?php
 
+use App\Http\Controllers\Admin\Api\AccountController;
+use App\Http\Controllers\Admin\Api\CalendarController;
+use App\Http\Controllers\Admin\Api\NewsController;
+use App\Http\Controllers\Admin\Api\ResourcePackController;
+use App\Http\Controllers\Admin\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function() {
     Route::prefix('/admin')->group(function() {
-        Route::post('/user/search', 'Admin\Api\UserController@search')->name('admin-user-search');
-        Route::put('/user/{user}/update', 'Admin\Api\UserController@update')->name('admin-user-update');
+        Route::prefix('/user')->group(function() {
+            Route::post('/search', [UserController::class, 'search'])->name('admin-user-search');
+            Route::put('/{user}/update', [UserController::class, 'update'])->name('admin-user-update');
+        });
 
-        Route::post('/account/store', 'Admin\Api\AccountController@store')->name('admin-account-store');
-        Route::post('/account/search', 'Admin\Api\AccountController@search')->name('admin-account-search');
-        Route::put('/account/{account}/update', 'Admin\Api\AccountController@update')->name('admin-account-update');
+        Route::prefix('/account')->group(function() {
+            Route::post('/store', [AccountController::class, 'store'])->name('admin-account-store');
+            Route::post('/search', [AccountController::class, 'search'])->name('admin-account-search');
+            Route::post('/{account}/update', [AccountController::class, 'update'])->name('admin-account-update');
+        });
 
-        Route::post('/news/create', 'Admin\Api\NewsController@store')->name('admin-newspost-store');
-        Route::put('/news/{newsPost}/update', 'Admin\Api\NewsController@update')->name('admin-newspost-update');
-        Route::delete('/news/{newsPost}/destroy', 'Admin\Api\NewsController@destroy')->name('admin-newspost-destroy');
+        Route::prefix('/news')->group(function() {
+            Route::post('/create', [NewsController::class, 'store'])->name('admin-newspost-store');
+            Route::put('/{newsPost}/update', [NewsController::class, 'update'])->name('admin-newspost-update');
+            Route::delete('/{newsPost}/destroy', [NewsController::class, 'destroy'])->name('admin-newspost-destroy');
+        });
 
-        Route::post('/calendar/create', 'Admin\Api\CalendarController@store')->name('admin-calendar');
-        Route::post('/calendar/{calendar}/update', 'Admin\Api\CalendarController@update')->name('admin-calendar-update');
-        Route::patch('/calendar/{calendar}/schedule', 'Admin\Api\CalendarController@updateSchedule')->name('admin-calendar-schedule-update');
-        Route::delete('/calendar/{calendar}/destroy', 'Admin\Api\CalendarController@destroy')->name('admin-calendar-destroy');
+        Route::prefix('/calendar')->group(function() {
+            Route::post('/create', [CalendarController::class, 'store'])->name('admin-calendar');
+            Route::post('/{calendar}/update', [CalendarController::class, 'update'])->name('admin-calendar-update');
+            Route::patch('/{calendar}/schedule', [CalendarController::class, 'updateSchedule'])->name('admin-calendar-update-schedule');
+            Route::delete('/{calendar}/destroy', [CalendarController::class, 'destroy'])->name('admin-destroy');
+        });
 
-		Route::post('/settings/resource-pack', 'Admin\Api\ResourcePackController@search')->name('admin-settings-resourcepack-search');
-		Route::patch('/settings/resource-pack/{resourcePack}/switch', 'Admin\Api\ResourcePackController@switch')->name('admin-settings-resourcepack-switch');
-		Route::patch('/settings/resource-pack/{resourcePack}/update', 'Admin\Api\ResourcePackController@update')->name('admin-settings-resourcepack-update');
+        Route::prefix('/settings')->group(function() {
+            Route::prefix('/resource-pack')->group(function() {
+                Route::post('/search', [ResourcePackController::class, 'search'])->name('admin-settings-resourcepack-search');
+                Route::patch('/{resourcePack}/switch', [ResourcePackController::class, 'switch'])->name('admin-settings-resourcepack-switch');
+                Route::patch('/{resourcePack}/update', [ResourcePackController::class, 'update'])->name('admin-settings-resourcepack-update');
+            });
+        });
     });
 });

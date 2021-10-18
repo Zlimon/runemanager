@@ -26,8 +26,8 @@ use App\Http\Resources\SkillResource;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('/user')->group(function() {
-	Route::post('/register', 'Api\UserController@register')->name('user-register');
-	Route::post('/login', 'Api\UserController@login')->name('user-login');
+    Route::post('/register', [UserController::class, 'register'])->name('user-register');
+    Route::post('/login', [UserController::class, 'login'])->name('user-login');
 });
 
 Route::middleware('auth:api')->group(function() {
