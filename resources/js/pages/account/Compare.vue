@@ -37,7 +37,7 @@
                                 <img :src="'/images/' + accountTwo.account.account_type +'.png'"
                                      class="pixel"
                                      alt="Account type icon"
-                                     style="width: 1rem;">
+                                     style="width: 1rem; transform: scaleX(-1);">
                             </span>
                             <input v-model="accountTwo.username"
                                    v-bind:class="{ 'is-invalid' : this.errors && this.errors.accountTwo !== undefined }"
@@ -123,6 +123,30 @@
                         </div>
                     </div>
                 </div>
+
+                <h1 class="text-center">Boss Hiscores</h1>
+
+                <div v-if="accountOne.username !== '' && accountTwo.username !== ''">
+                    <div v-if="loading">
+                        <div class="d-flex justify-content-center">
+                            <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else class="d-flex justify-content-center">
+                        <div v-if="accountOne.hiscore !== undefined && accountOne.hiscore.skill !== undefined" class="col">
+                            <table-hiscore-boss :account="accountOne"></table-hiscore-boss>
+                        </div>
+                        <div v-else-if="this.errors && this.errors.accountOne !== undefined" class="col-5 text-center py-5">
+                            <img :src="'/images/ignore.png'"
+                                 class="pixel icon"
+                                 alt="Sad face">
+                            <h3>{{ errors.accountOne }}</h3>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -130,11 +154,12 @@
 
 <script>
 import TableHiscoreSkill from "../../components/TableHiscoreSkill";
+import TableHiscoreBoss from "../../components/TableHiscoreBoss";
 
 export default {
     name: "PageHiscoreCompare",
 
-    components: {TableHiscoreSkill},
+    components: {TableHiscoreBoss, TableHiscoreSkill},
 
     props: {
         accountOneUsername: {required: false},
@@ -163,6 +188,7 @@ export default {
                     axios
                         .get('/api/account/' + account + '/boss')
                         .then((response) => {
+                            console.log(response)
                             this.errors.accountOne = undefined;
 
                             this.accountOne.account = response.data.data;
