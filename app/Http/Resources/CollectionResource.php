@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Collection;
 use App\Helpers\Helper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,12 +26,16 @@ class CollectionResource extends JsonResource
             "updated_at" => 0
         ]);
 
+        $collection = Collection::whereModel(get_class($this->resource))->first();
+
         return [
             'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
             'kill_count' => $this->kill_count,
             'obtained' => $this->obtained,
             'total' => sizeof($collectionUniques),
             'log' => $collectionUniques,
+            'name' => $collection->name,
+            'slug' => $collection->slug,
         ];
     }
 }
