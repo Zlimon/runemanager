@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => bcrypt('test1234'),
             'remember_token' => Str::random(10),
-            'icon_id' => ItemHelper::randomItemId(true),
+            'icon_id' => ItemHelper::randomItemId(false),
         ]);
     }
 }
