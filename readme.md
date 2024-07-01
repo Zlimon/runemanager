@@ -1,126 +1,66 @@
-# RuneManager for Old School RuneScape
-**Welcome to RuneManager!**
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-RuneManager is a CMS developed for clans in Old School RuneScape. With RuneManager will you as a member of a clan have the possibility to communicate with each other in a more engaging and interactive way. By offering different content for each clan members outside the game such as news posting, events in-game, competeties, socializing and much more will you with RuneManager have a more complete feeling of being a member of clan outside the game!
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-**RuneManager is available to test on a [live demo](https://runemanager.habski.me)!**
-[![N|Solid](https://i.imgur.com/Y0TKY30.png)](https://runemanager.habski.me)
+## About Laravel
 
-## What is the point of this?
-Why RuneManager? As a veteran of RuneScape I feel the social aspect of the game is important, and with that we have the in-game clans to gather a small community for your own. With a clan you have a structured way to have a group of people together in-game, and this is now even easier outside the game thanks to different medias such as Discord. However, there are not really any way to still have a communication with integrated elements in the game. By this I mean having a structured way to host events for your clan, notifying your clan with important updates or even have a way to see each other’s statistics without having to manually look them up.
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-RuneManager resolves this. As there is a lack of open-source applications for clan owners in RuneScape, I want to fill this gap and bring the possibility for every clans in RuneScape to provide such content. With RuneManager will you as a clan owner have a structured way of providing content such as these to your clan. By having a list of different features you will be able to integrate your clan members even more with each other outside the game.
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-# Main features
-## News posting
-Want to update your clan members on something? Do it by publishin a news post on your RuneManager application! This is an easy way for everyone to get the same update so there won't be any confusion. News posts also has a integrated comment system so people can discuss whatever that has been posted.
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Task system
-RuneManger delivers a unique way of assigning different tasks in-game in a shape of a task system. The task system will bring a competitive aspect for the clan to compete against each other in order to obtain different perks within the clan where rewards are based on points. The points are differentiated after how difficult the task is, and  will have its own seperate hiscores for the clan members to compete against each other.
+## Learning Laravel
 
-Examples on tasks are:
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-"Get 1 Angler piece"
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-"Get 5 uniques from medium clues"
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-"Complete the Ardougne Hard Diary"
+## Laravel Sponsors
 
-For this to work clan members must install a RuneLite plugin created for this purpose. This plugin is another project related to RuneManager, and will be worked on when RuneManager is complete. Currently, the task system is purely individually so there are no hiscores yet and users of the application are free to assign and complete as many tasks as they wish.
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-## Calendar & Events planning
-With the calendar, clan owners (and administrators) on RuneManager are able to provide clan members an easy way to inform and schedule when something clan related is about to happen. This calendar is synchronized with the clan events and follows the in-game time.
+### Premium Partners
 
-## Leaderboards
-RuneManager allows clan members to show off their accomplishments. With the RuneLite plugin, clan members are able to show off their rare drops, milestones and much more that will be added later.
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[WebReinvent](https://webreinvent.com/)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Jump24](https://jump24.co.uk)**
+- **[Redberry](https://redberry.international/laravel/)**
+- **[Active Logic](https://activelogic.com)**
+- **[byte5](https://byte5.de)**
+- **[OP.GG](https://op.gg)**
 
-### Completed and fully functional
- - User registration & OSRS account linking
- - News
- - Hiscores (automatic scheduled updating)
- - (Simplified) Task system
+## Contributing
 
-### Planned and WIP features
-- [ ] Admin panel
-    - [X] Users (profiles)
-    - [X] Members (Linked OSRS accounts)
-        - [X] Preregistration of accounts
-        - [X] Edit (Transfer ownership)
-    - [X] News
-    - [ ] Events
-    - [ ] Task system (administration)
-    - [ ] Ranks and permissions system
-    - [ ] Ban and user deletion system
-    - [ ] Mail system(?)
-- [ ] Calendar (for in-game events)
-- [ ] Task leaderboards
-- [ ] Data grabbing system (Runelite plugin)
-    - [ ] Loot
-    - [ ] Achievements
-    - [ ] Integration with task system
-- [ ] Customizable application design
-- [X] Discord widget
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-**Todos for the future**
- - [ ] Integrate Ironman hiscores
-    - [ ] Integration with Group Ironman when released
+## Code of Conduct
 
-# Quick Installation
-If you are already familiar with Laravel and setting up a Laravel application with Nginx or Apache, just follow these instructions.
-If not, visit our [wiki](https://github.com/Zlimon/RuneManager-OSRS/wiki/Installing-RuneManager-(Linux)-(MySQL)-(Nginx)) for clear instructions on how to install everything you need!
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-To have scheduled actions such as hiscore synchronization, it is recommended to host RuneManager with Linux
+## Security Vulnerabilities
 
-## Linux
-1. Create a folder and give your current user ownership of it.
-```sh
-sudo mkdir -p /var/www/html/runemanager
-sudo chown $USER:$USER /var/www/html/runemanager
-```
-2. Clone RuneManager via Git to the newly created folder.
-```sh
-cd /var/www/html/runemanager
-git clone https://github.com/Zlimon/RuneManager-OSRS.git .
-```
-3. Next, install the RuneManager dependencies with Composer and clean up the installation files.
-```sh
-composer install
-php artisan clear-compiled
-```
-4. Copy the .env-example file into a file named .env, and edit the .env file with your favourite editor and set the environment variables.
-5. Generate an encryption key and create a symbolic link to the storage folder (this is where newspost images are stored).
-```sh
-php artisan key:generate
-php artisan storage:link
-```
-6. Populate the database with the necassery tables and relations.
-```sh
-php artisan migrate:fresh
-```
-7. Create a crontab job schedule so the hiscores on the website are regularly updated.
-```sh
-crontab -e
-* * * * * php /var/www/runemanager/artisan schedule:run
-```
-8. Change the group ownership of the storage and bootstrap/cache directories to www-data, and then recursively grant all permissions, including write and execute, to the group.
-```sh
-sudo chgrp -R www-data storage bootstrap/cache
-sudo chmod -R ug+rwx storage bootstrap/cache
-```
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-# Getting started
-The first thing to do when RuneManager is properly set up is to create a Super Administrator account. Before making the application public you should register your own account and assign it the Super Administrator role. Do this by registering the account you want to be "Super Admin". The first account that is registered on the website is automatically assigned the Super Administrator role. If you want to change that you can do it in the Admin panel.
+## License
 
-Then you should put a default image for newsposts. You can do it by placing a png image called default in the storage/image folder. This image is used for news post without any given image.
-
-That's it!
-
-### Tech
-RuneManager uses two open source projects to work properly:
-* [spatie/laravel-permission](https://github.com/spatie/laravel-permission) - Associate users with roles and permissions
-* [unisharp/laravel-ckeditor](https://github.com/UniSharp/laravel-ckeditor) - This is a fork from the official CKEditor branch (standard edition), wrapped into the Laravel package.
-
-### License
-RuneManager is licensed under the MIT License. [See the license header in the respective file to be sure](https://github.com/Zlimon/RuneManager-OSRS/blob/master/LICENSE).
-
-Reason for this is the different dependencies RuneManager uses, also including assets such as skill icons and images that are intellectual property and copyrighted by Jagex. This means RuneManager will only provide content that are limited within this license, and always ensures these assets are owned by Jagex.
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
