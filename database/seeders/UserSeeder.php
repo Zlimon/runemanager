@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Helpers\ItemHelper;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => bcrypt('test1234'),
             'remember_token' => Str::random(10),
-            'icon_id' => Helper::randomItemId(true),
+            'icon_id' => ItemHelper::randomItemId(true),
         ]);
     }
 }
