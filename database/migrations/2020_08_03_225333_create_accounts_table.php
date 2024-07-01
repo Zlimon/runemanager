@@ -14,10 +14,16 @@ class CreateAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('accounts', function (Blueprint $table) {
+
+        $accountTypes = array_map(function ($accountType) {
+                return $accountType->value;
+            }, \App\Enums\AccountTypesEnum::cases()
+        );
+
+        Schema::create('accounts', function (Blueprint $table) use ($accountTypes) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->enum('account_type', Helper::listAccountTypes());
+            $table->enum('account_type', $accountTypes);
             $table->string('username', 13)->unique();
             $table->integer('rank')->default(0);
             $table->integer('level')->default(32); // Minimum total level

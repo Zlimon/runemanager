@@ -11,7 +11,8 @@
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "tightenco/ziggy": "^2.0"
+        "tightenco/ziggy": "^2.0",
+        "zanysoft/laravel-zip": "dev-laravel-11"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -65,5 +66,11 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/CalumChamberlain/laravel-zip.git"
+        }
+    ]
 }
