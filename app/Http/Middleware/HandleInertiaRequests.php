@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Collection;
+use App\Models\Skill;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,7 +38,9 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            //
+            'skills' => fn () => Skill::pluck('slug')->toArray() ?? [],
+            'bosses' => fn () => Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('slug')->toArray() ?? [],
+            'clues' =>  fn () => Collection::where('category_id', 5)->pluck('slug')->toArray() ?? [],
         ]);
     }
 }

@@ -16,7 +16,6 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
-            .use('flowbite')
             .mount(el);
     },
     progress: {
