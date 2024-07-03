@@ -17,7 +17,7 @@ const props = defineProps({
 
 const showingNavigationDropdown = ref(false);
 
-let selectedHiscore = ref('skill');
+let selectedHiscore = ref(null);
 
 let skills = usePage().props.skills;
 let topSkillsArray = ref([]);
@@ -127,7 +127,7 @@ onMounted(() => {
                         </ul>
                     </div>
                 </div>
-                <div id="mega-menu-full-dropdown" class="mt-1 border-gray-200 shadow-sm bg-gray-50 md:bg-white border-y dark:bg-gray-800 dark:border-gray-600 background-dialog-iron-rivets">
+                <div id="mega-menu-full-dropdown" class="mt-1 border-gray-200 shadow-sm bg-gray-50 md:bg-white border-y dark:bg-gray-800 dark:border-gray-600 hidden background-dialog-iron-rivets">
                     <div class="flex justify-between max-w-screen-md px-4 py-5 mx-auto text-gray-900 dark:text-white md:px-6">
                         <SecondaryButton @mouseover="selectedHiscore = 'skill'" class="!p-6 background-world-map">
                             <img src="/images/skill/total.webp" class="h-8 w-8" />
