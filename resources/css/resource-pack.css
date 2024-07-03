@@ -45,8 +45,8 @@
     bottom right,
     top -13px left,
     left -13px top 10px,
-    right,
-    bottom,
+    right -13px top 10px,
+    bottom -12px left,
     center;
 }
 
@@ -67,13 +67,15 @@
     bottom right,
     top -15px left,
     left -15px top 10px,
-    right,
+    right -15px top 10px,
     bottom -15px left,
     center;
 }
 
 .background-world-map
 {
+    border: 0;
+
     font-family: 'runescape', sans-serif;
     font-size: 1.5em;
     font-weight: bold;
