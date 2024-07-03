@@ -1,0 +1,222 @@
+.dropdown-bank-tag-down-arrow
+{
+    width: 2.5rem;
+    height: 2.5rem;
+
+    transition: all .2s ease-in;
+
+    background: url('resource-pack/bank/tag_down_arrow.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+}
+
+.header-chatbox-sword:after
+{
+    display: block;
+
+    max-width: 10rem;
+    height: 1rem;
+    margin: auto;
+
+    content: '';
+
+    background: url('resource-pack/chatbox/sword_pointed_left.png') no-repeat,
+    url('resource-pack/options/round_check_box.png') no-repeat,
+    url('resource-pack/chatbox/sword_pointed_right.png') no-repeat;
+    background-position: left,
+    center,
+    right;
+}
+
+.background-dialog-panel
+{
+    background: url('resource-pack/dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
+    url('resource-pack/dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat, /* top right */
+    url('resource-pack/dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('resource-pack/dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('resource-pack/dialog/bottom_line_mode_side_panel_edge_top.png') repeat-x, /* top */
+    url('resource-pack/dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y, /* left */
+    url('resource-pack/dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y, /* right */
+    url('resource-pack/dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x, /* bottom */
+    url('resource-pack/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top -13px left,
+    left -13px top 10px,
+    right,
+    bottom,
+    center;
+}
+
+.background-dialog-iron-rivets
+{
+    background: url('resource-pack/dialog/iron_rivets_corner_top_left.png') no-repeat, /* top left */
+    url('resource-pack/dialog/iron_rivets_corner_top_right.png') no-repeat, /* top right */
+    url('resource-pack/dialog/iron_rivets_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('resource-pack/dialog/iron_rivets_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('resource-pack/dialog/iron_rivets_edge_top.png') repeat-x, /* top */
+    url('resource-pack/dialog/iron_rivets_vertical.png') repeat-y, /* left */
+    url('resource-pack/dialog/iron_rivets_edge_right.png') repeat-y, /* right */
+    url('resource-pack/dialog/iron_rivets_bottom.png') repeat-x, /* bottom */
+    url('resource-pack/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top -15px left,
+    left -15px top 10px,
+    right,
+    bottom -15px left,
+    center;
+}
+
+.background-world-map
+{
+    font-family: 'runescape', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+
+    transition: all .2s ease-in;
+
+    color: #cbcbcb;
+    background: url('resource-pack/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('resource-pack/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('resource-pack/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('resource-pack/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('resource-pack/button/world_map_edge_top.png') repeat-x, /* top */
+    url('resource-pack/button/world_map_edge_left.png') repeat-y, /* left */
+    url('resource-pack/button/world_map_edge_right.png') repeat-y, /* right */
+    url('resource-pack/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('resource-pack/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+}
+
+.background-world-map:hover
+{
+    transition: all .2s ease-in;
+
+    background: url('resource-pack/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('resource-pack/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('resource-pack/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('resource-pack/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('resource-pack/button/world_map_edge_top.png') repeat-x, /* top */
+    url('resource-pack/button/world_map_edge_left.png') repeat-y, /* left */
+    url('resource-pack/button/world_map_edge_right.png') repeat-y, /* right */
+    url('resource-pack/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('resource-pack/dialog/background_brighter.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+}
+
+.icon-radio [type=radio]
+{
+    position: absolute;
+
+    width: 0;
+    height: 0;
+
+    opacity: 0;
+}
+
+.icon-radio [type=radio] + img
+{
+    padding: 8px 8px 8px 8px;
+
+    cursor: pointer;
+}
+
+.icon-radio [type=radio] + img:hover
+{
+    background: url('resource-pack/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('resource-pack/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('resource-pack/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('resource-pack/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('resource-pack/button/world_map_edge_top.png') repeat-x, /* top */
+    url('resource-pack/button/world_map_edge_left.png') repeat-y, /* left */
+    url('resource-pack/button/world_map_edge_right.png') repeat-y, /* right */
+    url('resource-pack/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('resource-pack/dialog/background.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+}
+
+.icon-radio [type=radio]:checked + img
+{
+    background: url('resource-pack/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
+    url('resource-pack/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
+    url('resource-pack/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
+    url('resource-pack/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
+    url('resource-pack/button/world_map_edge_top.png') repeat-x, /* top */
+    url('resource-pack/button/world_map_edge_left.png') repeat-y, /* left */
+    url('resource-pack/button/world_map_edge_right.png') repeat-y, /* right */
+    url('resource-pack/button/world_map_edge_bottom.png') repeat-x, /* bottom */
+    url('resource-pack/dialog/background_brighter.png'); /* body */
+    background-position: top left,
+    top right,
+    bottom left,
+    bottom right,
+    top 0 left,
+    left 0 top 10px,
+    right,
+    bottom,
+    center;
+}
+
+::-webkit-scrollbar {
+    width: 16px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: url('resource-pack/scrollbar/thumb_middle_dark.png');
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: url('resource-pack/scrollbar/thumb_top.png') no-repeat,
+    url('resource-pack/scrollbar/thumb_bottom.png') no-repeat,
+    url('resource-pack/scrollbar/thumb_middle.png');
+    background-position: top,
+    bottom,
+    center;
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(255,0,0,0.4);
+}
+
+/* Up */
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background: url('resource-pack/scrollbar/arrow_up.png');
+}
+
+::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+    border-color: transparent transparent #777777 transparent;
+}
+/* Down */
+::-webkit-scrollbar-button:single-button:vertical:increment {
+    background: url('resource-pack/scrollbar/arrow_down.png');
+}
