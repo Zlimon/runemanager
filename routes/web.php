@@ -21,4 +21,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::prefix('/accounts')->group(function() {
+        Route::get('/', [App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
+    });
 });
