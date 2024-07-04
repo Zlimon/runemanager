@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Helpers\ItemHelper;
+use App\Models\Account;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         User::factory(10)->withPersonalTeam()->create();
+        User::factory(15)->withPersonalTeam()->has(Account::factory()->count(rand(1, 5)))->create();
 
         User::factory()->withPersonalTeam()->create([
             'name' => 'Zlimon',
