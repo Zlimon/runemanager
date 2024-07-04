@@ -17,9 +17,7 @@ class AccountController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Accounts/Index', [
-            'accounts' => AccountResource::collection(Account::with('user')->get()),
-        ]);
+        return Inertia::render('Accounts/Index');
     }
 
     /**
