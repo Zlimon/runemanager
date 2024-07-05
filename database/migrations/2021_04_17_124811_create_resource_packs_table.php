@@ -20,21 +20,10 @@ class CreateResourcePacksTable extends Migration
             $table->string('version');
             $table->string('author');
             $table->string('url');
+            $table->string('tags');
+            $table->boolean('dark_mode')->default(false);
             $table->timestamps();
         });
-
-        // TODO refactor to use Storage facade instead
-        if (!File::exists(public_path('storage'))) {
-            Artisan::call('storage:link');
-        }
-
-        Artisan::call(
-            'resourcepack:fetch',
-            [
-                'name' => 'pack-osrs-dark',
-                '--use' => 'yes',
-            ]
-        );
     }
 
     /**

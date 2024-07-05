@@ -113,6 +113,9 @@ class ResourcePackFetch extends Command
                 }
             }
 
+            $tags = explode(',', $values['tags'] ?? '');
+            $tags = array_map('Str::lower', $tags);
+
             $resourcePack->name = $name;
             $resourcePack->alias = $values['displayName'] ??
                 Str::replaceFirst(
@@ -123,6 +126,8 @@ class ResourcePackFetch extends Command
             $resourcePack->version = $values['compatibleVersion'] ?? '1.0.0';
             $resourcePack->author = $values['author'] ?? '<unknown>';
             $resourcePack->url = $url;
+            $resourcePack->tags = implode(',', $tags);
+            $resourcePack->dark_mode = in_array('dark', $tags);
 
             $resourcePack->save();
         } else {

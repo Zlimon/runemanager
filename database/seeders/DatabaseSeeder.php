@@ -7,6 +7,8 @@ use App\Models\Account;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -29,6 +31,19 @@ class DatabaseSeeder extends Seeder
             'two_factor_recovery_codes' => null,
             'current_team_id' => null,
         ]);
+
+        // TODO refactor to use Storage facade instead
+        if (!File::exists(public_path('storage'))) {
+            Artisan::call('storage:link');
+        }
+
+        Artisan::call(
+            'resourcepack:fetch',
+            [
+                'name' => 'pack-osrs-dark',
+                '--use' => 'yes',
+            ]
+        );
 
 //        $this->call([
 //            UserSeeder::class,
