@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Skill;
+namespace App\Models\Skill;
 
+use App\Models\Account;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Skill\Hitpoints
@@ -36,8 +38,8 @@ class Hitpoints extends Model
 
     protected $hidden = ['user_id'];
 
-    public function account()
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(\App\Account::class);
+        return $this->belongsTo(Account::class);
     }
 }

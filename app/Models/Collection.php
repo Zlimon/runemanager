@@ -23,7 +23,14 @@ class Collection extends Model
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function scopeByCategoryName($query, $categoryName)
+    {
+        return $query->whereHas('category', function ($q) use ($categoryName) {
+            $q->where('category', $categoryName);
+        });
     }
 
 //    public function collection()

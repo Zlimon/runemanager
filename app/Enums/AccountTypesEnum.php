@@ -8,12 +8,12 @@ enum AccountTypesEnum: string {
     case HARDCORE_IRONMAN = 'hardcore';
     case ULTIMATE_IRONMAN = 'ultimate';
 
-    public function returnAllAccountTypes(): array {
+    public static function returnAllAccountTypes(): array {
         return [
-            AccountTypesEnum::NORMAL,
-            AccountTypesEnum::IRONMAN,
-            AccountTypesEnum::HARDCORE_IRONMAN,
-            AccountTypesEnum::ULTIMATE_IRONMAN,
+            AccountTypesEnum::NORMAL->name => AccountTypesEnum::NORMAL->value,
+            AccountTypesEnum::IRONMAN->name => AccountTypesEnum::IRONMAN->value,
+            AccountTypesEnum::HARDCORE_IRONMAN->name => AccountTypesEnum::HARDCORE_IRONMAN->value,
+            AccountTypesEnum::ULTIMATE_IRONMAN->name => AccountTypesEnum::ULTIMATE_IRONMAN->value,
         ];
     }
 }

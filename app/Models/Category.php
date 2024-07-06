@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    public function collection(): HasMany
+    public function collections(): HasMany
     {
-        return $this->hasMany(Collection::class);
+        return $this->hasMany(Collection::class, 'category_id');
     }
 
 //    public function broadcast()

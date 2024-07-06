@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Account extends Model
 {
@@ -28,13 +29,15 @@ class Account extends Model
 //        return $this->hasManyThrough(Broadcast::class, Log::class);
 //    }
 //
-//    public function collection(Collection $collection) {
-//        return $this->hasOne($collection->model);
-//    }
+    public function collection(Collection $collection): HasOne
+    {
+        return $this->hasOne($collection->model);
+    }
 //
-//    public function skill(Skill $skill) {
-//        return $this->hasOne($skill->model);
-//    }
+    public function skill(Skill $skill): HasOne
+    {
+        return $this->hasOne($skill->model);
+    }
 //
 //    public function equipment() {
 //        return $this->hasOne(Equipment::class);
