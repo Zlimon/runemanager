@@ -97,7 +97,7 @@ onMounted(() => {
 
         <Banner />
 
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-800">
             <nav @mouseleave="selectedHiscore = ''"
                  class="bg-white border-gray-200 dark:border-gray-600 dark:bg-gray-900">
                 <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
