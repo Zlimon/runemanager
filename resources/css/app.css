@@ -22,21 +22,30 @@
 }
 
 h1 {
-    @apply text-2xl font-medium text-gray-200 text-center header-chatbox-sword;
+    @apply text-2xl font-extrabold leading-none tracking-tight text-gray-900 header-chatbox-sword dark:text-white md:text-5xl lg:text-6xl;
 }
 h2 {
-    @apply text-xl font-medium text-gray-200 text-center header-chatbox-sword;
+    @apply text-xl font-extrabold leading-none tracking-tight text-gray-900 header-chatbox-sword dark:text-white md:text-4xl lg:text-5xl;
 }
 h3 {
-    @apply text-lg font-medium text-gray-200 text-center header-chatbox-sword;
+    @apply text-lg font-extrabold leading-none tracking-tight text-gray-900 header-chatbox-sword dark:text-white md:text-3xl lg:text-4xl;
+}
+h4 {
+    @apply text-base font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-2xl lg:text-3xl;
+}
+h5 {
+    @apply text-sm font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-xl lg:text-2xl;
+}
+h6 {
+    @apply text-xs font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-lg lg:text-xl;
 }
 
 .card-lg {
-    @apply overflow-hidden p-6 lg:p-8;
+    @apply bg-white border border-gray-200 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-6 lg:p-8;
 }
 .card-md {
-    @apply overflow-hidden p-4 lg:p-6;
+    @apply bg-white border border-gray-200 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-4 lg:p-6;
 }
 .card-sm {
-    @apply overflow-hidden p-2 lg:p-4;
+    @apply bg-white border border-gray-200 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-2 lg:p-4;
 }
