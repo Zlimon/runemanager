@@ -2,11 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Account;
-use App\Helpers\Helper;
-use App\Http\Controllers\Api\AccountController;
+use App\Helpers\AccountHelper;
+use App\Models\Account;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class AccountUpdate extends Command
 {
@@ -23,71 +24,91 @@ class AccountUpdate extends Command
      *
      * @var string
      */
-    protected $description = 'Fetches up-to-date account data from Old School RuneScape hiscores';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Fetches up-to-date account data from Old School RuneScape hiscores, and creates or updates the account in the database.';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
+     * @throws \Throwable
      */
-    public function handle()
+    public function handle(): int
     {
-        $accounts = [];
-
         $username = $this->option('username');
-        if (!is_null($username)) {
+
+        if ($username) {
             $account = Account::whereUsername($username)->first();
 
             if (!$account) {
-                // TODO this will cause trouble if two or more accounts has the "same" name, but differentiate them using _ or -
-                // TLDR Command argument needs to support spaces
-                $username = str_replace(['_', '-'], ' ', $username);
-                $account = Account::whereUsername($username)->first();
+                $userName = $this->choice("Choose user to assign account to", User::orderBy('id')->pluck('name')->all());
 
-                if (!$account) {
-                    $this->info(sprintf('Could not find any existing account with username "%s".', $username));
+                if (!$userName) {
+                    $this->error("No user selected.");
 
-                    return 1;
+                    return CommandAlias::FAILURE;
                 }
+
+                $user = User::whereName($userName)->first();
+
+                $account = AccountHelper::createOrUpdateAccount($username, $user);
+
+                try {
+                    $this->info(sprintf("Successfully created account '%s'.", $account->username));
+                } catch (\Exception $e) {
+                    $this->error(sprintf("Could not create account '%s'. Message: %s", $account->username, $e->getMessage()));
+                }
+
+                return CommandAlias::SUCCESS;
             }
 
             $accounts[] = $account;
         } else {
-            $accounts = Account::get();
+            $account = $this->choice("Choose account", array_merge(Account::orderBy('id')->pluck('username')->all(), ['all']));
+
+            if ($account == 'all') {
+                $accounts = Account::all();
+            } else {
+                $accounts[] = Account::whereUsername($account)->first();
+            }
         }
+
+//        if (!is_null($username)) {
+//            $account = Account::whereUsername($username)->first();
+//
+//            if (!$account) {
+//                // TODO this will cause trouble if two or more accounts has the "same" name, but differentiate them using _ or -
+//                // TLDR Command argument needs to support spaces
+//                $username = str_replace(['_', '-'], ' ', $username);
+//                $account = Account::whereUsername($username)->first();
+//
+//                if (!$account) {
+//                    $this->info(sprintf('Could not find any existing account with username "%s".', $username));
+//
+//                    return 1;
+//                }
+//            }
+//
+//            $accounts[] = $account;
+//        } else {
+//            $accounts = Account::all();
+//        }
 
         foreach ($accounts as $account) {
             if ($account->online !== 0) {
-                $this->info(sprintf('"%s" is logged in to the game! Not updating.', $account->username));
+                $this->warn(sprintf("'%s' is logged in to the game! Not updating.", $account->username));
 
                 continue;
             }
 
-            DB::beginTransaction();
+            try {
+                AccountHelper::createOrUpdateAccount($account->username, $account->user()->first(), constant(sprintf("App\Enums\AccountTypesEnum::%s", strtoupper($account->account_type))));
 
-            $account = Helper::createOrUpdateAccount($account->username, $account->account_type, $account->user_id, true);
-
-            if ($account instanceof Account) {
-                $this->info(sprintf('Successfully updated account "%s".', $account->username));
-            } else {
-                $this->info(sprintf($account));
+                $this->info(sprintf("Successfully updated account '%s'.", $account->username));
+            } catch (\Exception $e) {
+                $this->warn(sprintf("Could not update account '%s'. Message: %s", $account->username, $e->getMessage()));
 
                 continue;
             }
-
-            DB::commit();
         }
 
-        return 0;
+        return CommandAlias::SUCCESS;
     }
 }
