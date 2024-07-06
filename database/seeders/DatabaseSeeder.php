@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
         Artisan::call(
             'resourcepack:fetch',
             [
-                'name' => 'pack-osrs-dark',
+                'name' => 'sample-vanilla',
                 '--use' => 'yes',
             ]
         );
