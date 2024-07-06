@@ -2,13 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Category;
-use App\Collection;
+use App\Models\Category;
+use App\Models\Collection;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class HiscoreCreate extends Command
 {
@@ -30,74 +30,64 @@ class HiscoreCreate extends Command
     protected $description = 'Creates model, migration, collection and image directory for new hiscore based on type. Should be used when a new hiscore entry is added to the official hiscores';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
-     *
-     * @return int
+     * @throws \Throwable
      */
-    public function handle()
+    public function handle(): int
     {
         $hiscoreType = $this->argument('type');
         $hiscoreName = $this->argument('name');
 
         try {
-            $makeModel = "make:model ".ucfirst($hiscoreType)."/".Str::studly($hiscoreName)."";
+            $makeModel = sprintf("make:model %s/%s", ucfirst($hiscoreType), Str::studly($hiscoreName));
+
             Artisan::call($makeModel);
         } catch (\Exception $e) {
-            $this->info(sprintf("Could not create model: '%s'", Str::studly($hiscoreName)));
-            $this->info(sprintf("%s", $e->getMessage()));
-
-            return 1;
+            $this->fail(sprintf("Could not create model: '%s'. Message: %s", Str::studly($hiscoreName), $e->getMessage()));
         }
 
         try {
-            $makeMigration = "make:migration create_".Str::snake($hiscoreName)."_table";
+            $makeMigration = sprintf("make:migration create_%s_table", Str::snake($hiscoreName));
+
             Artisan::call($makeMigration);
         } catch (\Exception $e) {
-            $this->info(sprintf("Could not create migration: '%s'", Str::snake($hiscoreName)));
-            $this->info(sprintf("%s", $e->getMessage()));
-
-            return 1;
+            $this->fail(sprintf("Could not create migration: '%s'. Message: %s", Str::snake($hiscoreName), $e->getMessage()));
         }
 
         $categoryId = Category::whereCategory(strtolower($hiscoreType))->pluck('id')->first();
-
         if (!$categoryId) {
-            $this->info(sprintf("Could not find category: '%s'", strtolower($hiscoreType)));
+            $this->fail(sprintf("Could not find category: '%s'", strtolower($hiscoreType)));
+        }
 
-            return 1;
+        $newestCollection = Collection::whereCategoryId($categoryId)->orderByDesc('order')->pluck('order')->first();
+
+        if ($newestCollection) {
+            $order = ++$newestCollection;
+        } else {
+            $order = $categoryId * 1000;
         }
 
         $collection = new Collection();
 
         $collection->category_id = $categoryId;
-        $collection->order = 666;
+        $collection->order = $order;
         $collection->name = Str::title(str_replace('_', ' ', $hiscoreName));
         $collection->slug = Str::slug(($hiscoreName));
-        $collection->model = "App\\".ucfirst($hiscoreType)."\\".Str::studly($hiscoreName);
+        $collection->model = sprintf("App\Models\%s\%s", ucfirst($hiscoreType), Str::of($hiscoreName)->studly());
 
         $collection->save();
 
-        $imageDirectoryPath = public_path().'/images/'.strtolower($hiscoreType).'/'.Str::slug(($hiscoreName));
+        $imageDirectoryPath = sprintf("%s/images/%s/%s", public_path(), strtolower($hiscoreType), Str::slug($hiscoreName));
         if (!File::exists($imageDirectoryPath)) {
-            File::makeDirectory($imageDirectoryPath);
+            File::makeDirectory($imageDirectoryPath, 0755, true, true);
         }
 
-        if ($this->option('migrate') == "yes") {
-            Artisan::call("migrate");
+        if ($this->option('migrate') == 'yes') {
+            Artisan::call('migrate');
         }
 
         $this->info(sprintf("Successfully created model, migration, collection and image directory for %s hiscore: '%s'", $hiscoreType, Str::title(str_replace('_', ' ', $hiscoreName))));
 
-        return 0;
+        return CommandAlias::SUCCESS;
     }
 }
