@@ -18,4 +18,4 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/resources/css/resource-pack
+/resources/css/resource-pack*
