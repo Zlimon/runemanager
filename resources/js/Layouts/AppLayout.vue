@@ -49,6 +49,14 @@ const logout = () => {
 onMounted(() => {
     initFlowbite();
 
+    // if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (usePage().props.dark_mode === true) {
+        console.log('dark mode')
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark')
+    }
+
     // Split skills (23 in total) array into three arrays for a top, middle and bottom skill bar
     skills.forEach((skill, index) => {
         if (index < 8) {
