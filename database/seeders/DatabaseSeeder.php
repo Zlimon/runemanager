@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             AccountSeeder::class,
+            CollectionSeeder::class,
         ]);
 
         Artisan::call(
