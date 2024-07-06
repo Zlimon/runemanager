@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Clues;
+namespace App\Models\Clue;
 
+use App\Models\Account;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Clues\HardTreasureTrails
@@ -580,8 +582,8 @@ class HardTreasureTrails extends Model
 
     protected $hidden = ['user_id'];
 
-    public function account()
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(\App\Account::class);
+        return $this->belongsTo(Account::class);
     }
 }

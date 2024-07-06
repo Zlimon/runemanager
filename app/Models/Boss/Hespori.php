@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Boss;
+namespace App\Models\Boss;
 
+use App\Models\Account;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Boss\Hespori
@@ -50,8 +52,8 @@ class Hespori extends Model
 
     protected $hidden = ['user_id'];
 
-    public function account()
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(\App\Account::class);
+        return $this->belongsTo(Account::class);
     }
 }
