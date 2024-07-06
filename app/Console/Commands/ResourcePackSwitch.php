@@ -40,9 +40,9 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
         return [
             'name' => fn () => search(
                 label: 'Search for a resource pack:',
-                options: fn ($value) => strlen($value) > 0
-                    ? (ResourcePack::where('name', 'like', "%{$value}%")->orWhere('alias', 'like', "%{$value}%")->pluck('name', 'id')->all()) ?: ([ResourcePack::pluck('name', 'id')->first()])
-                    : [ResourcePack::pluck('name', 'id')->first()],
+                options: fn ($value) => (strlen($value) > 0
+                    ? array_merge(['None'], (ResourcePack::where('name', 'like', "%{$value}%")->orWhere('alias', 'like', "%{$value}%")->pluck('name', 'id')->all()) ?: ([ResourcePack::pluck('name', 'id')->first()]))
+                    : ['None']),
             ),
         ];
     }
@@ -57,6 +57,20 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
 
         $resourcePack = ResourcePack::where('name', 'like', "%{$name}%")->orWhere('alias', 'like', "%{$name}%")->orWhere('id', $name)->pluck('name')->first();
         $name = $resourcePack;
+
+        if (is_null($name) || is_null($resourcePack)) {
+            $this->info(sprintf("No resource pack provided! No resource pack will be applied / existing resource pack will be deleted."));
+
+            SettingHelper::setSetting('resource_pack_id', 0);
+
+            try {
+                File::deleteDirectory(resource_path('/css/resource-pack'));
+            } catch (\Exception $e) {
+                $this->error(sprintf("Could not delete current resource pack. Message: %s", $e->getMessage()));
+            }
+
+            return CommandAlias::SUCCESS;
+        }
 
         if (!$resourcePack || !File::exists(resource_path(sprintf("/css/resource-packs-downloaded/%s.zip", $name)))) {
             $this->fail(sprintf("Resource pack '%s' does not exist! Try downloading it again.", $name));
