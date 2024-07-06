@@ -1,7 +1,42 @@
+@import url('resource-pack.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    @font-face {
+        font-family: 'runescape';
+        src: url('fonts/runescape/runescape.eot');
+        src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape/runescape.woff') format('woff'),
+        url('fonts/runescape/runescape.ttf') format('truetype'),
+        url('fonts/runescape/runescape.svg#runescape') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
+}
+
 [x-cloak] {
     display: none;
+}
+
+h1 {
+    @apply text-2xl font-medium text-gray-200 text-center header-chatbox-sword;
+}
+h2 {
+    @apply text-xl font-medium text-gray-200 text-center header-chatbox-sword;
+}
+h3 {
+    @apply text-lg font-medium text-gray-200 text-center header-chatbox-sword;
+}
+
+.card-lg {
+    @apply overflow-hidden p-6 lg:p-8;
+}
+.card-md {
+    @apply overflow-hidden p-4 lg:p-6;
+}
+.card-sm {
+    @apply overflow-hidden p-2 lg:p-4;
 }

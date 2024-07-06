@@ -28,7 +28,7 @@
     right;
 }
 
-.background-dialog-panel
+.resource-pack-dialog
 {
     background: url('resource-pack/dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat, /* top left */
     url('resource-pack/dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat, /* top right */
@@ -45,12 +45,12 @@
     bottom right,
     top -13px left,
     left -13px top 10px,
-    right -13px top 10px,
+    right -12px top 10px,
     bottom -12px left,
     center;
 }
 
-.background-dialog-iron-rivets
+.resource-pack-iron-rivets
 {
     background: url('resource-pack/dialog/iron_rivets_corner_top_left.png') no-repeat, /* top left */
     url('resource-pack/dialog/iron_rivets_corner_top_right.png') no-repeat, /* top right */
@@ -72,17 +72,8 @@
     center;
 }
 
-.background-world-map
+.resource-pack-world-map
 {
-    border: 0;
-
-    font-family: 'runescape', sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-
-    transition: all .2s ease-in;
-
-    color: #cbcbcb;
     background: url('resource-pack/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
     url('resource-pack/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
     url('resource-pack/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
@@ -92,30 +83,6 @@
     url('resource-pack/button/world_map_edge_right.png') repeat-y, /* right */
     url('resource-pack/button/world_map_edge_bottom.png') repeat-x, /* bottom */
     url('resource-pack/dialog/background.png'); /* body */
-    background-position: top left,
-    top right,
-    bottom left,
-    bottom right,
-    top 0 left,
-    left 0 top 10px,
-    right,
-    bottom,
-    center;
-}
-
-.background-world-map:hover
-{
-    transition: all .2s ease-in;
-
-    background: url('resource-pack/button/world_map_metal_corner_top_left.png') no-repeat, /* top left */
-    url('resource-pack/button/world_map_metal_corner_top_right.png') no-repeat, /* top right */
-    url('resource-pack/button/world_map_metal_corner_bottom_left.png') no-repeat, /* bottom left */
-    url('resource-pack/button/world_map_metal_corner_bottom_right.png') no-repeat,  /* bottom right */
-    url('resource-pack/button/world_map_edge_top.png') repeat-x, /* top */
-    url('resource-pack/button/world_map_edge_left.png') repeat-y, /* left */
-    url('resource-pack/button/world_map_edge_right.png') repeat-y, /* right */
-    url('resource-pack/button/world_map_edge_bottom.png') repeat-x, /* bottom */
-    url('resource-pack/dialog/background_brighter.png'); /* body */
     background-position: top left,
     top right,
     bottom left,
