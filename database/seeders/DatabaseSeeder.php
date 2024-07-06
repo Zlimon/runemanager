@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(15)->withPersonalTeam()->has(Account::factory()->count(rand(1, 5)))->create();
+//        User::factory(15)->withPersonalTeam()->has(Account::factory()->count(rand(1, 5)))->create();
+        User::factory(15)->withPersonalTeam()->create();
 
         User::factory()->withPersonalTeam()->create([
             'name' => 'Zlimon',
@@ -32,10 +33,9 @@ class DatabaseSeeder extends Seeder
             'current_team_id' => null,
         ]);
 
-        // TODO refactor to use Storage facade instead
-        if (!File::exists(public_path('storage'))) {
-            Artisan::call('storage:link');
-        }
+        $this->call([
+            AccountSeeder::class,
+        ]);
 
         Artisan::call(
             'resourcepack:fetch',
@@ -44,9 +44,5 @@ class DatabaseSeeder extends Seeder
                 '--use' => 'yes',
             ]
         );
-
-//        $this->call([
-//            UserSeeder::class,
-//        ]);
     }
 }
