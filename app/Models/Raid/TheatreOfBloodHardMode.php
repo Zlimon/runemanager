@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Raid;
+namespace App\Models\Raid;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Account;

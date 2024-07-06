@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Raid;
+namespace App\Models\Raid;
 
 use App\Models\Account;
 use Illuminate\Database\Eloquent\Model;
