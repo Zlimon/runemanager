@@ -77,7 +77,7 @@ class HiscoreCreate extends Command
         $collection->order = $order;
         $collection->name = Str::title(str_replace('_', ' ', $hiscoreName));
         $collection->slug = Str::slug(($hiscoreName));
-        $collection->model = sprintf("App\Models\%s\%s", ucfirst($hiscoreType), Str::of($hiscoreName)->studly());
+        $collection->model = sprintf("App\Models\%s\%s", ucfirst($hiscoreType), str_replace(':', '', Str::of($hiscoreName)->studly()));
 
         $collection->save();
 
