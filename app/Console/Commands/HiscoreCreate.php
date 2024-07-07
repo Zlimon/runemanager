@@ -41,11 +41,11 @@ class HiscoreCreate extends Command
         $hiscoreSlug = $this->argument('slug');
 
         try {
-            $makeModel = sprintf("make:model %s/%s", ucfirst($hiscoreType), $hiscoreSlug);
+            $makeModel = sprintf("make:model %s/%s", ucfirst($hiscoreType), Str::studly($hiscoreSlug));
 
             Artisan::call($makeModel);
         } catch (\Exception $e) {
-            $this->fail(sprintf("Could not create model: '%s'. Message: %s", $hiscoreSlug, $e->getMessage()));
+            $this->fail(sprintf("Could not create model: '%s'. Message: %s", Str::studly($hiscoreSlug), $e->getMessage()));
         }
 
         try {
