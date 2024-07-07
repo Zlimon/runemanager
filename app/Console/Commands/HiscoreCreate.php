@@ -20,6 +20,7 @@ class HiscoreCreate extends Command
     protected $signature = 'hiscore:create
                             {type : Category type of new hiscore}
                             {name : Name of new hiscore (must be in snake case)}
+                            {slug : Slug of new hiscore (must be in studly case)}
                             {--migrate= : Whether the hiscore should be migrated immediately or not}';
 
     /**
@@ -37,17 +38,18 @@ class HiscoreCreate extends Command
     {
         $hiscoreType = $this->argument('type');
         $hiscoreName = $this->argument('name');
+        $hiscoreSlug = $this->argument('slug');
 
         try {
-            $makeModel = sprintf("make:model %s/%s", ucfirst($hiscoreType), Str::studly($hiscoreName));
+            $makeModel = sprintf("make:model %s/%s", ucfirst($hiscoreType), $hiscoreSlug);
 
             Artisan::call($makeModel);
         } catch (\Exception $e) {
-            $this->fail(sprintf("Could not create model: '%s'. Message: %s", Str::studly($hiscoreName), $e->getMessage()));
+            $this->fail(sprintf("Could not create model: '%s'. Message: %s", $hiscoreSlug, $e->getMessage()));
         }
 
         try {
-            $migrationName = str_replace("-", "_", Str::snake(Str::singular(strtolower($hiscoreName))));
+            $migrationName = str_replace('-', '_', Str::snake(Str::singular(strtolower($hiscoreSlug))));
 
 //            $makeMigration = sprintf("make:migration:schema create_%s_table --schema=\"account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned\"", $migrationName);
             $makeMigration = sprintf("make:migration create_%s_table", $migrationName);
