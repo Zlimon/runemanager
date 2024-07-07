@@ -110,15 +110,24 @@ class AccountHelper
     {
         DB::beginTransaction();
 
-
         $models = [
-            'skills' => Skill::pluck('slug')->all(),
-            'minigames' => ['bounty-hunter', 'bounty-hunter-rogues', 'lms', 'soul-wars', 'castle-wars', 'clan-wars'],
+            'skills' => array_merge(['overall'], Skill::pluck('slug')->all()),
+            'pvp' => Collection::byCategoryName('pvp')->pluck('slug')->all(),
             'clues' => Collection::byCategoryName('clue')->pluck('slug')->all(),
+            'minigame' => Collection::byCategoryName('minigame')->pluck('slug')->all(),
             'bosses' => Collection::byCategoryName('boss')->pluck('slug')->all(),
         ];
-        dd(array_merge($models['skills'], $models['minigames'], $models['clues'], $models['bosses']));
 
+        $keys = array_merge($models['skills'], $models['pvp'], $models['clues'], $models['minigame'], $models['bosses']);
+
+        $combined = [];
+        foreach ($keys as $index => $skill) {
+            if (isset($playerData[$index])) {
+                $combined[$skill] = array_combine(range(1, count($playerData[$index])), $playerData[$index]);
+            }
+        }
+
+        dd($combined);
 
         $skills = Skill::all();
 
