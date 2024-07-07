@@ -34,8 +34,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            AccountSeeder::class,
             CollectionSeeder::class,
+            AccountSeeder::class,
         ]);
 
         Artisan::call(
