@@ -137,7 +137,7 @@ class CollectionSeeder extends Seeder
 
                     Artisan::call('hiscore:create', [
                         'type' => $category,
-                        'name' => Str::snake($slug),
+                        'name' => $name,
                     ]);
 
                     $newestCollection = Collection::whereCategoryId($categoryId)->orderByDesc('order')->pluck('order')->first();
