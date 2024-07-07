@@ -19,15 +19,22 @@ class CollectionSeeder extends Seeder
         /**
          * Categories:
          * 1 - skill
-         * 2 - boss
-         * 3 - raid
-         * 4 - npc
-         * 5 - clue
-         * 6 - minigame
-         * 7 - other
-         * 8 - account
+         * 2 - pvp
+         * 3 - clue
+         * 4 - minigame
+         * 5 - boss
+         * 6 - raid
+         * 7 - npc
          */
         $collections = [
+            'pvp' => [
+                'Bounty Hunter - Hunter' => 'bounty-hunter',
+                'Bounty Hunter - Rogue' => 'bounty-hunter-rogue',
+                'Bounty Hunter (Legacy) - Hunter' => 'bounty-hunter-legacy',
+                'Bounty Hunter (Legacy) - Rogue' => 'bounty-hunter-rogue-legacy',
+                'Unknown 1' => 'unknown-1',
+                'Unknown 2' => 'unknown-2',
+            ],
             'clue' => [
                 'All Treasure Trails' => 'all-treasure-trails',
                 'Clue scroll (beginner)' => 'beginner-treasure-trails',
@@ -38,10 +45,6 @@ class CollectionSeeder extends Seeder
                 'Clue scroll (master)' => 'master-treasure-trails',
             ],
             'minigame' => [
-                'Bounty Hunter - Hunter' => 'bounty-hunter',
-                'Bounty Hunter - Rogue' => 'bounty-hunter-rogue',
-                'Bounty Hunter (Legacy) - Hunter' => 'bounty-hunter-legacy',
-                'Bounty Hunter (Legacy) - Rogue' => 'bounty-hunter-rogues-legacy',
                 'Last Man Standing' => 'last-man-standing',
                 'PvP Arena' => 'pvp-arena',
                 'Soul Wars Zeal' => 'soul-wars-zeal',
@@ -57,8 +60,8 @@ class CollectionSeeder extends Seeder
                 'Callisto' => 'callisto',
                 'Calvar\'ion' => 'calvarion',
                 'Cerberus' => 'cerberus',
-//                'Chambers of Xeric' => 'chambers-of-xeric',
-//                'Chambers of Xeric: Challenge Mode' => 'chambers-of-xeric-challenge-mode',
+                'Chambers of Xeric - Placeholder' => 'chambers-of-xeric',
+                'Chambers of Xeric: Challenge Mode - Placeholder' => 'chambers-of-xeric-challenge-mode',
                 'Chaos Elemental' => 'chaos-elemental',
                 'Chaos Fanatic' => 'chaos-fanatic',
                 'Commander Zilyana' => 'commander-zilyana',
@@ -69,6 +72,7 @@ class CollectionSeeder extends Seeder
                 'Dagannoth Rex' => 'dagannoth-rex',
                 'Dagannoth Supreme' => 'dagannoth-supreme',
                 'Deranged Archaeologist' => 'deranged-archaeologist',
+                'Duke Sucellus' => 'duke-sucellus',
                 'General Graardor' => 'general-graardor',
                 'Giant Mole' => 'giant-mole',
                 'Grotesque Guardians' => 'grotesque-guardians',
@@ -89,18 +93,21 @@ class CollectionSeeder extends Seeder
                 'Scorpia' => 'scorpia',
                 'Scurrius' => 'scurrius',
                 'Skotizo' => 'skotizo',
+                'Unknown 3' => 'unknown-3',
                 'Spindel' => 'spindel',
                 'Tempoross' => 'tempoross',
                 'The Gauntlet' => 'the-gauntlet',
                 'The Corrupted Gauntlet' => 'the-corrupted-gauntlet',
                 'The Leviathan' => 'the-leviathan',
-//                'Theatre of Blood' => 'theatre-of-blood',
-//                'Theatre of Blood: Hard Mode' => 'theatre-of-blood-hard-mode',
+                'Unknown 4' => 'unknown-4',
+                'Theatre of Blood - Placeholder' => 'theatre-of-blood',
+                'Theatre of Blood: Hard Mode - Placeholder' => 'theatre-of-blood-hard-mode',
                 'Thermonuclear Smoke Devil' => 'thermonuclear-smoke-devil',
-//                'Tombs of Amascut' => 'tombs-of-amascut',
-//                'Tombs of Amascut: Expert Mode' => 'tombs-of-amascut-expert-mode',
+                'Tombs of Amascut - Placeholder' => 'tombs-of-amascut',
+                'Tombs of Amascut: Expert Mode - Placeholder' => 'tombs-of-amascut-expert-mode',
                 'TzKal-Zuk' => 'tzkal-zuk',
                 'TzTok-Jad' => 'tztok-jad',
+                'Unknown 5' => 'unknown-5',
                 'Venenatis' => 'venenatis',
                 'Vet\'ion' => 'vetion',
                 'Vorkath' => 'vorkath',
