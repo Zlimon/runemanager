@@ -47,7 +47,9 @@ class HiscoreCreate extends Command
         }
 
         try {
-            $makeMigration = sprintf("make:migration:schema create_%s_table --schema=\"account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned\"", Str::snake($hiscoreName));
+            $migrationName = str_replace("-", "_", Str::snake(Str::singular(strtolower($hiscoreName))));
+
+            $makeMigration = sprintf("make:migration:schema create_%s_table --schema=\"account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned\"", $migrationName);
 
             Artisan::call($makeMigration);
         } catch (\Exception $e) {
