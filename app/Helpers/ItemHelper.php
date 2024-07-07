@@ -77,6 +77,26 @@ class ItemHelper
         return $itemData[0][$attribute];
     }
 
+    public static function monsterItemsData(string $monsterName)
+    {
+        $wikiScraper = new WikiScraper();
+
+        try {
+            // Fetch the drops by monster
+            $promise = $wikiScraper->getDropsByMonster(ucfirst($monsterName));
+
+            // Wait for the promise to resolve and get the result
+            $items = $promise->wait();
+
+            // Process the items as needed
+            // For example, you can return or print them
+            return $items;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+
     public static function downloadItemIcon(string $itemName)
     {
         $dir = storage_path() . '/app/public/items'; // /storage/items/

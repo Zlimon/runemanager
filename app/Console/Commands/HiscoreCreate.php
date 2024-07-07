@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\ItemHelper;
 use App\Models\Category;
 use App\Models\Collection;
 use Illuminate\Console\Command;
@@ -36,6 +37,12 @@ class HiscoreCreate extends Command
      */
     public function handle(): int
     {
+        $items = ItemHelper::monsterItemsData(ucfirst($this->argument('name')));
+
+        dd($items);
+
+
+
         $hiscoreType = $this->argument('type');
         $hiscoreName = $this->argument('name');
         $hiscoreSlug = $this->argument('slug');
