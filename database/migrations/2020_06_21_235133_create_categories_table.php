@@ -21,15 +21,13 @@ class CreateCategoriesTable extends Migration
 
         DB::table('categories')->insert(
             [
-                ["category" => "skill"],
-                ["category" => "boss"],
-                ["category" => "raid"],
-                ["category" => "npc"],
-                ["category" => 'clue'],
-                ["category" => 'minigame'],
-                ["category" => 'other'],
-                ["category" => "account"],
-                ["category" => "lootcrate"],
+                ['category' => 'skill'],
+                ['category' => 'pvp'],
+                ['category' => 'clue'],
+                ['category' => 'minigame'],
+                ['category' => 'boss'],
+                ['category' => 'raid'],
+                ['category' => 'npc'],
             ]
         );
     }
