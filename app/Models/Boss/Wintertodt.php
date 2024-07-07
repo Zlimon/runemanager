@@ -47,10 +47,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereWarmGloves($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
  * @mixin \Eloquent
- * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
  */
 class Wintertodt extends Model
 {

@@ -55,13 +55,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSinhazaShroudTier5($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereVialOfBlood($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
  * @mixin \Eloquent
- * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
  */
 class TheatreOfBlood extends Model
 {

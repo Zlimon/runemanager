@@ -37,10 +37,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereYoungllef($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
  * @mixin \Eloquent
- * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
  */
 class TheGauntlet extends Model
 {

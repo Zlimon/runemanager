@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Category query()
  * @method static \Illuminate\Database\Eloquent\Builder|Category whereCategory($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Category whereId($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Collection> $collections
+ * @property-read int|null $collections_count
  * @mixin \Eloquent
  */
 class Category extends Model

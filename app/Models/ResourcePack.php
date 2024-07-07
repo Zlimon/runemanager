@@ -23,11 +23,15 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUrl($value)
- * @mixin \Eloquent
  * @property string $version
  * @property string $author
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereAuthor($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereVersion($value)
+ * @property string $tags
+ * @property int $dark_mode
+ * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereDarkMode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereTags($value)
+ * @mixin \Eloquent
  */
 class ResourcePack extends Model
 {

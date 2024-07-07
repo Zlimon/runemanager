@@ -35,10 +35,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereSarachnisCudgel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereSraracha($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
  * @mixin \Eloquent
- * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
  */
 class Sarachnis extends Model
 {

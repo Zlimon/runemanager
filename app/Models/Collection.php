@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereModel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereType($value)
- * @mixin \Eloquent
  * @property int $id
  * @property int $category_id
  * @property int $order
@@ -30,6 +29,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection byCategoryName($categoryName)
+ * @mixin \Eloquent
  */
 class Collection extends Model
 {

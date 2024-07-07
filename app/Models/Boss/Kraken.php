@@ -35,10 +35,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
  * @mixin \Eloquent
- * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
  */
 class Kraken extends Model
 {
