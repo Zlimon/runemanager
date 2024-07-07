@@ -1236,7 +1236,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Zlimon/Laravel-5-Generators-Extended.git",
-                "reference": "e40e6328ba07abfaedc758c95f748db279baca7d"
+                "reference": "30c5f4e74bf5703842998e0c0f332354e7f43030"
             },
             "require": {
                 "illuminate/support": "^11.0"
@@ -1277,7 +1277,7 @@
                 "generators",
                 "laravel"
             ],
-            "time": "2024-07-07T17:29:16+00:00"
+            "time": "2024-07-07T17:41:14+00:00"
         },
         {
             "name": "laravel/fortify",
