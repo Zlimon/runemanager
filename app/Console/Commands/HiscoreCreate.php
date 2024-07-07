@@ -49,7 +49,7 @@ class HiscoreCreate extends Command
         }
 
         try {
-            $migrationName = str_replace('-', '_', Str::snake(Str::singular(strtolower($hiscoreSlug))));
+            $migrationName = str_replace('-', '_', Str::snake(strtolower($hiscoreSlug)));
 
 //            $makeMigration = sprintf("make:migration:schema create_%s_table --schema=\"account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned\"", $migrationName);
             $makeMigration = sprintf("make:migration create_%s_table", $migrationName);
