@@ -6,15 +6,17 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-curl": "*",
         "inertiajs/inertia-laravel": "^1.0",
+        "laracasts/generators": "dev-laravel-11",
         "laravel/framework": "^11.9",
         "laravel/jetstream": "^5.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "symfony/dom-crawler": "^7.1",
         "tightenco/ziggy": "^2.0",
         "zanysoft/laravel-zip": "dev-laravel-11",
-        "laracasts/generators": "dev-laravel-11",
-        "ext-curl": "*"
+        "ext-intl": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",
