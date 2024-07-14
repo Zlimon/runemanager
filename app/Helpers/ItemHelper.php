@@ -77,16 +77,13 @@ class ItemHelper
         return $itemData[0][$attribute];
     }
 
-    public static function monsterItemsData(string $monsterName)
+    public static function wikiMonsterDrops(string $monsterName)
     {
         $wikiScraper = new WikiScraper();
 
         try {
             // Fetch the drops by monster
-            $promise = $wikiScraper->getDropsByMonster(ucfirst($monsterName));
-
-            // Wait for the promise to resolve and get the result
-            $items = $promise->wait();
+            $items = $wikiScraper->getDropsByMonster(ucfirst($monsterName));
 
             // Process the items as needed
             // For example, you can return or print them
@@ -95,7 +92,6 @@ class ItemHelper
             return $e->getMessage();
         }
     }
-
 
     public static function downloadItemIcon(string $itemName)
     {

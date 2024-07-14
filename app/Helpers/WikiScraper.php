@@ -5,7 +5,6 @@ namespace App\Helpers;
 use App\Models\WikiItem;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\PromiseInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
 class WikiScraper {
@@ -20,115 +19,132 @@ class WikiScraper {
         $this->baseWikiLookupUrl = $this->baseWikiUrl . "Special:Lookup";
     }
 
-    public function getDropsByMonster(string $monsterName, int $monsterId = -1): PromiseInterface
+    public function getDropsByMonster(string $monsterName, int $monsterId = -1)
     {
         $url = ($monsterId > -1) ? $this->getWikiUrlWithId($monsterName, $monsterId) : $this->getWikiUrl($monsterName);
 
         $httpClient = new Client();
 
-        return $this->requestAsync($httpClient, $url)->then(function($responseHTML) use ($monsterName) {
-            $dropTableSections = [];
-            $doc = new Crawler($responseHTML);
+        try {
+            $response = $this->requestSync($httpClient, $url);
+            return $this->parseResponse($response, $monsterName);
+        } catch (RequestException $e) {
+            return $e->getMessage();
+        }
+    }
 
-            $tableHeaders = $doc->filter('h2 span.mw-headline, h3 span.mw-headline, h4 span.mw-headline');
-            $parseDropTableSection = false;
-            $currDropTableSection = new DropTableSection();
-            $currDropTable = [];
-            $tableIndexH3 = 0;
-            $tableIndexH4 = 0;
-            $incrementH3Index = false;
+    private function requestSync(Client $httpClient, $url)
+    {
+        $response = $httpClient->request('GET', $url, [
+            'headers' => ['User-Agent' => 'Runemanager Wiki Scraper/2.0 (+zlimon@runemanager.com)']
+        ]);
 
-            foreach ($tableHeaders as $tableHeaderElement) {
-                $tableHeaderText = $tableHeaderElement->textContent;
-                $monsterNameLC = strtolower($monsterName);
+        return $response->getBody()->getContents();
+    }
 
-                // Handle edge cases for specific pages
-                if ($monsterNameLC === "hespori" && $tableHeaderText === "Main table") continue;
-                if ($monsterNameLC === "chaos elemental" && $tableHeaderText === "Major drops") continue;
-                if ($monsterNameLC === "cyclops" && $tableHeaderText === "Drops") continue;
-                if ($monsterNameLC === "gorak" && $tableHeaderText === "Drops") continue;
-                if ($monsterNameLC === "undead druid" && $tableHeaderText === "Seeds") {
-                    $incrementH3Index = true;
-                    continue;
+    private function parseResponse($responseHTML, $monsterName)
+    {
+        $dropTableSections = [];
+        $doc = new Crawler($responseHTML);
+
+        $tableHeaders = $doc->filter('h2 span.mw-headline, h3 span.mw-headline, h4 span.mw-headline');
+        $parseDropTableSection = false;
+        $currDropTableSection = new DropTableSection();
+        $currDropTable = [];
+        $tableIndexH3 = 0;
+        $tableIndexH4 = 0;
+        $incrementH3Index = false;
+
+        foreach ($tableHeaders as $tableHeaderElement) {
+            $tableHeaderText = $tableHeaderElement->textContent;
+            $monsterNameLC = strtolower($monsterName);
+
+            // Handle edge cases for specific pages
+            if ($monsterNameLC === "hespori" && $tableHeaderText === "Main table") continue;
+            if ($monsterNameLC === "chaos elemental" && $tableHeaderText === "Major drops") continue;
+            if ($monsterNameLC === "cyclops" && $tableHeaderText === "Drops") continue;
+            if ($monsterNameLC === "gorak" && $tableHeaderText === "Drops") continue;
+            if ($monsterNameLC === "undead druid" && $tableHeaderText === "Seeds") {
+                $incrementH3Index = true;
+                continue;
+            }
+
+            $tableHeaderTextLower = strtolower($tableHeaderText);
+            $isDropsTableHeader = strpos($tableHeaderTextLower, "drop") !== false || strpos($tableHeaderTextLower, "levels") !== false || $this->isDropsHeaderForEdgeCases($monsterName, $tableHeaderText);
+            $isPickpocketLootHeader = strpos($tableHeaderTextLower, "loot") !== false;
+            $parseH3Primary = $isPickpocketLootHeader || $this->parseH3PrimaryForEdgeCases($monsterName);
+
+            $parentH2 = $this->closest($tableHeaderElement, 'h2');
+            $isParentH2 = $parentH2 !== null;
+
+            $parentH3 = $this->closest($tableHeaderElement, 'h3');
+            $isParentH3 = $parentH3 !== null;
+
+            $parentH4 = $this->closest($tableHeaderElement, 'h4');
+            $isParentH4 = $parentH4 !== null;
+
+            // Handle edge cases for specific pages
+            if ($isParentH3 && $tableHeaderText === "Regular drops") {
+                $incrementH3Index = true;
+                continue;
+            }
+
+            if ($isParentH2 || ($parseH3Primary && $isParentH3)) {
+                if (!empty($currDropTable)) {
+                    // reset section
+                    $currDropTableSection->setTable($currDropTable);
+                    $dropTableSections[] = $currDropTableSection;
+
+                    $currDropTable = [];
+                    $currDropTableSection = new DropTableSection();
                 }
 
-                $tableHeaderTextLower = strtolower($tableHeaderText);
-                $isDropsTableHeader = strpos($tableHeaderTextLower, "drop") !== false || strpos($tableHeaderTextLower, "levels") !== false || $this->isDropsHeaderForEdgeCases($monsterName, $tableHeaderText);
-                $isPickpocketLootHeader = strpos($tableHeaderTextLower, "loot") !== false;
-                $parseH3Primary = $isPickpocketLootHeader || $this->parseH3PrimaryForEdgeCases($monsterName);
-
-                $parentH2 = $this->closest($tableHeaderElement, 'h2');
-                $isParentH2 = $parentH2 !== null;
-
-                $parentH3 = $this->closest($tableHeaderElement, 'h3');
-                $isParentH3 = $parentH3 !== null;
-
-                $parentH4 = $this->closest($tableHeaderElement, 'h4');
-                $isParentH4 = $parentH4 !== null;
-
-                // Handle edge cases for specific pages
-                if ($isParentH3 && $tableHeaderText === "Regular drops") {
-                    $incrementH3Index = true;
-                    continue;
+                if ($isDropsTableHeader || $isPickpocketLootHeader) {
+                    // new section
+                    $parseDropTableSection = true;
+                    $currDropTableSection->setHeader($tableHeaderText);
+                } else {
+                    $parseDropTableSection = false;
                 }
+            } elseif ($parseDropTableSection && ($isParentH3 || $isParentH4)) {
+                $element = $isParentH4 ? "h4" : "h3";
+                $tableIndex = $isParentH4 ? $tableIndexH4 : $tableIndexH3;
+                // parse table
+                $tableRows = $this->getTableItems($doc, $tableIndex, $element . " ~ table.item-drops");
 
-                if ($isParentH2 || ($parseH3Primary && $isParentH3)) {
-                    if (!empty($currDropTable)) {
-                        // reset section
-                        $currDropTableSection->setTable($currDropTable);
-                        $dropTableSections[] = $currDropTableSection;
-
-                        $currDropTable = [];
-                        $currDropTableSection = new DropTableSection();
-                    }
-
-                    if ($isDropsTableHeader || $isPickpocketLootHeader) {
-                        // new section
-                        $parseDropTableSection = true;
-                        $currDropTableSection->setHeader($tableHeaderText);
-                    } else {
-                        $parseDropTableSection = false;
-                    }
-                } elseif ($parseDropTableSection && ($isParentH3 || $isParentH4)) {
-                    $element = $isParentH4 ? "h4" : "h3";
-                    $tableIndex = $isParentH4 ? $tableIndexH4 : $tableIndexH3;
-                    // parse table
-                    $tableRows = $this->getTableItems($doc, $tableIndex, $element . " ~ table.item-drops");
-
-                    if (!empty($tableRows) && !isset($currDropTable[$tableHeaderText])) {
-                        $currDropTable[$tableHeaderText] = $tableRows;
-                        if ($isParentH4) {
-                            $tableIndexH4++;
-                            if ($incrementH3Index) {
-                                $tableIndexH3++;
-                            }
-                        } else {
+                if (!empty($tableRows) && !isset($currDropTable[$tableHeaderText])) {
+                    $currDropTable[$tableHeaderText] = $tableRows;
+                    if ($isParentH4) {
+                        $tableIndexH4++;
+                        if ($incrementH3Index) {
                             $tableIndexH3++;
                         }
+                    } else {
+                        $tableIndexH3++;
                     }
                 }
             }
+        }
 
-            if (!empty($currDropTable)) {
-                $currDropTableSection->setTable($currDropTable);
-                $dropTableSections[] = $currDropTableSection;
-            }
+        if (!empty($currDropTable)) {
+            $currDropTableSection->setTable($currDropTable);
+            $dropTableSections[] = $currDropTableSection;
+        }
 
-            if (empty($dropTableSections)) {
-                $tableHeaders = $doc->filter('h2 span.mw-headline');
+        if (empty($dropTableSections)) {
+            $tableHeaders = $doc->filter('h2 span.mw-headline');
 
-                if (!empty($tableHeaders)) {
-                    $tableRows = $this->getTableItems($doc, 0, "h2 ~ table.item-drops");
-                    if (!empty($tableRows)) {
-                        $currDropTable = [];
-                        $currDropTable["Drops"] = $tableRows;
-                        $dropTableSections[] = new DropTableSection("Drops", $currDropTable);
-                    }
+            if (!empty($tableHeaders)) {
+                $tableRows = $this->getTableItems($doc, 0, "h2 ~ table.item-drops");
+                if (!empty($tableRows)) {
+                    $currDropTable = [];
+                    $currDropTable["Drops"] = $tableRows;
+                    $dropTableSections[] = new DropTableSection("Drops", $currDropTable);
                 }
             }
+        }
 
-            return $dropTableSections;
-        });
+        return $dropTableSections;
     }
 
     private function getTableItems($doc, $tableIndex, $selector) {
@@ -137,6 +153,7 @@ class WikiScraper {
 
         if (count($dropTables) > $tableIndex) {
             $dropTableRows = $dropTables->eq($tableIndex)->filter('tbody tr');
+
             foreach ($dropTableRows as $dropTableRow) {
                 $lootRow = [];
                 $dropTableCells = (new Crawler($dropTableRow))->filter('td');
@@ -144,6 +161,7 @@ class WikiScraper {
 
                 foreach ($dropTableCells as $dropTableCell) {
                     $cellContent = $dropTableCell->textContent;
+
                     $images = (new Crawler($dropTableCell))->filter('img');
 
                     if (count($images) !== 0) {
@@ -289,21 +307,6 @@ class WikiScraper {
 
     public static function parseH3PrimaryForEdgeCases($monsterName) {
         return strtolower($monsterName) === "cyclops";
-    }
-
-    private function requestAsync(Client $httpClient, $url) {
-        $promise = $httpClient->requestAsync('GET', $url, [
-            'headers' => ['User-Agent' => 'Runemanager Wiki Scraper/2.0 (+zlimon@runemanager.com)']
-        ]);
-
-        return $promise->then(
-            function ($response) {
-                return $response->getBody()->getContents();
-            },
-            function (RequestException $e) {
-                return $e->getMessage();
-            }
-        );
     }
 
     private function closest($element, $selector) {
