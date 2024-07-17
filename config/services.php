@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    'osrsbox' => [
+        'url' => env('OSRS_BOX_API_URL'),
+    ],
 ];
