@@ -25,4 +25,10 @@ Route::middleware([
     Route::prefix('/accounts')->group(function() {
         Route::get('/', [App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
     });
+
+    Route::prefix('/admin')->group(function() {
+        Route::prefix('/hiscores')->group(function() {
+            Route::get('/create', [\App\Http\Controllers\Admin\HiscoreController::class, 'create'])->name('admin.hiscores.create');
+        });
+    });
 });

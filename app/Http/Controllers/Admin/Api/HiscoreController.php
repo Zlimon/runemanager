@@ -1,57 +1,53 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Http\Controllers\Admin\Api;
 
-use App\Helpers\ItemHelper;
-use App\Models\Category;
-use App\Models\Collection;
-use Illuminate\Console\Command;
+use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Command\Command as CommandAlias;
 
-class HiscoreCreate extends Command
+class HiscoreController extends Controller
 {
     /**
-     * The name and signature of the console command.
-     *
-     * @var string
+     * Display a listing of the resource.
      */
-    protected $signature = 'hiscore:create
-                            {type : Category type of new hiscore}
-                            {name : Name of new hiscore (must be in snake case)}
-                            {slug : Slug of new hiscore (must be in studly case)}
-                            {uniques?* : Unique columns for new hiscore}';
-//                            {--migrate= : Whether the hiscore should be migrated immediately or not}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Creates model, migration, collection and image directory for new hiscore based on type. Should be used when a new hiscore entry is added to the official hiscores';
-
-    /**
-     * Execute the console command.
-     * @throws \Throwable
-     */
-    public function handle(): int
+    public function index()
     {
-        $hiscoreType = $this->argument('type');
-        $hiscoreName = $this->argument('name');
-        $hiscoreSlug = $this->argument('slug');
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'type' => ['required', 'string'],
+            'name' => ['required', 'string'],
+        ]);
 
         try {
-            $makeModel = sprintf("make:model %s/%s", ucfirst($hiscoreType), Str::studly($hiscoreSlug));
+            $model = sprintf("%s/%s", Str::ucfirst($request['type']), Str::studly($request['slug']));
+
+            $makeModel = sprintf("make:model %s", $model);
 
             Artisan::call($makeModel);
-        } catch (\Exception $e) {
-            $this->fail(sprintf("Could not create model: '%s'. Message: %s", Str::studly($hiscoreSlug), $e->getMessage()));
+        } catch (Exception $e) {
+            throw new Exception(sprintf("Could not create model: '%s'. Message: %s", $model, $e->getMessage()));
         }
 
         try {
-            $migrationName = str_replace('-', '_', Str::snake(strtolower($hiscoreSlug)));
+            $migrationName = str_replace('-', '_', Str::snake(Str::lower($request['slug'])));
 
             if ($this->argument('unique')[0] === "drops" && sizeof($this->argument('unique')) === 1) {
 //                $handle = curl_init('https://api.osrsbox.com/monsters?where=' . urlencode('{"name":"' . ucfirst(str_replace("_",
@@ -103,7 +99,7 @@ class HiscoreCreate extends Command
 
 
             Artisan::call($makeMigration);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->fail(sprintf("Could not create migration: '%s'. Message: %s", Str::snake($hiscoreName), $e->getMessage()));
         }
 
@@ -142,5 +138,37 @@ class HiscoreCreate extends Command
         $this->info(sprintf("Successfully created model, migration, collection and image directory for %s hiscore: '%s'", $hiscoreType, Str::title(str_replace('_', ' ', $hiscoreName))));
 
         return CommandAlias::SUCCESS;
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
     }
 }
