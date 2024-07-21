@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,8 +14,6 @@ class NpcResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $drops = $this->drop_items;
-
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -61,18 +58,7 @@ class NpcResource extends JsonResource
             'defence_crush' => $this->defence_crush,
             'defence_magic' => $this->defence_magic,
             'defence_ranged' => $this->defence_ranged,
-            'drops' => $this->drop_items,
-//            'drops' => array_map(function ($drop) {
-//                $item = Item::where('id', (string) $drop['id'])->first();
-//
-//                $item = (new ItemResource($item))->resolve();
-//                $item['rarity'] = $drop['rarity'];
-//
-//                return $item;
-//            }, $this->drops),
-//        'drops' => $this->whenLoaded('drops'),
-//            (new UserResource($this->whenLoaded('user')))
-//        NpcResource::collection($npcs->with('drops')->paginate($perPage))
+            'drops' => ItemResource::collection($this->dropItems),
         ];
     }
 }
