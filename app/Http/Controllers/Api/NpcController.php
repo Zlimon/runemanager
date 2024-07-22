@@ -16,10 +16,22 @@ class NpcController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $npcs = Npc::where('name', 'LIKE', '%' . $request['search'] . '%')->get();
+        $request->validate([
+            'search' => ['required', 'string', 'min:3', 'max:75'],
+            'per_page' => ['nullable', 'integer', 'min:4', 'max:20'],
+        ]);
+
+        $perPage = $request->get('per_page', 16);
+
+        $npcs = Npc::where('name', 'LIKE', '%' . $request->get('search') . '%')
+            ->orderByDesc('combat_level')
+            ->paginate($perPage)
+            ->through(function ($npc) {
+                return new NpcResource($npc);
+            });
 
         return response()->json([
-            'data' => NpcResource::collection($npcs),
+            'npcs' => $npcs,
         ], 200);
     }
 }
