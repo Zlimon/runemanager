@@ -52,7 +52,7 @@ networks:
     sail:
         driver: bridge
     osrsbox:
-        driver: bridge
+        external: true
 volumes:
     sail-mysql:
         driver: local
