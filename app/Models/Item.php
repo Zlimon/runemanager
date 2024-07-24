@@ -7,4 +7,6 @@ use MongoDB\Laravel\Eloquent\Model;
 class Item extends Model
 {
     protected $connection = 'mongodb';
+
+    protected $primaryKey = 'id';
 }

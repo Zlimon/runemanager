@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Collection;
+use App\Models\Item;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class HiscoreController extends Controller
@@ -29,115 +34,92 @@ class HiscoreController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
+        $request['items'] = array_map('strval', $request['items']);
+
         $request->validate([
-            'type' => ['required', 'string'],
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', 'exists:mongodb.monsters,name', 'unique:collections,name'],
+            'items' => ['required', 'array', 'exists:mongodb.items,id'],
         ]);
 
-        try {
-            $model = sprintf("%s/%s", Str::ucfirst($request['type']), Str::studly($request['slug']));
-
-            $makeModel = sprintf("make:model %s", $model);
-
-            Artisan::call($makeModel);
-        } catch (Exception $e) {
-            throw new Exception(sprintf("Could not create model: '%s'. Message: %s", $model, $e->getMessage()));
+        $modelName = Str::studly(Str::slug($request['name']));
+        if (!file_exists(sprintf("%s/Models/Npc/%s.php", app_path(), $modelName))) {
+            try {
+                $model = sprintf("Npc/%s", $modelName);
+                $makeModel = sprintf("make:model %s", $model);
+                Artisan::call($makeModel);
+            } catch (Exception $e) {
+                throw new Exception(sprintf("Could not create model: '%s'. Message: %s", $modelName, $e->getMessage()));
+            }
         }
 
-        try {
-            $migrationName = str_replace('-', '_', Str::snake(Str::lower($request['slug'])));
+        $itemNames = Item::whereIn('id', $request['items'])->orderBy('name')->pluck('name')->map(function ($item) {
+            return Str::snake($item);
+        })->toArray();
 
-            if ($this->argument('unique')[0] === "drops" && sizeof($this->argument('unique')) === 1) {
-//                $handle = curl_init('https://api.osrsbox.com/monsters?where=' . urlencode('{"name":"' . ucfirst(str_replace("_",
-//                            " ", str_replace("-",
-//                                " ", $this->argument('npc')))) . '"}') . '');
-
-                $itemHelper = new ItemHelper();
-
-                $drops = $itemHelper->apiMonsterDrops($hiscoreName);
-
-                $uniques = array_map(
-                    function ($drop) {
-                        return $drop['name'];
-                    },
-                    $drops
+        $migrationName = Str::snake(Str::lower($request['name']));
+        if (!file_exists(sprintf("%s/database/migrations/*_create_%s_table.php", base_path(), $migrationName))) {
+            try {
+                $npcItems = implode(
+                    ' ',
+                    array_map(
+                        function ($item) {
+                            return (Str::replace(["'", "-"], ["", "_"], Str::snake(Str::lower($item)))) . ':integer:default(0):unsigned,'; // abyssal_whip
+                        },
+                        $itemNames
+                    )
                 );
 
-                if (empty($json["_items"][0]["drops"])) {
-                    $this->info(sprintf("Could not find any drops for '%s'. Try to manually type the items you wish to track instead", $this->argument('npc')));
-
-                    return COMMAND::FAILURE;
-//                        foreach ($json["_items"][0]["drops"] as $drop) {
-//                            $uniques[] = $drop["name"];
-//                        }
-                }
-            } else {
-                $uniques = $this->argument('unique');
+                $makeMigration = sprintf('make:migration:schema create_%s_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, %s',
+                    $migrationName,
+                    substr($npcItems, 0, -1) // Remove trailing comma
+                );
+                Artisan::call($makeMigration);
+            } catch (Exception $e) {
+                throw new Exception(sprintf("Could not create migration: '%s'. Message: %s", $migrationName, $e->getMessage()));
             }
-
-            $uniques = array_unique($uniques);
-    dd($uniques);
-            $migrationUniques = implode(
-                ' ',
-                array_map(
-                    function ($unique) {
-                        return (str_replace("'", "", str_replace("-", "_",
-                                Str::snake(strtolower($unique))))) . ':integer:default(0):unsigned,'; // abyssal_whip
-                    },
-                    $uniques
-                )
-            );
-
-            $command = 'make:migration:schema create_' . $migrationName . '_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, ' . substr($migrationUniques,
-                    0, -1) . '"';
-
-
-            $makeMigration = sprintf("make:migration:schema create_%s_table --schema=\"account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned\"", $migrationName);
-//            $makeMigration = sprintf("make:migration create_%s_table", $migrationName);
-
-
-            Artisan::call($makeMigration);
-        } catch (Exception $e) {
-            $this->fail(sprintf("Could not create migration: '%s'. Message: %s", Str::snake($hiscoreName), $e->getMessage()));
         }
 
-        $categoryId = Category::whereCategory(strtolower($hiscoreType))->pluck('id')->first();
-        if (!$categoryId) {
-            $this->fail(sprintf("Could not find category: '%s'", strtolower($hiscoreType)));
+        $npcCollectionId = Category::whereCategory('npc')->pluck('id')->first();
+        if (!$npcCollectionId) {
+            throw new Exception("Could not find category 'npc'.");
         }
 
-        $newestCollection = Collection::whereCategoryId($categoryId)->orderByDesc('order')->pluck('order')->first();
-
+        $newestCollection = Collection::whereCategoryId($npcCollectionId)->orderByDesc('order')->pluck('order')->first();
         if ($newestCollection) {
             $order = ++$newestCollection;
         } else {
-            $order = $categoryId * 1000;
+            $order = $npcCollectionId * 1000;
         }
 
-        $collection = new Collection();
+        try {
+            $collection = new Collection();
 
-        $collection->category_id = $categoryId;
-        $collection->order = $order;
-        $collection->name = Str::title(str_replace('_', ' ', $hiscoreName));
-        $collection->slug = Str::slug(($hiscoreName));
-        $collection->model = sprintf("App\Models\%s\%s", ucfirst($hiscoreType), str_replace(':', '', Str::of($hiscoreName)->studly()));
+            $collection->category_id = $npcCollectionId;
+            $collection->order = $order;
+            $collection->name = $request['name'];
+            $collection->slug = Str::slug(($request['name']));
+            $collection->model = sprintf("App\Models\Npc\%s", $modelName);
 
-        $collection->save();
-
-        $imageDirectoryPath = sprintf("%s/images/%s/%s", public_path(), strtolower($hiscoreType), Str::slug($hiscoreName));
-        if (!File::exists($imageDirectoryPath)) {
-            File::makeDirectory($imageDirectoryPath, 0755, true, true);
+            $collection->save();
+        } catch (Exception $e) {
+            throw new Exception(sprintf("Could not create collection: '%s'. Message: %s", $request['name'], $e->getMessage()));
         }
 
-        if ($this->option('migrate') == 'yes') {
-            Artisan::call('migrate');
+        try {
+            $imageDirectoryPath = sprintf("%s/images/npc/%s", public_path(), Str::slug($request['name']));
+
+            if (!File::exists($imageDirectoryPath)) {
+                File::makeDirectory($imageDirectoryPath, 0755, true, true);
+            }
+        } catch (Exception $e) {
+            throw new Exception(sprintf("Could not create image directory: '%s'. Message: %s", $request['name'], $e->getMessage()));
         }
 
-        $this->info(sprintf("Successfully created model, migration, collection and image directory for %s hiscore: '%s'", $hiscoreType, Str::title(str_replace('_', ' ', $hiscoreName))));
-
-        return CommandAlias::SUCCESS;
+        return response()->json([
+            'collection' => $collection,
+        ], 201);
     }
 
     /**
