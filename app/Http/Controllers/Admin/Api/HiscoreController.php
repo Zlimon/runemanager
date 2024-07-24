@@ -40,7 +40,7 @@ class HiscoreController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'exists:mongodb.monsters,name', 'unique:collections,name'],
-            'items' => ['required', 'array', 'exists:mongodb.items,id'],
+            'items' => ['array', 'exists:mongodb.items,id'],
         ]);
 
         $modelName = Str::studly(Str::slug($request['name']));
@@ -54,32 +54,33 @@ class HiscoreController extends Controller
             }
         }
 
-        $itemNames = Item::whereIn('id', $request['items'])->orderBy('name')->pluck('name')->map(function ($item) {
-            return Str::snake($item);
-        })->toArray();
+//        TODO Move to MongoDB
+//        $itemNames = Item::whereIn('id', $request['items'])->orderBy('name')->pluck('name')->map(function ($item) {
+//            return Str::snake($item);
+//        })->toArray();
 
-        $migrationName = Str::snake(Str::lower($request['name']));
-        if (!file_exists(sprintf("%s/database/migrations/*_create_%s_table.php", base_path(), $migrationName))) {
-            try {
-                $npcItems = implode(
-                    ' ',
-                    array_map(
-                        function ($item) {
-                            return (Str::replace(["'", "-"], ["", "_"], Str::snake(Str::lower($item)))) . ':integer:default(0):unsigned,'; // abyssal_whip
-                        },
-                        $itemNames
-                    )
-                );
-
-                $makeMigration = sprintf('make:migration:schema create_%s_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, %s',
-                    $migrationName,
-                    substr($npcItems, 0, -1) // Remove trailing comma
-                );
-                Artisan::call($makeMigration);
-            } catch (Exception $e) {
-                throw new Exception(sprintf("Could not create migration: '%s'. Message: %s", $migrationName, $e->getMessage()));
-            }
-        }
+//        $migrationName = Str::snake(Str::lower($request['name']));
+//        if (!file_exists(sprintf("%s/database/migrations/*_create_%s_table.php", base_path(), $migrationName))) {
+//            try {
+//                $npcItems = implode(
+//                    ' ',
+//                    array_map(
+//                        function ($item) {
+//                            return (Str::replace(["'", "-"], ["", "_"], Str::snake(Str::lower($item)))) . ':integer:default(0):unsigned,'; // abyssal_whip
+//                        },
+//                        $itemNames
+//                    )
+//                );
+//
+//                $makeMigration = sprintf('make:migration:schema create_%s_table --schema="account_id:integer:unsigned:unique, kill_count:integer:default(0):unsigned, obtained:integer:default(0):unsigned, %s',
+//                    $migrationName,
+//                    substr($npcItems, 0, -1) // Remove trailing comma
+//                );
+//                Artisan::call($makeMigration);
+//            } catch (Exception $e) {
+//                throw new Exception(sprintf("Could not create migration: '%s'. Message: %s", $migrationName, $e->getMessage()));
+//            }
+//        }
 
         $npcCollectionId = Category::whereCategory('npc')->pluck('id')->first();
         if (!$npcCollectionId) {
