@@ -18,10 +18,10 @@ class NpcController extends Controller
     {
         $request->validate([
             'search' => ['required', 'string', 'min:3', 'max:75'],
-            'per_page' => ['nullable', 'integer', 'min:4', 'max:20'],
+            'per_page' => ['nullable', 'integer', 'min:3', 'max:21'],
         ]);
 
-        $perPage = $request->get('per_page', 16);
+        $perPage = $request->get('per_page', 18);
 
         $npcs = Npc::where('name', 'LIKE', '%' . $request->get('search') . '%')
             ->orderByDesc('combat_level')

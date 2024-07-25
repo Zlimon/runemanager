@@ -19,7 +19,7 @@ let loading = ref(false);
 
 let searchNpcForm = useForm({
     search: '',
-    per_page: 16,
+    per_page: 18,
 });
 
 watch(() => [searchNpcForm.search, searchNpcForm.per_page], debounce((value) => {
@@ -65,13 +65,19 @@ let selectedNpc = ref(null);
 const selectNpc = (npc) => {
     selectedNpc.value = npc;
 
+    createHiscoreForm.reset('items', 'all_items');
     createHiscoreForm.name = npc.name;
+
     createHiscoreForm.errors = {};
 };
 
-// Sort drops by lowest rarity
+// Filter duplicate items and sort drops by lowest rarity
 const sortDrops = (drops) => {
-    return drops.sort((a, b) => a.rarity - b.rarity);
+    return drops.filter((drop, index, self) =>
+        index === self.findIndex((t) => (
+            t.item.id === drop.item.id
+        ))
+    ).sort((a, b) => a.rarity - b.rarity);
 };
 
 watch(() => createHiscoreForm.all_items, () => {
@@ -84,8 +90,6 @@ watch(() => createHiscoreForm.all_items, () => {
 
 const createHiscore = () => {
     axios.post(route('admin.api.hiscores.store'), createHiscoreForm).then((response) => {
-        console.log(response)
-
         createHiscoreForm.errors = {};
     }).catch(error => {
         createHiscoreForm.errors = error.response.data.errors || {};
@@ -100,63 +104,61 @@ const createHiscore = () => {
 
 <template>
     <AppLayout title="Hiscore - Create">
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="grid sm:grid-cols-3 gap-4 mt-12">
-                    <div class="col-span-1">
-                        <div class="card-lg resource-pack-dialog">
-                            <h3 class="text-center header-chatbox-sword">Create hiscore</h3>
+        <div class="p-4 sm:p-6 lg:p-12">
+            <div class="mx-auto max-w-7xl">
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="col-span-3 md:col-span-1">
+                        <div class="card-lg">
+                            <h3>Create hiscore</h3>
 
-                            <div class="max-w-md mx-auto mt-6 lg:mt-6">
-                                <div class="max-w-md mx-auto">
-                                    <div class="mt-4 lg:mt-2">
-                                        <InputLabel for="searchNpcForm-search" value="Search for any monster" />
-                                        <div class="relative">
-                                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                                                </svg>
-                                            </div>
-                                            <TextInput v-model="searchNpcForm.search"
-                                                       type="search"
-                                                       id="searchNpcForm-search"
-                                                       name="searchNpcForm-search"
-                                                       class="block w-full ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                       :error="searchNpcForm.errors.search !== undefined"
-                                            />
+                            <div class="mt-6 lg:mt-8">
+                                <div class="mt-2">
+                                    <InputLabel for="searchNpcForm-search" value="Search for any monster" />
+                                    <div class="relative">
+                                        <div class="pointer-events-none absolute inset-y-0 flex items-center start-0 ps-3">
+                                            <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                                            </svg>
                                         </div>
-                                        <InputError v-if="searchNpcForm.errors.search !== undefined" :messages="searchNpcForm.errors.search" />
-                                    </div>
-
-                                    <div class="mt-4 lg:mt-2">
-                                        <InputLabel for="createHiscoreForm-name" value="Name" />
-                                        <TextInput v-model="createHiscoreForm.name"
-                                                   type="text"
-                                                   id="createHiscoreForm-name"
-                                                   name="createHiscoreForm-name"
-                                                   :error="createHiscoreForm.errors.name !== undefined"
-                                                   disabled
+                                        <TextInput v-model="searchNpcForm.search"
+                                                   type="search"
+                                                   id="searchNpcForm-search"
+                                                   name="searchNpcForm-search"
+                                                   class="block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 ps-10 focus:border-blue-500 focus:ring-blue-500 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                                                   :error="searchNpcForm.errors.search !== undefined"
                                         />
-                                        <InputError v-if="createHiscoreForm.errors.name !== undefined" :messages="createHiscoreForm.errors.name" />
                                     </div>
+                                    <InputError v-if="searchNpcForm.errors.search !== undefined" :messages="searchNpcForm.errors.search" />
+                                </div>
 
-                                    <div class="mt-4 lg:mt-2">
-                                        <PrimaryButton @click="createHiscore()" class="mt-4">
-                                            Create
-                                        </PrimaryButton>
-                                    </div>
+                                <div class="mt-2">
+                                    <InputLabel for="createHiscoreForm-name" value="Name" />
+                                    <TextInput v-model="createHiscoreForm.name"
+                                               type="text"
+                                               id="createHiscoreForm-name"
+                                               name="createHiscoreForm-name"
+                                               :error="createHiscoreForm.errors.name !== undefined"
+                                               disabled
+                                    />
+                                    <InputError v-if="createHiscoreForm.errors.name !== undefined" :messages="createHiscoreForm.errors.name" />
+                                </div>
+
+                                <div class="mt-6 lg:mt-8">
+                                    <PrimaryButton @click="createHiscore()">
+                                        Create
+                                    </PrimaryButton>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-if="selectedNpc !== null" class="card-lg resource-pack-dialog mt-4">
-                            <h4 class="text-center header-chatbox-sword">{{ selectedNpc.name }} ({{ selectedNpc.combat_level }})</h4>
+                        <div v-if="selectedNpc !== null" class="mt-4 card-lg">
+                            <h4 class="text-center">{{ selectedNpc.name }}</h4>
 
-                            <div class="flex justify-between">
+                            <div class="mt-2 flex justify-between">
                                 <h5>Drops</h5>
 
-                                <div class="flex items-center gap-2">
-                                    <InputLabel for="createHiscoreForm-all_items" value="All items" />
+                                <div class="flex gap-2">
+                                    <InputLabel for="createHiscoreForm-all_items" value="All items" class="!m-0" />
                                     <Checkbox v-model="createHiscoreForm.all_items"
                                               id="createHiscoreForm-all_items"
                                               name="createHiscoreForm-all_items"
@@ -165,23 +167,23 @@ const createHiscore = () => {
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="mt-2 grid grid-cols-5 gap-4 md:grid-cols-3">
                                 <div v-for="drop in sortDrops(selectedNpc.drops)" :key="drop.id"
-                                     class="hover:bg-gray-100 dark:hover:bg-gray-700 card-sm resource-pack-dialog !p-1">
+                                     class="hover:bg-gray-100 dark:hover:bg-gray-700 card-sm !p-1 hover:cursor-pointer"
+                                     :class="{ '!bg-gray-400': createHiscoreForm.items.includes(drop.id) }">
                                     <div @click="createHiscoreForm.items.includes(drop.id) ? createHiscoreForm.items = createHiscoreForm.items.filter(item => item !== drop.id) : createHiscoreForm.items.push(drop.id)"
-                                         class="flex flex-col justify-between p-4 leading-normal text-center"
-                                         :class="{ 'bg-gray-500': createHiscoreForm.items.includes(drop.id) }">
+                                         class="flex flex-col justify-between p-1 text-center leading-normal">
                                         <img :src="`data:image/jpeg;base64,${drop.item.icon}`"
-                                             class="object-contain h-8 w-8 m-auto">
+                                             class="m-auto h-8 w-8 object-contain">
 
-                                        <p class="text-xs mt-1">{{ drop.name }}</p>
+                                        <p class="break-words text-xs text-gray-700 dark:text-gray-400">{{ drop.name }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="col-span-3 md:col-span-2">
                         <div v-if="!loading && npcs.total > 0">
                             <InputLabel for="searchNpcForm.per_page" value="Per page" />
                             <TextInput v-model="searchNpcForm.per_page"
@@ -189,34 +191,38 @@ const createHiscore = () => {
                                        id="searchNpcForm-per_page"
                                        name="searchNpcForm-per_page"
                                        class="!w-20"
-                                       min="4"
-                                       max="20"
-                                       step="4"
+                                       min="3"
+                                       max="21"
+                                       step="3"
+                                       :error="searchNpcForm.errors.per_page !== undefined"
                             />
-                            <InputError v-if="searchNpcForm.errors?.per_page?.length > 0" :messages="searchNpcForm.errors.per_page" />
+                            <InputError v-if="searchNpcForm.errors.per_page !== undefined" :messages="searchNpcForm.errors.per_page" />
 
-                            <div class="grid grid-cols-4 gap-4 mt-4">
-                                <div v-for="npc in npcs.data" :key="npc.id">
+                            <div class="mt-2 grid grid-cols-2 gap-4 md:grid-cols-3">
+                                <div v-for="npc in npcs.data" :key="npc.id"
+                                     class="hover:bg-gray-100 dark:hover:bg-gray-700 card-sm !p-1 hover:cursor-pointer"
+                                     :class="{ '!bg-gray-400': selectedNpc !== null && selectedNpc.id === npc.id }">
                                     <div @click="selectNpc(npc)"
-                                         class="flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 card-sm resource-pack-dialog hover:cursor-pointer">
-            <!--                            <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.user.icon_id}.png`"-->
-            <!--                                 class="object-contain h-16 w-16 m-4">-->
-                                        <div class="flex flex-col justify-between p-4 leading-normal">
-                                            <div class="flex">
-                                                <h5 class="">{{ npc.name }} ({{ npc.combat_level }})</h5>
-                                            </div>
+                                         class="flex flex-col justify-between p-4 leading-normal">
+                                        <h5 class="">{{ npc.name }}</h5>
 
-                                            <div class="flex">
-                                                <img src="/images/skill/total.webp"
-                                                     class="object-contain h-8 w-8">
-                                                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ npc.examine }}</p>
+                                        <p class="text-gray-700 dark:text-gray-400">{{ npc.examine }}</p>
+
+                                        <div class="mt-2 grid grid-cols-3 gap-2">
+                                            <div v-for="drop in sortDrops(npc.drops).slice(0, 3)" :key="drop.id"
+                                                 class="card-sm !p-1">
+                                                <div class="flex flex-col justify-between text-center leading-normal">
+                                                    <img :src="`data:image/jpeg;base64,${drop.item.icon}`"
+                                                         class="m-auto h-8 w-8 object-contain">
+                                                </div>
                                             </div>
                                         </div>
+                                        <p v-if="npc.drops.length > 3" class="mt-1 text-xs">+ {{ npc.drops.length - 3 }} more drops...</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="text-center mt-4">
+                            <div class="mt-4 text-center">
                                 <TailwindPagination :data="npcs" @pagination-change-page="searchNpcs($event)"></TailwindPagination>
                             </div>
                         </div>
