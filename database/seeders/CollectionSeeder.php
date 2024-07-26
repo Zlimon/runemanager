@@ -126,7 +126,7 @@ class CollectionSeeder extends Seeder
         ];
 
         foreach ($collections as $category => $collection) {
-            $category = Category::whereCategory($category)->first();
+            $category = Category::whereSlug($category)->first();
 
             foreach ($collection as $name => $slug) {
                 try {

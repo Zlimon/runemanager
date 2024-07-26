@@ -112,10 +112,10 @@ class AccountHelper
 
         $models = [
             'skills' => array_merge(['overall'], Skill::pluck('slug')->all()),
-            'pvp' => Collection::byCategoryName('pvp')->pluck('slug')->all(),
-            'clues' => Collection::byCategoryName('clue')->pluck('slug')->all(),
-            'minigame' => Collection::byCategoryName('minigame')->pluck('slug')->all(),
-            'bosses' => Collection::byCategoryName('boss')->pluck('slug')->all(),
+            'pvp' => Collection::byCategorySlug('pvp')->pluck('slug')->all(),
+            'clues' => Collection::byCategorySlug('clue')->pluck('slug')->all(),
+            'minigame' => Collection::byCategorySlug('minigame')->pluck('slug')->all(),
+            'bosses' => Collection::byCategorySlug('boss')->pluck('slug')->all(),
         ];
 
         $keys = array_merge($models['skills'], $models['pvp'], $models['clues'], $models['minigame'], $models['bosses']);
@@ -154,11 +154,11 @@ class AccountHelper
 
         $skillsCount = count($skills);
 
-//        $miniGames = Collection::byCategoryName('minigame')->pluck('slug')->all();
+//        $miniGames = Collection::byCategorySlug('minigame')->pluck('slug')->all();
         $miniGames = ['bounty-hunter', 'bounty-hunter-rogues', 'lms', 'soul-wars', 'castle-wars', 'clan-wars'];
         $miniGamesCount = count($miniGames);
 
-        $clues = Collection::byCategoryName('clue')->pluck('slug')->all();
+        $clues = Collection::byCategorySlug('clue')->pluck('slug')->all();
         $cluesCount = count($clues);
         $cluesIndex = 0;
 
@@ -186,7 +186,7 @@ class AccountHelper
             $cluesIndex++;
         }
 
-        $bosses = Collection::byCategoryName('boss')->pluck('slug')->all();
+        $bosses = Collection::byCategorySlug('boss')->pluck('slug')->all();
         array_splice($bosses, 13, 1);
         $bossCount = count($bosses);
         $bossIndex = 0;
@@ -249,7 +249,7 @@ class AccountHelper
             throw $e;
         }
 
-//        $npcs = Collection::byCategoryName('npc')->pluck('slug')->all();
+//        $npcs = Collection::byCategorySlug('npc')->pluck('slug')->all();
 //
 //        foreach ($npcs as $npc) {
 //            $npcCollection = Collection::findByNameAndCategory($npc, 4);
