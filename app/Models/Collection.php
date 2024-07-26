@@ -6,30 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * App\Collection
+ * 
  *
- * @property string $name
- * @property string $alias
- * @property string $type
- * @property string $model
- * @property-read Model|\Eloquent $collection
- * @method static \Illuminate\Database\Eloquent\Builder|Collection newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Collection newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Collection query()
- * @method static \Illuminate\Database\Eloquent\Builder|Collection whereAlias($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Collection whereModel($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Collection whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Collection whereType($value)
  * @property int $id
  * @property int $category_id
  * @property int $order
+ * @property string $name
  * @property string $slug
- * @property-read \App\Category $category
+ * @property string $model
+ * @property-read \App\Models\Category $category
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection byCategorySlug($categorySlug)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection query()
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereModel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Collection whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Collection whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Collection byCategoryName($categoryName)
  * @mixin \Eloquent
  */
 class Collection extends Model
@@ -43,20 +38,15 @@ class Collection extends Model
         return 'slug';
     }
 
-    public static function findByNameAndCategory(string $name, int $categoryId)
-    {
-        return self::where([['name', $name], ['category_id', $categoryId]])->first();
-    }
-
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class);
     }
 
-    public function scopeByCategoryName($query, $categoryName)
+    public function scopeByCategorySlug($query, $categorySlug)
     {
-        return $query->whereHas('category', function ($q) use ($categoryName) {
-            $q->where('category', $categoryName);
+        return $query->whereHas('category', function ($q) use ($categorySlug) {
+            $q->where('slug', $categorySlug);
         });
     }
 
