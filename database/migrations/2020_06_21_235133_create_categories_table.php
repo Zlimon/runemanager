@@ -16,18 +16,19 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('category');
+            $table->string('name');
+            $table->string('slug')->unique();
         });
 
         DB::table('categories')->insert(
             [
-                ['category' => 'skill'],
-                ['category' => 'pvp'],
-                ['category' => 'clue'],
-                ['category' => 'minigame'],
-                ['category' => 'boss'],
-                ['category' => 'raid'],
-                ['category' => 'npc'],
+                ['name' => 'Skill', 'slug' => 'skill'],
+                ['name' => 'PvP', 'slug' => 'pvp'],
+                ['name' => 'Clue', 'slug' => 'clue'],
+                ['name' => 'Minigame', 'slug' => 'minigame'],
+                ['name' => 'Boss', 'slug' => 'boss'],
+                ['name' => 'Raid', 'slug' => 'raid'],
+                ['name' => 'NPC', 'slug' => 'npc'],
             ]
         );
     }
