@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Item;
+use App\Traits\CollectionTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
 
 class HiscoreController extends Controller
 {
+    use CollectionTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -43,15 +46,13 @@ class HiscoreController extends Controller
             'items' => ['array', 'exists:mongodb.items,id'],
         ]);
 
-        $modelName = Str::studly(Str::slug($request['name']));
-        if (!file_exists(sprintf("%s/Models/Npc/%s.php", app_path(), $modelName))) {
-            try {
-                $model = sprintf("Npc/%s", $modelName);
-                $makeModel = sprintf("make:model %s", $model);
-                Artisan::call($makeModel);
-            } catch (Exception $e) {
-                throw new Exception(sprintf("Could not create model: '%s'. Message: %s", $modelName, $e->getMessage()));
-            }
+        try {
+            $category = Category::whereName('npc')->first();
+            $collection = $this->createHiscore($category, $request['name']);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 400);
         }
 
 //        TODO Move to MongoDB
@@ -81,42 +82,6 @@ class HiscoreController extends Controller
 //                throw new Exception(sprintf("Could not create migration: '%s'. Message: %s", $migrationName, $e->getMessage()));
 //            }
 //        }
-
-        $npcCollectionId = Category::whereCategory('npc')->pluck('id')->first();
-        if (!$npcCollectionId) {
-            throw new Exception("Could not find category 'npc'.");
-        }
-
-        $newestCollection = Collection::whereCategoryId($npcCollectionId)->orderByDesc('order')->pluck('order')->first();
-        if ($newestCollection) {
-            $order = ++$newestCollection;
-        } else {
-            $order = $npcCollectionId * 1000;
-        }
-
-        try {
-            $collection = new Collection();
-
-            $collection->category_id = $npcCollectionId;
-            $collection->order = $order;
-            $collection->name = $request['name'];
-            $collection->slug = Str::slug(($request['name']));
-            $collection->model = sprintf("App\Models\Npc\%s", $modelName);
-
-            $collection->save();
-        } catch (Exception $e) {
-            throw new Exception(sprintf("Could not create collection: '%s'. Message: %s", $request['name'], $e->getMessage()));
-        }
-
-        try {
-            $imageDirectoryPath = sprintf("%s/images/npc/%s", public_path(), Str::slug($request['name']));
-
-            if (!File::exists($imageDirectoryPath)) {
-                File::makeDirectory($imageDirectoryPath, 0755, true, true);
-            }
-        } catch (Exception $e) {
-            throw new Exception(sprintf("Could not create image directory: '%s'. Message: %s", $request['name'], $e->getMessage()));
-        }
 
         return response()->json([
             'collection' => $collection,
