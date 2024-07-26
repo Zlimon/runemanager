@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\AccountTypesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -44,6 +45,18 @@ class Account extends Model
     public function getRouteKeyName(): string
     {
         return 'username';
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'account_type' => AccountTypesEnum::class,
+        ];
     }
 
     public function user(): BelongsTo
