@@ -3,14 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Models\Collection;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Traits\CollectionTrait;
+use Exception;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Str;
 
 class CollectionSeeder extends Seeder
 {
+    use CollectionTrait;
+
     /**
      * Run the database seeds.
      */
@@ -126,39 +126,16 @@ class CollectionSeeder extends Seeder
         ];
 
         foreach ($collections as $category => $collection) {
-            $categoryId = Category::whereCategory($category)->first()->id;
-            $order = $categoryId * 1000;
+            $category = Category::whereCategory($category)->first();
 
             foreach ($collection as $name => $slug) {
-                $model = sprintf("App\Models\%s\%s", ucfirst($category), Str::of($slug)->studly());
-
-                if (!class_exists($model)) {
-                    $this->command->warn(sprintf("Model %s does not exist. Creating...", $model));
-
-                    Artisan::call('hiscore:create', [
-                        'type' => $category,
-                        'name' => $name,
-                        'slug' => $slug,
-                    ]);
-
-                    $newestCollection = Collection::whereCategoryId($categoryId)->orderByDesc('order')->pluck('order')->first();
-
-                    if ($newestCollection) {
-                        $order = ++$newestCollection;
-                    }
+                try {
+                    $this->createHiscore($category, $name);
+                } catch (Exception $e) {
+                    $this->command->warn($e->getMessage());
 
                     continue;
                 }
-
-                Collection::create([
-                    'category_id' => $categoryId,
-                    'order' => $order,
-                    'name' => $name,
-                    'slug' => $slug,
-                    'model' => $model,
-                ]);
-
-                $order++;
             }
         }
     }
