@@ -19,11 +19,23 @@ trait CollectionTrait
      */
     public function createHiscore(Category $category, string $name): Collection
     {
-        $this->createModel($category, $name);
+        try {
+            $this->createModel($category, $name);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
-        $collection = $this->getOrCreateCollection($category, $name);
+        try {
+            $collection = $this->getOrCreateCollection($category, $name);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
-        $this->createImageDirectory($category, $collection);
+        try {
+            $this->createImageDirectory($category, $collection);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
         return $collection;
     }
@@ -39,7 +51,7 @@ trait CollectionTrait
         $modelName = $this->formatModelName($name);
 
         if (class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $modelName))) {
-            throw new Exception(sprintf("Model '%s' already exists.", $modelName));
+            return;
         }
 
         try {
@@ -97,7 +109,7 @@ trait CollectionTrait
      * @return void
      * @throws Exception
      */
-    public function createImageDirectory(Category $category, Collection $collection)
+    public function createImageDirectory(Category $category, Collection $collection): void
     {
         try {
             $imageDirectoryPath = sprintf("%s/images/%s/%s", public_path(), $category->slug, $collection->slug);
