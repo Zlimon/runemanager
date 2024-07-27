@@ -38,4 +38,9 @@ return [
     'osrsbox' => [
         'url' => env('OSRS_BOX_API_URL'),
     ],
+
+    'collectionlog' => [
+        'url' => env('COLLECTION_LOG_API_URL'),
+    ],
+
 ];
