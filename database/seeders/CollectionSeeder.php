@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Clients\CollectionLogClient;
 use App\Models\Category;
 use App\Traits\CollectionTrait;
 use Exception;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CollectionSeeder extends Seeder
 {
@@ -28,114 +30,177 @@ class CollectionSeeder extends Seeder
          */
         $collections = [
             'pvp' => [
-                'Bounty Hunter - Hunter' => 'bounty-hunter',
-                'Bounty Hunter - Rogue' => 'bounty-hunter-rogue',
-                'Bounty Hunter (Legacy) - Hunter' => 'bounty-hunter-legacy',
-                'Bounty Hunter (Legacy) - Rogue' => 'bounty-hunter-rogue-legacy',
-                'Unknown 1' => 'unknown-1',
-                'Unknown 2' => 'unknown-2',
+                'bounty-hunter' => 'Bounty Hunter - Hunter',
+                'bounty-hunter-rogue' => 'Bounty Hunter - Rogue',
+                'bounty-hunter-legacy' => 'Bounty Hunter (Legacy) - Hunter',
+                'bounty-hunter-rogue-legacy' => 'Bounty Hunter (Legacy) - Rogue',
+                'unknown-1' => 'Unknown 1',
+                'unknown-2' => 'Unknown 2',
             ],
             'clue' => [
-                'All Treasure Trails' => 'all-treasure-trails',
-                'Clue scroll (beginner)' => 'beginner-treasure-trails',
-                'Clue scroll (easy)' => 'easy-treasure-trails',
-                'Clue scroll (medium)' => 'medium-treasure-trails',
-                'Clue scroll (hard)' => 'hard-treasure-trails',
-                'Clue scroll (elite)' => 'elite-treasure-trails',
-                'Clue scroll (master)' => 'master-treasure-trails',
+                'all-treasure-trails' => 'All Treasure Trails',
+                'beginner-treasure-trails' => 'Beginner Treasure Trails',
+                'easy-treasure-trails' => 'Easy Treasure Trails',
+                'medium-treasure-trails' => 'Clue scroll (medium)',
+                'hard-treasure-trails' => 'Hard Treasure Trails',
+                'elite-treasure-trails' => 'Elite Treasure Trails',
+                'master-treasure-trails' => 'Master Treasure Trails',
             ],
             'minigame' => [
-                'Last Man Standing' => 'last-man-standing',
-                'PvP Arena' => 'pvp-arena',
-                'Soul Wars Zeal' => 'soul-wars-zeal',
-                'Rifts closed' => 'rifts-closed',
-                'Colosseum Glory' => 'colosseum-glory',
+                'last-man-standing' => 'Last Man Standing',
+                'pvp-arena' => 'PvP Arena',
+                'soul-wars-zeal' => 'Soul Wars Zeal',
+                'rifts-closed' => 'Rifts closed',
+                'colosseum-glory' => 'Colosseum Glory',
             ],
             'boss' => [
-                'Abyssal Sire' => 'abyssal-sire',
-                'Alchemical Hydra' => 'alchemical-hydra',
-                'Artio' => 'artio',
-                'Barrows Chests' => 'barrows-chests',
-                'Bryophyta' => 'bryophyta',
-                'Callisto' => 'callisto',
-                'Calvar\'ion' => 'calvarion',
-                'Cerberus' => 'cerberus',
-                'Chambers of Xeric - Placeholder' => 'chambers-of-xeric',
-                'Chambers of Xeric: Challenge Mode - Placeholder' => 'chambers-of-xeric-challenge-mode',
-                'Chaos Elemental' => 'chaos-elemental',
-                'Chaos Fanatic' => 'chaos-fanatic',
-                'Commander Zilyana' => 'commander-zilyana',
-                'Corporeal Beast' => 'corporeal-beast',
-                'Crazy Archaeologist' => 'crazy-archaeologist',
-//                'Dagannoth Kings' => 'dagannoth-kings',
-                'Dagannoth Prime' => 'dagannoth-prime',
-                'Dagannoth Rex' => 'dagannoth-rex',
-                'Dagannoth Supreme' => 'dagannoth-supreme',
-                'Deranged Archaeologist' => 'deranged-archaeologist',
-                'Duke Sucellus' => 'duke-sucellus',
-                'General Graardor' => 'general-graardor',
-                'Giant Mole' => 'giant-mole',
-                'Grotesque Guardians' => 'grotesque-guardians',
-                'Hespori' => 'hespori',
-                'Kalphite Queen' => 'kalphite-queen',
-                'King Black Dragon' => 'king-black-dragon',
-                'Kraken' => 'kraken',
-                'Kree\'arra' => 'kreearra',
-                'K\'ril Tsutsaroth' => 'kril-tsutsaroth',
-                'Lunar Chests' => 'lunar-chests',
-                'Mimic' => 'mimic',
-                'Nex' => 'nex',
-                'Nightmare' => 'nightmare',
-                'Phosani\'s Nightmare' => 'phosanis-nightmare',
-                'Obor' => 'obor',
-                'Phantom Muspah' => 'phantom-muspah',
-                'Sarachnis' => 'sarachnis',
-                'Scorpia' => 'scorpia',
-                'Scurrius' => 'scurrius',
-                'Skotizo' => 'skotizo',
-                'Unknown 3' => 'unknown-3',
-                'Spindel' => 'spindel',
-                'Tempoross' => 'tempoross',
-                'The Gauntlet' => 'the-gauntlet',
-                'The Corrupted Gauntlet' => 'the-corrupted-gauntlet',
-                'The Leviathan' => 'the-leviathan',
-                'Unknown 4' => 'unknown-4',
-                'Theatre of Blood - Placeholder' => 'theatre-of-blood',
-                'Theatre of Blood: Hard Mode - Placeholder' => 'theatre-of-blood-hard-mode',
-                'Thermonuclear Smoke Devil' => 'thermonuclear-smoke-devil',
-                'Tombs of Amascut - Placeholder' => 'tombs-of-amascut',
-                'Tombs of Amascut: Expert Mode - Placeholder' => 'tombs-of-amascut-expert-mode',
-                'TzKal-Zuk' => 'tzkal-zuk',
-                'TzTok-Jad' => 'tztok-jad',
-                'Unknown 5' => 'unknown-5',
-                'Venenatis' => 'venenatis',
-                'Vet\'ion' => 'vetion',
-                'Vorkath' => 'vorkath',
-                'Wintertodt' => 'wintertodt',
-                'Zalcano' => 'zalcano',
-                'Zulrah' => 'zulrah',
+                'abyssal-sire' => 'Abyssal Sire',
+                'alchemical-hydra' => 'Alchemical Hydra',
+                'artio' => 'Artio',
+                'barrows-chests' => 'Barrows Chests',
+                'bryophyta' => 'Bryophyta',
+                'callisto' => 'Callisto',
+                'calvarion' => 'Calvar\'ion',
+                'cerberus' => 'Cerberus',
+                'chambers-of-xeric' => 'Chambers of Xeric - Placeholder',
+                'chambers-of-xeric-challenge-mode' => 'Chambers of Xeric: Challenge Mode - Placeholder',
+                'chaos-elemental' => 'Chaos Elemental',
+                'chaos-fanatic' => 'Chaos Fanatic',
+                'commander-zilyana' => 'Commander Zilyana',
+                'corporeal-beast' => 'Corporeal Beast',
+                'crazy-archaeologist' => 'Crazy Archaeologist',
+                'dagannoth-prime' => 'Dagannoth Prime',
+                'dagannoth-rex' => 'Dagannoth Rex',
+                'dagannoth-supreme' => 'Dagannoth Supreme',
+                'deranged-archaeologist' => 'Deranged Archaeologist',
+                'duke-sucellus' => 'Duke Sucellus',
+                'general-graardor' => 'General Graardor',
+                'giant-mole' => 'Giant Mole',
+                'grotesque-guardians' => 'Grotesque Guardians',
+                'hespori' => 'Hespori',
+                'kalphite-queen' => 'Kalphite Queen',
+                'king-black-dragon' => 'King Black Dragon',
+                'kraken' => 'Kraken',
+                'kreearra' => 'Kree\'arra',
+                'kril-tsutsaroth' => 'K\'ril Tsutsaroth',
+                'lunar-chests' => 'Lunar Chests',
+                'mimic' => 'Mimic',
+                'nex' => 'Nex',
+                'nightmare' => 'Nightmare',
+                'phosanis-nightmare' => 'Phosani\'s Nightmare',
+                'obor' => 'Obor',
+                'phantom-muspah' => 'Phantom Muspah',
+                'sarachnis' => 'Sarachnis',
+                'scorpia' => 'Scorpia',
+                'scurrius' => 'Scurrius',
+                'skotizo' => 'Skotizo',
+                'unknown-3' => 'Unknown 3',
+                'spindel' => 'Spindel',
+                'tempoross' => 'Tempoross',
+                'the-gauntlet' => 'The Gauntlet',
+                'the-corrupted-gauntlet' => 'The Corrupted Gauntlet',
+                'the-leviathan' => 'The Leviathan',
+                'unknown-4' => 'Unknown 4',
+                'theatre-of-blood' => 'Theatre of Blood - Placeholder',
+                'theatre-of-blood-hard-mode' => 'Theatre of Blood: Hard Mode - Placeholder',
+                'thermonuclear-smoke-devil' => 'Thermonuclear Smoke Devil',
+                'tombs-of-amascut' => 'Tombs of Amascut - Placeholder',
+                'tombs-of-amascut-expert-mode' => 'Tombs of Amascut: Expert Mode - Placeholder',
+                'tzkal-zuk' => 'TzKal-Zuk',
+                'tztok-jad' => 'TzTok-Jad',
+                'unknown-5' => 'Unknown 5',
+                'venenatis' => 'Venenatis',
+                'vetion' => 'Vet\'ion',
+                'vorkath' => 'Vorkath',
+                'wintertodt' => 'Wintertodt',
+                'zalcano' => 'Zalcano',
+                'zulrah' => 'Zulrah',
             ],
             'raid' => [
-                'Chambers of Xeric' => 'chambers-of-xeric',
-                'Chambers of Xeric: Challenge Mode' => 'chambers-of-xeric-challenge-mode',
-                'Theatre of Blood' => 'theatre-of-blood',
-                'Theatre of Blood: Hard Mode' => 'theatre-of-blood-hard-mode',
-                'Tombs of Amascut' => 'tombs-of-amascut',
-                'Tombs of Amascut: Expert Mode' => 'tombs-of-amascut-expert-mode',
+                'chambers-of-xeric' => 'Chambers of Xeric',
+                'chambers-of-xeric-challenge-mode' => 'Chambers of Xeric: Challenge Mode',
+                'theatre-of-blood' => 'Theatre of Blood',
+                'theatre-of-blood-hard-mode' => 'Theatre of Blood: Hard Mode',
+                'tombs-of-amascut' => 'Tombs of Amascut',
+                'tombs-of-amascut-expert-mode' => 'Tombs of Amascut: Expert Mode',
             ]
         ];
+
+        $collectionLogClient = new CollectionLogClient();
+
+        // Get number 1 player on collectionlog.net hiscores to get all collection log pages
+        try {
+            $response = $collectionLogClient->request('GET', '/hiscores/1?accountType=NORMAL');
+
+            $result = json_decode($response->getBody()->getContents(), true);
+
+            if (!isset($result['hiscores'][0]['username'])) {
+                throw new Exception('Could not retrieve rank 1 player from collectionlog.net hiscores.');
+            }
+        } catch (Exception $e) {
+            $this->command->warn($e->getMessage());
+
+            return;
+        }
+
+        $rankOne = $result['hiscores'][0]['username'];
+
+        // Get all collection log entries for rank 1 player
+        try {
+            $response = $collectionLogClient->request('GET', '/collectionlog/user/' . $rankOne);
+        } catch (Exception $e) {
+            $this->command->warn($e->getMessage());
+
+            return;
+        }
+
+        $result = json_decode($response->getBody()->getContents(), true);
+
+
 
         foreach ($collections as $category => $collection) {
             $category = Category::whereSlug($category)->first();
 
-            foreach ($collection as $name => $slug) {
-                try {
-                    $this->createHiscore($category, $name);
-                } catch (Exception $e) {
-                    $this->command->warn($e->getMessage());
-
-                    continue;
+            foreach ($collection as $slug => $name) {
+                // collectionLogTab is the collection name on collectionlog.net
+                switch ($category->slug) {
+                    case 'clue':
+                        $collectionLogTab = 'Clues';
+                        break;
+                    case 'minigame':
+                        $collectionLogTab = 'Minigames';
+                        break;
+                    case 'boss':
+                        $collectionLogTab = 'Bosses';
+                        break;
+                    case 'raid':
+                        $collectionLogTab = 'Raids';
+                        break;
+                    default:
+                        $collectionLogTab = $category->slug;
+                        break;
                 }
+
+                if (isset($result['collectionLog']['tabs'][$collectionLogTab][$name])) {
+                    try {
+                        $this->createHiscore($category, $name, $result['collectionLog']['tabs'][$collectionLogTab][$name]['items']);
+                    } catch (Exception $e) {
+                        $this->command->warn($e->getMessage());
+
+                        continue;
+                    }
+                }
+
+                // Find respective entry in collectionlog.net hiscores and create hiscore entry with items
+//                dd($result['collectionLog']['tabs'][$collectionLogTab]);
+
+//                try {
+//                    $this->createHiscore($category, $name);
+//                } catch (Exception $e) {
+//                    $this->command->warn($e->getMessage());
+//
+//                    continue;
+//                }
             }
         }
     }
