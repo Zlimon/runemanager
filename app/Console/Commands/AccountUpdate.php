@@ -2,11 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\AccountHelper;
+use App\Actions\Account\CreateOrUpdateAccount;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class AccountUpdate extends Command
@@ -34,6 +33,8 @@ class AccountUpdate extends Command
     {
         $username = $this->option('username');
 
+        $createOrUpdateAccount = new \App\Actions\Account\CreateOrUpdateAccount;
+
         if ($username) {
             $account = Account::whereUsername($username)->first();
 
@@ -48,7 +49,7 @@ class AccountUpdate extends Command
 
                 $user = User::whereName($userName)->first();
 
-                $account = AccountHelper::createOrUpdateAccount($username, $user);
+                $account = $createOrUpdateAccount->createOrUpdateAccount($username, $user);
 
                 try {
                     $this->info(sprintf("Successfully created account '%s'.", $account->username));
@@ -99,7 +100,7 @@ class AccountUpdate extends Command
             }
 
             try {
-                AccountHelper::createOrUpdateAccount($account->username, $account->user()->first(), constant(sprintf("App\Enums\AccountTypesEnum::%s", strtoupper($account->account_type))));
+                $createOrUpdateAccount->createOrUpdateAccount($account->username, $account->user()->first(), $account->account_type);
 
                 $this->info(sprintf("Successfully updated account '%s'.", $account->username));
             } catch (\Exception $e) {

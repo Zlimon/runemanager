@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Actions\Account\CreateOrUpdateAccount;
 use App\Enums\AccountTypesEnum;
-use App\Helpers\AccountHelper;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -68,13 +68,15 @@ class AccountSeeder extends Seeder
             'TobeTask',
         ];
 
-        AccountHelper::createOrUpdateAccount('Habski', User::whereName('Zlimon')->first(), AccountTypesEnum::IRONMAN);
+        $createOrUpdateAccount = new CreateOrUpdateAccount();
+
+        $createOrUpdateAccount->createOrUpdateAccount('Habski', User::whereName('Zlimon')->first(), AccountTypesEnum::IRONMAN);
 
         foreach ($accounts as $account) {
             $user = User::inRandomOrder()->pluck('id')->first();
 
 //            \App\Enums\AccountTypesEnum::returnAllAccountTypes()[rand(0, 3)]
-            AccountHelper::createOrUpdateAccount($account, $user);
+            $createOrUpdateAccount->createOrUpdateAccount($account, $user);
         }
     }
 }

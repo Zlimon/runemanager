@@ -127,8 +127,6 @@ class CreateOrUpdateAccount
             }
         }
 
-        dd($combined);
-
         $skills = Skill::all();
 
         foreach ($skills as $key => $skill) {
