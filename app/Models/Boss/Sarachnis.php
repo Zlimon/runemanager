@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Sarachnis whereGiantEggSac(full)($value)
  * @mixin \Eloquent
  */
 class Sarachnis extends Model

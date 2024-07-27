@@ -51,6 +51,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Wintertodt whereTomeOfFire(empty)($value)
  * @mixin \Eloquent
  */
 class Wintertodt extends Model

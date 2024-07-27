@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheGauntlet whereBladeOfSaeldor(inactive)($value)
  * @mixin \Eloquent
  */
 class TheGauntlet extends Model

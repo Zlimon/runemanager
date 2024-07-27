@@ -77,6 +77,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereRuneScimitarOrnamentKit(guthix)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereRuneScimitarOrnamentKit(saradomin)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereRuneScimitarOrnamentKit(zamorak)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereAmuletOfDefence(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereMonksRobe(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereMonksRobeTop(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereRuneScimitarOrnamentKit(guthix)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereRuneScimitarOrnamentKit(saradomin)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BeginnerTreasureTrails whereRuneScimitarOrnamentKit(zamorak)($value)
  * @mixin \Eloquent
  */
 class BeginnerTreasureTrails extends Model

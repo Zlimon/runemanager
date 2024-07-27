@@ -221,6 +221,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereObsidianCape(r)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereBucketHelm(g)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereObsidianCape(r)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereBucketHelm(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MasterTreasureTrails whereObsidianCape(r)($value)
  * @mixin \Eloquent
  */
 class MasterTreasureTrails extends Model

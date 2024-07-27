@@ -238,6 +238,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(g)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(t)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereDragonLegs/skirtOrnamentKit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideBody(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideBody(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(g)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereBlackDhideChaps(t)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|EliteTreasureTrails whereDragonLegs/skirtOrnamentKit($value)
  * @mixin \Eloquent
  */
 class EliteTreasureTrails extends Model

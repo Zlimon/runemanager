@@ -63,6 +63,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereSanguinestiStaff(uncharged)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TheatreOfBlood whereScytheOfVitur(uncharged)($value)
  * @mixin \Eloquent
  */
 class TheatreOfBlood extends Model

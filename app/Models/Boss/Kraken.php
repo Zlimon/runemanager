@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kraken whereTridentOfTheSeas(full)($value)
  * @mixin \Eloquent
  */
 class Kraken extends Model
