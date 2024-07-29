@@ -170,52 +170,54 @@ class CollectionSeeder extends Seeder
                     default => $category->slug,
                 };
 
-                if (isset($result['collectionLog']['tabs'][$collectionLogTab][$name])) {
-                    $items = [];
+                $collectionName = $name;
 
-                    // Merge certain collections
-                    switch ($name) {
-                        case 'Artio' || 'Callisto':
-                            $name = 'Callisto and Artio';
-                            break;
-                        case 'Calvar\'ion' || 'Vet\'ion':
-                            $name = 'Vet\'ion and Calvar\'ion';
-                            break;
+                // Merge certain collections
+                switch ($name) {
+                    case 'Artio' || 'Callisto':
+                        $collectionName = 'Callisto and Artio';
+                        break;
+                    case 'Calvar\'ion' || 'Vet\'ion':
+                        $collectionName = 'Vet\'ion and Calvar\'ion';
+                        break;
 //                        case 'Chambers of Xeric - Placeholder' || 'Chambers of Xeric: Challenge Mode - Placeholder':
 //                            $name = 'Chambers of Xeric';
 //                            break;
-                        case 'Dagannoth Prime' || 'Dagannoth Rex' || 'Dagannoth Supreme':
-                            $name = 'Dagannoth Kings';
-                            break;
-                        case 'Deranged Archaeologist':
-                            break;
-                        case 'Lunar Chests':
-                            $name = 'Moons of Peril';
-                            break;
-                        case 'Mimic':
-                            break;
-                        case 'Nightmare' || 'Phosani\'s Nightmare':
-                            $name = 'The Nightmare';
-                            break;
-                        case 'Spindel' || 'Venenatis':
-                            $name = 'Venenatis and Spindel';
-                            break;
-                        case 'Gauntlet' || 'The Corrupted Gauntlet':
-                            $name = 'The Gauntlet';
-                            break;
-                        case 'TzKal-Zuk':
-                            $name = 'The Inferno';
-                            break;
-                        case 'TzTok-Jad':
-                            $name = 'The Fight Caves';
-                            break;
-                    }
+                    case 'Dagannoth Prime' || 'Dagannoth Rex' || 'Dagannoth Supreme':
+                        $collectionName = 'Dagannoth Kings';
+                        break;
+                    case 'Deranged Archaeologist':
+                        break;
+                    case 'Lunar Chests':
+                        $collectionName = 'Moons of Peril';
+                        break;
+                    case 'Mimic':
+                        break;
+                    case 'Nightmare' || 'Phosani\'s Nightmare':
+                        $collectionName = 'The Nightmare';
+                        break;
+                    case 'Spindel' || 'Venenatis':
+                        $collectionName = 'Venenatis and Spindel';
+                        break;
+                    case 'Gauntlet' || 'The Corrupted Gauntlet':
+                        $collectionName = 'The Gauntlet';
+                        break;
+                    case 'TzKal-Zuk':
+                        $collectionName = 'The Inferno';
+                        break;
+                    case 'TzTok-Jad':
+                        $collectionName = 'The Fight Caves';
+                        break;
+                }
 
-                    if (!empty($result['collectionLog']['tabs'][$collectionLogTab][$name]['items'])) {
+                if (isset($result['collectionLog']['tabs'][$collectionLogTab][$collectionName])) {
+                    $items = [];
+
+                    if (!empty($result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items'])) {
                         // Map items from Item model
                         $itemIds = array_map(function ($item) {
                             return (string) $item['id'];
-                        }, $result['collectionLog']['tabs'][$collectionLogTab][$name]['items']);
+                        }, $result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items']);
 
 //                        $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
 //                            return Str::slug(Str::snake($item), '_');
@@ -233,7 +235,7 @@ class CollectionSeeder extends Seeder
                     }
 
                     try {
-                        $this->createHiscore($category, $name, $items);
+                        $this->createHiscore($category, $collectionName, $items);
                     } catch (Exception $e) {
                         $this->command->warn($e->getMessage());
 
