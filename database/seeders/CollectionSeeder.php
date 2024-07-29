@@ -42,7 +42,7 @@ class CollectionSeeder extends Seeder
                 'all-treasure-trails' => 'All Treasure Trails',
                 'beginner-treasure-trails' => 'Beginner Treasure Trails',
                 'easy-treasure-trails' => 'Easy Treasure Trails',
-                'medium-treasure-trails' => 'Clue scroll (medium)',
+                'medium-treasure-trails' => 'Medium Treasure Trails',
                 'hard-treasure-trails' => 'Hard Treasure Trails',
                 'elite-treasure-trails' => 'Elite Treasure Trails',
                 'master-treasure-trails' => 'Master Treasure Trails',
@@ -173,6 +173,44 @@ class CollectionSeeder extends Seeder
                 if (isset($result['collectionLog']['tabs'][$collectionLogTab][$name])) {
                     $items = [];
 
+                    // Merge certain collections
+                    switch ($name) {
+                        case 'Artio' || 'Callisto':
+                            $name = 'Callisto and Artio';
+                            break;
+                        case 'Calvar\'ion' || 'Vet\'ion':
+                            $name = 'Vet\'ion and Calvar\'ion';
+                            break;
+//                        case 'Chambers of Xeric - Placeholder' || 'Chambers of Xeric: Challenge Mode - Placeholder':
+//                            $name = 'Chambers of Xeric';
+//                            break;
+                        case 'Dagannoth Prime' || 'Dagannoth Rex' || 'Dagannoth Supreme':
+                            $name = 'Dagannoth Kings';
+                            break;
+                        case 'Deranged Archaeologist':
+                            break;
+                        case 'Lunar Chests':
+                            $name = 'Moons of Peril';
+                            break;
+                        case 'Mimic':
+                            break;
+                        case 'Nightmare' || 'Phosani\'s Nightmare':
+                            $name = 'The Nightmare';
+                            break;
+                        case 'Spindel' || 'Venenatis':
+                            $name = 'Venenatis and Spindel';
+                            break;
+                        case 'Gauntlet' || 'The Corrupted Gauntlet':
+                            $name = 'The Gauntlet';
+                            break;
+                        case 'TzKal-Zuk':
+                            $name = 'The Inferno';
+                            break;
+                        case 'TzTok-Jad':
+                            $name = 'The Fight Caves';
+                            break;
+                    }
+
                     if (!empty($result['collectionLog']['tabs'][$collectionLogTab][$name]['items'])) {
                         // Map items from Item model
                         $itemIds = array_map(function ($item) {
@@ -189,7 +227,7 @@ class CollectionSeeder extends Seeder
                             $item = Item::whereId($itemId)->first();
 
                             if ($item) {
-                                $items[] = $item->id;
+                                $items[] = $item;
                             }
                         }
                     }
