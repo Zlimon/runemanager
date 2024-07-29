@@ -29,7 +29,7 @@ class CollectionSeeder extends Seeder
          * 6 - raid
          * 7 - npc
          */
-        $collections = [
+        $hiscoreEntries = [
             'pvp' => [
                 'bounty-hunter' => 'Bounty Hunter - Hunter',
                 'bounty-hunter-rogue' => 'Bounty Hunter - Rogue',
@@ -95,13 +95,13 @@ class CollectionSeeder extends Seeder
                 'scorpia' => 'Scorpia',
                 'scurrius' => 'Scurrius',
                 'skotizo' => 'Skotizo',
-                'unknown-3' => 'Unknown 3',
+                'sol-heredit' => 'Sol Heredit',
                 'spindel' => 'Spindel',
                 'tempoross' => 'Tempoross',
                 'the-gauntlet' => 'The Gauntlet',
                 'the-corrupted-gauntlet' => 'The Corrupted Gauntlet',
                 'the-leviathan' => 'The Leviathan',
-                'unknown-4' => 'Unknown 4',
+                'the whisperer' => 'The Whisperer',
                 'theatre-of-blood' => 'Theatre of Blood - Placeholder',
                 'theatre-of-blood-hard-mode' => 'Theatre of Blood: Hard Mode - Placeholder',
                 'thermonuclear-smoke-devil' => 'Thermonuclear Smoke Devil',
@@ -109,7 +109,7 @@ class CollectionSeeder extends Seeder
                 'tombs-of-amascut-expert-mode' => 'Tombs of Amascut: Expert Mode - Placeholder',
                 'tzkal-zuk' => 'TzKal-Zuk',
                 'tztok-jad' => 'TzTok-Jad',
-                'unknown-5' => 'Unknown 5',
+                'vardorvis' => 'Vardorvis',
                 'venenatis' => 'Venenatis',
                 'vetion' => 'Vet\'ion',
                 'vorkath' => 'Vorkath',
@@ -157,10 +157,10 @@ class CollectionSeeder extends Seeder
             return;
         }
 
-        foreach ($collections as $category => $collection) {
+        foreach ($hiscoreEntries as $category => $hiscore) {
             $category = Category::whereSlug($category)->first();
 
-            foreach ($collection as $slug => $name) {
+            foreach ($hiscore as $slug => $name) {
                 // collectionLogTab is the collection name on collectionlog.net
                 $collectionLogTab = match ($category->slug) {
                     'clue' => 'Clues',
