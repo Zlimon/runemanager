@@ -183,7 +183,15 @@ class CollectionSeeder extends Seeder
 //                            return Str::slug(Str::snake($item), '_');
 //                        })->toArray();
 
-                        $items = Item::whereIn('id', $itemIds)->get()->toArray();
+//                        $items = Item::whereIn('id', $itemIds)->orderBy('id')->get()->toArray();
+                        // Get items from Item model in same order the items are in the collection log
+                        foreach ($itemIds as $itemId) {
+                            $item = Item::whereId($itemId)->first();
+
+                            if ($item) {
+                                $items[] = $item->id;
+                            }
+                        }
                     }
 
                     try {
