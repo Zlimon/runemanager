@@ -170,20 +170,22 @@ class CollectionSeeder extends Seeder
                     default => $category->slug,
                 };
 
-                $collectionName = $name;
-
                 // Merge certain collections
                 switch ($name) {
-                    case 'Artio' || 'Callisto':
+                    case 'Callisto':
+                    case 'Artio':
                         $collectionName = 'Callisto and Artio';
                         break;
-                    case 'Calvar\'ion' || 'Vet\'ion':
+                    case 'Vet\'ion':
+                    case 'Calvar\'ion':
                         $collectionName = 'Vet\'ion and Calvar\'ion';
                         break;
-//                        case 'Chambers of Xeric - Placeholder' || 'Chambers of Xeric: Challenge Mode - Placeholder':
-//                            $name = 'Chambers of Xeric';
-//                            break;
-                    case 'Dagannoth Prime' || 'Dagannoth Rex' || 'Dagannoth Supreme':
+//case 'Chambers of Xeric - Placeholder' || 'Chambers of Xeric: Challenge Mode - Placeholder':
+//$name = 'Chambers of Xeric';
+//break;
+                    case 'Dagannoth Prime':
+                    case 'Dagannoth Rex':
+                    case 'Dagannoth Supreme':
                         $collectionName = 'Dagannoth Kings';
                         break;
                     case 'Deranged Archaeologist':
@@ -193,13 +195,16 @@ class CollectionSeeder extends Seeder
                         break;
                     case 'Mimic':
                         break;
-                    case 'Nightmare' || 'Phosani\'s Nightmare':
+                    case 'Nightmare':
+                    case 'Phosani\'s Nightmare':
                         $collectionName = 'The Nightmare';
                         break;
-                    case 'Spindel' || 'Venenatis':
+                    case 'Spindel':
+                    case 'Venenatis':
                         $collectionName = 'Venenatis and Spindel';
                         break;
-                    case 'Gauntlet' || 'The Corrupted Gauntlet':
+                    case 'Gauntlet':
+                    case 'The Corrupted Gauntlet':
                         $collectionName = 'The Gauntlet';
                         break;
                     case 'TzKal-Zuk':
@@ -207,6 +212,9 @@ class CollectionSeeder extends Seeder
                         break;
                     case 'TzTok-Jad':
                         $collectionName = 'The Fight Caves';
+                        break;
+                    default:
+                        $collectionName = $name;
                         break;
                 }
 
@@ -242,7 +250,7 @@ class CollectionSeeder extends Seeder
                         continue;
                     }
                 } else {
-                    $this->command->warn(sprintf("Could not find collection '%s' in collectionlog.net hiscores.", $name));
+                    $this->command->warn(sprintf("Could not find collection '%s' in tab '%s' collectionlog.net hiscores.", $collectionName, $collectionLogTab));
                 }
             }
         }
