@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Clients\CollectionLogClient;
 use App\Models\Category;
+use App\Models\Item;
 use App\Traits\CollectionTrait;
 use Exception;
 use Illuminate\Database\Seeder;
@@ -148,59 +149,53 @@ class CollectionSeeder extends Seeder
         // Get all collection log entries for rank 1 player
         try {
             $response = $collectionLogClient->request('GET', '/collectionlog/user/' . $rankOne);
+
+            $result = json_decode($response->getBody()->getContents(), true);
         } catch (Exception $e) {
             $this->command->warn($e->getMessage());
 
             return;
         }
 
-        $result = json_decode($response->getBody()->getContents(), true);
-
-
-
         foreach ($collections as $category => $collection) {
             $category = Category::whereSlug($category)->first();
 
             foreach ($collection as $slug => $name) {
                 // collectionLogTab is the collection name on collectionlog.net
-                switch ($category->slug) {
-                    case 'clue':
-                        $collectionLogTab = 'Clues';
-                        break;
-                    case 'minigame':
-                        $collectionLogTab = 'Minigames';
-                        break;
-                    case 'boss':
-                        $collectionLogTab = 'Bosses';
-                        break;
-                    case 'raid':
-                        $collectionLogTab = 'Raids';
-                        break;
-                    default:
-                        $collectionLogTab = $category->slug;
-                        break;
-                }
+                $collectionLogTab = match ($category->slug) {
+                    'clue' => 'Clues',
+                    'minigame' => 'Minigames',
+                    'boss' => 'Bosses',
+                    'raid' => 'Raids',
+                    default => $category->slug,
+                };
 
                 if (isset($result['collectionLog']['tabs'][$collectionLogTab][$name])) {
+                    $items = [];
+
+                    if (!empty($result['collectionLog']['tabs'][$collectionLogTab][$name]['items'])) {
+                        // Map items from Item model
+                        $itemIds = array_map(function ($item) {
+                            return (string) $item['id'];
+                        }, $result['collectionLog']['tabs'][$collectionLogTab][$name]['items']);
+
+//                        $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
+//                            return Str::slug(Str::snake($item), '_');
+//                        })->toArray();
+
+                        $items = Item::whereIn('id', $itemIds)->get()->toArray();
+                    }
+
                     try {
-                        $this->createHiscore($category, $name, $result['collectionLog']['tabs'][$collectionLogTab][$name]['items']);
+                        $this->createHiscore($category, $name, $items);
                     } catch (Exception $e) {
                         $this->command->warn($e->getMessage());
 
                         continue;
                     }
+                } else {
+                    $this->command->warn(sprintf("Could not find collection '%s' in collectionlog.net hiscores.", $name));
                 }
-
-                // Find respective entry in collectionlog.net hiscores and create hiscore entry with items
-//                dd($result['collectionLog']['tabs'][$collectionLogTab]);
-
-//                try {
-//                    $this->createHiscore($category, $name);
-//                } catch (Exception $e) {
-//                    $this->command->warn($e->getMessage());
-//
-//                    continue;
-//                }
             }
         }
     }
