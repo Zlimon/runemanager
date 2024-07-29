@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Item;
 use Exception;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -15,7 +14,7 @@ trait CollectionTrait
     /**
      * @param Category $category
      * @param string $name
-     * @param array $items
+     * @param array<Item> $items
      * @return Collection
      * @throws Exception
      */
@@ -53,56 +52,57 @@ trait CollectionTrait
     {
         $modelName = $this->formatModelName($name);
 
-        if (class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $modelName))) {
+        if (class_exists($modelName)) {
             return;
         }
 
         try {
             $model = sprintf("%s/%s", Str::studly($category->slug), $modelName);
+            $tableName = Str::snake($modelName);
 
-                $modelPath = 'app/Models/' . $model . '.php';
+            $namespace = 'namespace App\Models\\' . Str::studly($category->slug) . ';';
+            $table = '$table';
+            $fillable = '$fillable';
+            $hidden = '$hidden';
+            $thisBelongsTo = '$this->belongsTo(Account::class)';
 
-                $table = '$table';
-                $fillable = '$fillable';
-                $hidden = '$hidden';
-                $thisBelongsTo = '$this->belongsTo(\App\Account::class)';
+            $modelFileContent = <<<EOD
+            <?php
 
-                $modelFile = <<<EOD
-                <?php
+            $namespace
 
-                namespace App\Npc;
+            use App\Models\Account;
+            use Illuminate\Database\Eloquent\Model;
 
-                use Illuminate\Database\Eloquent\Model;
+            class $modelName extends Model
+            {
+                protected $table = '$tableName';
 
-                class $modelName extends Model
+                protected $fillable = [
+                    'obtained',
+                    'kill_count',\r\n
+            EOD;
+            foreach ($items as $item) {
+//                $fillable = str_replace("'", "", str_replace("-", "_", Str::snake(strtolower($unique))));
+                $fillable = $item['id'];
+
+                $modelFileContent .= <<<EOD
+                        '$fillable',\r\n
+                EOD;
+            }
+            $modelFileContent .= <<<EOD
+                ];
+
+                protected $hidden = ['user_id'];
+
+                public function account()
                 {
-                    protected $table = '$modelName';
-
-                    protected $fillable = [
-                        'obtained',
-                        'kill_count',\r\n
-                EOD;
-                foreach ($items as $unique) {
-                    dd($unique);
-                    $fillable = str_replace("'", "", str_replace("-", "_", Str::snake(strtolower($unique))));
-
-                    $modelFile .= <<<EOD
-                            '$fillable',\r\n
-                    EOD;
+                    return $thisBelongsTo;
                 }
-                $modelFile .= <<<EOD
-                    ];
+            }
+            EOD;
 
-                    protected $hidden = ['user_id'];
-
-                    public function account()
-                    {
-                        return $thisBelongsTo;
-                    }
-                }
-                EOD;
-
-            File::put($modelPath, $modelFile);
+            File::put('app/Models/' . $model . '.php', $modelFileContent);
         } catch (Exception $e) {
             throw new Exception(sprintf("Could not create model: '%s'. Message: %s", $modelName, $e->getMessage()));
         }
@@ -116,6 +116,10 @@ trait CollectionTrait
      */
     public function getOrCreateCollection(Category $category, string $name): Collection
     {
+        if (!class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
+            throw new Exception(sprintf("Model does not exist: '%s'.", $this->formatModelName($name)));
+        }
+
         $collection = Collection::whereCategoryId($category->id)->whereName($name)->first();
 
         if ($collection) {
