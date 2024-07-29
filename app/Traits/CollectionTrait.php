@@ -73,6 +73,7 @@ trait CollectionTrait
 
             use App\Models\Account;
             use Illuminate\Database\Eloquent\Model;
+            use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
             class $modelName extends Model
             {
@@ -95,7 +96,7 @@ trait CollectionTrait
 
                 protected $hidden = ['user_id'];
 
-                public function account()
+                public function account(): BelongsTo
                 {
                     return $thisBelongsTo;
                 }
