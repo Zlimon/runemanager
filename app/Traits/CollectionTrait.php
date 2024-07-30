@@ -27,6 +27,12 @@ trait CollectionTrait
         }
 
         try {
+            $this->createMigration($category, $name, $items);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        try {
             $collection = $this->getOrCreateCollection($category, $name);
         } catch (Exception $e) {
             throw $e;
@@ -109,6 +115,65 @@ trait CollectionTrait
         }
     }
 
+    public function createMigration(Category $category, string $name, array $items = []): void
+    {
+        $migrationName = $this->formatMigrationName($name);
+
+        try {
+            $tableName = Str::snake($name);
+
+            $migrationFileContent = <<<EOD
+            <?php
+
+            use Illuminate\Database\Migrations\Migration;
+            use Illuminate\Database\Schema\Blueprint;
+            use Illuminate\Support\Facades\Schema;
+
+            return new class extends Migration
+            {
+                /**
+                 * Run the migrations.
+                 */
+                public function up(): void
+                {
+                    Schema::create('$tableName', function (Blueprint \$table) {
+                        \$table->id();
+                        \$table->unsignedBigInteger('user_id');
+                        \$table->boolean('obtained')->default(false);
+                        \$table->integer('kill_count')->default(0);\r\n
+            EOD;
+            foreach ($items as $item) {
+                $unique = $item['unique'];
+
+                $migrationFileContent .= <<<EOD
+                        \$table->integer('$unique')->default(0);\r\n
+                EOD;
+            }
+            $migrationFileContent .= <<<EOD
+                        \$table->timestamps();
+
+                        \$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                    });
+                }
+
+                /**
+                 * Reverse the migrations.
+                 */
+                public function down(): void
+                {
+                    Schema::dropIfExists('$tableName');
+                }
+            };
+            EOD;
+
+            File::put('database/migrations/' . date('Y_m_d_His') . '_' . $migrationName . '.php', $migrationFileContent);
+
+            sleep(2);
+        } catch (Exception $e) {
+            throw new Exception(sprintf("Could not create migration: '%s'. Message: %s", $migrationName, $e->getMessage()));
+        }
+    }
+
     /**
      * @param Category $category
      * @param string $name
@@ -178,5 +243,14 @@ trait CollectionTrait
     private function formatModelName(string $name): string
     {
         return Str::studly(Str::slug($name));
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    private function formatMigrationName(string $name): string
+    {
+        return 'create_' . Str::snake($name) . '_table';
     }
 }
