@@ -182,12 +182,13 @@ trait CollectionTrait
     /**
      * @param Category $category
      * @param string $name
+     * @param bool $skipModelCheck
      * @return Collection
      * @throws Exception
      */
-    public function getOrCreateCollection(Category $category, string $name): Collection
+    public function getOrCreateCollection(Category $category, string $name, bool $skipModelCheck = false): Collection
     {
-        if (!class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
+        if (!$skipModelCheck && !class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
             throw new Exception(sprintf("Model does not exist: '%s'.", $this->formatModelName($name)));
         }
 
