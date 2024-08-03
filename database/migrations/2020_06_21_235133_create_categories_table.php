@@ -28,6 +28,7 @@ class CreateCategoriesTable extends Migration
                 ['name' => 'Minigame', 'slug' => 'minigame'],
                 ['name' => 'Boss', 'slug' => 'boss'],
                 ['name' => 'Raid', 'slug' => 'raid'],
+                ['name' => 'Other', 'slug' => 'other'],
                 ['name' => 'NPC', 'slug' => 'npc'],
             ]
         );
