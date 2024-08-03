@@ -20,19 +20,13 @@ const showingNavigationDropdown = ref(false);
 let selectedHiscore = ref(null);
 
 let skills = usePage().props.skills;
-let topSkillsArray = ref([]);
-let middleSkillsArray = ref([]);
-let bottomSkillsArray = ref([]);
+let skillArray = ref([]);
 
 let bosses = usePage().props.bosses;
-let topBossesArray = ref([]);
-let middleBossesArray = ref([]);
-let bottomBossesArray = ref([]);
+let bossArray = ref([]);
 
 let clues = usePage().props.clues;
-let topCluesArray = ref([]);
-let middleCluesArray = ref([]);
-let bottomCluesArray = ref([]);
+let clueArray = ref([]);
 
 const switchToTeam = (team) => {
     router.put(route('current-team.update'), {
@@ -46,6 +40,13 @@ const logout = () => {
     router.post(route('logout'));
 };
 
+const chunkIntoN = (arr, n) => {
+    const size = Math.ceil(arr.length / n);
+    return Array.from({ length: n }, (v, i) =>
+        arr.slice(i * size, i * size + size)
+    );
+}
+
 onMounted(() => {
     initFlowbite();
 
@@ -56,38 +57,11 @@ onMounted(() => {
         document.documentElement.classList.remove('dark')
     }
 
-    // Split skills (23 in total) array into three arrays for a top, middle and bottom skill bar
-    skills.forEach((skill, index) => {
-        if (index < 8) {
-            topSkillsArray.value.push(skill);
-        } else if (index < 15) {
-            middleSkillsArray.value.push(skill);
-        } else {
-            bottomSkillsArray.value.push(skill);
-        }
-    });
+    skillArray.value = chunkIntoN(skills, 3);
 
-    // Split bosses (48 in total) array into three arrays for a top, middle and bottom boss bar
-    bosses.forEach((boss, index) => {
-        if (index < 16) {
-            topBossesArray.value.push(boss);
-        } else if (index < 32) {
-            middleBossesArray.value.push(boss);
-        } else {
-            bottomBossesArray.value.push(boss);
-        }
-    });
+    bossArray.value = chunkIntoN(bosses, 3);
 
-    // Split clues (7 in total) array into three arrays for a top, middle and bottom clue bar
-    clues.forEach((clue, index) => {
-        if (index < 2) {
-            topCluesArray.value.push(clue);
-        } else if (index < 5) {
-            middleCluesArray.value.push(clue);
-        } else {
-            bottomCluesArray.value.push(clue);
-        }
-    });
+    clueArray.value = chunkIntoN(clues, 3);
 })
 </script>
 
@@ -150,84 +124,42 @@ onMounted(() => {
                     </div>
 
                     <div v-if="selectedHiscore === 'skill'" class="grid max-w-screen-xl px-4 py-5 mx-auto text-gray-900 dark:text-white sm:grid-cols-3 md:px-6">
-                        <ul>
-                            <li v-for="skill in topSkillsArray" :key="skill">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/skill/${skill}.webp`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ skill }}</div>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul>
-                            <li v-for="skill in middleSkillsArray" :key="skill">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/skill/${skill}.webp`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ skill }}</div>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul>
-                            <li v-for="skill in bottomSkillsArray" :key="skill">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/skill/${skill}.webp`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ skill }}</div>
-                                </a>
-                            </li>
-                        </ul>
+                        <div v-for="skillGroup in skillArray">
+                            <ul>
+                                <li v-for="skill in skillGroup" :key="skill">
+                                    <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <img :src="`/images/skill/${skill.slug}.webp`" class="h-8 w-8 object-contain" />
+                                        <div class="font-semibold capitalize">{{ skill.name }}</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div v-if="selectedHiscore === 'boss'" class="grid max-w-screen-xl px-4 py-5 mx-auto text-gray-900 dark:text-white sm:grid-cols-3 md:px-6">
-                        <ul>
-                            <li v-for="boss in topBossesArray" :key="boss">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/boss/${boss}.png`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ boss }}</div>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul>
-                            <li v-for="boss in middleBossesArray" :key="boss">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/boss/${boss}.png`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ boss }}</div>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul>
-                            <li v-for="boss in bottomBossesArray" :key="boss">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/boss/${boss}.png`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ boss }}</div>
-                                </a>
-                            </li>
-                        </ul>
+                        <div v-for="bossGroup in bossArray">
+                            <ul>
+                                <li v-for="boss in bossGroup" :key="boss">
+                                    <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <img :src="`/images/boss/${boss.slug}.png`" class="h-8 w-8 object-contain" />
+                                        <div class="font-semibold capitalize">{{ boss.name }}</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div v-if="selectedHiscore === 'clue'" class="grid max-w-screen-xl px-4 py-5 mx-auto text-gray-900 dark:text-white sm:grid-cols-3 md:px-6">
-                        <ul>
-                            <li v-for="clue in topCluesArray" :key="clue">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/clue/${clue}.png`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ clue }}</div>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul>
-                            <li v-for="clue in middleCluesArray" :key="clue">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/clue/${clue}.png`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ clue }}</div>
-                                </a>
-                            </li>
-                        </ul>
-                        <ul>
-                            <li v-for="clue in bottomCluesArray" :key="clue">
-                                <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <img :src="`/images/clue/${clue}.png`" class="h-8 w-8 object-contain" />
-                                    <div class="font-semibold capitalize">{{ clue }}</div>
-                                </a>
-                            </li>
-                        </ul>
+                        <div v-for="clueGroup in clueArray">
+                            <ul>
+                                <li v-for="clue in clueGroup" :key="clue">
+                                    <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <img :src="`/images/clue/${clue.slug}.png`" class="h-8 w-8 object-contain" />
+                                        <div class="font-semibold capitalize">{{ clue.name }}</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </nav>

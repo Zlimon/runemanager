@@ -43,9 +43,9 @@ class HandleInertiaRequests extends Middleware
 
         return array_merge(parent::share($request), [
             'dark_mode' => isset($resourcePack->dark_mode) ? $resourcePack->dark_mode == 1 : false,
-            'skills' => fn () => Skill::pluck('slug')->toArray() ?? [],
-            'bosses' => fn () => Collection::distinct()->where('category_id', 2)->orWhere('category_id', 3)->pluck('slug')->toArray() ?? [],
-            'clues' =>  fn () => Collection::where('category_id', 5)->pluck('slug')->toArray() ?? [],
+            'skills' => fn () => Skill::distinct()->select('name', 'slug')->get()->toArray() ?? [],
+            'bosses' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 5)->get()->toArray() ?? [],
+            'clues' =>  fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 3)->get()->toArray() ?? [],
         ]);
     }
 }
