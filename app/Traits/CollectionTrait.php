@@ -121,11 +121,11 @@ trait CollectionTrait
 
     public function createMigration(Category $category, string $name, array $items = []): void
     {
-        $migrationName = $this->formatMigrationName($name);
+        $tableName = $this->formatMigrationName($name);
+        $migrationName = 'create_' . $tableName . '_table';
+
 
         try {
-            $tableName = Str::snake($name);
-
             $migrationFileContent = <<<EOD
             <?php
 
@@ -255,6 +255,6 @@ trait CollectionTrait
      */
     private function formatMigrationName(string $name): string
     {
-        return 'create_' . Str::snake(Str::slug($name)) . '_table';
+        return Str::snake(Str::slug($name));
     }
 }
