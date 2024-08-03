@@ -125,30 +125,30 @@ class CollectionSeeder extends Seeder
     /**
      * Run the database seeds.
      */
+//    public function run(): void
+//    {
+//        foreach ($this->hiscoreEntries as $category => $hiscore) {
+//            $category = Category::whereSlug($category)->first();
+//
+//            if (!$category) {
+//                $this->command->warn(sprintf("Category '%s' does not exist.", $category));
+//
+//                continue;
+//            }
+//
+//            foreach ($hiscore as $slug => $name) {
+//                try {
+//                    $this->createHiscore($category, $name);
+//                } catch (Exception $e) {
+//                    $this->command->warn($e->getMessage());
+//
+//                    continue;
+//                }
+//            }
+//        }
+//    }
+
     public function run(): void
-    {
-        foreach ($this->hiscoreEntries as $category => $hiscore) {
-            $category = Category::whereSlug($category)->first();
-
-            if (!$category) {
-                $this->command->warn(sprintf("Category '%s' does not exist.", $category));
-
-                continue;
-            }
-
-            foreach ($hiscore as $slug => $name) {
-                try {
-                    $this->createHiscore($category, $name);
-                } catch (Exception $e) {
-                    $this->command->warn($e->getMessage());
-
-                    continue;
-                }
-            }
-        }
-    }
-
-    private function createCollectionHiscores(): void
     {
         $collectionLogClient = new CollectionLogClient();
 
@@ -180,97 +180,92 @@ class CollectionSeeder extends Seeder
             return;
         }
 
-        foreach ($this->hiscoreEntries as $category => $hiscore) {
+        foreach ($result['collectionLog']['tabs'] as $category => $hiscore) {
+            // collectionLogTab is the collection name on collectionlog.net
+            $category = match ($category) {
+                'Clues' => 'clue',
+                'Minigames' => 'minigame',
+                'Bosses' => 'boss',
+                'Raids' => 'raid',
+                'Other' => 'other',
+                default => $category,
+            };
+
             $category = Category::whereSlug($category)->first();
 
-            foreach ($hiscore as $slug => $name) {
-                // collectionLogTab is the collection name on collectionlog.net
-                $collectionLogTab = match ($category->slug) {
-                    'clue' => 'Clues',
-                    'minigame' => 'Minigames',
-                    'boss' => 'Bosses',
-                    'raid' => 'Raids',
-                    default => $category->slug,
-                };
+            foreach ($hiscore as $name => $items) {
+//                Merge certain collections
+//                switch ($name) {
+//                    case 'Callisto':
+//                    case 'Artio':
+//                        $collectionName = 'Callisto and Artio';
+//                        break;
+//                    case 'Vet\'ion':
+//                    case 'Calvar\'ion':
+//                        $collectionName = 'Vet\'ion and Calvar\'ion';
+//                        break;
+//                    case 'Dagannoth Prime':
+//                    case 'Dagannoth Rex':
+//                    case 'Dagannoth Supreme':
+//                        $collectionName = 'Dagannoth Kings';
+//                        break;
+//                    case 'Deranged Archaeologist':
+//                        break;
+//                    case 'Lunar Chests':
+//                        $collectionName = 'Moons of Peril';
+//                        break;
+//                    case 'Mimic':
+//                        break;
+//                    case 'Nightmare':
+//                    case 'Phosani\'s Nightmare':
+//                        $collectionName = 'The Nightmare';
+//                        break;
+//                    case 'Spindel':
+//                    case 'Venenatis':
+//                        $collectionName = 'Venenatis and Spindel';
+//                        break;
+//                    case 'Gauntlet':
+//                    case 'The Corrupted Gauntlet':
+//                        $collectionName = 'The Gauntlet';
+//                        break;
+//                    case 'TzKal-Zuk':
+//                        $collectionName = 'The Inferno';
+//                        break;
+//                    case 'TzTok-Jad':
+//                        $collectionName = 'The Fight Caves';
+//                        break;
+//                    default:
+//                        $collectionName = $name;
+//                        break;
+//                }
 
-                // Merge certain collections
-                switch ($name) {
-                    case 'Callisto':
-                    case 'Artio':
-                        $collectionName = 'Callisto and Artio';
-                        break;
-                    case 'Vet\'ion':
-                    case 'Calvar\'ion':
-                        $collectionName = 'Vet\'ion and Calvar\'ion';
-                        break;
-                    case 'Dagannoth Prime':
-                    case 'Dagannoth Rex':
-                    case 'Dagannoth Supreme':
-                        $collectionName = 'Dagannoth Kings';
-                        break;
-                    case 'Deranged Archaeologist':
-                        break;
-                    case 'Lunar Chests':
-                        $collectionName = 'Moons of Peril';
-                        break;
-                    case 'Mimic':
-                        break;
-                    case 'Nightmare':
-                    case 'Phosani\'s Nightmare':
-                        $collectionName = 'The Nightmare';
-                        break;
-                    case 'Spindel':
-                    case 'Venenatis':
-                        $collectionName = 'Venenatis and Spindel';
-                        break;
-                    case 'Gauntlet':
-                    case 'The Corrupted Gauntlet':
-                        $collectionName = 'The Gauntlet';
-                        break;
-                    case 'TzKal-Zuk':
-                        $collectionName = 'The Inferno';
-                        break;
-                    case 'TzTok-Jad':
-                        $collectionName = 'The Fight Caves';
-                        break;
-                    default:
-                        $collectionName = $name;
-                        break;
-                }
-
-                if (isset($result['collectionLog']['tabs'][$collectionLogTab][$collectionName])) {
-                    $items = [];
-
-//                    if (!empty($result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items'])) {
-//                        // Map items from Item model
-//                        $itemIds = array_map(function ($item) {
-//                            return (string) $item['id'];
-//                        }, $result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items']);
+//                if (!empty($result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items'])) {
+//                    // Map items from Item model
+//                    $itemIds = array_map(function ($item) {
+//                        return (string) $item['id'];
+//                    }, $result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items']);
 //
-////                        $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
-////                            return Str::slug(Str::snake($item), '_');
-////                        })->toArray();
+////                    $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
+////                        return Str::slug(Str::snake($item), '_');
+////                    })->toArray();
+////
+////                    $items = Item::whereIn('id', $itemIds)->orderBy('id')->get()->toArray();
+//                    // Get items from Item model in same order the items are in the collection log
+//                    foreach ($itemIds as $itemId) {
+//                        $item = Item::whereId($itemId)->first();
 //
-////                        $items = Item::whereIn('id', $itemIds)->orderBy('id')->get()->toArray();
-//                        // Get items from Item model in same order the items are in the collection log
-//                        foreach ($itemIds as $itemId) {
-//                            $item = Item::whereId($itemId)->first();
-//
-//                            if ($item) {
-//                                $items[] = $item;
-//                            }
+//                        if ($item) {
+//                            $items[] = $item;
 //                        }
 //                    }
+//                }
 
-                    try {
-                        $this->createHiscore($category, $collectionName, $items);
-                    } catch (Exception $e) {
-                        $this->command->warn($e->getMessage());
+                try {
+                    $collection = $this->getOrCreateCollection($category, $name, true);
+                } catch (Exception $e) {
+                    $this->command->warn($e->getMessage());
 
-                        continue;
-                    }
-                } else {
-                    $this->command->warn(sprintf("Could not find collection '%s' in tab '%s' collectionlog.net hiscores.", $collectionName, $collectionLogTab));
+                    continue;
                 }
             }
         }
