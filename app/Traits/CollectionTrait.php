@@ -255,6 +255,6 @@ trait CollectionTrait
      */
     private function formatMigrationName(string $name): string
     {
-        return 'create_' . Str::snake($name) . '_table';
+        return 'create_' . Str::snake(Str::slug($name)) . '_table';
     }
 }
