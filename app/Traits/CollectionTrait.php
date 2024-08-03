@@ -172,7 +172,8 @@ trait CollectionTrait
 
             File::put('database/migrations/' . date('Y_m_d_His') . '_' . $migrationName . '.php', $migrationFileContent);
 
-            sleep(2);
+            // This is to let the timestamp prefix in the migration file name to be unique
+            sleep(1);
         } catch (Exception $e) {
             throw new Exception(sprintf("Could not create migration: '%s'. Message: %s", $migrationName, $e->getMessage()));
         }
