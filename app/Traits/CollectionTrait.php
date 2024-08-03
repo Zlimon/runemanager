@@ -58,8 +58,8 @@ trait CollectionTrait
     {
         $modelName = $this->formatModelName($name);
 
-        if (!File::exists('app/Models/' . Str::studly($category->slug))) {
-            File::makeDirectory('app/Models/' . Str::studly($category->slug), 0755, true, true);
+        if (!File::exists('app/Models/' . Str::ucfirst(Str::studly($category->slug)))) {
+            File::makeDirectory('app/Models/' . Str::ucfirst(Str::studly($category->slug)), 0755, true, true);
         }
 
         if (class_exists($modelName)) {
