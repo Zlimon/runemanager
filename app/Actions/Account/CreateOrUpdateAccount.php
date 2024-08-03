@@ -150,6 +150,11 @@ class CreateOrUpdateAccount
             }
         }
 
+        DB::commit();
+
+        // Currently not supporting other hiscores than skills. Other hiscores are handled by collectionlog.net API
+        return $account;
+
         $skillsCount = count($skills);
 
 //        $miniGames = Collection::byCategorySlug('minigame')->pluck('slug')->all();

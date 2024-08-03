@@ -73,10 +73,16 @@ class AccountSeeder extends Seeder
         $createOrUpdateAccount->createOrUpdateAccount('Habski', User::whereName('Zlimon')->first(), AccountTypesEnum::IRONMAN);
 
         foreach ($accounts as $account) {
-            $user = User::inRandomOrder()->pluck('id')->first();
+            $user = User::inRandomOrder()->first();
 
 //            \App\Enums\AccountTypesEnum::returnAllAccountTypes()[rand(0, 3)]
-            $createOrUpdateAccount->createOrUpdateAccount($account, $user);
+            try {
+                $createOrUpdateAccount->createOrUpdateAccount($account, $user);
+            } catch (\Exception $e) {
+                $this->command->warn($e->getMessage());
+
+                continue;
+            }
         }
     }
 }
