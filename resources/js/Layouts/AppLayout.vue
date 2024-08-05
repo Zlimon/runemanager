@@ -127,10 +127,11 @@ onMounted(() => {
                         <div v-for="skillGroup in skillArray">
                             <ul>
                                 <li v-for="skill in skillGroup" :key="skill">
-                                    <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <Link :href="route('hiscores.skill.show', skill.slug)"
+                                          class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                         <img :src="`/images/skill/${skill.slug}.webp`" class="h-8 w-8 object-contain" />
                                         <div class="font-semibold capitalize">{{ skill.name }}</div>
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>

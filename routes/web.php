@@ -26,6 +26,10 @@ Route::middleware([
         Route::get('/', [App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
     });
 
+    Route::prefix('/hiscores')->group(function() {
+        Route::get('/skill/{skill}', [\App\Http\Controllers\HiscoreController::class, 'showSkill'])->name('hiscores.skill.show');
+    });
+
     Route::prefix('/admin')->group(function() {
         Route::prefix('/hiscores')->group(function() {
             Route::get('/create', [\App\Http\Controllers\Admin\HiscoreController::class, 'create'])->name('admin.hiscores.create');
