@@ -27,7 +27,7 @@ Route::middleware([
     });
 
     Route::prefix('/hiscores')->group(function() {
-        Route::get('/skill/{skill}', [\App\Http\Controllers\HiscoreController::class, 'showSkill'])->name('hiscores.skill.show');
+        Route::get('/skills/{skill}', [\App\Http\Controllers\HiscoreController::class, 'showSkill'])->name('hiscores.skill.show');
     });
 
     Route::prefix('/admin')->group(function() {
