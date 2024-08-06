@@ -256,6 +256,6 @@ trait CollectionTrait
      */
     private function formatMigrationName(string $name): string
     {
-        return Str::snake(Str::slug($name));
+        return Str::snake(Str::slug($name, '_'));
     }
 }
