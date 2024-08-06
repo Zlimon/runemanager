@@ -120,13 +120,13 @@ trait CollectionTrait
     public function createMigration(Category $category, string $name, array $items = []): void
     {
         $tableName = $this->formatMigrationName($name);
+        $className = 'Create' . Str::studly($name) . 'Table';
 
-        if (class_exists("Create{$name}Table")) {
+        if (class_exists($className)) {
             return;
         }
 
         $migrationName = 'create_' . $tableName . '_table';
-        $className = 'Create' . $name . 'Table';
 
         try {
             $migrationFileContent = <<<EOD
