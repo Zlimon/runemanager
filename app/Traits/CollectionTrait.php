@@ -122,6 +122,11 @@ trait CollectionTrait
     public function createMigration(Category $category, string $name, array $items = []): void
     {
         $tableName = $this->formatMigrationName($name);
+
+        if (class_exists("Create{$name}Table")) {
+            return;
+        }
+
         $migrationName = 'create_' . $tableName . '_table';
 
         try {
@@ -132,17 +137,19 @@ trait CollectionTrait
             use Illuminate\Database\Schema\Blueprint;
             use Illuminate\Support\Facades\Schema;
 
-            return new class extends Migration
+            class Create'$name'Table extends Migration
             {
                 /**
                  * Run the migrations.
+                 *
+                 * @return void
                  */
                 public function up(): void
                 {
                     Schema::create('$tableName', function (Blueprint \$table) {
                         \$table->id();
-                        \$table->unsignedBigInteger('user_id');
-                        \$table->boolean('obtained')->default(false);
+                        \$table->unsignedBigInteger('account_id');
+                        \$table->integer('obtained')->default(0);
                         \$table->integer('kill_count')->default(0);\r\n
             EOD;
             foreach ($items as $item) {
@@ -161,6 +168,8 @@ trait CollectionTrait
 
                 /**
                  * Reverse the migrations.
+                 *
+                 * @return void
                  */
                 public function down(): void
                 {
