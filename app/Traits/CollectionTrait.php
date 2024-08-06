@@ -104,8 +104,6 @@ trait CollectionTrait
             $modelFileContent .= <<<EOD
                 ];
 
-                protected $hidden = ['user_id'];
-
                 public function account(): BelongsTo
                 {
                     return $thisBelongsTo;
@@ -128,6 +126,7 @@ trait CollectionTrait
         }
 
         $migrationName = 'create_' . $tableName . '_table';
+        $className = 'Create' . $name . 'Table';
 
         try {
             $migrationFileContent = <<<EOD
@@ -137,7 +136,7 @@ trait CollectionTrait
             use Illuminate\Database\Schema\Blueprint;
             use Illuminate\Support\Facades\Schema;
 
-            class Create'$name'Table extends Migration
+            class $className extends Migration
             {
                 /**
                  * Run the migrations.
@@ -162,7 +161,7 @@ trait CollectionTrait
             $migrationFileContent .= <<<EOD
                         \$table->timestamps();
 
-                        \$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                        \$table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
                     });
                 }
 
