@@ -181,7 +181,7 @@ class CollectionSeeder extends Seeder
         }
 
         $storeItems = false;
-        foreach ($result['collectionLog']['tabs'] as $category => $hiscore) {
+        foreach ($result['collectionLog']['tabs'] as $category => $hiscores) {
             // collectionLogTab is the collection name on collectionlog.net
             $category = match ($category) {
                 'Clues' => 'clue',
@@ -194,7 +194,7 @@ class CollectionSeeder extends Seeder
 
             $category = Category::whereSlug($category)->first();
 
-            foreach ($hiscore as $name => $items) {
+            foreach ($hiscores as $name => $hiscore) {
 //                Merge certain collections
 //                switch ($name) {
 //                    case 'Callisto':
@@ -240,11 +240,12 @@ class CollectionSeeder extends Seeder
 //                        break;
 //                }
 
-                if ($storeItems && !empty($items['items'])) {
+                $items = [];
+                if ($storeItems && !empty($hiscore['items'])) {
                     // Map items from Item model
                     $itemIds = array_map(function ($item) {
                         return (string) $item['id'];
-                    }, $items['items']);
+                    }, $hiscore['items']);
 
 //                    $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
 //                        return Str::slug(Str::snake($item), '_');
@@ -262,7 +263,7 @@ class CollectionSeeder extends Seeder
                 }
 
                 try {
-                    $collection = $this->createHiscore($category, $name, $items);
+                    $collection = $this->createHiscore($category, $name, $storeItems ? $items : []);
                 } catch (Exception $e) {
                     $this->command->warn($e->getMessage());
 
