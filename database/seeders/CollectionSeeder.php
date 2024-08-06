@@ -180,6 +180,7 @@ class CollectionSeeder extends Seeder
             return;
         }
 
+        $storeItems = false;
         foreach ($result['collectionLog']['tabs'] as $category => $hiscore) {
             // collectionLogTab is the collection name on collectionlog.net
             $category = match ($category) {
@@ -239,34 +240,42 @@ class CollectionSeeder extends Seeder
 //                        break;
 //                }
 
-//                if (!empty($result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items'])) {
-//                    // Map items from Item model
-//                    $itemIds = array_map(function ($item) {
-//                        return (string) $item['id'];
-//                    }, $result['collectionLog']['tabs'][$collectionLogTab][$collectionName]['items']);
+                if ($storeItems && !empty($items['items'])) {
+                    // Map items from Item model
+                    $itemIds = array_map(function ($item) {
+                        return (string) $item['id'];
+                    }, $items['items']);
+
+//                    $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
+//                        return Str::slug(Str::snake($item), '_');
+//                    })->toArray();
 //
-////                    $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
-////                        return Str::slug(Str::snake($item), '_');
-////                    })->toArray();
-////
-////                    $items = Item::whereIn('id', $itemIds)->orderBy('id')->get()->toArray();
-//                    // Get items from Item model in same order the items are in the collection log
-//                    foreach ($itemIds as $itemId) {
-//                        $item = Item::whereId($itemId)->first();
-//
-//                        if ($item) {
-//                            $items[] = $item;
-//                        }
-//                    }
-//                }
+//                    $items = Item::whereIn('id', $itemIds)->orderBy('id')->get()->toArray();
+                    // Get items from Item model in same order the items are in the collection log
+                    foreach ($itemIds as $itemId) {
+                        $item = Item::whereId($itemId)->first();
+
+                        if ($item) {
+                            $items[] = $item;
+                        }
+                    }
+                }
 
                 try {
-                    $collection = $this->getOrCreateCollection($category, $name, true);
+                    $collection = $this->createHiscore($category, $name, $items);
                 } catch (Exception $e) {
                     $this->command->warn($e->getMessage());
 
                     continue;
                 }
+
+//                try {
+//                    $collection = $this->getOrCreateCollection($category, $name, true);
+//                } catch (Exception $e) {
+//                    $this->command->warn($e->getMessage());
+//
+//                    continue;
+//                }
             }
         }
     }

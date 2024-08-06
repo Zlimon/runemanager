@@ -124,7 +124,6 @@ trait CollectionTrait
         $tableName = $this->formatMigrationName($name);
         $migrationName = 'create_' . $tableName . '_table';
 
-
         try {
             $migrationFileContent = <<<EOD
             <?php
