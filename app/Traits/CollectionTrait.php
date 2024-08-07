@@ -132,7 +132,7 @@ trait CollectionTrait
     public function createMigration(Category $category, string $name, array $items = [], bool $skipModelCheck = false): void
     {
         if (!$skipModelCheck && !class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
-            throw new Exception(sprintf("Model does not exist: '%s'.", $this->formatModelName($name)));
+            throw new Exception(sprintf("Could not create migration: Model '%s' does not exist.", $this->formatModelName($name)));
         }
 
         $tableName = $this->formatMigrationName($name);
@@ -207,7 +207,7 @@ trait CollectionTrait
     public function getOrCreateCollection(Category $category, string $name, bool $skipModelCheck = false): Collection
     {
         if (!$skipModelCheck && !class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
-            throw new Exception(sprintf("Model does not exist: '%s'.", $this->formatModelName($name)));
+            throw new Exception(sprintf("Could not create collection: Model '%s'does not exist:.", $this->formatModelName($name)));
         }
 
         $collection = Collection::whereCategoryId($category->id)->whereName($name)->first();
