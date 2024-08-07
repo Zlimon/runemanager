@@ -21,15 +21,18 @@ trait CollectionTrait
     public function createHiscore(Category $category, string $name, array $items = []): Collection
     {
         try {
-            $this->createModel($category, $name, $items);
+            $modelCreated = $this->createModel($category, $name, $items);
         } catch (Exception $e) {
             throw $e;
         }
 
-        try {
-            $this->createMigration($category, $name, $items);
-        } catch (Exception $e) {
-            throw $e;
+        // Only create migration if model was created in same procedure
+        if ($modelCreated === true) {
+            try {
+                $this->createMigration($category, $name, $items);
+            } catch (Exception $e) {
+                throw $e;
+            }
         }
 
         try {
@@ -51,10 +54,10 @@ trait CollectionTrait
      * @param Category $category
      * @param string $name
      * @param array<Item> $items
-     * @return void
+     * @return bool
      * @throws Exception
      */
-    public function createModel(Category $category, string $name, array $items = []): void
+    public function createModel(Category $category, string $name, array $items = []): bool
     {
         $modelName = $this->formatModelName($name);
 
@@ -63,7 +66,7 @@ trait CollectionTrait
         }
 
         if (class_exists($modelName)) {
-            return;
+            return false;
         }
 
         try {
@@ -112,20 +115,28 @@ trait CollectionTrait
             EOD;
 
             File::put('app/Models/' . $model . '.php', $modelFileContent);
+
+            return true;
         } catch (Exception $e) {
             throw new Exception(sprintf("Could not create model: '%s'. Message: %s", $modelName, $e->getMessage()));
         }
     }
 
-    public function createMigration(Category $category, string $name, array $items = []): void
+    /**
+     * @param Category $category
+     * @param string $name
+     * @param array $items
+     * @param bool $skipModelCheck
+     * @throws Exception
+     */
+    public function createMigration(Category $category, string $name, array $items = [], bool $skipModelCheck = false): void
     {
-        $tableName = $this->formatMigrationName($name);
-        $className = 'Create' . Str::studly($name) . 'Table';
-
-        if (class_exists($className)) {
-            return;
+        if (!$skipModelCheck && !class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
+            throw new Exception(sprintf("Model does not exist: '%s'.", $this->formatModelName($name)));
         }
 
+        $tableName = $this->formatMigrationName($name);
+        $className = 'Create' . Str::studly($name) . 'Table';
         $migrationName = 'create_' . $tableName . '_table';
 
         try {
