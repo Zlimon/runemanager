@@ -136,7 +136,7 @@ trait CollectionTrait
         }
 
         $tableName = $this->formatMigrationName($name);
-        $className = 'Create' . Str::studly($name) . 'Table';
+        $className = 'Create' . Str::studly($this->formatMigrationName($name)) . 'Table';
         $migrationName = 'create_' . $tableName . '_table';
 
         try {
