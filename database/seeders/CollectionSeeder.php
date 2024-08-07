@@ -322,15 +322,17 @@ class CollectionSeeder extends Seeder
         }
 
         // Create separate collections for hiscore entries not merged in collectionlog.net
-        foreach ($hiscoreEntries as $category => $name) {
-            try {
-                $category = Category::whereSlug($category)->first();
+        foreach ($hiscoreEntries as $category => $hiscores) {
+            $category = Category::whereSlug($category)->first();
 
-                $collection = $this->createHiscore($category, $name, []);
-            } catch (Exception $e) {
-                $this->command->warn($e->getMessage());
+            foreach ($hiscores as $name) {
+                try {
+                    $collection = $this->createHiscore($category, $name, []);
+                } catch (Exception $e) {
+                    $this->command->warn($e->getMessage());
 
-                continue;
+                    continue;
+                }
             }
         }
     }
