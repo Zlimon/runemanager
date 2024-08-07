@@ -194,6 +194,7 @@ class CollectionSeeder extends Seeder
 
             $category = Category::whereSlug($category)->first();
 
+            $hiscoreEntries = [];
             foreach ($hiscores as $name => $hiscore) {
 //                Merge certain collections
 //                switch ($name) {
@@ -240,6 +241,46 @@ class CollectionSeeder extends Seeder
 //                        break;
 //                }
 
+                switch ($name) {
+                    case 'Callisto and Artio':
+                        $hiscoreEntries[] = 'Callisto';
+                        $hiscoreEntries[] = 'Artio';
+                        break;
+                    case 'Vet\'ion and Calvar\'ion':
+                        $hiscoreEntries[] = 'Vet\'ion';
+                        $hiscoreEntries[] = 'Calvar\'ion';
+                        break;
+                    case 'Dagannoth Kings':
+                        $hiscoreEntries[] = 'Dagannoth Prime';
+                        $hiscoreEntries[] = 'Dagannoth Rex';
+                        $hiscoreEntries[] = 'Dagannoth Supreme';
+                        break;
+                    case 'Moons of Peril':
+                        $hiscoreEntries[] = 'Lunar Chests';
+                        break;
+                    case 'The Nightmare':
+                        $hiscoreEntries[] = 'Nightmare';
+                        $hiscoreEntries[] = 'Phosani\'s Nightmare';
+                        break;
+                    case 'Venenatis and Spindel':
+                        $hiscoreEntries[] = 'Spindel';
+                        $hiscoreEntries[] = 'Venenatis';
+                        break;
+                    case 'The Gauntlet':
+                        $hiscoreEntries[] = 'Gauntlet';
+                        $hiscoreEntries[] = 'The Corrupted Gauntlet';
+                        break;
+                    case 'The Inferno':
+                        $hiscoreEntries[] = 'TzKal-Zuk';
+                        break;
+                    case 'The Fight Caves':
+                        $hiscoreEntries[] = 'TzTok-Jad';
+                        break;
+                    default:
+                        $hiscoreEntries[] = $name;
+                        break;
+                }
+
                 $items = [];
                 if ($storeItems && !empty($hiscore['items'])) {
                     // Map items from Item model
@@ -277,6 +318,19 @@ class CollectionSeeder extends Seeder
 //
 //                    continue;
 //                }
+            }
+
+            // Create separate collections for hiscore entries not merged in collectionlog.net
+            foreach ($hiscoreEntries as $name) {
+                try {
+                    $category = Category::whereSlug('boss')->first();
+
+                    $collection = $this->createHiscore($category, $name, []);
+                } catch (Exception $e) {
+                    $this->command->warn($e->getMessage());
+
+                    continue;
+                }
             }
         }
     }
