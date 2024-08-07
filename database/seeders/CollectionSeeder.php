@@ -277,7 +277,6 @@ class CollectionSeeder extends Seeder
                         $hiscoreEntries[$category->slug][] = 'TzTok-Jad';
                         break;
                     default:
-                        $hiscoreEntries[$category->slug][] = $name;
                         break;
                 }
 
