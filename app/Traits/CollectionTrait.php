@@ -65,7 +65,7 @@ trait CollectionTrait
             File::makeDirectory('app/Models/' . Str::ucfirst(Str::studly($category->slug)), 0755, true, true);
         }
 
-        if (class_exists($modelName)) {
+        if (class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
             return false;
         }
 
