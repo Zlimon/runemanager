@@ -26,13 +26,10 @@ trait CollectionTrait
             throw $e;
         }
 
-        // Only create migration if model was created in same procedure
-        if ($modelCreated === true) {
-            try {
-                $this->createMigration($category, $name, $items);
-            } catch (Exception $e) {
-                throw $e;
-            }
+        try {
+            $migrationCreated = $this->createMigration($category, $name, $items);
+        } catch (Exception $e) {
+            throw $e;
         }
 
         try {
@@ -126,13 +123,16 @@ trait CollectionTrait
      * @param Category $category
      * @param string $name
      * @param array $items
+     * @return bool
      * @throws Exception
      */
-    public function createMigration(Category $category, string $name, array $items = []): void
+    public function createMigration(Category $category, string $name, array $items = []): bool
     {
         if (!class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
             throw new Exception(sprintf("Could not create migration: Model '%s' does not exist.", $this->formatModelName($name)));
         }
+
+        // TODO Should implement check if migration already exists
 
         $tableName = $this->formatMigrationName($name);
         $className = 'Create' . Str::studly($this->formatMigrationName($name)) . 'Table';
@@ -191,6 +191,8 @@ trait CollectionTrait
 
             // This is to let the timestamp prefix in the migration file name to be unique
             sleep(1);
+
+            return true;
         } catch (Exception $e) {
             throw new Exception(sprintf("Could not create migration: '%s'. Message: %s", $migrationName, $e->getMessage()));
         }
