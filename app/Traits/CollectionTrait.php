@@ -65,7 +65,7 @@ trait CollectionTrait
             File::makeDirectory('app/Models/' . Str::ucfirst(Str::studly($category->slug)), 0755, true, true);
         }
 
-        if (class_exists(sprintf("app\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
+        if (class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
             return false;
         }
 
@@ -130,7 +130,7 @@ trait CollectionTrait
      */
     public function createMigration(Category $category, string $name, array $items = []): void
     {
-        if (!class_exists(sprintf("app\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
+        if (!class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
             throw new Exception(sprintf("Could not create migration: Model '%s' does not exist.", $this->formatModelName($name)));
         }
 
