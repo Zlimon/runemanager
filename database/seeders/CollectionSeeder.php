@@ -180,6 +180,7 @@ class CollectionSeeder extends Seeder
             return;
         }
 
+        $hiscoreEntries = [];
         $storeItems = false;
         foreach ($result['collectionLog']['tabs'] as $category => $hiscores) {
             // collectionLogTab is the collection name on collectionlog.net
@@ -194,7 +195,6 @@ class CollectionSeeder extends Seeder
 
             $category = Category::whereSlug($category)->first();
 
-            $hiscoreEntries = [];
             foreach ($hiscores as $name => $hiscore) {
 //                Merge certain collections
 //                switch ($name) {
@@ -243,41 +243,41 @@ class CollectionSeeder extends Seeder
 
                 switch ($name) {
                     case 'Callisto and Artio':
-                        $hiscoreEntries[] = 'Callisto';
-                        $hiscoreEntries[] = 'Artio';
+                        $hiscoreEntries[$category->slug][] = 'Callisto';
+                        $hiscoreEntries[$category->slug][] = 'Artio';
                         break;
                     case 'Vet\'ion and Calvar\'ion':
-                        $hiscoreEntries[] = 'Vet\'ion';
-                        $hiscoreEntries[] = 'Calvar\'ion';
+                        $hiscoreEntries[$category->slug][] = 'Vet\'ion';
+                        $hiscoreEntries[$category->slug][] = 'Calvar\'ion';
                         break;
                     case 'Dagannoth Kings':
-                        $hiscoreEntries[] = 'Dagannoth Prime';
-                        $hiscoreEntries[] = 'Dagannoth Rex';
-                        $hiscoreEntries[] = 'Dagannoth Supreme';
+                        $hiscoreEntries[$category->slug][] = 'Dagannoth Prime';
+                        $hiscoreEntries[$category->slug][] = 'Dagannoth Rex';
+                        $hiscoreEntries[$category->slug][] = 'Dagannoth Supreme';
                         break;
                     case 'Moons of Peril':
-                        $hiscoreEntries[] = 'Lunar Chests';
+                        $hiscoreEntries[$category->slug][] = 'Lunar Chests';
                         break;
                     case 'The Nightmare':
-                        $hiscoreEntries[] = 'Nightmare';
-                        $hiscoreEntries[] = 'Phosani\'s Nightmare';
+                        $hiscoreEntries[$category->slug][] = 'Nightmare';
+                        $hiscoreEntries[$category->slug][] = 'Phosani\'s Nightmare';
                         break;
                     case 'Venenatis and Spindel':
-                        $hiscoreEntries[] = 'Spindel';
-                        $hiscoreEntries[] = 'Venenatis';
+                        $hiscoreEntries[$category->slug][] = 'Spindel';
+                        $hiscoreEntries[$category->slug][] = 'Venenatis';
                         break;
                     case 'The Gauntlet':
-                        $hiscoreEntries[] = 'Gauntlet';
-                        $hiscoreEntries[] = 'The Corrupted Gauntlet';
+                        $hiscoreEntries[$category->slug][] = 'Gauntlet';
+                        $hiscoreEntries[$category->slug][] = 'The Corrupted Gauntlet';
                         break;
                     case 'The Inferno':
-                        $hiscoreEntries[] = 'TzKal-Zuk';
+                        $hiscoreEntries[$category->slug][] = 'TzKal-Zuk';
                         break;
                     case 'The Fight Caves':
-                        $hiscoreEntries[] = 'TzTok-Jad';
+                        $hiscoreEntries[$category->slug][] = 'TzTok-Jad';
                         break;
                     default:
-                        $hiscoreEntries[] = $name;
+                        $hiscoreEntries[$category->slug][] = $name;
                         break;
                 }
 
@@ -319,18 +319,18 @@ class CollectionSeeder extends Seeder
 //                    continue;
 //                }
             }
+        }
 
-            // Create separate collections for hiscore entries not merged in collectionlog.net
-            foreach ($hiscoreEntries as $name) {
-                try {
-                    $category = Category::whereSlug('boss')->first();
+        // Create separate collections for hiscore entries not merged in collectionlog.net
+        foreach ($hiscoreEntries as $category => $name) {
+            try {
+                $category = Category::whereSlug($category)->first();
 
-                    $collection = $this->createHiscore($category, $name, []);
-                } catch (Exception $e) {
-                    $this->command->warn($e->getMessage());
+                $collection = $this->createHiscore($category, $name, []);
+            } catch (Exception $e) {
+                $this->command->warn($e->getMessage());
 
-                    continue;
-                }
+                continue;
             }
         }
     }
