@@ -62,8 +62,12 @@ trait CollectionTrait
             File::makeDirectory('app/Models/' . Str::ucfirst(Str::studly($category->slug)), 0755, true, true);
         }
 
-        if (class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
-            return false;
+        try {
+            if (class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
+                return false;
+            }
+        } catch (Exception $e) {
+            // Don't do anything since this would be thrown as the model is not loaded in composer autoload
         }
 
         try {
@@ -128,15 +132,26 @@ trait CollectionTrait
      */
     public function createMigration(Category $category, string $name, array $items = []): bool
     {
-        if (!class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
-            throw new Exception(sprintf("Could not create migration: Model '%s' does not exist.", $this->formatModelName($name)));
+        try {
+            if (!class_exists(sprintf("App\Models\%s\%s", Str::studly($category->slug), $this->formatModelName($name)))) {
+                throw new Exception(sprintf("Could not create migration: Model '%s' does not exist.", $this->formatModelName($name)));
+            }
+        } catch (Exception $e) {
+            throw new Exception(sprintf("Could not create migration: %s.", $e->getMessage()));
         }
 
-        // TODO Should implement check if migration already exists
-
         $tableName = $this->formatMigrationName($name);
-        $className = 'Create' . Str::studly($this->formatMigrationName($name)) . 'Table';
         $migrationName = 'create_' . $tableName . '_table';
+        $migrationPath = database_path('migrations');
+        $files = scandir($migrationPath);
+
+        foreach ($files as $file) {
+            if (strpos($file, $migrationName) !== false) {
+                return true;
+            }
+        }
+
+        $className = 'Create' . Str::studly($this->formatMigrationName($name)) . 'Table';
 
         try {
             $migrationFileContent = <<<EOD
