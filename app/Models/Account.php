@@ -8,36 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-/**
- * 
- *
- * @property int $id
- * @property int $user_id
- * @property string $account_type
- * @property string $username
- * @property int $rank
- * @property int $level
- * @property int $xp
- * @property int $online
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @method static \Database\Factories\AccountFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder|Account newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Account newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Account query()
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereAccountType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereLevel($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereOnline($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereRank($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUsername($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereXp($value)
- * @mixin \Eloquent
- */
 class Account extends Model
 {
     use HasFactory;
