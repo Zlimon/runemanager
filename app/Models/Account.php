@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -64,6 +64,16 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function skill(Skill $skill): HasOne
+    {
+        return $this->hasOne($skill->model);
+    }
+
+    public function collection(Collection $collection): HasOne
+    {
+        return $this->hasOne($collection->model);
+    }
+
 //    public function log() {
 //        return $this->hasMany(Log::class);
 //    }
@@ -71,16 +81,6 @@ class Account extends Model
 //    public function logBroadcast() {
 //        return $this->hasManyThrough(Broadcast::class, Log::class);
 //    }
-//
-    public function collection(Collection $collection): HasOne
-    {
-        return $this->hasOne($collection->model);
-    }
-//
-    public function skill(Skill $skill): HasOne
-    {
-        return $this->hasOne($skill->model);
-    }
 //
 //    public function equipment() {
 //        return $this->hasOne(Equipment::class);
