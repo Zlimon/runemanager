@@ -30,8 +30,8 @@ class CollectionSeeder extends Seeder
             'bounty-hunter-rogue' => 'Bounty Hunter - Rogue',
             'bounty-hunter-legacy' => 'Bounty Hunter (Legacy) - Hunter',
             'bounty-hunter-rogue-legacy' => 'Bounty Hunter (Legacy) - Rogue',
-            'unknown-1' => 'Unknown 1',
-            'unknown-2' => 'Unknown 2',
+//            'unknown-1' => 'Unknown 1',
+//            'unknown-2' => 'Unknown 2',
         ],
         'clue' => [
             'all-treasure-trails' => 'All Treasure Trails',
@@ -180,7 +180,6 @@ class CollectionSeeder extends Seeder
             return;
         }
 
-        $hiscoreEntries = [];
         $storeItems = false;
         foreach ($result['collectionLog']['tabs'] as $category => $hiscores) {
             // collectionLogTab is the collection name on collectionlog.net
@@ -241,42 +240,46 @@ class CollectionSeeder extends Seeder
 //                        break;
 //                }
 
+                $slug = Str::slug($name);
+
                 switch ($name) {
                     case 'Callisto and Artio':
-                        $hiscoreEntries[$category->slug][] = 'Callisto';
-                        $hiscoreEntries[$category->slug][] = 'Artio';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Callisto')] = 'Callisto';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Artio')] = 'Artio';
                         break;
                     case 'Vet\'ion and Calvar\'ion':
-                        $hiscoreEntries[$category->slug][] = 'Vet\'ion';
-                        $hiscoreEntries[$category->slug][] = 'Calvar\'ion';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Vet\'ion')] = 'Vet\'ion';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Calvar\'ion')] = 'Calvar\'ion';
                         break;
                     case 'Dagannoth Kings':
-                        $hiscoreEntries[$category->slug][] = 'Dagannoth Prime';
-                        $hiscoreEntries[$category->slug][] = 'Dagannoth Rex';
-                        $hiscoreEntries[$category->slug][] = 'Dagannoth Supreme';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Dagannoth Prime')] = 'Dagannoth Prime';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Dagannoth Rex')] = 'Dagannoth Rex';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Dagannoth Supreme')] = 'Dagannoth Supreme';
                         break;
                     case 'Moons of Peril':
-                        $hiscoreEntries[$category->slug][] = 'Lunar Chests';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Lunar Chests')] = 'Lunar Chests';
                         break;
                     case 'The Nightmare':
-                        $hiscoreEntries[$category->slug][] = 'Nightmare';
-                        $hiscoreEntries[$category->slug][] = 'Phosani\'s Nightmare';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Nightmare')] = 'Nightmare';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Phosani\'s Nightmare')] = 'Phosani\'s Nightmare';
                         break;
                     case 'Venenatis and Spindel':
-                        $hiscoreEntries[$category->slug][] = 'Spindel';
-                        $hiscoreEntries[$category->slug][] = 'Venenatis';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Spindel')] = 'Spindel';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Venenatis')] = 'Venenatis';
                         break;
                     case 'The Gauntlet':
-                        $hiscoreEntries[$category->slug][] = 'Gauntlet';
-                        $hiscoreEntries[$category->slug][] = 'The Corrupted Gauntlet';
+                        $this->hiscoreEntries[$category->slug][Str::slug('Gauntlet')] = 'Gauntlet';
+                        $this->hiscoreEntries[$category->slug][Str::slug('The Corrupted Gauntlet')] = 'The Corrupted Gauntlet';
                         break;
                     case 'The Inferno':
-                        $hiscoreEntries[$category->slug][] = 'TzKal-Zuk';
+                        $this->hiscoreEntries[$category->slug][Str::slug('TzKal-Zuk')] = 'TzKal-Zuk';
                         break;
                     case 'The Fight Caves':
-                        $hiscoreEntries[$category->slug][] = 'TzTok-Jad';
+                        $this->hiscoreEntries[$category->slug][Str::slug('TzTok-Jad')] = 'TzTok-Jad';
                         break;
                     default:
+                        // Unset entries already fetched from collectionlog.net as we only want to create hiscore entries unique to OSRS hiscores
+                        unset($this->hiscoreEntries[$category->slug][Str::slug($name)]);
                         break;
                 }
 
@@ -321,7 +324,7 @@ class CollectionSeeder extends Seeder
         }
 
         // Create separate collections for hiscore entries not merged in collectionlog.net
-        foreach ($hiscoreEntries as $category => $hiscores) {
+        foreach ($this->hiscoreEntries as $category => $hiscores) {
             $category = Category::whereSlug($category)->first();
 
             foreach ($hiscores as $name) {
