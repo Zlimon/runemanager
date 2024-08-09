@@ -30,7 +30,6 @@ class HiscoreHelper
     public static function skill(): array
     {
         return [
-            Str::slug('Overall') => 'Overall',
             Str::slug('Attack') => 'Attack',
             Str::slug('Defence') => 'Defence',
             Str::slug('Strength') => 'Strength',
@@ -51,7 +50,7 @@ class HiscoreHelper
             Str::slug('Thieving') => 'Thieving',
             Str::slug('Slayer') => 'Slayer',
             Str::slug('Farming') => 'Farming',
-            Str::slug('Runecrafting') => 'Runecrafting',
+            Str::slug('Runecraft') => 'Runecraft',
             Str::slug('Hunter') => 'Hunter',
             Str::slug('Construction') => 'Construction',
         ];
@@ -70,13 +69,13 @@ class HiscoreHelper
     public static function clue(): array
     {
         return [
-            Str::slug('Clue Scrolls (all)') => 'Clue Scrolls (all)',
-            Str::slug('Beginner Treasure Trails') => 'Beginner Treasure Trails',
-            Str::slug('Easy Treasure Trails') => 'Easy Treasure Trails',
-            Str::slug('Medium Treasure Trails') => 'Medium Treasure Trails',
-            Str::slug('Hard Treasure Trails') => 'Hard Treasure Trails',
-            Str::slug('Elite Treasure Trails') => 'Elite Treasure Trails',
-            Str::slug('Master Treasure Trails') => 'Master Treasure Trails',
+            Str::slug('Shared Treasure Trail Rewards') => 'Shared Treasure Trail Rewards', // Clue Scrolls (all)
+            Str::slug('Beginner Treasure Trails') => 'Beginner Treasure Trails', // Clue Scrolls (beginner)
+            Str::slug('Easy Treasure Trails') => 'Easy Treasure Trails', // Clue Scrolls (easy)
+            Str::slug('Medium Treasure Trails') => 'Medium Treasure Trails', // Clue Scrolls (medium)
+            Str::slug('Hard Treasure Trails') => 'Hard Treasure Trails', // Clue Scrolls (hard)
+            Str::slug('Elite Treasure Trails') => 'Elite Treasure Trails', // Clue Scrolls (elite)
+            Str::slug('Master Treasure Trails') => 'Master Treasure Trails', // Clue Scrolls (master)
         ];
     }
 
@@ -85,9 +84,9 @@ class HiscoreHelper
         return [
             Str::slug('LMS - Rank') => 'LMS - Rank',
             Str::slug('PvP Arena - Rank') => 'PvP Arena - Rank',
-            Str::slug('Soul Wars Zeal') => 'Soul Wars Zeal',
-            Str::slug('Rifts closed') => 'Rifts closed',
-            Str::slug('Colosseum Glory') => 'Colosseum Glory',
+            Str::slug('Soul Wars') => 'Soul Wars', // Soul Wars Zeal
+            Str::slug('Guardians of the Rift') => 'Guardians of the Rift', // Rifts closed
+            Str::slug('Fortis Colosseum') => 'Fortis Colosseum', // Colosseum Glory
         ];
     }
 
