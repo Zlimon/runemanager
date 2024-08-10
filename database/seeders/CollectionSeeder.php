@@ -121,7 +121,7 @@ class CollectionSeeder extends Seeder
                 }
 
                 try {
-                    $collection = $this->createHiscore($category, $name, $storeItems ? $items : []);
+                    $collection = $this->createModel($category, $name, $storeItems ? $items : []);
                 } catch (Exception $e) {
                     $this->command->warn($e->getMessage());
 
