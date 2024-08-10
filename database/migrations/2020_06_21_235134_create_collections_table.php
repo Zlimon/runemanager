@@ -18,9 +18,11 @@ class CreateCollectionsTable extends Migration
             $table->id();
             $table->foreignId('category_id')->constrained();
             $table->integer('order')->unsigned()->unique();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('slug');
             $table->string('model');
+
+            $table->unique(['category_id', 'model']);
         });
     }
 
