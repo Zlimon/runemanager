@@ -142,7 +142,7 @@ class CollectionSeeder extends Seeder
 
             foreach ($hiscores as $name) {
                 try {
-                    $collection = $this->createHiscore($category, $name, []);
+                    $modelCreated = $this->createModel($category, $name, []);
                 } catch (Exception $e) {
                     $this->command->warn($e->getMessage());
 
