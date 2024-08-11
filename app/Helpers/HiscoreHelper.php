@@ -16,15 +16,22 @@ use Illuminate\Support\Str;
  */
 class HiscoreHelper
 {
-    public static function all(): array
+    public static function all(bool $bossWithRaid = false): array
     {
-        return [
+        $all = array_filter([
             'skill' => self::skill(),
             'pvp' => self::pvp(),
             'clue' => self::clue(),
             'minigame' => self::minigame(),
-            'boss' => self::boss(),
-        ];
+            'boss' => self::boss($bossWithRaid),
+            'raid' => self::raid(),
+        ]);
+
+        if ($bossWithRaid) {
+            unset($all['raid']);
+        }
+
+        return $all;
     }
 
     public static function skill(): array
@@ -90,9 +97,9 @@ class HiscoreHelper
         ];
     }
 
-    public static function boss(): array
+    public static function boss(bool $withRaid = false): array
     {
-        return [
+        $bosses = array_filter([
             Str::slug('Abyssal Sire') => 'Abyssal Sire',
             Str::slug('Alchemical Hydra') => 'Alchemical Hydra',
             Str::slug('Artio') => 'Artio',
@@ -101,8 +108,8 @@ class HiscoreHelper
             Str::slug('Callisto') => 'Callisto',
             Str::slug("Calvar'ion") => "Calvar'ion",
             Str::slug('Cerberus') => 'Cerberus',
-//            Str::slug('Chambers of Xeric') => 'Chambers of Xeric',
-//            Str::slug('Chambers of Xeric: Challenge Mode') => 'Chambers of Xeric: Challenge Mode',
+            $withRaid ? Str::slug('Chambers of Xeric') : null => 'Chambers of Xeric',
+            $withRaid ? Str::slug('Chambers of Xeric: Challenge Mode') : null => 'Chambers of Xeric: Challenge Mode',
             Str::slug('Chaos Elemental') => 'Chaos Elemental',
             Str::slug('Chaos Fanatic') => 'Chaos Fanatic',
             Str::slug('Commander Zilyana') => 'Commander Zilyana',
@@ -140,11 +147,11 @@ class HiscoreHelper
             Str::slug('The Corrupted Gauntlet') => 'The Corrupted Gauntlet',
             Str::slug('The Leviathan') => 'The Leviathan',
             Str::slug('The Whisperer') => 'The Whisperer',
-//            Str::slug('Theatre of Blood') => 'Theatre of Blood',
-//            Str::slug('Theatre of Blood: Hard Mode') => 'Theatre of Blood: Hard Mode',
+            $withRaid ? Str::slug('Theatre of Blood') : null => 'Theatre of Blood',
+            $withRaid ? Str::slug('Theatre of Blood: Hard Mode') : null => 'Theatre of Blood: Hard Mode',
             Str::slug('Thermonuclear Smoke Devil') => 'Thermonuclear Smoke Devil',
-//            Str::slug('Tombs of Amascut') => 'Tombs of Amascut',
-//            Str::slug('Tombs of Amascut: Expert Mode') => 'Tombs of Amascut: Expert Mode',
+            $withRaid ? Str::slug('Tombs of Amascut') : null => 'Tombs of Amascut',
+            $withRaid ? Str::slug('Tombs of Amascut: Expert Mode') : null => 'Tombs of Amascut: Expert Mode',
             Str::slug('TzKal-Zuk') => 'TzKal-Zuk',
             Str::slug('TzTok-Jad') => 'TzTok-Jad',
             Str::slug('Vardorvis') => 'Vardorvis',
@@ -154,6 +161,22 @@ class HiscoreHelper
             Str::slug('Wintertodt') => 'Wintertodt',
             Str::slug('Zalcano') => 'Zalcano',
             Str::slug('Zulrah') => 'Zulrah',
+        ]);
+
+        unset($bosses['']);
+
+        return $bosses;
+    }
+
+    public static function raid(): array
+    {
+        return [
+            Str::slug('Chambers of Xeric') => 'Chambers of Xeric',
+            Str::slug('Chambers of Xeric: Challenge Mode') => 'Chambers of Xeric: Challenge Mode',
+            Str::slug('Theatre of Blood') => 'Theatre of Blood',
+            Str::slug('Theatre of Blood: Hard Mode') => 'Theatre of Blood: Hard Mode',
+            Str::slug('Tombs of Amascut') => 'Tombs of Amascut',
+            Str::slug('Tombs of Amascut: Expert Mode') => 'Tombs of Amascut: Expert Mode',
         ];
     }
 }
