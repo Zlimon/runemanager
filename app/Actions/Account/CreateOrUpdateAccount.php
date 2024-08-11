@@ -3,6 +3,7 @@
 namespace App\Actions\Account;
 
 use App\Enums\AccountTypesEnum;
+use App\Helpers\HiscoreHelper;
 use App\Models\Account;
 use App\Models\Collection;
 use App\Models\Skill;
@@ -54,6 +55,8 @@ class CreateOrUpdateAccount
         try {
             $this->createOrUpdateAccountHiscores($account, $playerData);
         } catch (\Exception $e) {
+            DB::rollback();
+
             throw new \Exception(sprintf("Could not create or update account hiscores for '%s'. Message: %s", $accountUsername, $e->getMessage()));
         }
 
@@ -110,24 +113,8 @@ class CreateOrUpdateAccount
     {
         DB::beginTransaction();
 
-        $models = [
-            'skills' => array_merge(['overall'], Skill::pluck('slug')->all()),
-            'pvp' => Collection::byCategorySlug('pvp')->pluck('slug')->all(),
-            'clues' => Collection::byCategorySlug('clue')->pluck('slug')->all(),
-            'minigame' => Collection::byCategorySlug('minigame')->pluck('slug')->all(),
-            'bosses' => Collection::byCategorySlug('boss')->pluck('slug')->all(),
-        ];
-
-        $keys = array_merge($models['skills'], $models['pvp'], $models['clues'], $models['minigame'], $models['bosses']);
-
-        $combined = [];
-        foreach ($keys as $index => $skill) {
-            if (isset($playerData[$index])) {
-                $combined[$skill] = array_combine(range(1, count($playerData[$index])), $playerData[$index]);
-            }
-        }
-
         $skills = Skill::all();
+        $skillsCount = count($skills);
 
         foreach ($skills as $key => $skill) {
             $accountSkill = $account->skill($skill)->first();
@@ -150,23 +137,24 @@ class CreateOrUpdateAccount
             }
         }
 
-        DB::commit();
+        $pvp = array_keys(HiscoreHelper::pvp());
+        $pvpCount = count($pvp) + 2; // + 2 for unknown hiscore entries TODO Need to add to $pvp if populating PvP stats
 
-        // Currently not supporting other hiscores than skills. Other hiscores are handled by collectionlog.net API
-        return $account;
+        // TODO Add PvP stats
+        $pvpIndex = 0;
 
-        $skillsCount = count($skills);
+        $clues = array_keys(HiscoreHelper::clue());
+        $clueCount = count($clues);
 
-//        $miniGames = Collection::byCategorySlug('minigame')->pluck('slug')->all();
-        $miniGames = ['bounty-hunter', 'bounty-hunter-rogues', 'lms', 'soul-wars', 'castle-wars', 'clan-wars'];
-        $miniGamesCount = count($miniGames);
-
-        $clues = Collection::byCategorySlug('clue')->pluck('slug')->all();
-        $cluesCount = count($clues);
         $cluesIndex = 0;
+        for ($i = ($skillsCount + $pvpCount); $i < ($skillsCount + $pvpCount + $clueCount); $i++) {
+            $clueCollection = Collection::whereSlug($clues[$cluesIndex])->first();
 
-        for ($i = ($skillsCount + $miniGamesCount); $i < ($skillsCount + $miniGamesCount + $cluesCount); $i++) {
-            $clueCollection = Collection::where('slug', $clues[$cluesIndex])->first();
+            if (!$clueCollection) {
+                DB::rollback();
+
+                throw new \Exception(sprintf("Could not find collection '%s'.", $clues[$cluesIndex]));
+            }
 
             $accountClueCollection = $account->collection($clueCollection)->first();
 
@@ -189,15 +177,24 @@ class CreateOrUpdateAccount
             $cluesIndex++;
         }
 
-        $bosses = Collection::byCategorySlug('boss')->pluck('slug')->all();
-        array_splice($bosses, 13, 1);
+        $minigames = array_keys(HiscoreHelper::minigame());
+        $minigameCount = count($minigames);
+
+        // TODO Add minigame stats
+        $minigameIndex = 0;
+
+        $bosses = array_keys(HiscoreHelper::boss(true));
         $bossCount = count($bosses);
+
         $bossIndex = 0;
+        for ($i = ($skillsCount + $pvpCount + $clueCount + $minigameCount); $i < ($skillsCount + $pvpCount + $clueCount + $minigameCount + $bossCount); $i++) {
+            $bossCollection = Collection::whereSlug($bosses[$bossIndex])->first();
 
-        $dksKillCount = 0;
+            if (!$bossCollection) {
+                DB::rollback();
 
-        for ($i = ($skillsCount + $miniGamesCount + $cluesCount); $i < ($skillsCount + $cluesCount + $miniGamesCount + $bossCount); $i++) {
-            $bossCollection = Collection::where('slug', $bosses[$bossIndex])->first();
+                throw new \Exception(sprintf("Could not find collection '%s'.", $bosses[$bossCount]));
+            }
 
             $accountBossCollection = $account->collection($bossCollection)->first();
 
@@ -209,16 +206,8 @@ class CreateOrUpdateAccount
             $accountBossCollection->kill_count = ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
             $accountBossCollection->rank = ($playerData[$i + 1][0] >= 0 ? $playerData[$i + 1][0] : 0);
 
-            if (in_array(
-                $bosses[$bossIndex],
-                ['dagannoth prime', 'dagannoth rex', 'dagannoth supreme'],
-                true
-            )) {
-                $dksKillCount += ($playerData[$i + 1][1] >= 0 ? $playerData[$i + 1][1] : 0);
-            }
-
             try {
-                $bossCollection->save();
+                $accountBossCollection->save();
             } catch (\Exception $e) {
                 DB::rollback();
 
@@ -226,30 +215,6 @@ class CreateOrUpdateAccount
             }
 
             $bossIndex++;
-        }
-
-        /**
-         * Since there are no official total kill count hiscore for
-         * DKS' and we are going to retrieve loot for them from the
-         * collection log, we have to manually create a table.
-         * This might also happen with other bosses in the future
-         * that share collection log entry, but have separate hiscores.
-         */
-        $dks = $account->collection(Collection::where('slug', 'dagannoth-kings')->first())->first();
-
-        if (!$dks) {
-            $dks = new \App\Models\Boss\DagannothKings;
-        }
-
-        $dks->account_id = $account->id;
-        $dks->kill_count = $dksKillCount;
-
-        try {
-            $dks->save();
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            throw $e;
         }
 
 //        $npcs = Collection::byCategorySlug('npc')->pluck('slug')->all();
