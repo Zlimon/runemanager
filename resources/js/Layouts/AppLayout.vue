@@ -143,10 +143,11 @@ onMounted(() => {
                         <div v-for="bossGroup in bossArray">
                             <ul>
                                 <li v-for="boss in bossGroup" :key="boss">
-                                    <a href="#" class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <Link :href="route('hiscores.bosses.index', boss.slug)"
+                                          class="flex gap-2 items-center block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                         <img :src="`/images/boss/${boss.slug}.png`" class="h-8 w-8 object-contain" />
                                         <div class="font-semibold capitalize">{{ boss.name }}</div>
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>
