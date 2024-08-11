@@ -35,6 +35,11 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CollectionSeeder::class,
+        ]);
+
+        Artisan::call('migrate');
+
+        $this->call([
             AccountSeeder::class,
         ]);
 
