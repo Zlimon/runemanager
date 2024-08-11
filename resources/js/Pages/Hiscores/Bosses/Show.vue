@@ -3,7 +3,7 @@ import {ref} from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
-    skillProp: String,
+    bossProp: String,
     hiscoresProp: Object,
 });
 
@@ -16,7 +16,7 @@ let hiscores = ref(props.hiscoresProp);
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="relative overflow-x-auto sm:rounded-lg">
                     <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4">
-                        <h1>{{ skillProp }}</h1>
+                        <h1>{{ bossProp }}</h1>
 
                         <label for="table-search" class="sr-only">Search</label>
                         <div class="relative">
@@ -42,15 +42,15 @@ let hiscores = ref(props.hiscoresProp);
                                     Rank
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    Level
+                                    Score
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    XP
+                                    Obtained
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="hiscore in hiscores.data"
+                            <tr v-for="hiscore in hiscores"
                                 class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                 <th scope="row"
                                     class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
@@ -64,10 +64,10 @@ let hiscores = ref(props.hiscoresProp);
                                     {{ hiscore.rank }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ hiscore.level }}
+                                    {{ hiscore.kill_count }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ hiscore.xp }}
+                                    {{ hiscore.obtained }}
                                 </td>
                             </tr>
                         </tbody>
