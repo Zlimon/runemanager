@@ -17,7 +17,9 @@ class SkillResource extends JsonResource
         return [
             'id' => $this->id,
             'account_id' => $this->account_id,
-            'account' => (new AccountResource($this->whenLoaded('account'))),
+            'account' => $this->whenLoaded('account', function () {
+                return (new AccountResource($this->account))->resolve();
+            }),
             'rank' => $this->rank,
             'level' => $this->level,
             'xp' => $this->xp,

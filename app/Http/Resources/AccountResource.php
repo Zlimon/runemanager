@@ -16,7 +16,9 @@ class AccountResource extends JsonResource
     {
         return [
             'user_id' => $this->user_id,
-            'user' => (new UserResource($this->whenLoaded('user'))),
+            'user' => $this->whenLoaded('user', function () {
+                return (new UserResource($this->user))->resolve();
+            }),
             'account_type' => $this->account_type,
             'username' => $this->username,
             'rank' => $this->rank,
