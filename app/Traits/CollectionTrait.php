@@ -173,8 +173,9 @@ trait CollectionTrait
                     Schema::create('$tableName', function (Blueprint \$table) {
                         \$table->id();
                         \$table->unsignedBigInteger('account_id');
-                        \$table->integer('obtained')->default(0);
-                        \$table->integer('kill_count')->default(0);\r\n
+                        \$table->integer('rank')->default(0);
+                        \$table->integer('kill_count')->default(0);
+                        \$table->integer('obtained')->default(0);\r\n
             EOD;
             foreach ($items as $item) {
                 $unique = $item['unique'];
