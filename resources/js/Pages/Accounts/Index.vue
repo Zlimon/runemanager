@@ -74,7 +74,7 @@ const searchAccounts = (query, load = true) => {
                 <div class="grid sm:grid-cols-3 mt-12">
                     <div v-for="account in accounts.data" :key="account.id">
                         <a href="#" class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-gray-100 dark:hover:bg-gray-700 m-6 lg:m-8 card-sm resource-pack-dialog">
-                            <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.user.icon_id}.png`"
+                            <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.icon_id}.png`"
                                  class="object-contain h-16 w-16 m-4">
                             <div class="flex flex-col justify-between p-4 leading-normal">
                                 <div class="flex">

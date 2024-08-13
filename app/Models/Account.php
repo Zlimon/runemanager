@@ -64,6 +64,11 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getUserIconAttribute(): string
+    {
+        return $this->user->icon_id ?? '';
+    }
+
     public function skill(Skill $skill): HasOne
     {
         return $this->hasOne($skill->model);

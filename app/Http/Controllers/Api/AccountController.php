@@ -25,7 +25,7 @@ class AccountController extends Controller
 
         $perPage = $request['per_page'] ?? $perPage;
 
-        $accounts = AccountResource::collection($accountsQuery->with('user')->paginate($perPage));
+        $accounts = AccountResource::collection($accountsQuery->paginate($perPage));
 
         $request['page'] = $page;
 
