@@ -13,12 +13,13 @@ class CollectionHiscoreController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param string $category
      * @param string $collection
      * @return Response
      */
-    public function index(string $collection): Response
+    public function index(string $category,string $collection): Response
     {
-        $collectionRecord = Collection::byCategorySlug('boss')->whereSlug($collection)->firstOrFail();
+        $collectionRecord = Collection::byCategorySlug($category)->whereSlug($collection)->firstOrFail();
 
         $modelClass = $collectionRecord->model;
 
