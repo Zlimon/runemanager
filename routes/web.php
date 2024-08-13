@@ -25,6 +25,7 @@ Route::middleware([
 
     Route::prefix('/accounts')->group(function() {
         Route::get('/', [\App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
+        Route::get('/{account}', [\App\Http\Controllers\AccountController::class, 'show'])->name('accounts.show');
     });
 
     Route::prefix('/hiscores')->group(function() {

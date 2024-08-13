@@ -38,10 +38,14 @@ class AccountController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @param Account $account
      */
-    public function show(string $id)
+    public function show(Account $account): Response
     {
-        //
+        return Inertia::render('Accounts/Show', [
+            'accountProp' => (new AccountResource($account))->resolve(),
+        ]);
     }
 
     /**
