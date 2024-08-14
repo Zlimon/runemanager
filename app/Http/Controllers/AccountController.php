@@ -44,7 +44,7 @@ class AccountController extends Controller
     public function show(Account $account): Response
     {
         return Inertia::render('Accounts/Show', [
-            'accountProp' => (new AccountResource($account))->resolve(),
+            'accountProp' => (new AccountResource($account->append('skills')))->resolve(),
         ]);
     }
 

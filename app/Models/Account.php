@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AccountTypesEnum;
+use App\Http\Resources\SkillResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -67,6 +68,17 @@ class Account extends Model
     public function getUserIconAttribute(): string
     {
         return $this->user->icon_id ?? '';
+    }
+
+    public function getSkillsAttribute()
+    {
+        return Skill::all()->map(function ($skill) {
+            $skills = (new SkillResource($this->skill($skill)->first()))->resolve();
+            $skills['name'] = $skill['name'];
+            $skills['slug'] = $skill['slug'];
+
+            return $skills;
+        });
     }
 
     public function skill(Skill $skill): HasOne

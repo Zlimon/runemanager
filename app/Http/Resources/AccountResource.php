@@ -26,6 +26,9 @@ class AccountResource extends JsonResource
             'level' => $this->level,
             'xp' => $this->xp,
             'online' => $this->online,
+            'skills' => $this->whenAppended('skills', function () {
+                return $this->skills;
+            }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
