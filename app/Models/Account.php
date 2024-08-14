@@ -67,7 +67,7 @@ class Account extends Model
 
     public function getUserIconAttribute(): string
     {
-        return $this->user->icon_id ?? '';
+        return $this->user->icon() ?? '';
     }
 
     public function getSkillsAttribute()

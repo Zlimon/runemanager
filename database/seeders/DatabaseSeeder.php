@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Helpers\ItemHelper;
 use App\Models\Account;
+use App\Models\Item;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => bcrypt('test1234'),
             'remember_token' => Str::random(10),
-            'icon_id' => ItemHelper::randomItemId(false),
+            'icon_id' => Item::randomItemId(),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'current_team_id' => null,

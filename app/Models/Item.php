@@ -5,7 +5,7 @@ namespace App\Models;
 use MongoDB\Laravel\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property string $_id 1000 occurrences
  * @property string|null $buy_limit 1000 occurrences
@@ -88,4 +88,14 @@ class Item extends Model
     protected $connection = 'mongodb';
 
     protected $primaryKey = 'id';
+
+    public function icon(): string
+    {
+        return ItemIcon::where('id', $this->id)->first()->icon;
+    }
+
+    public static function randomItemId(): int
+    {
+        return (int) Item::where([['noted', false], ['placeholder', false], ['duplicate', false]])->whereNotNull('release_date')->get()->pluck('id')->random();
+    }
 }

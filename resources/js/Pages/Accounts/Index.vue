@@ -76,7 +76,7 @@ const searchAccounts = (query, load = true) => {
                     <div v-for="account in accounts.data" :key="account.id">
                         <Link :href="route('accounts.show', account)"
                               class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-gray-100 dark:hover:bg-gray-700 m-6 lg:m-8 card-sm resource-pack-dialog">
-                            <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.icon_id}.png`"
+                            <img :src="`data:image/jpeg;base64,${account.icon}`"
                                  class="object-contain h-16 w-16 m-4">
                             <div class="flex flex-col justify-between p-4 leading-normal">
                                 <div class="flex">

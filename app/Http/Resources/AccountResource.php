@@ -19,7 +19,7 @@ class AccountResource extends JsonResource
             'user' => $this->whenLoaded('user', function () {
                 return (new UserResource($this->user))->resolve();
             }),
-            'icon_id' => $this->userIcon,
+            'icon' => $this->userIcon,
             'account_type' => $this->account_type,
             'username' => $this->username,
             'rank' => $this->rank,

@@ -13,7 +13,7 @@ use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -120,5 +120,10 @@ class User extends Authenticatable
     public function account(): HasMany
     {
         return $this->hasMany(Account::class);
+    }
+
+    public function icon(): string
+    {
+        return ItemIcon::where('id', $this->icon_id)->first()->icon;
     }
 }

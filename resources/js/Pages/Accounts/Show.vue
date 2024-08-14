@@ -38,7 +38,7 @@ let account = ref(props.accountProp);
                             <div class="max-w-md mx-auto mt-6">
                                 <div class="flex">
                                     <div>
-                                        <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.icon_id}.png`"
+                                        <img :src="`data:image/jpeg;base64,${account.icon}`"
                                              class="object-contain h-16 w-16 m-4">
                                     </div>
 
