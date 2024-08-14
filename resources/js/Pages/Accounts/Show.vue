@@ -1,6 +1,7 @@
 <script setup>
 import {ref} from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
+import {Link} from '@inertiajs/vue3';
 
 const props = defineProps({
     accountProp: Object,
@@ -30,18 +31,18 @@ let account = ref(props.accountProp);
                 </div>
 
                 <div class="card-lg resource-pack-dialog">
-                    <div class="grid grid-cols-3">
+                    <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
                             <h3 class="text-center header-chatbox-sword">{{ account.username }}</h3>
 
-                            <div class="max-w-md mx-auto mt-6 lg:mt-6">
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div class="col-span-1">
+                            <div class="max-w-md mx-auto mt-6">
+                                <div class="flex">
+                                    <div class="bg-red-500">
                                         <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.icon_id}.png`"
                                              class="object-contain h-16 w-16 m-4">
                                     </div>
 
-                                    <div class="col-span-1 grid grid-cols-2 gap-6">
+                                    <div class="bg-blue-500 grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
                                             <label for="rank" class="block text-sm font-medium text-gray-700 dark:text-white">Rank</label>
                                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ account.rank }}</p>
@@ -69,20 +70,22 @@ let account = ref(props.accountProp);
                         <div class="col-span-2">
                             <h3 class="text-center header-chatbox-sword">Skills</h3>
 
-                            <div class="">
-                                <ul>
-                                    <li v-for="skill in account.skills" :key="skill.id">
-                                        <div class="grid grid-cols-2 gap-6">
-                                            <div class="col-span-1">
-                                                <label for="skill" class="block text-sm font-medium text-gray-700 dark:text-white">{{ skill.name }}</label>
-                                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ skill.level }}</p>
-                                            </div>
-
-                                            <div class="col-span-1">
-                                                <label for="xp" class="block text-sm font-medium text-gray-700 dark:text-white">XP</label>
-                                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ skill.xp }}</p>
-                                            </div>
+                            <div class="mx-auto mt-6">
+                                <ul class="grid grid-cols-8 gap-1">
+                                    <li>
+                                        <div class="flex items-center justify-center gap-2 rounded-lg p-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white">
+                                            <img :src="`/images/skill/total.webp`"
+                                                 class="h-6 w-6 object-contain"/>
+                                            <div class="font-semibold capitalize text-xs">{{ account.level }}</div>
                                         </div>
+                                    </li>
+                                    <li v-for="skill in account.skills" :key="skill.id">
+                                        <Link :href="route('hiscores.skills.index', skill.slug)"
+                                              class="flex items-center justify-center gap-2 rounded-lg p-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white">
+                                            <img :src="`/images/skill/${skill.slug}.webp`"
+                                                 class="h-6 w-6 object-contain"/>
+                                            <div class="font-semibold capitalize text-xs">{{ skill.level }}</div>
+                                        </Link>
                                     </li>
                                 </ul>
                             </div>
