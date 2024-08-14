@@ -33,15 +33,20 @@ let account = ref(props.accountProp);
                 <div class="card-lg resource-pack-dialog">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
-                            <h3 class="text-center header-chatbox-sword">{{ account.username }}</h3>
+                            <div class="flex justify-center items-center header-chatbox-sword">
+                                <img v-if="account.account_type === 'ironman'"
+                                     :src="`/images/ironman.png`"
+                                     class="object-contain h-8 w-8">
+                                <img v-else-if="account.account_type !== 'normal'"
+                                     :src="`/images/${account.account_type}_ironman.png`"
+                                     class="object-contain h-8 w-8">
+                                <h3>{{ account.username }}</h3>
+                            </div>
 
-                            <div class="max-w-md mx-auto mt-6">
-                                <div class="flex">
-                                    <div>
-                                        <img :src="`data:image/jpeg;base64,${account.icon}`"
-                                             class="object-contain h-16 w-16 m-4">
-                                    </div>
-
+                            <div class="flex flex-col items-center md:flex-row md:max-w-xl m-6 lg:m-8">
+                                <img :src="`data:image/jpeg;base64,${account.icon}`"
+                                     class="object-contain h-16 w-16 m-4">
+                                <div class="flex flex-col justify-between p-4 leading-normal">
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
                                             <label for="rank" class="block text-sm font-medium text-gray-700 dark:text-white">Rank</label>
