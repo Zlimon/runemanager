@@ -37,12 +37,12 @@ let account = ref(props.accountProp);
 
                             <div class="max-w-md mx-auto mt-6">
                                 <div class="flex">
-                                    <div class="bg-red-500">
+                                    <div>
                                         <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.icon_id}.png`"
                                              class="object-contain h-16 w-16 m-4">
                                     </div>
 
-                                    <div class="bg-blue-500 grid grid-cols-2 gap-6">
+                                    <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
                                             <label for="rank" class="block text-sm font-medium text-gray-700 dark:text-white">Rank</label>
                                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ account.rank }}</p>
