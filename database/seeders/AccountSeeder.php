@@ -71,6 +71,8 @@ class AccountSeeder extends Seeder
         $createOrUpdateAccount = new CreateOrUpdateAccount();
 
         $createOrUpdateAccount->createOrUpdateAccount('Habski', User::whereName('Zlimon')->first(), AccountTypesEnum::IRONMAN);
+        $createOrUpdateAccount->createOrUpdateAccount('Marni', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
+        $createOrUpdateAccount->createOrUpdateAccount('Hey Jase', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
 
         foreach ($accounts as $account) {
             $user = User::inRandomOrder()->first();
