@@ -2,65 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Models\Account;
-use App\Models\Collection;
-use App\Models\Image;
-use App\Skill;
-use DateTime;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ItemHelper
 {
-    /**
-     * Generates a valid random item ID.
-     *
-     * @param bool $verify
-     * @return int
-     */
-    public static function randomItemId(bool $verify = false): int
-    {
-        $randomItemId = rand(0, 25317);
-
-        if ($verify) {
-            if (self::verifyItem($randomItemId)) {
-                return $randomItemId;
-            } else {
-                return self::randomItemId(true);
-            }
-        }
-
-        return $randomItemId;
-    }
-
-    /**
-     * Verifies whether the item exists or not.
-     *
-     * @param $itemId
-     * @return bool
-     */
-    public static function verifyItem($itemId): bool
-    {
-        $itemData = 'https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json';
-
-        $itemData = @file_get_contents($itemData);
-
-        if ($itemData === false) {
-            return false;
-        }
-
-        $itemData = json_decode($itemData, true);
-
-        if (!$itemData['noted']) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /**
      * Grabs data about item and return data based on attribute.
      *
@@ -75,22 +22,6 @@ class ItemHelper
         $itemData[] = json_decode(file_get_contents('https://www.osrsbox.com/osrsbox-db/items-json/' . $itemId . '.json'), true);
 
         return $itemData[0][$attribute];
-    }
-
-    public static function wikiMonsterDrops(string $monsterName)
-    {
-        $wikiScraper = new WikiScraper();
-
-        try {
-            // Fetch the drops by monster
-            $items = $wikiScraper->getDropsByMonster(ucfirst($monsterName));
-
-            // Process the items as needed
-            // For example, you can return or print them
-            return $items;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
     }
 
     public static function downloadItemIcon(string $itemName)
