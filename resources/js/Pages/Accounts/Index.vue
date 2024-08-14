@@ -3,6 +3,7 @@ import {onMounted, ref, watch} from "vue";
 import debounce from 'lodash/debounce';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import TextInput from "@/Components/TextInput.vue";
+import {Link} from '@inertiajs/vue3';
 
 let accounts = ref([]);
 let search = ref('');
@@ -73,7 +74,8 @@ const searchAccounts = (query, load = true) => {
 
                 <div class="grid sm:grid-cols-3 mt-12">
                     <div v-for="account in accounts.data" :key="account.id">
-                        <a href="#" class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-gray-100 dark:hover:bg-gray-700 m-6 lg:m-8 card-sm resource-pack-dialog">
+                        <Link :href="route('accounts.show', account)"
+                              class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-gray-100 dark:hover:bg-gray-700 m-6 lg:m-8 card-sm resource-pack-dialog">
                             <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${account.icon_id}.png`"
                                  class="object-contain h-16 w-16 m-4">
                             <div class="flex flex-col justify-between p-4 leading-normal">
@@ -93,7 +95,7 @@ const searchAccounts = (query, load = true) => {
                                     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ account.level }}</p>
                                 </div>
                             </div>
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
