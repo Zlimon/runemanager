@@ -42,7 +42,7 @@ class HandleInertiaRequests extends Middleware
         $resourcePack = ResourcePack::find(SettingHelper::getSetting('resource_pack_id', 1));
 
         return array_merge(parent::share($request), [
-            'dark_mode' => isset($resourcePack->dark_mode) ? $resourcePack->dark_mode == 1 : false,
+            'dark_mode' => isset($resourcePack->dark_mode) && $resourcePack->dark_mode == 1,
             'skills' => fn () => Skill::distinct()->select('name', 'slug')->get()->toArray() ?? [],
             'bosses' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 5)->get()->toArray() ?? [],
             'clues' =>  fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 3)->get()->toArray() ?? [],
