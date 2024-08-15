@@ -65,6 +65,11 @@ const getCollectionLog = () => {
                             role="tablist">
                             <li v-for="(row, collection) in collectionLog.collectionLog.tabs[tab]" role="presentation">
                                 <button class="inline-block w-full border-b-2 p-4 text-left active hover:bg-gray-100 dark:border-gray-700 dark:text-gray-500 dark:hover:bg-gray-800"
+                                        :class="{
+                                            'text-green-500': row.obtained === row.total,
+                                            'text-red-500': row.obtained === 0,
+                                            'text-yellow-500': row.obtained >= 1 && row.obtained !== row.total
+                                        }"
                                         :id="`${collection}-tab`"
                                         :data-tabs-target="`#${collection}`"
                                         type="button"
