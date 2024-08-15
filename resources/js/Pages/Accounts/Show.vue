@@ -57,7 +57,7 @@ let account = ref(props.accountProp);
 
                                         <div class="col-span-1">
                                             <label for="xp" class="block text-sm font-medium text-gray-700 dark:text-white">Total XP</label>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ account.xp }}</p>
+                                            <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ account.xp.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
                                         </div>
 
                                         <div class="col-span-1">
