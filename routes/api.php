@@ -16,3 +16,11 @@ Route::prefix('/accounts')->group(function() {
 Route::prefix('/hiscores')->group(function() {
     Route::post('/store', [App\Http\Controllers\Admin\Api\HiscoreController::class, 'store'])->name('admin.api.hiscores.store');
 });
+
+Route::prefix('/collectionlog')->group(function() {
+    Route::prefix('/collectionlog')->group(function() {
+        Route::prefix('/user')->group(function() {
+            Route::post('/', [App\Http\Controllers\Api\CollectionLogController::class, 'user'])->name('api.collectionlog.collectionlog.user');
+        });
+    });
+});

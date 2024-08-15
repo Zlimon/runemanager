@@ -1,7 +1,9 @@
 <script setup>
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {Link} from '@inertiajs/vue3';
+import Loader from "@/Components/Loader.vue";
+import CollectionLog from "@/Components/CollectionLog.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -93,6 +95,12 @@ let account = ref(props.accountProp);
                                         </Link>
                                     </li>
                                 </ul>
+                            </div>
+
+                            <h3 class="text-center header-chatbox-sword mt-6">Collection Log</h3>
+
+                            <div class="mt-6">
+                                <CollectionLog :accountProp="account" />
                             </div>
                         </div>
                     </div>

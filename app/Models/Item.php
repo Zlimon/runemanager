@@ -89,9 +89,11 @@ class Item extends Model
 
     protected $primaryKey = 'id';
 
-    public function icon(): string
+    public function getIconAttribute(): string
     {
-        return ItemIcon::where('id', $this->id)->first()->icon;
+        $itemIcon = ItemIcon::where('id', (int) $this->id)->first();
+
+        return $itemIcon ? $itemIcon->icon : '';
     }
 
     public static function randomItemId(): int
