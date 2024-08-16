@@ -16,8 +16,6 @@ onMounted(() => {
 });
 
 watch(search, debounce(function (value) {
-    value = value.replaceAll(' ', '-').toLowerCase();
-
     payload = {
         ...payload,
         'search': value,
