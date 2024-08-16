@@ -105,6 +105,37 @@ class CollectionLogController extends Controller
 
                         $item = array_merge($itemResource, $collectionLogItem);
 
+                        // Strip out fields not needed for frontend for better caching and performance
+                        unset($item['last_updated']);
+                        unset($item['incomplete']);
+                        unset($item['members']);
+                        unset($item['tradeable']);
+                        unset($item['tradeable_on_ge']);
+                        unset($item['stackable']);
+                        unset($item['stacked']);
+                        unset($item['noted']);
+                        unset($item['noteable']);
+                        unset($item['linked_id_item']);
+                        unset($item['linked_id_noted']);
+                        unset($item['linked_id_placeholder']);
+                        unset($item['placeholder']);
+                        unset($item['equipable']);
+                        unset($item['equipable_by_player']);
+                        unset($item['equipable_weapon']);
+                        unset($item['cost']);
+                        unset($item['lowalch']);
+                        unset($item['highalch']);
+                        unset($item['weight']);
+                        unset($item['buy_limit']);
+                        unset($item['quest_item']);
+                        unset($item['release_date']);
+                        unset($item['duplicate']);
+                        unset($item['wiki_name']);
+                        unset($item['wiki_url']);
+                        unset($item['equipment']);
+                        unset($item['weapon']);
+                        unset($item['sequence']);
+
                         $collectionRow['items'][$key] = $item;
                     }
                 }
