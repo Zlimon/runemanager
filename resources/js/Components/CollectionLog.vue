@@ -28,6 +28,13 @@ const getCollectionLog = () => {
         collectionLogLoading.value = false;
     });
 };
+
+function handleImageError() {
+    document.getElementById('screenshot-container')?.classList.add('!hidden');
+    document.getElementById('docs-card')?.classList.add('!row-span-1');
+    document.getElementById('docs-card-content')?.classList.add('!flex-row');
+    document.getElementById('background')?.classList.add('!hidden');
+}
 </script>
 
 <template>
@@ -115,7 +122,8 @@ const getCollectionLog = () => {
                                                  :src="`data:image/jpeg;base64,${item.icon}`"
                                                  class="mx-auto h-10 w-10 object-contain"
                                                  :class="{ 'opacity-50': item.obtained === false }"
-                                                 loading="lazy">
+                                                 loading="lazy"
+                                                 @error="handleImageError">
                                             <span v-else>{{ item.name }}</span>
                                         </button>
 
