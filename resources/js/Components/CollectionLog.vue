@@ -103,7 +103,7 @@ const getCollectionLog = () => {
                                     </p>
                                 </div>
 
-                                <ul class="grid grid-cols-5 gap-4">
+                                <ul class="grid grid-cols-5 gap-4 mt-4">
                                     <li v-for="item in row.items" class="flex items-center justify-between">
                                         <button :data-tooltip-target="`${collection}-${item.id}-tooltip-bottom`"
                                                 data-tooltip-placement="bottom"
@@ -114,7 +114,8 @@ const getCollectionLog = () => {
                                             <img v-if="item.icon"
                                                  :src="`data:image/jpeg;base64,${item.icon}`"
                                                  class="mx-auto h-10 w-10 object-contain"
-                                                 :class="{ 'opacity-50': item.obtained === false }">
+                                                 :class="{ 'opacity-50': item.obtained === false }"
+                                                 loading="lazy">
                                             <span v-else>{{ item.name }}</span>
                                         </button>
 
