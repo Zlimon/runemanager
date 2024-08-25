@@ -1,6 +1,7 @@
 <script setup>
 import {ref} from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
+import {Link} from '@inertiajs/vue3';
 
 const props = defineProps({
     skillProp: String,
@@ -52,22 +53,24 @@ let hiscores = ref(props.hiscoresProp);
                         <tbody>
                             <tr v-for="hiscore in hiscores"
                                 class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                <th scope="row"
-                                    class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                                    <img :src="`https://www.osrsbox.com/osrsbox-db/items-icons/${hiscore.account.user.icon_id}.png`"
-                                         class="object-contain h-10 w-10">
-                                    <div class="ps-3">
-                                        <div class="text-base font-semibold">{{ hiscore.account.username }}</div>
-                                    </div>
+                                <th scope="row">
+                                    <Link :href="route('accounts.show', hiscore.account)"
+                                          class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                                        <img :src="`data:image/jpeg;base64,${hiscore.account.user.icon}`"
+                                             class="object-contain h-10 w-10">
+                                        <div class="ps-3">
+                                            <div class="text-base font-semibold">{{ hiscore.account.username }}</div>
+                                        </div>
+                                    </Link>
                                 </th>
                                 <td class="px-6 py-4">
-                                    {{ hiscore.rank }}
+                                    {{ hiscore.rank.toLocaleString('en-US') }}
                                 </td>
                                 <td class="px-6 py-4">
                                     {{ hiscore.level }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ hiscore.xp }}
+                                    {{ hiscore.xp.toLocaleString('en-US') }}
                                 </td>
                             </tr>
                         </tbody>

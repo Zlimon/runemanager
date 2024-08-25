@@ -122,8 +122,10 @@ class User extends Authenticatable
         return $this->hasMany(Account::class);
     }
 
-    public function icon(): string
+    public function getIconAttribute(): string
     {
-        return ItemIcon::where('id', $this->icon_id)->first()->icon;
+        $itemIcon = ItemIcon::where('id', (int) $this->icon_id)->first();
+
+        return $itemIcon ? $itemIcon->icon : '';
     }
 }
