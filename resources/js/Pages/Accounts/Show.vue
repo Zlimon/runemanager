@@ -138,7 +138,7 @@ const searchAccounts = (query, load = true) => {
                                                 Rank
                                             </label>
                                             <p class="mt-1 text-sm text-gray-900 dark:text-white">
-                                                {{ account.rank }}
+                                                {{ account.rank.toLocaleString('en-US') }}
                                             </p>
                                         </div>
 
