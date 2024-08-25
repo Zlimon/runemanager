@@ -6,6 +6,7 @@ import {Link} from '@inertiajs/vue3';
 import Loader from "@/Components/Loader.vue";
 import CollectionLog from "@/Components/CollectionLog.vue";
 import TextInput from "@/Components/TextInput.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -63,7 +64,7 @@ const searchAccounts = (query, load = true) => {
                             </label>
                             <div class="relative">
                                 <div class="pointer-events-none absolute inset-y-0 flex items-center rtl:inset-r-0 start-0 ps-3">
-                                    <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"aria-hidden="true"
+                                    <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                               stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
@@ -116,25 +117,50 @@ const searchAccounts = (query, load = true) => {
                 <div class="mt-4 card-lg resource-pack-dialog">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
-                            <div class="flex items-center justify-center header-chatbox-sword">
-                                <img v-if="account.account_type === 'ironman'"
-                                     :src="`/images/ironman.png`"
-                                     class="h-8 w-8 object-contain">
-                                <img v-else-if="account.account_type !== 'normal'"
-                                     :src="`/images/${account.account_type}_ironman.png`"
-                                     class="h-8 w-8 object-contain">
-                                <h3>
-                                    {{ account.username }}
-                                </h3>
+                            <div class="flex flex-col justify-between gap-y-7 md:flex-row-reverse md:items-end">
+                                <div class="flex items-center gap-x-5">
+                                    <img :src="`data:image/jpeg;base64,${account.icon}`"
+                                         class="h-16 w-16 rounded-full p-2 ring-2 ring-gray-300 dark:ring-gray-500">
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <img v-if="account.account_type === 'ironman'"
+                                                     :src="`/images/ironman.png`"
+                                                     class="h-8 w-8 object-contain">
+                                                <img v-else-if="account.account_type !== 'normal'"
+                                                     :src="`/images/${account.account_type}_ironman.png`"
+                                                     class="h-8 w-8 object-contain">
+                                                <h1 class="text-xl font-bold md:text-3xl">
+                                                    {{ account.username }}
+                                                </h1>
+                                            </div>
+
+                                            <div class="flex shrink-0 items-center">
+                                                <PrimaryButton>
+                                                    Update
+                                                </PrimaryButton>
+                                            </div>
+                                        </div>
+
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            <span class="capitalize">
+                                                {{ account.account_type }}
+                                            </span>
+                                            ·
+                                            <span>
+                                                Last updated {{ account.updated_at }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="m-6 flex flex-col items-center md:max-w-xl md:flex-row lg:m-8">
-                                <img :src="`data:image/jpeg;base64,${account.icon}`"
-                                     class="m-4 h-16 w-16 object-contain">
                                 <div class="flex flex-col justify-between p-4 leading-normal">
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
-                                            <label for="rank" class="block text-sm font-medium text-gray-700 dark:text-white">
+                                            <label for="rank"
+                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
                                                 Rank
                                             </label>
                                             <p class="mt-1 text-sm text-gray-900 dark:text-white">
@@ -143,7 +169,8 @@ const searchAccounts = (query, load = true) => {
                                         </div>
 
                                         <div class="col-span-1">
-                                            <label for="xp" class="block text-sm font-medium text-gray-700 dark:text-white">
+                                            <label for="xp"
+                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
                                                 Total XP
                                             </label>
                                             <p class="mt-1 text-sm text-gray-900 dark:text-white">
@@ -152,7 +179,8 @@ const searchAccounts = (query, load = true) => {
                                         </div>
 
                                         <div class="col-span-1">
-                                            <label for="level" class="block text-sm font-medium text-gray-700 dark:text-white">
+                                            <label for="level"
+                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
                                                 Total level
                                             </label>
                                             <p class="mt-1 text-sm text-gray-900 dark:text-white">
@@ -161,7 +189,8 @@ const searchAccounts = (query, load = true) => {
                                         </div>
 
                                         <div class="col-span-1">
-                                            <label for="joined" class="block text-sm font-medium text-gray-700 dark:text-white">
+                                            <label for="joined"
+                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
                                                 Joined
                                             </label>
                                             <p class="mt-1 text-sm text-gray-900 dark:text-white">
