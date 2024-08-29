@@ -175,10 +175,10 @@ const searchAccounts = (load = true) => {
                     </div>
                 </div>
 
-                <div class="mt-12 grid sm:grid-cols-4">
+                <div class="mt-12 grid sm:grid-cols-4 gap-4">
                     <div v-for="account in accounts.data" :key="account.id">
                         <Link :href="route('accounts.show', account)"
-                              class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-[#DFD5C1] dark:hover:bg-gray-700 m-2 !my-6 card-sm resource-pack-dialog !shadow-lg">
+                              class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-[#DFD5C1] dark:hover:bg-gray-700 card-sm resource-pack-dialog !shadow-lg">
                             <img :src="`data:image/jpeg;base64,${account.icon}`"
                                  class="h-16 w-16 rounded-full p-2 ring-2 ring-[#B8A282] dark:ring-gray-500">
                             <div class="flex flex-col justify-between p-4 leading-normal">
