@@ -2,14 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Helpers\ItemHelper;
-use App\Models\Account;
 use App\Models\Item;
+use App\Models\NewsPost;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -51,5 +48,7 @@ class DatabaseSeeder extends Seeder
                 '--use' => 'yes',
             ]
         );
+
+        NewsPost::factory(15)->create();
     }
 }
