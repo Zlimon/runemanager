@@ -48,7 +48,7 @@ const classes = computed(() => {
                 {{ option[optionKey].charAt(0).toUpperCase() + option[optionKey].slice(1) }}
             </div>
             <div v-else>
-                {{ option }}
+                {{ option[optionKey] }}
             </div>
         </option>
     </select>
