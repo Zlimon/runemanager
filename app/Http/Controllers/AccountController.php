@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AccountTypesEnum;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use Illuminate\Http\Request;
@@ -17,7 +18,11 @@ class AccountController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Accounts/Index');
+        $accountTypes = array_values(AccountTypesEnum::returnAllAccountTypes());
+
+        return Inertia::render('Accounts/Index', [
+            'accountTypesProp' => $accountTypes,
+        ]);
     }
 
     /**
