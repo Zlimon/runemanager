@@ -37,16 +37,18 @@ const classes = computed(() => {
         ref="input"
         class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500"
         :class="classes"
-        @input="$emit('update:modelValue', (optionObject ? JSON.parse($event.target.value) : $event.target.value))"
-        :disabled="disabled"
-    >
+        @input="$emit('update:modelValue', (optionObject ? JSON.parse($event.target.value) : {id: $event.target.value}))"
+        :disabled="disabled">
         <option v-if="optionDefault !== undefined" :value="optionDefault">{{ optionDefault.charAt(0).toUpperCase() + optionDefault.slice(1) }}</option>
-        <option v-for="option in options" :value="option[optionValue]">
-            <div v-if="option[optionKey] !== undefined && typeof option[optionKey] === 'string'">
+        <option v-for="(option, index) in options" :value="((optionKey === undefined || optionKey === '') || (optionValue === undefined || optionValue === '') ? options[index] : option[optionValue])">
+            <div v-if="(optionKey === undefined || optionKey === '') || (optionValue === undefined || optionValue === '')">
+                {{ option }}
+            </div>
+            <div v-else-if="option[optionKey] !== undefined && typeof option[optionKey] === 'string'">
                 {{ option[optionKey].charAt(0).toUpperCase() + option[optionKey].slice(1) }}
             </div>
             <div v-else>
-                {{ option[optionKey] }}
+                {{ option }}
             </div>
         </option>
     </select>
