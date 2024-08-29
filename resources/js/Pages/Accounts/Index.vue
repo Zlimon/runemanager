@@ -178,11 +178,11 @@ const searchAccounts = (load = true) => {
                 <div class="mt-12 grid sm:grid-cols-4 gap-4">
                     <div v-for="account in accounts.data" :key="account.id">
                         <Link :href="route('accounts.show', account)"
-                              class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-[#DFD5C1] dark:hover:bg-gray-700 card-sm resource-pack-dialog !shadow-lg">
+                              class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-beige-200 dark:hover:bg-gray-700 card-sm resource-pack-dialog !shadow-lg">
                             <img :src="`data:image/jpeg;base64,${account.icon}`"
-                                 class="h-16 w-16 rounded-full p-2 ring-2 ring-[#B8A282] dark:ring-gray-500">
+                                 class="h-16 w-16 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500">
                             <div class="flex flex-col justify-between p-4 leading-normal">
-                                <div class="flex items-center">
+                                <div class="flex items-center space-x-1">
                                     <img v-if="account.account_type === 'ironman'"
                                          :src="`/images/ironman.png`"
                                          class="h-6 w-6 object-contain">
@@ -192,7 +192,7 @@ const searchAccounts = (load = true) => {
                                     <h5 class="">{{ account.username }}</h5>
                                 </div>
 
-                                <div class="flex items-center">
+                                <div class="flex items-center space-x-1">
                                     <img src="/images/skill/total.webp"
                                          class="h-6 w-6 object-contain">
                                     <p class="font-normal text-gray-700 dark:text-gray-400">{{ account.level }}</p>
