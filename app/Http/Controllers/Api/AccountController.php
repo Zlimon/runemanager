@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\AccountTypesEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
+use App\Rules\AccountUsernameRule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AccountController extends Controller
 {
@@ -19,15 +23,44 @@ class AccountController extends Controller
         //
     }
 
-    public function search(Request $request, int $page = 1, int $perPage = 10): JsonResponse
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function search(Request $request): JsonResponse
     {
+        $request['account_types'] = array_map(function($item) {
+            return Str::replace([' ', '-'], '_', Str::lower($item));
+        },$request->get('account_types', []) ?? []);
+
+        try {
+            $username = $request->input('username');
+
+            $rules = [];
+
+            // Add the AccountUsernameRule only if the username is not empty
+            // This is because the rule should only be applied if a username is being searched for
+            if (!empty($username)) {
+                $rules['username'] = [new AccountUsernameRule()];
+            }
+
+            if (!empty($request->get('account_types'))) {
+                $accountTypes = implode(',', array_values(AccountTypesEnum::returnAllAccountTypes()));
+
+                $rules['account_types'] = ['array', 'in:' . $accountTypes];
+            }
+
+            $request->validate($rules);
+        } catch (ValidationException $e) {
+            throw $e;
+        }
+
         $accountsQuery = $this->searchQuery($request->all());
 
-        $perPage = $request['per_page'] ?? $perPage;
+        $perPage = $request->get('per_page', 16);
 
         $accounts = AccountResource::collection($accountsQuery->paginate($perPage));
-
-        $request['page'] = $page;
 
         return response()->json([
             'data' => $accounts,
@@ -42,24 +75,20 @@ class AccountController extends Controller
     {
         $accounts = Account::query();
 
-        if (isset($request['search'])) {
-            $accounts->where('username', 'LIKE', '%'.$request['search'].'%');
+        if (isset($request['username'])) {
+            $accounts->where('username', 'LIKE', '%'.$request['username'].'%');
         }
 
-        if (isset($request['account_type'])) {
+        if (isset($request['account_types']) && is_array($request['account_types']) && count($request['account_types']) > 0) {
             $accountTypes = [];
 
-            if (is_array($request['account_type'])) {
-                $accountTypes = array_merge($accountTypes, $request['account_type']);
-            }
-
-            $accountTypes = array_unique($accountTypes);
+            $accountTypes = array_unique(array_merge($accountTypes, $request['account_types']));
 
             $accounts = $accounts->whereIn('account_type', $accountTypes);
         }
 
         if (isset($request['online']) && boolval($request['online']) === true) {
-            $accounts = $accounts->where('online', boolval($request['online']))->orderByDesc('online');
+            $accounts = $accounts->where('online', true)->orderByDesc('online');
         }
 
         $accounts->orderByDesc('created_at')->orderByDesc('id');
