@@ -4,7 +4,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import {Link} from '@inertiajs/vue3';
 
 const props = defineProps({
-    skillProp: String,
+    skillNameProp: String,
+    skillSlugProp: String,
     hiscoresProp: Object,
 });
 
@@ -17,7 +18,7 @@ let hiscores = ref(props.hiscoresProp);
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="relative overflow-x-auto sm:rounded-lg">
                     <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4">
-                        <h1>{{ skillProp }}</h1>
+                        <h1>{{ skillNameProp }}</h1>
 
                         <label for="table-search" class="sr-only">Search</label>
                         <div class="relative">

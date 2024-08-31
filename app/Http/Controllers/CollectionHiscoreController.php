@@ -17,7 +17,7 @@ class CollectionHiscoreController extends Controller
      * @param string $collection
      * @return Response
      */
-    public function index(string $category,string $collection): Response
+    public function index(string $category, string $collection): Response
     {
         $collectionRecord = Collection::byCategorySlug($category)->whereSlug($collection)->firstOrFail();
 
@@ -39,7 +39,9 @@ class CollectionHiscoreController extends Controller
         $hiscores = CollectionResource::collection($hiscores)->resolve();
 
         return Inertia::render('Hiscores/Bosses/Show', [
-            'bossProp' => $collectionRecord->name,
+            'recordTypeProp' => $category,
+            'collectionNameProp' => $collectionRecord->name,
+            'collectionSlugProp' => $collectionRecord->slug,
             'hiscoresProp' => $hiscores,
         ]);
     }

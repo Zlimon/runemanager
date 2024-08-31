@@ -20,13 +20,8 @@ const showingNavigationDropdown = ref(false);
 let selectedHiscore = ref(null);
 
 let skills = usePage().props.skills;
-let skillArray = ref([]);
-
 let bosses = usePage().props.bosses;
-let bossArray = ref([]);
-
 let clues = usePage().props.clues;
-let clueArray = ref([]);
 
 const switchToTeam = (team) => {
     router.put(route('current-team.update'), {
@@ -40,13 +35,6 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-const chunkIntoN = (arr, n) => {
-    const size = Math.ceil(arr.length / n);
-    return Array.from({length: n}, (v, i) =>
-        arr.slice(i * size, i * size + size)
-    );
-}
-
 onMounted(() => {
     initFlowbite();
 
@@ -56,12 +44,6 @@ onMounted(() => {
     } else {
         document.documentElement.classList.remove('dark')
     }
-
-    skillArray.value = chunkIntoN(skills, 3);
-
-    bossArray.value = chunkIntoN(bosses, 4);
-
-    clueArray.value = chunkIntoN(clues, 3);
 })
 </script>
 
@@ -72,14 +54,15 @@ onMounted(() => {
         <Banner/>
 
         <div class="min-h-screen bg-beige-300 dark:bg-gray-800">
-            <nav @mouseleave="selectedHiscore = ''"
-                 class="border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900">
+            <nav @mouseleave="selectedHiscore = null"
+                 class="border-gray-200 bg-beige-600 dark:border-gray-600 dark:bg-gray-900">
                 <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
-                    <a href="https://flowbite.com" class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo"/>
-                        <span
-                            class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">Flowbite</span>
-                    </a>
+                    <Link :href="route('dashboard')" class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <span class="self-center whitespace-nowrap text-2xl text-6xl font-bold dark:text-white md:text-7xl"
+                              style="font-family: 'runescape-smooth', sans-serif">
+                            {{ usePage().props.app.name }}
+                        </span>
+                    </Link>
                     <button data-collapse-toggle="mega-menu-full" type="button"
                             class="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 md:hidden dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                             aria-controls="mega-menu-full" aria-expanded="false">
@@ -92,105 +75,103 @@ onMounted(() => {
                     </button>
                     <div id="mega-menu-full"
                          class="hidden w-full items-center justify-between font-medium md:order-1 md:flex md:w-auto">
-                        <ul class="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 md:space-x-8 md:mt-0 md:flex-row md:border-0 md:bg-white md:p-0 md:dark:bg-gray-900">
+                        <ul class="mt-4 flex flex-col rounded-lg border border-gray-100 p-4 bg-beige-100 rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 md:space-x-8 md:bg-beige-600 md:mt-0 md:flex-row md:border-0 md:p-0 md:dark:bg-gray-900">
                             <li>
-                                <a href="#"
-                                   class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white md:p-0 dark:hover:bg-gray-700 dark:hover:text-blue-500 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500"
-                                   aria-current="page">
+                                <ResponsiveNavLink :href="route('dashboard')"
+                                                   :active="route().current('dashboard')">
                                     Home
-                                </a>
+                                </ResponsiveNavLink>
                             </li>
                             <li>
-                                <button id="mega-menu-full-dropdown-button"
-                                        data-collapse-toggle="mega-menu-full-dropdown"
-                                        class="flex w-full items-center justify-between rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white md:w-auto md:border-0 md:p-0 dark:hover:bg-gray-700 dark:hover:text-blue-500 md:hover:bg-transparent md:hover:text-blue-600 md:dark:hover:bg-transparent md:dark:hover:text-blue-500">
-                                    Hiscores
-                                    <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true"
-                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                              stroke-width="2" d="m1 1 4 4 4-4"/>
-                                    </svg>
-                                </button>
+                                <ResponsiveNavLink :active="route().current('hiscores.*')"
+                                                   as="button"
+                                                   id="hiscores-menu-dropdown-button"
+                                                   data-collapse-toggle="hiscores-menu-dropdown">
+                                    <div class="flex items-center">
+                                        Hiscores
+                                        <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true"
+                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                  stroke-width="2" d="m1 1 4 4 4-4"/>
+                                        </svg>
+                                    </div>
+                                </ResponsiveNavLink>
                             </li>
                             <li>
-                                <Link :href="route('accounts.index')"
-                                      class="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-white md:p-0 dark:hover:bg-gray-700 dark:hover:text-blue-500 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500">
+                                <ResponsiveNavLink :href="route('accounts.index')"
+                                                   :active="route().current('accounts.*')">
                                     Accounts
-                                </Link>
+                                </ResponsiveNavLink>
+                            </li>
+                            <li>
+                                <form method="POST" @submit.prevent="logout">
+                                    <ResponsiveNavLink as="button">
+                                        Log out
+                                    </ResponsiveNavLink>
+                                </form>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div id="mega-menu-full-dropdown"
-                     class="mt-1 hidden border-y border-gray-200 bg-gray-50 shadow-sm dark:border-gray-600 dark:bg-gray-800 md:bg-white">
-                    <div
-                        class="mx-auto flex max-w-screen-md justify-between px-4 py-5 text-gray-900 dark:text-white md:px-6">
-                        <SecondaryButton @mouseover="selectedHiscore = 'skill'" class="!p-6 background-world-map">
+                <div id="hiscores-menu-dropdown"
+                     class="hidden border-y border-gray-200 shadow-sm bg-beige-100 dark:border-gray-600 dark:bg-gray-800">
+                    <div class="mx-auto flex max-w-screen-md justify-between px-4 py-5 text-gray-900 dark:text-white md:px-6">
+                        <SecondaryButton @mouseover="selectedHiscore = 'skill'"
+                                         class="!p-6 card-sm"
+                                         :class="{ '!bg-beige-200': selectedHiscore === 'skill' || usePage().props.recordTypeProp === 'skill' }">
                             <img src="/images/skill/total.webp" class="h-8 w-8"/>
                         </SecondaryButton>
-                        <SecondaryButton @mouseover="selectedHiscore = 'boss'" class="!p-6 background-world-map">
+                        <SecondaryButton @mouseover="selectedHiscore = 'boss'"
+                                         class="!p-6 card-sm"
+                                         :class="{ '!bg-beige-200': selectedHiscore === 'boss' || usePage().props.recordTypeProp === 'boss' }">
                             <img src="/images/boss/boss.png" class="h-8 w-8"/>
                         </SecondaryButton>
-                        <SecondaryButton @mouseover="selectedHiscore = 'monster'" class="!p-6 background-world-map">
+                        <SecondaryButton @mouseover="selectedHiscore = 'monster'"
+                                         class="!p-6 card-sm"
+                                         :class="{ '!bg-beige-200': selectedHiscore === 'monster' || usePage().props.recordTypeProp === 'monster' }">
                             <img src="/images/boss/boss.png" class="h-8 w-8"/>
                         </SecondaryButton>
-                        <SecondaryButton @mouseover="selectedHiscore = 'clue'" class="!p-6 background-world-map">
+                        <SecondaryButton @mouseover="selectedHiscore = 'clue'"
+                                         class="!p-6 card-sm"
+                                         :class="{ '!bg-beige-200': selectedHiscore === 'clue' || usePage().props.recordTypeProp === 'clue' }">
                             <img src="/images/clue/clue.png" class="h-8 w-8"/>
                         </SecondaryButton>
                     </div>
 
                     <div v-if="selectedHiscore === 'skill'"
-                         class="mx-auto grid max-w-screen-xl px-4 py-5 text-gray-900 dark:text-white sm:grid-cols-3 md:px-6">
-                        <div v-for="skillGroup in skillArray">
-                            <ul>
-                                <li v-for="skill in skillGroup" :key="skill">
-                                    <div class="flex justify-center">
-                                        <Link :href="route('hiscores.skills.index', skill.slug)"
-                                              class="flex items-center gap-2 rounded-lg p-3 w-[50%] h-16 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <img :src="`/images/skill/${skill.slug}.webp`"
-                                                 class="h-8 w-8 object-contain"/>
-                                            <div class="font-semibold capitalize">{{ skill.name }}</div>
-                                        </Link>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+                         class="mx-auto grid max-w-screen-xl grid-cols-4 place-items-center gap-y-2 px-4 pb-5 md:px-6">
+                        <Link v-for="skill in skills" :key="skill"
+                              :href="route('hiscores.skills.index', skill.slug)"
+                              class="flex items-center justify-center rounded-lg p-2 space-x-2 w-[50%] hover:bg-beige-400 sm:justify-start lg:p-4 hover:dark:bg-gray-800"
+                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': usePage().props.skillSlugProp === skill.slug }">
+                            <img :src="`/images/skill/${skill.slug}.webp`"
+                                 class="h-8 w-8 object-contain"/>
+                            <div class="hidden font-semibold capitalize sm:block">{{ skill.name }}</div>
+                        </Link>
                     </div>
 
                     <div v-if="selectedHiscore === 'boss'"
-                         class="mx-auto grid max-w-screen-xl px-4 py-5 text-gray-900 dark:text-white sm:grid-cols-4 md:px-6">
-                        <div v-for="bossGroup in bossArray">
-                            <ul>
-                                <li v-for="boss in bossGroup" :key="boss">
-                                    <div class="flex justify-center">
-                                        <Link :href="route('hiscores.bosses.index', boss.slug)"
-                                              class="flex items-center gap-2 rounded-lg p-3 w-[50%] h-16 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <img :src="`/images/boss/${boss.slug}.png`"
-                                                 class="h-8 w-8 object-contain"/>
-                                            <div class="font-semibold capitalize">{{ boss.name }}</div>
-                                        </Link>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+                         class="mx-auto grid max-w-screen-xl grid-cols-4 place-items-center gap-y-2 px-4 pb-5 md:px-6">
+                        <Link v-for="boss in bosses" :key="boss"
+                              :href="route('hiscores.bosses.index', boss.slug)"
+                              class="flex items-center justify-center rounded-lg p-2 space-x-2 w-[75%] hover:bg-beige-400 sm:justify-start lg:p-4 hover:dark:bg-gray-800"
+                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': usePage().props.collectionSlugProp === boss.slug }">
+                            <img :src="`/images/boss/${boss.slug}.png`"
+                                 class="h-8 w-8 object-contain"/>
+                            <div class="hidden font-semibold capitalize sm:block">{{ boss.name }}</div>
+                        </Link>
                     </div>
 
                     <div v-if="selectedHiscore === 'clue'"
-                         class="mx-auto grid max-w-screen-xl px-4 py-5 text-gray-900 dark:text-white sm:grid-cols-3 md:px-6">
-                        <div v-for="clueGroup in clueArray">
-                            <ul>
-                                <li v-for="clue in clueGroup" :key="clue">
-                                    <div class="flex justify-center">
-                                        <Link :href="route('hiscores.clues.index', clue.slug)"
-                                              class="flex items-center gap-2 rounded-lg p-3 w-[50%] h-16 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <img :src="`/images/clue/${clue.slug}.png`"
-                                                 class="h-8 w-8 object-contain"/>
-                                            <div class="font-semibold capitalize">{{ clue.name }}</div>
-                                        </Link>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+                         class="mx-auto grid max-w-screen-xl grid-cols-4 place-items-center gap-y-2 px-4 pb-5 md:px-6">
+                        <Link v-for="clue in clues" :key="clue"
+                              :href="route('hiscores.clues.index', clue.slug)"
+                              class="flex items-center justify-center rounded-lg p-2 space-x-2 w-[75%] hover:bg-beige-400 sm:justify-start lg:p-4 hover:dark:bg-gray-800"
+                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': usePage().props.collectionSlugProp === clue.slug }">
+                            <img :src="`/images/clue/${clue.slug}.png`"
+                                 class="h-8 w-8 object-contain"/>
+                            <div class="hidden font-semibold capitalize sm:block">{{ clue.name }}</div>
+                        </Link>
                     </div>
                 </div>
             </nav>

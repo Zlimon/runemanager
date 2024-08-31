@@ -15,6 +15,28 @@
         font-weight: normal;
         font-style: normal;
     }
+
+    @font-face {
+        font-family: 'runescape-large';
+        src: url('fonts/runescape-large/runescape-large.eot');
+        src: url('fonts/runescape-large/runescape-large.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape-large/runescape-large.woff') format('woff'),
+        url('fonts/runescape-large/runescape-large.ttf') format('truetype'),
+        url('fonts/runescape-large/runescape-large.svg#runescape') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'runescape-smooth';
+        src: url('fonts/runescape-smooth/runescape-smooth.eot');
+        src: url('fonts/runescape-smooth/runescape-smooth.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape-smooth/runescape-smooth.woff') format('woff'),
+        url('fonts/runescape-smooth/runescape-smooth.ttf') format('truetype'),
+        url('fonts/runescape-smooth/runescape-smooth.svg#runescape') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
 }
 
 [x-cloak] {

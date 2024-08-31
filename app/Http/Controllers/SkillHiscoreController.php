@@ -38,7 +38,9 @@ class SkillHiscoreController extends Controller
         $hiscores = SkillResource::collection($hiscores)->resolve();
 
         return Inertia::render('Hiscores/Skills/Show', [
-            'skillProp' => $skillRecord->name,
+            'recordTypeProp' => 'skill',
+            'skillNameProp' => $skillRecord->name,
+            'skillSlugProp' => $skillRecord->slug,
             'hiscoresProp' => $hiscores,
         ]);
     }
