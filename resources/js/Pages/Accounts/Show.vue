@@ -2,12 +2,13 @@
 import {ref, watch} from "vue";
 import debounce from 'lodash/debounce';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import {Link} from '@inertiajs/vue3';
+import {Link, usePage} from '@inertiajs/vue3';
 import Loader from "@/Components/Loader.vue";
 import CollectionLog from "@/Components/CollectionLog.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import dayjs from "dayjs";
 
 const props = defineProps({
     accountProp: Object,
@@ -121,7 +122,7 @@ const searchAccounts = (query, load = true) => {
                             <div class="flex flex-col justify-between gap-y-7 md:flex-row-reverse md:items-end">
                                 <div class="flex items-center gap-x-5">
                                     <img :src="`data:image/jpeg;base64,${account.icon}`"
-                                         class="h-16 w-16 rounded-full p-2 ring-2 ring-gray-300 dark:ring-gray-500">
+                                         class="h-16 w-16 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500">
                                     <div class="flex flex-col">
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center">
@@ -149,7 +150,7 @@ const searchAccounts = (query, load = true) => {
                                             </span>
                                             ·
                                             <span>
-                                                Last updated {{ account.updated_at }}
+                                                Last updated {{ dayjs(account.updated_at).format('MMMM D, YYYY h:mm A') }}
                                             </span>
                                         </p>
                                     </div>
@@ -157,7 +158,25 @@ const searchAccounts = (query, load = true) => {
                             </div>
 
                             <div class="m-6 flex flex-col items-center md:max-w-xl md:flex-row lg:m-8">
-                                <div class="flex flex-col justify-between p-4 leading-normal">
+                                <div class="flex flex-col justify-between leading-normal">
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <div class="col-span-1">
+                                            <InputLabel :value="`${usePage().props.app.name} rank`" class="text-sm" />
+                                            <p class="text-xl font-bold text-gray-900 dark:text-white">
+                                                {{ account.rank.toLocaleString('en-US') }}
+                                            </p>
+                                        </div>
+
+                                        <div class="col-span-1">
+                                            <InputLabel :value="`Joined ${usePage().props.app.name}`" class="text-sm" />
+                                            <p class="text-xl font-bold text-gray-900 dark:text-white">
+                                                {{ dayjs(account.created_at).format('MMM D, YYYY') }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-6 border border-beige-700 bg-beige-700">
+
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
                                             <InputLabel value="Rank" class="text-sm" />
@@ -181,9 +200,9 @@ const searchAccounts = (query, load = true) => {
                                         </div>
 
                                         <div class="col-span-1">
-                                            <InputLabel value="Joined" class="text-sm" />
+                                            <InputLabel value="Account created" class="text-sm" />
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
-                                                {{ account.created_at }}
+                                                {{ dayjs(account.created_at).format('MMM D, YYYY') }}
                                             </p>
                                         </div>
                                     </div>
