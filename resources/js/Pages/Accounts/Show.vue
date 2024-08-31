@@ -7,6 +7,7 @@ import Loader from "@/Components/Loader.vue";
 import CollectionLog from "@/Components/CollectionLog.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -159,41 +160,29 @@ const searchAccounts = (query, load = true) => {
                                 <div class="flex flex-col justify-between p-4 leading-normal">
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
-                                            <label for="rank"
-                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
-                                                Rank
-                                            </label>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                                            <InputLabel value="Rank" class="text-sm" />
+                                            <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.rank.toLocaleString('en-US') }}
                                             </p>
                                         </div>
 
                                         <div class="col-span-1">
-                                            <label for="xp"
-                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
-                                                Total XP
-                                            </label>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                                            <InputLabel value="Total XP" class="text-sm" />
+                                            <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.xp.toLocaleString('en-US') }}
                                             </p>
                                         </div>
 
                                         <div class="col-span-1">
-                                            <label for="level"
-                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
-                                                Total level
-                                            </label>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                                            <InputLabel value="Total level" class="text-sm" />
+                                            <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.level }}
                                             </p>
                                         </div>
 
                                         <div class="col-span-1">
-                                            <label for="joined"
-                                                   class="block text-sm font-medium text-gray-700 dark:text-white">
-                                                Joined
-                                            </label>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                                            <InputLabel value="Joined" class="text-sm" />
+                                            <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.created_at }}
                                             </p>
                                         </div>
@@ -203,7 +192,7 @@ const searchAccounts = (query, load = true) => {
                         </div>
 
                         <div class="col-span-2">
-                            <h3 class="text-center header-chatbox-sword">
+                            <h3 class="header-chatbox-sword">
                                 Skills
                             </h3>
 
@@ -262,7 +251,7 @@ const searchAccounts = (query, load = true) => {
                                 </ul>
                             </div>
 
-                            <h3 class="mt-6 text-center header-chatbox-sword">
+                            <h3 class="mt-6 header-chatbox-sword">
                                 Collection Log
                             </h3>
 
