@@ -116,26 +116,15 @@ onMounted(() => {
                 <div id="hiscores-menu-dropdown"
                      class="hidden border-y border-gray-200 shadow-sm bg-beige-100 dark:border-gray-600 dark:bg-gray-800">
                     <div class="mx-auto flex max-w-screen-md justify-between px-4 py-5 text-gray-900 dark:text-white md:px-6">
-                        <SecondaryButton @mouseover="selectedHiscore = 'skill'"
-                                         class="!p-6 card-sm"
-                                         :class="{ '!bg-beige-200': selectedHiscore === 'skill' || usePage().props.recordTypeProp === 'skill' }">
-                            <img src="/images/skill/total.webp" class="h-8 w-8"/>
-                        </SecondaryButton>
-                        <SecondaryButton @mouseover="selectedHiscore = 'boss'"
-                                         class="!p-6 card-sm"
-                                         :class="{ '!bg-beige-200': selectedHiscore === 'boss' || usePage().props.recordTypeProp === 'boss' }">
-                            <img src="/images/boss/boss.png" class="h-8 w-8"/>
-                        </SecondaryButton>
-                        <SecondaryButton @mouseover="selectedHiscore = 'monster'"
-                                         class="!p-6 card-sm"
-                                         :class="{ '!bg-beige-200': selectedHiscore === 'monster' || usePage().props.recordTypeProp === 'monster' }">
-                            <img src="/images/boss/boss.png" class="h-8 w-8"/>
-                        </SecondaryButton>
-                        <SecondaryButton @mouseover="selectedHiscore = 'clue'"
-                                         class="!p-6 card-sm"
-                                         :class="{ '!bg-beige-200': selectedHiscore === 'clue' || usePage().props.recordTypeProp === 'clue' }">
-                            <img src="/images/clue/clue.png" class="h-8 w-8"/>
-                        </SecondaryButton>
+                        <div @mouseover="selectedHiscore = 'skill'"
+                             class="h-20 w-20 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500 bg-[url('/images/skill/total.webp')] bg-center bg-no-repeat bg-[length:40px_40px]"
+                             :class="{ '!bg-beige-200': selectedHiscore === 'skill' || usePage().props.recordTypeProp === 'skill' }" />
+                        <div @mouseover="selectedHiscore = 'boss'"
+                             class="h-20 w-20 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500 bg-[url('/images/boss/boss.png')] bg-center bg-no-repeat bg-[length:40px_40px]"
+                             :class="{ '!bg-beige-200': selectedHiscore === 'boss' || usePage().props.recordTypeProp === 'boss' }" />
+                        <div @mouseover="selectedHiscore = 'clue'"
+                             class="h-20 w-20 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500 bg-[url('/images/clue/clue.png')] bg-center bg-no-repeat bg-[length:40px_40px]"
+                             :class="{ '!bg-beige-200': selectedHiscore === 'clue' || usePage().props.recordTypeProp === 'clue' }" />
                     </div>
 
                     <div v-if="selectedHiscore === 'skill'"
