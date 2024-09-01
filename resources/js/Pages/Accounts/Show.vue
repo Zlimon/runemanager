@@ -72,12 +72,15 @@ onMounted(() => {
     scene.add(directionalLight);
 
     const mtlLoader = new MTLLoader();
-    mtlLoader.load('/models/NPC Advisor Ghrim 2024-08-31_19-00-21.mtl', (materials) => {
+
+    const player = 'Player Annihilation 2024-09-01_12-03-23';
+
+    mtlLoader.load('/models/' + player + '.mtl', (materials) => {
         materials.preload();
 
         const objLoader = new OBJLoader();
         objLoader.setMaterials(materials);
-        objLoader.load('/models/NPC Advisor Ghrim 2024-08-31_19-00-21.obj', (object) => {
+        objLoader.load('/models/' + player + '.obj', (object) => {
             object.position.set(25, -100, 25);
             object.scale.set(1, 1, 1);
             scene.add(object);
@@ -212,7 +215,7 @@ onMounted(() => {
                             </div>
 
                             <div class="flex flex-col items-center">
-                                <div ref="sceneContainer" class="w-[50%] h-64 my-6 border border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800" />
+                                <div ref="sceneContainer" class="w-[50%] h-64 my-6 bg-beige-300 border border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800" />
 
                                 <div class="flex flex-col justify-between">
 
@@ -279,7 +282,7 @@ onMounted(() => {
                                               data-tooltip-target="total-tooltip-bottom"
                                               data-tooltip-placement="bottom"
                                               type="button"
-                                              class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-1 text-gray-900 dark:bg-gray-700 dark:text-white">
+                                              class="flex items-center justify-center gap-2 rounded-lg p-1 bg-beige-300 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800">
                                             <img src="/images/skill/total.webp"
                                                  class="h-6 w-6 object-contain"/>
                                             <span class="text-xs font-semibold capitalize">
@@ -304,7 +307,7 @@ onMounted(() => {
                                               :data-tooltip-target="`${skill.slug}-tooltip-bottom`"
                                               data-tooltip-placement="bottom"
                                               type="button"
-                                              class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-1 text-gray-900 dark:bg-gray-700 dark:text-white">
+                                              class="flex items-center justify-center gap-2 rounded-lg p-1 bg-beige-300 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800">
                                             <img :src="`/images/skill/${skill.slug}.webp`"
                                                  class="h-6 w-6 object-contain"/>
                                             <span class="text-xs font-semibold capitalize">
