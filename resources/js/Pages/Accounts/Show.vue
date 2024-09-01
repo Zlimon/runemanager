@@ -1,6 +1,10 @@
 <script setup>
-import {ref, watch} from "vue";
+import {ref, watch, onMounted} from "vue";
 import debounce from 'lodash/debounce';
+import * as THREE from 'three';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {Link, usePage} from '@inertiajs/vue3';
 import Loader from "@/Components/Loader.vue";
@@ -50,6 +54,56 @@ const searchAccounts = (query, load = true) => {
         searchAccountsLoading.value = false;
     });
 };
+
+const sceneContainer = ref(null);
+
+onMounted(() => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, sceneContainer.value.clientWidth / sceneContainer.value.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(sceneContainer.value.clientWidth, sceneContainer.value.clientHeight);
+    sceneContainer.value.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight.position.set(2, 1, 1).normalize();
+    scene.add(directionalLight);
+
+    const mtlLoader = new MTLLoader();
+    mtlLoader.load('/models/NPC Advisor Ghrim 2024-08-31_19-00-21.mtl', (materials) => {
+        materials.preload();
+
+        const objLoader = new OBJLoader();
+        objLoader.setMaterials(materials);
+        objLoader.load('/models/NPC Advisor Ghrim 2024-08-31_19-00-21.obj', (object) => {
+            object.position.set(25, -100, 25);
+            object.scale.set(1, 1, 1);
+            scene.add(object);
+            animate();
+        });
+    });
+
+    camera.position.set(100, 50, 150);
+    camera.lookAt(0, 0, 0);
+
+    // Orbit Controls for interactivity
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.update();
+
+    const animate = () => {
+        requestAnimationFrame(animate);
+        // Enable transparency in the renderer
+        renderer.setSize(sceneContainer.value.clientWidth, sceneContainer.value.clientHeight);
+
+        // Set background to transparent
+        renderer.setClearColor(0x000000, 0); // The second parameter controls the opacity, set to 0 for transparency
+
+        renderer.render(scene, camera);
+        controls.update(); // Needed to keep controls in sync
+    };
+});
 </script>
 
 <template>
@@ -119,7 +173,7 @@ const searchAccounts = (query, load = true) => {
                 <div class="mt-4 card-lg resource-pack-dialog">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
-                            <div class="flex flex-col justify-between gap-y-7 md:flex-row-reverse md:items-end">
+                            <div class="flex flex-col justify-between gap-y-7">
                                 <div class="flex items-center gap-x-5">
                                     <img :src="`data:image/jpeg;base64,${account.icon}`"
                                          class="h-16 w-16 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500">
@@ -157,8 +211,11 @@ const searchAccounts = (query, load = true) => {
                                 </div>
                             </div>
 
-                            <div class="m-6 flex flex-col items-center md:max-w-xl md:flex-row lg:m-8">
-                                <div class="flex flex-col justify-between leading-normal">
+                            <div class="flex flex-col items-center">
+                                <div ref="sceneContainer" class="w-[50%] h-64 my-6 border border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800" />
+
+                                <div class="flex flex-col justify-between">
+
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
                                             <InputLabel :value="`${usePage().props.app.name} rank`" class="text-sm" />
@@ -179,9 +236,9 @@ const searchAccounts = (query, load = true) => {
 
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
-                                            <InputLabel value="Rank" class="text-sm" />
+                                            <InputLabel value="Total level" class="text-sm" />
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
-                                                {{ account.rank.toLocaleString('en-US') }}
+                                                {{ account.level }}
                                             </p>
                                         </div>
 
@@ -193,9 +250,9 @@ const searchAccounts = (query, load = true) => {
                                         </div>
 
                                         <div class="col-span-1">
-                                            <InputLabel value="Total level" class="text-sm" />
+                                            <InputLabel value="Rank" class="text-sm" />
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
-                                                {{ account.level }}
+                                                {{ account.rank.toLocaleString('en-US') }}
                                             </p>
                                         </div>
 
