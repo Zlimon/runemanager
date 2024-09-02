@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use App\Actions\Account\CreateOrUpdateAccount;
+use App\Actions\Account\CreateOrUpdateAccountEquipment;
 use App\Enums\AccountTypesEnum;
+use App\Models\Equipment;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -68,23 +70,30 @@ class AccountSeeder extends Seeder
             'TobeTask',
         ];
 
-        $createOrUpdateAccount = new CreateOrUpdateAccount();
-
-        $createOrUpdateAccount->createOrUpdateAccount('Habski', User::whereName('Zlimon')->first(), AccountTypesEnum::IRONMAN);
-        $createOrUpdateAccount->createOrUpdateAccount('Marni', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
-        $createOrUpdateAccount->createOrUpdateAccount('Hey Jase', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
+        $this->createOrUpdateAccount('Habski', User::whereName('Zlimon')->first(), AccountTypesEnum::IRONMAN);
+        $this->createOrUpdateAccount('Marni', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
+        $this->createOrUpdateAccount('Hey Jase', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
 
         foreach ($accounts as $account) {
             $user = User::inRandomOrder()->first();
 
 //            \App\Enums\AccountTypesEnum::returnAllAccountTypes()[rand(0, 3)]
-            try {
-                $createOrUpdateAccount->createOrUpdateAccount($account, $user);
-            } catch (\Exception $e) {
-                $this->command->warn($e->getMessage());
+            $this->createOrUpdateAccount($account, $user, AccountTypesEnum::NORMAL);
+        }
+    }
 
-                continue;
-            }
+    private function createOrUpdateAccount(string $account, User $user, AccountTypesEnum $accountType): void
+    {
+        $createOrUpdateAccount = new CreateOrUpdateAccount();
+        $createOrUpdateAccountEquipment = new CreateOrUpdateAccountEquipment();
+
+        try {
+            $account = $createOrUpdateAccount->createOrUpdateAccount($account, $user, $accountType);
+
+            $equipment = Equipment::factory(1)->make()->first()->toArray();
+            $createOrUpdateAccountEquipment->createOrUpdateAccountEquipment($account, $equipment);
+        } catch (\Exception $e) {
+            $this->command->warn($e->getMessage());
         }
     }
 }

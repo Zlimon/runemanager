@@ -2,9 +2,9 @@
 import {ref, watch, onMounted} from "vue";
 import debounce from 'lodash/debounce';
 import * as THREE from 'three';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
+import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {Link, useForm, usePage} from '@inertiajs/vue3';
 import CollectionLog from "@/Components/CollectionLog.vue";
@@ -103,13 +103,15 @@ onMounted(() => {
     const animate = () => {
         requestAnimationFrame(animate);
         // Enable transparency in the renderer
-        renderer.setSize(sceneContainer.value.clientWidth, sceneContainer.value.clientHeight);
+        if (sceneContainer.value !== null) {
+            renderer.setSize(sceneContainer.value.clientWidth, sceneContainer.value.clientHeight);
 
-        // Set background to transparent
-        renderer.setClearColor(0x000000, 0); // The second parameter controls the opacity, set to 0 for transparency
+            // Set background to transparent
+            renderer.setClearColor(0x000000, 0); // The second parameter controls the opacity, set to 0 for transparency
 
-        renderer.render(scene, camera);
-        controls.update(); // Needed to keep controls in sync
+            renderer.render(scene, camera);
+            controls.update(); // Needed to keep controls in sync
+        }
     };
 });
 </script>
@@ -125,7 +127,7 @@ onMounted(() => {
                         <div class="flex flex-wrap items-center justify-end flex-column md:flex-row">
                             <InputLabel for="searchAccountForm-username"
                                         value="Search for any account by username"
-                                        class="sr-only" />
+                                        class="sr-only"/>
                             <div class="relative">
                                 <div class="pointer-events-none absolute inset-y-0 flex items-center start-0 ps-3">
                                     <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
@@ -152,7 +154,7 @@ onMounted(() => {
                                  class="w-[calc(100%+4rem)] absolute overflow-y-auto bg-beige-600 border-2 border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800 ">
                                 <div v-for="account in accounts.data" :key="account.id">
                                     <Link :href="route('accounts.show', account)"
-                                          class="flex items-center flex-row border-b border-beige-700 p-2 hover:bg-beige-200 dark:hover:bg-gray-700 space-x-2">
+                                          class="flex flex-row items-center border-b p-2 border-beige-700 space-x-2 hover:bg-beige-200 dark:hover:bg-gray-700">
                                         <img :src="`data:image/jpeg;base64,${account.icon}`"
                                              class="h-16 w-16 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500">
                                         <div class="flex flex-col justify-between">
@@ -163,13 +165,17 @@ onMounted(() => {
                                                 <img v-else-if="account.account_type !== 'normal'"
                                                      :src="`/images/${account.account_type}_ironman.png`"
                                                      class="h-6 w-6 object-contain">
-                                                <P class="text-xl">{{ account.username }}</P>
+                                                <p class="text-xl">
+                                                    {{ account.username }}
+                                                </p>
                                             </div>
 
                                             <div class="flex items-center space-x-1">
                                                 <img src="/images/skill/total.webp"
                                                      class="h-6 w-6 object-contain">
-                                                <p class="font-normal text-gray-700 dark:text-gray-400 text-md">{{ account.level }}</p>
+                                                <p class="font-normal text-gray-700 text-md dark:text-gray-400">
+                                                    {{ account.level }}
+                                                </p>
                                             </div>
                                         </div>
                                     </Link>
@@ -213,7 +219,8 @@ onMounted(() => {
                                             </span>
                                             ·
                                             <span>
-                                                Last updated {{ dayjs(account.updated_at).format('MMMM D, YYYY h:mm A') }}
+                                                Last updated
+                                                {{ dayjs(account.updated_at).format('MMMM D, YYYY h:mm A') }}
                                             </span>
                                         </p>
                                     </div>
@@ -221,20 +228,90 @@ onMounted(() => {
                             </div>
 
                             <div class="flex flex-col items-center">
-                                <div ref="sceneContainer" class="w-[50%] h-64 my-6 bg-beige-300 border border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800" />
+                                <div class="my-4 grid grid-cols-2 gap-4">
+                                    <div ref="sceneContainer"
+                                         class="h-64 rounded-lg border bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800"/>
+
+                                    <div class="mx-auto p-6 w-[168px]"
+                                         style="background-image: url('/images/equipment_slots.png'); background-repeat: no-repeat; background-position: center;">
+                                        <div class="ml-1 flex justify-center mt-[8px]">
+                                            <img v-if="account.equipment.head > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.head_item.icon}`"
+                                                 alt="Cape"
+                                                 :title="account.equipment.head_item.name">
+                                        </div>
+
+                                        <div class="ml-1 flex justify-center mt-[8px]">
+                                            <img v-if="account.equipment.cape > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.cape_item.icon}`"
+                                                 alt="Cape"
+                                                 :title="account.equipment.cape_item.name"
+                                                 style="margin-right: 5px;">
+                                            <img v-if="account.equipment.neck > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.neck_item.icon}`"
+                                                 alt="Neck"
+                                                 :title="account.equipment.neck_item.name">
+                                            <img v-if="account.equipment.ammo > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.ammo_item.icon}`"
+                                                 alt="Cape"
+                                                 :title="account.equipment.ammo_item.name"
+                                                 style="margin-left: 5px;">
+                                        </div>
+
+                                        <div class="ml-1 flex justify-center mt-[8px]">
+                                            <img v-if="account.equipment.weapon > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.weapon_item.icon}`"
+                                                 alt="Weapon"
+                                                 :title="account.equipment.weapon_item.name"
+                                                 style="margin-right: 20px;">
+                                            <img v-if="account.equipment.body > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.body_item.icon}`"
+                                                 alt="body"
+                                                 :title="account.equipment.body_item.name">
+                                            <img v-if="account.equipment.shield > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.shield_item.icon}`"
+                                                 alt="Shield"
+                                                 :title="account.equipment.shield_item.name"
+                                                 style="margin-left: 20px;">
+                                        </div>
+
+                                        <div class="ml-1 flex justify-center mt-[8px]">
+                                            <img v-if="account.equipment.legs > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.legs_item.icon}`"
+                                                 alt="Legs"
+                                                 :title="account.equipment.legs_item.name">
+                                        </div>
+
+                                        <div class="ml-1 flex justify-center mt-[8px]">
+                                            <img v-if="account.equipment.hands > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.hands_item.icon}`"
+                                                 alt="Hands"
+                                                 :title="account.equipment.hands_item.name"
+                                                 style="margin-right: 22.5px;">
+                                            <img v-if="account.equipment.feet > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.feet_item.icon}`"
+                                                 alt="Feet"
+                                                 :title="account.equipment.feet_item.name">
+                                            <img v-if="account.equipment.ring > 0"
+                                                 :src="`data:image/jpeg;base64,${account.equipment.ring_item.icon}`"
+                                                 alt="Ring"
+                                                 :title="account.equipment.ring_item.name"
+                                                 style="margin-left: 22.5px;">
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="flex flex-col justify-between">
-
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
-                                            <InputLabel :value="`${usePage().props.app.name} rank`" class="text-sm" />
+                                            <InputLabel :value="`${usePage().props.app.name} rank`" class="text-sm"/>
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.rank.toLocaleString('en-US') }}
                                             </p>
                                         </div>
 
                                         <div class="col-span-1">
-                                            <InputLabel :value="`Joined ${usePage().props.app.name}`" class="text-sm" />
+                                            <InputLabel :value="`Joined ${usePage().props.app.name}`" class="text-sm"/>
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ dayjs(account.created_at).format('MMM D, YYYY') }}
                                             </p>
@@ -245,28 +322,28 @@ onMounted(() => {
 
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="col-span-1">
-                                            <InputLabel value="Total level" class="text-sm" />
+                                            <InputLabel value="Total level" class="text-sm"/>
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.level }}
                                             </p>
                                         </div>
 
                                         <div class="col-span-1">
-                                            <InputLabel value="Total XP" class="text-sm" />
+                                            <InputLabel value="Total XP" class="text-sm"/>
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.xp.toLocaleString('en-US') }}
                                             </p>
                                         </div>
 
                                         <div class="col-span-1">
-                                            <InputLabel value="Rank" class="text-sm" />
+                                            <InputLabel value="Rank" class="text-sm"/>
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ account.rank.toLocaleString('en-US') }}
                                             </p>
                                         </div>
 
                                         <div class="col-span-1">
-                                            <InputLabel value="Account created" class="text-sm" />
+                                            <InputLabel value="Account created" class="text-sm"/>
                                             <p class="text-xl font-bold text-gray-900 dark:text-white">
                                                 {{ dayjs(account.created_at).format('MMM D, YYYY') }}
                                             </p>
@@ -288,7 +365,7 @@ onMounted(() => {
                                               data-tooltip-target="total-tooltip-bottom"
                                               data-tooltip-placement="bottom"
                                               type="button"
-                                              class="flex items-center justify-center gap-2 rounded-lg p-1 bg-beige-300 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800">
+                                              class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
                                             <img src="/images/skill/total.webp"
                                                  class="h-6 w-6 object-contain"/>
                                             <span class="text-xs font-semibold capitalize">
@@ -313,7 +390,7 @@ onMounted(() => {
                                               :data-tooltip-target="`${skill.slug}-tooltip-bottom`"
                                               data-tooltip-placement="bottom"
                                               type="button"
-                                              class="flex items-center justify-center gap-2 rounded-lg p-1 bg-beige-300 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800">
+                                              class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
                                             <img :src="`/images/skill/${skill.slug}.webp`"
                                                  class="h-6 w-6 object-contain"/>
                                             <span class="text-xs font-semibold capitalize">

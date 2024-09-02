@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->integer('icon_id');
+            $table->unsignedSmallInteger('icon_id');
             $table->boolean('private')->default(false);
             $table->foreignId('current_team_id')->nullable();
             $table->rememberToken();

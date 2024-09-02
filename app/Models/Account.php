@@ -91,16 +91,17 @@ class Account extends Model
         return $this->hasOne($collection->model);
     }
 
+    public function equipment(): HasOne
+    {
+        return $this->hasOne(Equipment::class);
+    }
+
 //    public function log() {
 //        return $this->hasMany(Log::class);
 //    }
 //
 //    public function logBroadcast() {
 //        return $this->hasManyThrough(Broadcast::class, Log::class);
-//    }
-//
-//    public function equipment() {
-//        return $this->hasOne(Equipment::class);
 //    }
 //
 //    public function bank() {
