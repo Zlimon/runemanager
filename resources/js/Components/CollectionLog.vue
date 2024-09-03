@@ -1,6 +1,7 @@
 <script setup>
 import {ref, onMounted} from "vue";
 import Loader from "@/Components/Loader.vue";
+import dayjs from "dayjs";
 
 const props = defineProps({
     accountProp: Object,
@@ -40,13 +41,13 @@ function handleImageError() {
 <template>
     <div v-if="!collectionLogLoading">
         <div v-if="collectionLog.collectionLog !== undefined">
-            <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="">
                 <ul class="-mb-px flex flex-wrap gap-2 text-center text-sm font-medium"
                     id="default-tab"
                     data-tabs-toggle="#default-tab-content"
                     role="tablist">
                     <li v-for="(bosses, tab) in collectionLog.collectionLog.tabs" role="presentation">
-                        <button class="inline-block rounded-t-lg bg-gray-100 p-4 text-blue-600 active dark:bg-gray-800 dark:text-blue-500"
+                        <button class="inline-block rounded-t-lg p-4 text-black active bg-beige-300 border-t border-b border-b-beige-300 border-x border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
                                 :id="`${tab}-tab`"
                                 :data-tabs-target="`#${tab}`"
                                 type="button"
@@ -61,7 +62,7 @@ function handleImageError() {
 
             <div id="default-tab-content">
                 <div v-for="(bosses, tab) in collectionLog.collectionLog.tabs"
-                     class="hidden rounded-lg bg-gray-50 dark:bg-gray-800"
+                     class="hidden rounded-b-lg rounded-r-lg bg-beige-300 border border-beige-700 dark:bg-gray-800"
                      :id="tab"
                      role="tabpanel"
                      :aria-labelledby="`${tab}-tab`">
@@ -71,7 +72,7 @@ function handleImageError() {
                             data-tabs-toggle="#default-sub-tab-content"
                             role="tablist">
                             <li v-for="(row, collection) in collectionLog.collectionLog.tabs[tab]" role="presentation">
-                                <button class="inline-block w-full border-b-2 p-4 text-left active hover:bg-gray-100 dark:border-gray-700 dark:text-gray-500 dark:hover:bg-gray-800"
+                                <button class="inline-block w-full border-b-2 p-4 text-left active hover:bg-beige-300 hover:text-black dark:border-gray-700 dark:text-gray-500 dark:hover:bg-gray-800"
                                         :class="{
                                             'text-green-500': row.obtained === row.total,
                                             'text-red-500': row.obtained === 0,
@@ -132,7 +133,7 @@ function handleImageError() {
                                              class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
                                             <p>{{ item.name }}</p>
                                             <p>{{ item.examine }}</p>
-                                            <p v-if="item.obtainedAt !== null">{{ item.obtainedAt }}</p>
+                                            <p v-if="item.obtainedAt !== null">{{ dayjs(item.obtainedAt).format('MMM D, YYYY h:mm A') }}</p>
                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                         </div>
                                     </li>
