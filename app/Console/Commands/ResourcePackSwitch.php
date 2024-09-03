@@ -3,13 +3,17 @@
 namespace App\Console\Commands;
 
 use App\Helpers\SettingHelper;
-use App\ResourcePack;
+use App\Models\ResourcePack;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
+use function Laravel\Prompts\search;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use VIPSoft\Unzip\Unzip;
+use Symfony\Component\Console\Command\Command as CommandAlias;
+use ZanySoft\Zip\Zip;
+use ZanySoft\Zip\ZipManager;
 
-class ResourcePackSwitch extends Command
+class ResourcePackSwitch extends Command implements PromptsForMissingInput
 {
     /**
      * The name and signature of the console command.
@@ -27,67 +31,114 @@ class ResourcePackSwitch extends Command
     protected $description = 'Switch and apply resource pack to current textures';
 
     /**
-     * Create a new command instance.
+     * Prompt for missing input arguments using the returned questions.
      *
-     * @return void
+     * @return array<string, string>
      */
-    public function __construct()
+    protected function promptForMissingArgumentsUsing(): array
     {
-        parent::__construct();
+        return [
+            'name' => fn () => search(
+                label: 'Search for a resource pack:',
+                options: fn ($value) => (strlen($value) > 0
+                    ? array_merge(['None'], (ResourcePack::where('name', 'like', "%{$value}%")->orWhere('alias', 'like', "%{$value}%")->pluck('name', 'id')->all()) ?: ([ResourcePack::pluck('name', 'id')->first()]))
+                    : ['None']),
+            ),
+        ];
     }
 
     /**
      * Execute the console command.
-     *
-     * @return int
+     * @throws \Throwable
      */
-    public function handle()
+    public function handle(): int
     {
         $name = $this->argument('name');
 
-        $resourcePack = ResourcePack::firstWhere('name', $name);
+        $resourcePack = ResourcePack::where('name', 'like', "%{$name}%")->orWhere('alias', 'like', "%{$name}%")->orWhere('id', $name)->pluck('name')->first();
+        $name = $resourcePack;
 
-        if (!$resourcePack || !File::exists(public_path('storage/resource-packs-downloaded/' . $name . '.zip'))) {
-            $this->info(sprintf('Resource pack "%s" does not exist! Try downloading it again.', $name));
+        if (is_null($name) || is_null($resourcePack)) {
+            $this->info(sprintf("No resource pack provided! No resource pack will be applied / existing resource pack will be deleted."));
 
-            return 1;
+            SettingHelper::setSetting('resource_pack_id', 0);
+
+            try {
+                File::deleteDirectory(resource_path('/css/resource-pack'));
+            } catch (\Exception $e) {
+                $this->error(sprintf("Could not delete current resource pack. Message: %s", $e->getMessage()));
+            }
+
+            return CommandAlias::SUCCESS;
         }
 
-        $extractFrom = public_path('storage/resource-packs-downloaded/' . $name . '.zip');
-        $extractTo = public_path('storage/resource-pack-tmp');
+        if (!$resourcePack || !File::exists(resource_path(sprintf("/css/resource-packs-downloaded/%s.zip", $name)))) {
+            $this->fail(sprintf("Resource pack '%s' does not exist! Try downloading it again.", $name));
+        }
+
+        $extractFrom = resource_path(sprintf("/css/resource-packs-downloaded/%s.zip", $name));
+        $extractTo = resource_path('/css/resource-pack-tmp');
 
         // Clean tmp dir
-        File::cleanDirectory(public_path('storage/resource-pack-tmp'));
+        File::cleanDirectory(resource_path('/css/resource-pack-tmp'));
 
-        $unZipper = new Unzip();
-        $filenames = $unZipper->extract($extractFrom, $extractTo);
+        try {
+            $manager = new ZipManager();
+            $manager->addZip((new Zip)->open($extractFrom));
+            $extract = $manager->extract($extractTo, true);
+        } catch (\Exception $e) {
+            $this->fail(sprintf("Could not extract resource pack '%s'. Message: %s", $name, $e->getMessage()));
+        }
 
-        $this->info(sprintf('Applying new textures.'));
+        if ($extract !== true) {
+            $this->fail(sprintf("Could not extract resource pack '%s'.", $name));
+        }
+
+        $this->info(sprintf('Applying new textures...'));
 
         // Remove current icon image in case the new resource pack does not contain any icon image
-        File::delete(public_path('storage/resource-pack/icon.png'));
-
-        // Copy resource pack from parent dir in tmp dir, and extract files one level up
-        File::copyDirectory(
-            public_path('storage/resource-pack-tmp/' . $filenames[0]),
-            public_path('storage/resource-pack')
-        );
-
-        $resourcePack = ResourcePack::whereName($name)->first();
-        SettingHelper::getSetting(['resource_pack_id', $resourcePack->id]);
-
-        // Just display a default image if resource pack has no icon image
-        if (!File::exists(public_path('storage/resource-pack/icon.png'))) {
-            File::copy(public_path('images/background.png'), public_path('storage/resource-pack/icon.png'));
+        try {
+            File::delete(resource_path('/css/resource-pack/icon.png'));
+        } catch (\Exception $e) {
+            $this->error(sprintf("Could not delete current icon image. Message: %s", $e->getMessage()));
         }
 
-        SettingHelper::getSetting(['site_hash', Str::random(20)]);
+        // First file in the resource pack dir is the actual resource pack dir
+        $resourcePackDir = File::allFiles(resource_path('/css/resource-pack-tmp'))[0]->getRelativePath();
+
+        // Copy resource pack from parent dir in tmp dir, and extract files one level up
+        try {
+            File::copyDirectory(
+                resource_path('/css/resource-pack-tmp/' . $resourcePackDir),
+                resource_path('/css/resource-pack')
+            );
+        } catch (\Exception $e) {
+            $this->fail(sprintf("Could not copy resource pack '%s' to resource pack dir. Message: %s", $name, $e->getMessage()));
+        }
+
+        $resourcePack = ResourcePack::whereName($name)->first();
+        SettingHelper::setSetting('resource_pack_id', $resourcePack->id, 'int');
+
+        // Just display a default image if resource pack has no icon image
+        try {
+            if (!File::exists(resource_path('/css/resource-pack/icon.png'))) {
+                File::copy(public_path('/images/background.png'), resource_path('/css/resource-pack/icon.png'));
+            }
+        } catch (\Exception $e) {
+            $this->error(sprintf("Could not copy default icon image. Message: %s", $e->getMessage()));
+        }
+
+        SettingHelper::setSetting('site_hash', Str::random(20));
 
         // Clean tmp dir
-        File::cleanDirectory(public_path('storage/resource-pack-tmp'));
+        try {
+            File::cleanDirectory(resource_path('/css/resource-pack-tmp'));
+        } catch (\Exception $e) {
+            $this->error(sprintf("Could not clean tmp dir. Message: %s", $e->getMessage()));
+        }
 
-        $this->info(sprintf('Finished! Resource pack "%s" is now ready for use.', $resourcePack->alias));
+        $this->info(sprintf("Resource pack '%s' is now ready for use.", $resourcePack->alias));
 
-        return 0;
+        return CommandAlias::SUCCESS;
     }
 }

@@ -2,102 +2,78 @@
 
 namespace App\Http\Controllers;
 
-use App\Account;
-use App\AccountAuthStatus;
-use App\Helpers\Helper;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
+use App\Enums\AccountTypesEnum;
+use App\Http\Resources\AccountResource;
+use App\Models\Account;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AccountController extends Controller
 {
     /**
-     * Show all the application accounts.
+     * Display a listing of the resource.
      *
-     * @return
+     * @return Response
      */
-    public function index()
+    public function index(): Response
     {
-        $accounts = Account::orderByDesc('level')->orderByDesc('xp')->get();
+        $accountTypes = array_values(AccountTypesEnum::returnAllAccountTypes());
 
-        $query = null;
-
-        return view('account.index', compact('accounts', 'query'));
+        return Inertia::render('Accounts/Index', [
+            'accountTypesProp' => $accountTypes,
+        ]);
     }
 
     /**
-     * Show the account creation page.
-     *
-     * @return
+     * Show the form for creating a new resource.
      */
     public function create()
     {
-        if (Auth::check()) {
-            if (AccountAuthStatus::where('user_id', Auth::user()->id)->where('status', '!=', 'success')->first()) {
-                // TODO limit amount of account links setting
-                return redirect(route('account-auth-show'))->withErrors('You already have a pending status! You have to link this Old School RuneScape account to your RuneManager user before you can access this feature.');
-            } else {
-                return view('account.create');
-            }
-        } else {
-            return redirect(route('login'))->withErrors(['You have to log in before linking a Old School RuneScape account!']);
-        }
+        //
     }
 
     /**
-     * Show a specific account and skills data from a URL request.
-     *
-     * @param string $username
-     * @return
+     * Store a newly created resource in storage.
      */
-    public function show(Account $account)
+    public function store(Request $request)
     {
-        $account = $account::with('user')->first();
-
-        return view('account.show', compact('account'));
+        //
     }
 
     /**
-     * Returns search results from query.
+     * Display the specified resource.
      *
-     * @return
+     * @param Account $account
      */
-    public function search()
+    public function show(Account $account): Response
     {
-        request()->validate([
-            'search' => ['nullable', 'string', 'max:13'],
-            'account_type' => ['nullable', Rule::in(Helper::listAccountTypes())],
-            'order_by' => [Rule::in(['level', 'xp', 'rank', 'account_type', 'user_id'])],
-            'order_by_order' => [Rule::in(['asc', 'desc'])],
-            'total_level_between_from' => ['integer'],
-            'total_level_between_to' => ['integer'],
+        return Inertia::render('Accounts/Show', [
+            'accountProp' => (new AccountResource($account->append('skills', 'equipment')))->resolve(),
         ]);
-
-        $query = request('search');
-
-        $accounts = Account::with('user')
-            ->where('username', 'LIKE', '%' . $query . '%')
-            ->when(in_array(request('account_type'),
-                Helper::listAccountTypes()), function ($query, $accountType) {
-                return $query->where('account_type', request('account_type'));
-            })
-            ->whereBetween('level', [request('total_level_between_from'), request('total_level_between_to')])//
-            ->orderBy(request('order_by'), request('order_by_order'))
-            ->get();
-
-        if (count($accounts) === 0) {
-            return redirect(route('account'))->withErrors(['No search results for "' . $query . '"!']);
-        } else {
-            return view('account.index', compact('accounts', 'query'));
-        }
     }
 
     /**
-     * Show the account comparison page
-     *
-     * @return
+     * Show the form for editing the specified resource.
      */
-    public function compare()
+    public function edit(string $id)
     {
-        return view('account.compare');
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
     }
 }

@@ -20,6 +20,8 @@ class CreateResourcePacksTable extends Migration
             $table->string('version');
             $table->string('author');
             $table->string('url');
+            $table->string('tags');
+            $table->boolean('dark_mode')->default(false);
             $table->timestamps();
         });
     }

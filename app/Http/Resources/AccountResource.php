@@ -2,9 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Helpers\Helper;
-use App\Skill;
-use App\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AccountResource extends JsonResource
@@ -12,44 +10,30 @@ class AccountResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
             'user_id' => $this->user_id,
+            'user' => $this->whenLoaded('user', function () {
+                return (new UserResource($this->user))->resolve();
+            }),
+            'icon' => $this->userIcon,
             'account_type' => $this->account_type,
             'username' => $this->username,
-            'rank' => (number_format($this->rank) >= 1 ? number_format($this->rank) : "Unranked"),
+            'rank' => $this->rank,
             'level' => $this->level,
-            'xp' => (number_format($this->xp) >= 1 ? number_format($this->xp) : "Unranked"),
-            'online' => $this->online == 0 ? "Offline" : "Online",
-            'joined' => date_format($this->created_at, "d. M Y"),
-            'user' => new UserResource($this->user),
-        ];
-    }
-
-    public function with($request)
-    {
-        $skillHiscores = [];
-
-        foreach (Skill::get() as $skill) {
-            $skillHiscores[$skill->slug] = $skill->model::firstWhere('account_id', $this->id);
-        }
-
-        $collectionHiscore = [];
-
-        foreach (Collection::get() as $collection) {
-            $collectionHiscore[$collection->slug] = $collection->model::firstWhere('account_id', $this->id);
-        }
-
-        return [
-            'meta' => [
-                'skill_hiscores' => SkillResource::collection(collect($skillHiscores)),
-                'collection_hiscores' => CollectionResource::collection(collect($collectionHiscore)),
-            ]
+            'xp' => $this->xp,
+            'online' => $this->online,
+            'skills' => $this->whenAppended('skills', function () {
+                return $this->skills;
+            }),
+            'equipment' => $this->whenAppended('equipment', function () {
+                return (new EquipmentResource($this->equipment))->resolve();
+            }),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

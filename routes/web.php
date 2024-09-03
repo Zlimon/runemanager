@@ -1,36 +1,58 @@
 <?php
 
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-Route::get('/', 'PageController@index')->name('index');
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
 
-Route::get('/home', 'HomeController@index')->name('home');
-Route::post('/home/{accountUsername}', 'HomeController@forceLogout')->name('account-force-logout');
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 
-Route::get('/news', 'NewsController@index')->name('news');
-Route::get('/news/{id}', 'NewsController@show')->name('news-show');
+    Route::prefix('/accounts')->group(function() {
+        Route::get('/', [\App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
+        Route::get('/{account}', [\App\Http\Controllers\AccountController::class, 'show'])->name('accounts.show');
+    });
 
-Route::get('/hiscore/{hiscoreType}/{hiscoreName}', 'PageController@hiscore')->name('hiscore');
+    Route::prefix('/hiscores')->group(function() {
+        Route::get('/skills/{skill}', [\App\Http\Controllers\SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
+        Route::get('/bosses/{boss}', function() {
+            $boss = $this->router->current()->parameters['boss'];
 
-Route::get('/calendar', 'PageController@calendar')->name('calendar');
+            if (!isset($boss)) {
+                abort(404);
+            }
 
-Route::get('/account', 'AccountController@index')->name('account');
-Route::post('/account', 'AccountController@search')->name('account-search');
-Route::get('/account/create', 'AccountController@create')->name('account-create');
-Route::get('/account/compare', 'AccountController@compare')->name('account-compare');
-Route::get('/account/{account}', 'AccountController@show')->name('account-show');
+            return App::call('\App\Http\Controllers\CollectionHiscoreController@index' , ['category' => 'boss', 'collection' => $boss]);
+        })->name('hiscores.bosses.index');
+        Route::get('/clues/{clue}', function() {
+            $clue = $this->router->current()->parameters['clue'];
 
-Route::get('/group', 'GroupController@index')->name('group');
-Route::post('/group/search', 'GroupController@search')->name('group-search');
-Route::get('/group/create', 'GroupController@create')->name('group-create');
-Route::get('/group/{groupName}/show', 'GroupController@show')->name('group-show');
+            if (!isset($clue)) {
+                abort(404);
+            }
 
-Route::get('/authenticate', 'AccountAuthController@index')->name('account-auth');
-Route::post('/authenticate/create', 'AccountAuthController@create')->name('account-auth-create');
-Route::patch('/authenticate/update', 'AccountAuthController@updateAccountType')->name('account-auth-update');
-Route::delete('/authenticate/delete', 'AccountAuthController@delete')->name('account-auth-delete');
+            return App::call('\App\Http\Controllers\CollectionHiscoreController@index' , ['category' => 'clue', 'collection' => $clue]);
+        })->name('hiscores.clues.index');
+    });
 
-Route::get('/user/edit', 'UserController@edit')->name('user-edit');
-Route::patch('/user/update', 'UserController@update')->name('user-update');
-
-Auth::routes();
+    Route::prefix('/admin')->group(function() {
+        Route::prefix('/hiscores')->group(function() {
+            Route::get('/create', [\App\Http\Controllers\Admin\HiscoreController::class, 'create'])->name('admin.hiscores.create');
+        });
+    });
+});

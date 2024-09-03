@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 
 class CreateImagesTable extends Migration
@@ -22,13 +24,23 @@ class CreateImagesTable extends Migration
             $table->timestamps();
         });
 
+        // TODO refactor to use Storage facade instead
+        if (!File::exists(public_path('storage'))) {
+            Artisan::call('storage:link');
+        }
+
+        if (!File::exists(public_path('storage/newspost'))) {
+            File::makeDirectory(public_path('storage/newspost'));
+        }
+
+        File::copy(public_path('images/newspost_default.png'), public_path('storage/newspost/newspost_default.png'));
+
         DB::table('images')->insert(
             [
-                'id' => 1,
-                'image_file_name' => 'default',
-                'image_file_extension' => 'png',
-                'image_file_type' => 'image/png',
-                'image_file_size' => 2231364
+                'image_file_name' => File::name(public_path('storage/newspost/newspost_default.png')),
+                'image_file_extension' => File::extension(public_path('storage/newspost/newspost_default.png')),
+                'image_file_type' => File::mimeType(public_path('storage/newspost/newspost_default.png')),
+                'image_file_size' => File::size(public_path('storage/newspost/newspost_default.png')),
             ]
         );
     }

@@ -1,0 +1,73 @@
+/*@import url('resource-pack.css');*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    @font-face {
+        font-family: 'runescape';
+        src: url('fonts/runescape/runescape.eot');
+        src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape/runescape.woff') format('woff'),
+        url('fonts/runescape/runescape.ttf') format('truetype'),
+        url('fonts/runescape/runescape.svg#runescape') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'runescape-large';
+        src: url('fonts/runescape-large/runescape-large.eot');
+        src: url('fonts/runescape-large/runescape-large.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape-large/runescape-large.woff') format('woff'),
+        url('fonts/runescape-large/runescape-large.ttf') format('truetype'),
+        url('fonts/runescape-large/runescape-large.svg#runescape') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'runescape-smooth';
+        src: url('fonts/runescape-smooth/runescape-smooth.eot');
+        src: url('fonts/runescape-smooth/runescape-smooth.eot?#iefix') format('embedded-opentype'),
+        url('fonts/runescape-smooth/runescape-smooth.woff') format('woff'),
+        url('fonts/runescape-smooth/runescape-smooth.ttf') format('truetype'),
+        url('fonts/runescape-smooth/runescape-smooth.svg#runescape') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
+}
+
+[x-cloak] {
+    display: none;
+}
+
+h1 {
+    @apply text-2xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl;
+}
+h2 {
+    @apply text-xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-4xl lg:text-5xl;
+}
+h3 {
+    @apply text-lg font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-3xl lg:text-4xl;
+}
+h4 {
+    @apply text-base font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-2xl lg:text-3xl;
+}
+h5 {
+    @apply text-sm font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-xl lg:text-2xl;
+}
+h6 {
+    @apply text-xs font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-lg lg:text-xl;
+}
+
+.card-lg {
+    @apply bg-beige-400 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-6 lg:p-8;
+}
+.card-md {
+    @apply bg-beige-400 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-4 lg:p-6;
+}
+.card-sm {
+    @apply bg-beige-400 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-2 lg:p-4;
+}

@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Account;
-use App\Helpers\Helper;
-use App\Http\Controllers\Api\AccountController;
+use App\Actions\Account\CreateOrUpdateAccount;
+use App\Models\Account;
+use App\Models\User;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class AccountUpdate extends Command
 {
@@ -15,95 +15,101 @@ class AccountUpdate extends Command
      *
      * @var string
      */
-    protected $signature = 'account:update';
+    protected $signature = 'account:update
+                            {--username= : Update only this account}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Fetches up-to-date data (account level, xp and skill) from Old School RuneScape hiscores';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Fetches up-to-date account data from Old School RuneScape hiscores, and creates or updates the account in the database.';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
+     * @throws \Throwable
      */
-    public function handle()
+    public function handle(): int
     {
-        foreach (Account::get() as $account) {
-            if ($account->online !== 0) {
-                $this->info(sprintf("%s is logged in to the game! Not updating", $account->username));
+        $username = $this->option('username');
 
-                continue;
+        $createOrUpdateAccount = new \App\Actions\Account\CreateOrUpdateAccount;
+
+        if ($username) {
+            $account = Account::whereUsername($username)->first();
+
+            if (!$account) {
+                $userName = $this->choice("Choose user to assign account to", User::orderBy('id')->pluck('name')->all());
+
+                if (!$userName) {
+                    $this->error("No user selected.");
+
+                    return CommandAlias::FAILURE;
+                }
+
+                $user = User::whereName($userName)->first();
+
+                $account = $createOrUpdateAccount->createOrUpdateAccount($username, $user);
+
+                try {
+                    $this->info(sprintf("Successfully created account '%s'.", $account->username));
+                } catch (\Exception $e) {
+                    $this->error(sprintf("Could not create account '%s'. Message: %s", $account->username, $e->getMessage()));
+                }
+
+                return CommandAlias::SUCCESS;
             }
 
-            $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
-                    ' ',
-                    '%20',
-                    $account->username
-                );
+            $accounts[] = $account;
+        } else {
+            $account = $this->choice("Choose account", array_merge(Account::orderBy('id')->pluck('username')->all(), ['all']));
 
-            /* Get the $playerDataUrl file content. */
-            $playerData = Helper::getPlayerData($playerDataUrl);
-
-            if (!$playerData) {
-                $this->info(
-                    sprintf("Could not fetch player data for %s from hiscores! Not updating", $account->username)
-                );
-
-                continue;
+            if ($account == 'all') {
+                $accounts = Account::all();
+            } else {
+                $accounts[] = Account::whereUsername($account)->first();
             }
-
-            if ($account->xp == $playerData[0][2] && $account->xp != 4600000000) {
-                $this->info(sprintf("No outdated data for %s! Not updating", $account->username));
-
-                continue;
-            }
-
-            $this->info(sprintf("Found outdated data for %s!", $account->username));
-
-            DB::beginTransaction();
-
-            $account->rank = $playerData[0][0];
-            $account->level = $playerData[0][1];
-            $account->xp = $playerData[0][2];
-
-            try {
-                $account->update();
-            } catch (\Exception $e) {
-                DB::rollback();
-                throw $e;
-            }
-
-            try {
-                $accountController = new AccountController();
-
-                $accountController->createOrUpdateAccountHiscores(
-                    $account,
-                    $playerData,
-                    true
-                );
-            } catch (\Exception $e) {
-                DB::rollback();
-                throw $e;
-            }
-
-            $this->info(sprintf("Updated %s", $account->username));
-
-            DB::commit();
         }
 
-        return 0;
+//        if (!is_null($username)) {
+//            $account = Account::whereUsername($username)->first();
+//
+//            if (!$account) {
+//                // TODO this will cause trouble if two or more accounts has the "same" name, but differentiate them using _ or -
+//                // TLDR Command argument needs to support spaces
+//                $username = str_replace(['_', '-'], ' ', $username);
+//                $account = Account::whereUsername($username)->first();
+//
+//                if (!$account) {
+//                    $this->info(sprintf('Could not find any existing account with username "%s".', $username));
+//
+//                    return 1;
+//                }
+//            }
+//
+//            $accounts[] = $account;
+//        } else {
+//            $accounts = Account::all();
+//        }
+
+        foreach ($accounts as $account) {
+            if ($account->online !== 0) {
+                $this->warn(sprintf("'%s' is logged in to the game! Not updating.", $account->username));
+
+                continue;
+            }
+
+            try {
+                $createOrUpdateAccount->createOrUpdateAccount($account->username, $account->user()->first(), $account->account_type);
+
+                $this->info(sprintf("Successfully updated account '%s'.", $account->username));
+            } catch (\Exception $e) {
+                $this->warn(sprintf("Could not update account '%s'. Message: %s", $account->username, $e->getMessage()));
+
+                continue;
+            }
+        }
+
+        return CommandAlias::SUCCESS;
     }
 }
