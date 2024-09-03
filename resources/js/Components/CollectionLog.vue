@@ -47,13 +47,14 @@ function handleImageError() {
                     data-tabs-toggle="#default-tab-content"
                     role="tablist">
                     <li v-for="(bosses, tab) in collectionLog.collectionLog.tabs" role="presentation">
-                        <button class="inline-block rounded-t-lg p-4 text-black active bg-beige-300 border-t border-b border-b-beige-300 border-x border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
-                                :id="`${tab}-tab`"
-                                :data-tabs-target="`#${tab}`"
-                                type="button"
-                                role="tab"
-                                :aria-controls="tab"
-                                aria-selected="false">
+                        <button
+                            class="inline-block rounded-t-lg p-4 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
+                            :id="`${tab}-tab`"
+                            :data-tabs-target="`#${tab}`"
+                            type="button"
+                            role="tab"
+                            :aria-controls="tab"
+                            aria-selected="false">
                             {{ tab }}
                         </button>
                     </li>
@@ -62,7 +63,7 @@ function handleImageError() {
 
             <div id="default-tab-content">
                 <div v-for="(bosses, tab) in collectionLog.collectionLog.tabs"
-                     class="hidden rounded-b-lg rounded-r-lg bg-beige-300 border border-beige-700 dark:bg-gray-800"
+                     class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
                      :id="tab"
                      role="tabpanel"
                      :aria-labelledby="`${tab}-tab`">
@@ -72,25 +73,28 @@ function handleImageError() {
                             data-tabs-toggle="#default-sub-tab-content"
                             role="tablist">
                             <li v-for="(row, collection) in collectionLog.collectionLog.tabs[tab]" role="presentation">
-                                <button class="inline-block w-full border-b-2 p-4 text-left active hover:bg-beige-300 hover:text-black dark:border-gray-700 dark:text-gray-500 dark:hover:bg-gray-800"
-                                        :class="{
-                                            'text-green-500': row.obtained === row.total,
-                                            'text-red-500': row.obtained === 0,
-                                            'text-yellow-500': row.obtained >= 1 && row.obtained !== row.total
-                                        }"
-                                        :id="`${collection}-tab`"
-                                        :data-tabs-target="`#${collection}`"
-                                        type="button"
-                                        role="tab"
-                                        :aria-controls="`${collection}`"
-                                        aria-selected="false">
+                                <button
+                                    class="inline-block w-full !text-black !border-b-2 !border-beige-700 p-4 text-left active hover:bg-beige-300 hover:text-black dark:border-gray-700 dark:text-gray-500 dark:hover:bg-gray-800"
+                                    :id="`${collection}-tab`"
+                                    :data-tabs-target="`#${collection}`"
+                                    type="button"
+                                    role="tab"
+                                    :aria-controls="`${collection}`"
+                                    aria-selected="false">
                                     {{ row.name }}
+                                    <span :class="{
+                                        'text-green-500': row.obtained === row.total,
+                                        'text-red-500': row.obtained === 0,
+                                        'text-yellow-500': row.obtained >= 1 && row.obtained !== row.total
+                                    }">
+                                        {{ row.obtained }} <span class="text-black">/</span> {{ row.total }}
+                                    </span>
                                 </button>
                             </li>
                         </ul>
                         <div class="overflow-y-scroll" id="default-sub-tab-content">
                             <div v-for="(row, collection) in collectionLog.collectionLog.tabs[tab]"
-                                 class="hidden rounded-lg bg-gray-50 p-4 dark:bg-gray-800"
+                                 class="hidden p-4"
                                  :id="collection"
                                  role="tabpanel"
                                  :aria-labelledby="`${collection}-tab`">
@@ -102,7 +106,7 @@ function handleImageError() {
                                         'text-red-500': row.obtained === 0,
                                         'text-yellow-500': row.obtained >= 1 && row.obtained !== row.total
                                     }">
-                                        {{ row.obtained }} / {{ row.total }}
+                                        {{ row.obtained }} <span class="text-black">/</span> {{ row.total }}
                                     </span>
                                 </p>
                                 <div v-for="killCount in row.killCount">
@@ -111,12 +115,12 @@ function handleImageError() {
                                     </p>
                                 </div>
 
-                                <ul class="grid grid-cols-5 gap-4 mt-4">
+                                <ul class="mt-4 grid grid-cols-5 gap-4">
                                     <li v-for="item in row.items" class="flex items-center justify-between">
                                         <button :data-tooltip-target="`${collection}-${item.id}-tooltip-bottom`"
                                                 data-tooltip-placement="bottom"
                                                 type="button"
-                                                class="relative h-20 w-20 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                                                class="relative h-20 w-20 rounded-lg border p-4 border-beige-700 dark:border-gray-700">
                                             <span v-if="item.quantity > 0"
                                                   class="absolute top-0 left-0 p-1 text-sm">{{ item.quantity }}</span>
                                             <img v-if="item.icon"
@@ -133,7 +137,8 @@ function handleImageError() {
                                              class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
                                             <p>{{ item.name }}</p>
                                             <p>{{ item.examine }}</p>
-                                            <p v-if="item.obtainedAt !== null">{{ dayjs(item.obtainedAt).format('MMM D, YYYY h:mm A') }}</p>
+                                            <p v-if="item.obtainedAt !== null">
+                                                {{ dayjs(item.obtainedAt).format('MMM D, YYYY h:mm A') }}</p>
                                             <div class="tooltip-arrow" data-popper-arrow></div>
                                         </div>
                                     </li>
