@@ -104,6 +104,13 @@ onMounted(() => {
                                 </ResponsiveNavLink>
                             </li>
                             <li>
+                                <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
+                                                   :href="route('api-tokens.index')"
+                                                   :active="route().current('api-tokens.index')">
+                                    API Tokens
+                                </ResponsiveNavLink>
+                            </li>
+                            <li>
                                 <form method="POST" @submit.prevent="logout">
                                     <ResponsiveNavLink as="button">
                                         Log out
