@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use App\Rules\AccountUsernameRule;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -130,10 +131,38 @@ class AccountController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param Request $request
+     * @param Account $account
+     * @return JsonResponse
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Account $account): JsonResponse
     {
-        //
+        try {
+            $compressedData = base64_decode($request['message']);
+
+            $decompressedData = gzdecode($compressedData);
+
+            if ($decompressedData === false) {
+                throw new Exception("Failed to decompress data");
+            }
+
+            $data = json_decode($decompressedData);
+
+            if (isset($data->equipment)) {
+                $equipmentController = new EquipmentController();
+
+                return $equipmentController->update($data->equipment, $account);
+            }
+
+            return response()->json([
+                'data' => $account,
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while updating the account. Message: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
