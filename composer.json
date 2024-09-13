@@ -8,6 +8,7 @@
         "php": "^8.3",
         "ext-curl": "*",
         "ext-intl": "*",
+        "andreaselia/laravel-api-to-postman": "^2.0",
         "inertiajs/inertia-laravel": "^1.0",
         "laracasts/generators": "dev-laravel-11",
         "laravel/framework": "^11.9",
@@ -18,7 +19,8 @@
         "opcodesio/log-viewer": "^3.10",
         "symfony/dom-crawler": "^7.1",
         "tightenco/ziggy": "^2.0",
-        "zanysoft/laravel-zip": "dev-laravel-11"
+        "zanysoft/laravel-zip": "dev-laravel-11",
+        "ext-zlib": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",
