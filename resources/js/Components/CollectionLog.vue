@@ -18,7 +18,7 @@ let collectionLog = ref([]);
 const getCollectionLog = () => {
     collectionLogLoading.value = true;
 
-    axios.post(route('api.collectionlog.collectionlog.user'), {
+    axios.post(route('api.collectionlog.user'), {
         username: account.value.username,
         tabs: ['Bosses', 'Raids', 'Clues'],
     }).then((response) => {
