@@ -91,6 +91,10 @@ class Account extends Model
         return $this->hasOne($collection->model);
     }
 
+    public function bank() {
+        return $this->hasOne(Bank::class);
+    }
+
     public function equipment(): HasOne
     {
         return $this->hasOne(Equipment::class);
@@ -104,9 +108,6 @@ class Account extends Model
 //        return $this->hasManyThrough(Broadcast::class, Log::class);
 //    }
 //
-//    public function bank() {
-//        return $this->hasOne(Bank::class);
-//    }
 //
 //    public function quest() {
 //        return $this->hasOne(Quest::class);

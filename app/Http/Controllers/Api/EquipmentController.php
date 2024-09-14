@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EquipmentResource;
 use App\Models\Account;
-use App\Models\Equipment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
