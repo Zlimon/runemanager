@@ -19,7 +19,7 @@ class EquipmentResource extends JsonResource
             'id' => $this->id,
             'account_id' => $this->account_id,
             'head' => $this->head,
-            'head_item' => Item::find((string) $this->head),
+            'head_item' => Item::find((string) $this->head), // Item::where('id', (string) $this->head)->value('name'),
             'cape' => $this->cape,
             'cape_item' => Item::find((string) $this->cape),
             'neck' => $this->neck,

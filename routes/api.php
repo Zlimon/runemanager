@@ -10,6 +10,15 @@ Route::middleware([
     Route::prefix('/accounts')->group(function() {
         Route::post('/search', [App\Http\Controllers\Api\AccountController::class, 'search'])->name('api.accounts.search');
         Route::put('/{account}/update', [App\Http\Controllers\Api\AccountController::class, 'update'])->name('api.accounts.update');
+
+        Route::prefix('/{account}')->group(function() {
+//            Route::get('/hiscores', [App\Http\Controllers\Api\AccountController::class, 'hiscores'])->name('api.accounts.hiscores');
+//            Route::get('/collectionlog', [App\Http\Controllers\Api\AccountController::class, 'collectionlog'])->name('api.accounts.collectionlog');
+            Route::prefix('/equipment')->group(function() {
+                Route::get('/', [App\Http\Controllers\Api\EquipmentController::class, 'show'])->name('api.accounts.equipment.show');
+                Route::put('/update', [App\Http\Controllers\Api\EquipmentController::class, 'update'])->name('api.accounts.equipment.update');
+            });
+        });
     });
 
     Route::post('/npc/search', [App\Http\Controllers\Api\NpcController::class, 'search'])->name('api.npc.search');
