@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BankResource;
 use App\Models\Account;
 use App\Models\Bank;
 use Illuminate\Http\JsonResponse;
@@ -36,10 +37,15 @@ class BankController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @param Account $account
+     * @return JsonResponse
      */
-    public function show(string $id)
+    public function show(Account $account): JsonResponse
     {
-        //
+        return response()->json([
+            'bank' => (new BankResource(Bank::where('account_id', $account->id)->first()))->resolve(),
+        ], 200);
     }
 
     /**
@@ -60,10 +66,10 @@ class BankController extends Controller
 public function update(Request $request, Account $account): JsonResponse
 {
     $request->validate([
-        'bank' => 'required|array',
-        'bank.*' => 'required|array',
-        'bank.*.*' => 'required|array',
-        'bank.*.*.*' => 'required|integer',
+        'bank' => ['required', 'array', 'max:10'], // tabs
+        'bank.*' => ['required', 'array'], // items in tabs
+        'bank.*.*' => ['required', 'array', 'size:2'], // itemId and quantity
+        'bank.*.*.*' => ['required', 'integer'],
     ]);
 
     // This does not work for MongoDB
