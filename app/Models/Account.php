@@ -91,6 +91,11 @@ class Account extends Model
         return $this->hasOne($collection->model);
     }
 
+    public function inventory(): HasOne
+    {
+        return $this->hasOne(Inventory::class);
+    }
+
     public function bank(): HasOne
     {
         return $this->hasOne(Bank::class);

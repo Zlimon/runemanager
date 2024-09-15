@@ -15,6 +15,11 @@ Route::middleware([
 //            Route::get('/hiscores', [App\Http\Controllers\Api\AccountController::class, 'hiscores'])->name('api.accounts.hiscores');
 //            Route::get('/collectionlog', [App\Http\Controllers\Api\AccountController::class, 'collectionlog'])->name('api.accounts.collectionlog');
 
+            Route::prefix('/inventory')->group(function() {
+                Route::get('/', [App\Http\Controllers\Api\InventoryController::class, 'show'])->name('api.accounts.inventory.show');
+                Route::put('/update', [App\Http\Controllers\Api\InventoryController::class, 'update'])->name('api.accounts.inventory.update');
+            });
+
             Route::prefix('/bank')->group(function() {
                 Route::get('/', [App\Http\Controllers\Api\BankController::class, 'show'])->name('api.accounts.bank.show');
                 Route::put('/update', [App\Http\Controllers\Api\BankController::class, 'update'])->name('api.accounts.bank.update');
