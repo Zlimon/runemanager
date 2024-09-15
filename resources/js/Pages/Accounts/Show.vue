@@ -356,87 +356,91 @@ onMounted(() => {
                         </div>
 
                         <div class="col-span-2">
-                            <h3 class="header-chatbox-sword">
-                                Skills
-                            </h3>
+                            <div class="mx-auto mt-6 grid grid-cols-3 gap-2">
+                                <div class="col-span-2">
+                                    <h3 class="header-chatbox-sword">
+                                        Skills
+                                    </h3>
 
-                            <div class="mx-auto mt-6">
-                                <ul class="grid grid-cols-8 gap-1">
-                                    <li>
-                                        <Link :href="route('accounts.index')"
-                                              data-tooltip-target="total-tooltip-bottom"
-                                              data-tooltip-placement="bottom"
-                                              type="button"
-                                              class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
-                                            <img src="/images/skill/total.webp"
-                                                 class="h-6 w-6 object-contain"/>
-                                            <span class="text-xs font-semibold capitalize">
-                                                {{ account.level }}
-                                            </span>
-                                        </Link>
+                                    <ul class="mt-4 grid grid-cols-6 gap-1">
+                                        <li>
+                                            <Link :href="route('accounts.index')"
+                                                  data-tooltip-target="total-tooltip-bottom"
+                                                  data-tooltip-placement="bottom"
+                                                  type="button"
+                                                  class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
+                                                <img src="/images/skill/total.webp"
+                                                     class="h-6 w-6 object-contain"/>
+                                                <span class="text-xs font-semibold capitalize">
+                                                    {{ account.level }}
+                                                </span>
+                                            </Link>
 
-                                        <div id="total-tooltip-bottom"
-                                             role="tooltip"
-                                             class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
-                                            <p>
-                                                Total level
-                                            </p>
-                                            <p>
-                                                {{ account.xp.toLocaleString('en-US') }}
-                                            </p>
-                                            <div class="tooltip-arrow" data-popper-arrow></div>
-                                        </div>
-                                    </li>
-                                    <li v-for="skill in account.skills" :key="skill.name">
-                                        <Link :href="route('hiscores.skills.index', skill.slug)"
-                                              :data-tooltip-target="`${skill.slug}-tooltip-bottom`"
-                                              data-tooltip-placement="bottom"
-                                              type="button"
-                                              class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
-                                            <img :src="`/images/skill/${skill.slug}.webp`"
-                                                 class="h-6 w-6 object-contain"/>
-                                            <span class="text-xs font-semibold capitalize">
-                                                {{ skill.level }}
-                                            </span>
-                                        </Link>
+                                            <div id="total-tooltip-bottom"
+                                                 role="tooltip"
+                                                 class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
+                                                <p>
+                                                    Total level
+                                                </p>
+                                                <p>
+                                                    {{ account.xp.toLocaleString('en-US') }}
+                                                </p>
+                                                <div class="tooltip-arrow" data-popper-arrow></div>
+                                            </div>
+                                        </li>
+                                        <li v-for="skill in account.skills" :key="skill.name">
+                                            <Link :href="route('hiscores.skills.index', skill.slug)"
+                                                  :data-tooltip-target="`${skill.slug}-tooltip-bottom`"
+                                                  data-tooltip-placement="bottom"
+                                                  type="button"
+                                                  class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
+                                                <img :src="`/images/skill/${skill.slug}.webp`"
+                                                     class="h-6 w-6 object-contain"/>
+                                                <span class="text-xs font-semibold capitalize">
+                                                    {{ skill.level }}
+                                                </span>
+                                            </Link>
 
-                                        <div :id="`${skill.slug}-tooltip-bottom`"
-                                             role="tooltip"
-                                             class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
-                                            <p>
-                                                {{ skill.name }}
-                                            </p>
-                                            <p>
-                                                {{ skill.xp.toLocaleString('en-US') }}
-                                            </p>
-                                            <div class="tooltip-arrow" data-popper-arrow></div>
-                                        </div>
-                                    </li>
-                                </ul>
+                                            <div :id="`${skill.slug}-tooltip-bottom`"
+                                                 role="tooltip"
+                                                 class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
+                                                <p>
+                                                    {{ skill.name }}
+                                                </p>
+                                                <p>
+                                                    {{ skill.xp.toLocaleString('en-US') }}
+                                                </p>
+                                                <div class="tooltip-arrow" data-popper-arrow></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="col-span-1">
+                                    <h3 class="header-chatbox-sword">
+                                        Quests
+                                    </h3>
+
+                                    <div class="mt-4 rounded-lg border p-2 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
+                                        <Quests :accountProp="account" />
+                                    </div>
+                                </div>
                             </div>
 
-                            <h3 class="mt-6 header-chatbox-sword">
+                            <h3 class="mt-4 header-chatbox-sword">
                                 Collection Log
                             </h3>
 
-                            <div class="mt-6">
+                            <div class="mt-4">
                                 <CollectionLog :accountProp="account"/>
                             </div>
 
-                            <h3 class="mt-6 header-chatbox-sword">
+                            <h3 class="mt-4 header-chatbox-sword">
                                 Bank
                             </h3>
 
-                            <div class="mt-6">
+                            <div class="mt-4">
                                 <Bank :accountProp="account"/>
-                            </div>
-
-                            <h3 class="mt-6 header-chatbox-sword">
-                                Quests
-                            </h3>
-
-                            <div class="mt-6">
-                                <Quests :accountProp="account"/>
                             </div>
                         </div>
                     </div>
