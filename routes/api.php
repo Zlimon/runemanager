@@ -24,6 +24,11 @@ Route::middleware([
                 Route::get('/', [App\Http\Controllers\Api\EquipmentController::class, 'show'])->name('api.accounts.equipment.show');
                 Route::put('/update', [App\Http\Controllers\Api\EquipmentController::class, 'update'])->name('api.accounts.equipment.update');
             });
+
+            Route::prefix('/quests')->group(function() {
+                Route::get('/', [App\Http\Controllers\Api\QuestController::class, 'show'])->name('api.accounts.quests.show');
+                Route::put('/update', [App\Http\Controllers\Api\QuestController::class, 'update'])->name('api.accounts.quests.update');
+            });
         });
     });
 

@@ -9,12 +9,12 @@ const props = defineProps({
 let account = ref(props.accountProp);
 
 onMounted(() => {
-    getCollectionLog();
+    getBank();
 });
 
 let bankLoading = ref(true);
 let bank = ref([]);
-const getCollectionLog = () => {
+const getBank = () => {
     bankLoading.value = true;
 
     axios.get(route('api.accounts.bank.show', account.value))

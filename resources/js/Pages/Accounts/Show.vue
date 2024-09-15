@@ -14,6 +14,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import dayjs from "dayjs";
 import InputError from "@/Components/InputError.vue";
 import Bank from "@/Components/RuneManager/Bank.vue";
+import Quests from "@/Components/RuneManager/Quests.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -428,6 +429,14 @@ onMounted(() => {
 
                             <div class="mt-6">
                                 <Bank :accountProp="account"/>
+                            </div>
+
+                            <h3 class="mt-6 header-chatbox-sword">
+                                Quests
+                            </h3>
+
+                            <div class="mt-6">
+                                <Quests :accountProp="account"/>
                             </div>
                         </div>
                     </div>
