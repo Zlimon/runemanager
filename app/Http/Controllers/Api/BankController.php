@@ -63,37 +63,37 @@ class BankController extends Controller
      * @param Account $account
      * @return JsonResponse
      */
-public function update(Request $request, Account $account): JsonResponse
-{
-    $request->validate([
-        'bank' => ['required', 'array', 'max:10'], // tabs
-        'bank.*' => ['required', 'array'], // items in tabs
-        'bank.*.*' => ['required', 'array', 'size:2'], // itemId and quantity
-        'bank.*.*.*' => ['required', 'integer'],
-    ]);
+    public function update(Request $request, Account $account): JsonResponse
+    {
+        $request->validate([
+            'bank' => ['required', 'array', 'max:10'], // tabs
+            'bank.*' => ['required', 'array'], // items in tabs
+            'bank.*.*' => ['required', 'array', 'size:2'], // itemId and quantity
+            'bank.*.*.*' => ['required', 'integer'],
+        ]);
 
-    // This does not work for MongoDB
-//    $account->bank()->updateOrCreate([
-//        'account_id' => $account->id
-//    ], [
-//        'bank' => $request->input('bank')
-//    ]);
+        // This does not work for MongoDB
+    //    $account->bank()->updateOrCreate([
+    //        'account_id' => $account->id
+    //    ], [
+    //        'bank' => $request->input('bank')
+    //    ]);
 
-    $bank = Bank::where('account_id', $account->id)->first();
+        $bank = Bank::where('account_id', $account->id)->first();
 
-    if (!$bank) {
-        $bank = new Bank();
-        $bank->account_id = $account->id;
+        if (!$bank) {
+            $bank = new Bank();
+            $bank->account_id = $account->id;
+        }
+
+        $bank->bank = $request['bank'];
+
+        $bank->save();
+
+        return response()->json([
+            'data' => $account->bank,
+        ]);
     }
-
-    $bank->bank = $request['bank'];
-
-    $bank->save();
-
-    return response()->json([
-        'data' => $account->bank,
-    ]);
-}
 
 
     /**
