@@ -66,7 +66,7 @@ class InventoryController extends Controller
     public function update(Request $request, Account $account): JsonResponse
     {
         $request->validate([
-            'inventory' => ['required', 'array'],
+            'inventory' => ['required', 'array', 'max:28'],
             'inventory.*' => ['required', 'array'],
             'inventory.*.0' => ['required', 'integer'],
             'inventory.*.1' => ['required', 'integer'],
