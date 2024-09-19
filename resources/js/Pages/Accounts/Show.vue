@@ -356,12 +356,50 @@ onMounted(() => {
                                 </div>
                             </div>
 
-                            <div class="mt-4 rounded-lg border p-2 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800 max-w-[24rem]">
-                                <Inventory :accountProp="account"/>
-                            </div>
+                            <ul class="-mb-px flex flex-wrap gap-2 text-center text-sm font-medium mt-4"
+                                id="default-tab"
+                                data-tabs-toggle="#default-tab-content"
+                                role="tablist">
+                                <li role="presentation">
+                                    <button class="inline-block rounded-t-lg p-2 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
+                                            id="inventory-tab"
+                                            data-tabs-target="#inventory"
+                                            type="button"
+                                            role="tab"
+                                            aria-controls="inventory"
+                                            aria-selected="false">
+                                            Inventory
+                                    </button>
+                                </li>
+                                <li role="presentation">
+                                    <button class="inline-block rounded-t-lg p-2 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
+                                            id="looting-bag-tab"
+                                            data-tabs-target="#looting-bag"
+                                            type="button"
+                                            role="tab"
+                                            aria-controls="looting-bag"
+                                            aria-selected="false">
+                                        Looting bag
+                                    </button>
+                                </li>
+                            </ul>
 
-                            <div class="mt-4 rounded-lg border p-2 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800 max-w-[24rem]">
-                                <LootingBag :accountProp="account"/>
+                            <div id="default-tab-content">
+                                <div class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
+                                     id="inventory"
+                                     role="tabpanel"
+                                     aria-labelledby="inventory-tab">
+
+                                    <Inventory :accountProp="account"/>
+                                </div>
+
+                                <div class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
+                                     id="looting-bag"
+                                     role="tabpanel"
+                                     aria-labelledby="looting-bag-tab">
+
+                                    <LootingBag :accountProp="account"/>
+                                </div>
                             </div>
                         </div>
 
