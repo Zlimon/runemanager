@@ -67,7 +67,7 @@ class InventoryController extends Controller
     {
         $request->validate([
             'inventory' => ['required', 'array', 'max:28'],
-            'inventory.*' => ['required', 'array'],
+            'inventory.*' => ['required', 'array', 'max:2'],
             'inventory.*.0' => ['required', 'integer'],
             'inventory.*.1' => ['required', 'integer'],
         ]);

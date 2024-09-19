@@ -63,7 +63,7 @@ class LootingBagController extends Controller
     {
         $request->validate([
             'looting_bag' => ['required', 'array', 'max:28'],
-            'looting_bag.*' => ['required', 'array'],
+            'looting_bag.*' => ['required', 'array', 'max:2'],
             'looting_bag.*.0' => ['required', 'integer'],
             'looting_bag.*.1' => ['required', 'integer'],
         ]);
