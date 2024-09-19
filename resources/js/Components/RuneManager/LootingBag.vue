@@ -19,7 +19,6 @@ const getLootingBag = () => {
 
     axios.get(route('api.accounts.looting-bag.show', account.value))
     .then((response) => {
-        console.log(response.data.looting_bag);
         lootingBag.value = response.data.looting_bag;
     }).catch(error => {
         console.error(error)
