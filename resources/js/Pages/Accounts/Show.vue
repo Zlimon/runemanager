@@ -16,6 +16,7 @@ import InputError from "@/Components/InputError.vue";
 import Bank from "@/Components/RuneManager/Bank.vue";
 import Quests from "@/Components/RuneManager/Quests.vue";
 import Inventory from "@/Components/RuneManager/Inventory.vue";
+import LootingBag from "@/Components/RuneManager/LootingBag.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -357,6 +358,10 @@ onMounted(() => {
 
                             <div class="mt-4 rounded-lg border p-2 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800 max-w-[24rem]">
                                 <Inventory :accountProp="account"/>
+                            </div>
+
+                            <div class="mt-4 rounded-lg border p-2 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800 max-w-[24rem]">
+                                <LootingBag :accountProp="account"/>
                             </div>
                         </div>
 

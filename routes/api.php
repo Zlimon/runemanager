@@ -20,6 +20,12 @@ Route::middleware([
                 Route::put('/update', [App\Http\Controllers\Api\InventoryController::class, 'update'])->name('api.accounts.inventory.update');
             });
 
+            Route::prefix('/looting-bag')->group(function() {
+                Route::get('/', [App\Http\Controllers\Api\LootingBagController::class, 'show'])->name('api.accounts.looting-bag.show');
+                Route::put('/update', [App\Http\Controllers\Api\LootingBagController::class, 'update'])->name('api.accounts.looting-bag.update');
+            });
+
+
             Route::prefix('/bank')->group(function() {
                 Route::get('/', [App\Http\Controllers\Api\BankController::class, 'show'])->name('api.accounts.bank.show');
                 Route::put('/update', [App\Http\Controllers\Api\BankController::class, 'update'])->name('api.accounts.bank.update');
