@@ -421,11 +421,27 @@ let selectedHiscore = ref('skill');
                         <div class="col-span-2">
                             <div class="mx-auto mt-6 grid grid-cols-3 gap-2">
                                 <div class="col-span-2">
-                                    <h3 class="header-chatbox-sword">
-                                        Skills
-                                    </h3>
+                                    <div class="flex justify-between header-chatbox-sword">
+                                        <h3>Skills</h3>
 
-                                    <ul class="mt-4 grid grid-cols-6 gap-1">
+                                        <div class="flex space-x-2">
+                                            <div @click="selectedHiscore = 'skill'"
+                                                 :class="{ 'bg-beige-300': selectedHiscore === 'skill', 'bg-beige-200': selectedHiscore !== 'skill' }"
+                                                 class="flex items-center justify-center gap-2 rounded-lg border p-2 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
+                                                <img src="/images/skill/total.webp"
+                                                     class="h-6 w-6 object-contain"/>
+                                            </div>
+
+                                            <div @click="selectedHiscore = 'boss'"
+                                                 :class="{ 'bg-beige-300': selectedHiscore === 'boss', 'bg-beige-200': selectedHiscore !== 'boss' }"
+                                                 class="flex items-center justify-center gap-2 rounded-lg border p-2 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
+                                                <img src="/images/boss/boss.png"
+                                                     class="h-6 w-6 object-contain"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <ul v-if="selectedHiscore === 'skill'" class="mt-4 grid grid-cols-6 gap-1">
                                         <li>
                                             <Link :href="route('accounts.index')"
                                                   data-tooltip-target="total-tooltip-bottom"
@@ -472,6 +488,34 @@ let selectedHiscore = ref('skill');
                                                 </p>
                                                 <p>
                                                     {{ skill.xp.toLocaleString('en-US') }}
+                                                </p>
+                                                <div class="tooltip-arrow" data-popper-arrow></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+
+                                    <ul v-else-if="selectedHiscore === 'boss'" class="mt-4 grid grid-cols-6 gap-1">
+                                        <li v-for="boss in account.bosses" :key="boss.name">
+                                            <Link :href="route('hiscores.bosses.index', boss.slug)"
+                                                  :data-tooltip-target="`${boss.slug}-tooltip-bottom`"
+                                                  data-tooltip-placement="bottom"
+                                                  type="button"
+                                                  class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800">
+                                                <img :src="`/images/boss/${boss.slug}.png`"
+                                                     class="h-6 w-6 object-contain"/>
+                                                <span class="text-xs font-semibold capitalize">
+                                                    {{ boss.kills.toLocaleString('en-US') }}
+                                                </span>
+                                            </Link>
+
+                                            <div :id="`${boss.slug}-tooltip-bottom`"
+                                                 role="tooltip"
+                                                 class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
+                                                <p>
+                                                    {{ boss.name }}
+                                                </p>
+                                                <p>
+                                                    {{ boss.kills.toLocaleString('en-US') }}
                                                 </p>
                                                 <div class="tooltip-arrow" data-popper-arrow></div>
                                             </div>
