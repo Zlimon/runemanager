@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AccountTypesEnum;
+use App\Http\Resources\CollectionResource;
 use App\Http\Resources\SkillResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -78,6 +79,21 @@ class Account extends Model
             $skills['slug'] = $skill['slug'];
 
             return $skills;
+        });
+    }
+
+    public function getBossesAttribute()
+    {
+        return Collection::byCategorySlug('boss')->get()->map(function ($boss) {
+            if ($boss !== null) {
+                try {
+                    $collection = (new CollectionResource($this->collection($boss)->first()))->resolve();
+                } catch (\Exception $e) {
+                    return [];
+                }
+
+                return $collection;
+            }
         });
     }
 
