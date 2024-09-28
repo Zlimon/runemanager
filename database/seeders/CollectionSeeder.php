@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Clients\CollectionLogClient;
 use App\Helpers\HiscoreHelper;
 use App\Models\Category;
+use App\Models\Collection;
 use App\Models\Item;
 use App\Traits\CollectionTrait;
 use Exception;
@@ -17,6 +18,7 @@ class CollectionSeeder extends Seeder
 
     /**
      * Run the database seeds.
+     * @throws Exception
      */
 //    public function run(): void
 //    {
@@ -74,6 +76,8 @@ class CollectionSeeder extends Seeder
         }
 
         $hiscoreEntries = HiscoreHelper::all();
+        $masterCollections = [];
+        $slaveCollectionCategories = [];
         $storeItems = false;
         foreach ($result['collectionLog']['tabs'] as $category => $hiscores) {
             // collectionLogTab is the collection name on collectionlog.net
@@ -95,6 +99,17 @@ class CollectionSeeder extends Seeder
             }
 
             foreach ($hiscores as $name => $hiscore) {
+                // If collection log entry matches a hiscore entry that means it is most likely a slave collection, and we need to link the slave collections to the master collection
+                try {
+                    if (isset($hiscoreEntries[$category->slug][Str::slug($name)])) {
+                        $slaveCollectionCategories[$category->slug][] = Str::slug($hiscoreEntries[$category->slug][Str::slug($name)]);
+                    }
+                } catch (Exception $e) {
+                    $this->command->warn($e->getMessage());
+
+                    continue;
+                }
+
                 // Unset entries already fetched from collectionlog.net as we only want to create hiscore entries unique to OSRS hiscores
                 unset($hiscoreEntries[$category->slug][Str::slug($name)]);
 
@@ -126,6 +141,33 @@ class CollectionSeeder extends Seeder
                     $this->command->warn($e->getMessage());
 
                     continue;
+                }
+            }
+        }
+
+        // Create slave collections
+        foreach ($slaveCollectionCategories as $category => $slaveCollections) {
+            foreach ($slaveCollections as $slaveCollection) {
+                // Find the slave collection slug within the master collections slug
+                foreach ($masterCollections as $masterCollection) {
+                    if (Str::contains($masterCollection->slug, $slaveCollection)) {
+                        $category = Category::whereSlug($category)->first();
+                        $newestCollection = Collection::byCategorySlug($category)->orderByDesc('order')->pluck('order')->first();
+
+                        if ($newestCollection) {
+                            $order = ++$newestCollection;
+                        } else {
+                            $order = $category->id * 1000;
+                        }
+
+                        $masterCollection->slaveCollections()->create([
+                            'category_id' => $masterCollection->category_id,
+                            'order' => $order,
+                            'name' => $masterCollection->name,
+                            'slug' => $slaveCollection,
+                            'model' => $masterCollection->model,
+                        ]);
+                    }
                 }
             }
         }
