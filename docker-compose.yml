@@ -21,7 +21,6 @@ services:
             - '.:/var/www/html'
         networks:
             - sail
-            - osrsbox
         depends_on:
             - mysql
     mysql:
@@ -51,8 +50,6 @@ services:
 networks:
     sail:
         driver: bridge
-    osrsbox:
-        external: true
 volumes:
     sail-mysql:
         driver: local
