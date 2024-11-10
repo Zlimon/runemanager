@@ -72,14 +72,16 @@ const searchAccounts = (load = true) => {
     searchAccountForm.per_page = 16;
 
     axios.post(route('api.accounts.search'), searchAccountForm)
-    .then((response) => {
-        accounts.value = response.data;
+        .then((response) => {
+            console.log(response)
+            accounts.value = response.data;
 
-        searchAccountForm.errors = {};
-    }).catch(error => {
-    searchAccountForm.errors = error.response.data.errors || {};
+            searchAccountForm.errors = {};
+        }).catch(error => {
+            console.log(error)
+            searchAccountForm.errors = error.response.data.errors || {};
 
-    console.error(error)
+            console.error(error)
     }).finally(() => {
         loading.value = false;
     });

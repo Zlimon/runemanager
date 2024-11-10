@@ -239,23 +239,23 @@ onMounted(() => {
                                     <div class="mx-auto p-6 w-[168px]"
                                          style="background-image: url('/images/equipment_slots.png'); background-repeat: no-repeat; background-position: center;">
                                         <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.head > 0"
+                                            <img v-if="account.equipment.head_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.head_item.icon}`"
                                                  alt="Cape"
                                                  :title="account.equipment.head_item.name">
                                         </div>
 
                                         <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.cape > 0"
+                                            <img v-if="account.equipment.cape_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.cape_item.icon}`"
                                                  alt="Cape"
                                                  :title="account.equipment.cape_item.name"
                                                  style="margin-right: 5px;">
-                                            <img v-if="account.equipment.neck > 0"
+                                            <img v-if="account.equipment.neck_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.neck_item.icon}`"
                                                  alt="Neck"
                                                  :title="account.equipment.neck_item.name">
-                                            <img v-if="account.equipment.ammo > 0"
+                                            <img v-if="account.equipment.ammo_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.ammo_item.icon}`"
                                                  alt="Cape"
                                                  :title="account.equipment.ammo_item.name"
@@ -263,16 +263,16 @@ onMounted(() => {
                                         </div>
 
                                         <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.weapon > 0"
+                                            <img v-if="account.equipment.weapon_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.weapon_item.icon}`"
                                                  alt="Weapon"
                                                  :title="account.equipment.weapon_item.name"
                                                  style="margin-right: 20px;">
-                                            <img v-if="account.equipment.body > 0"
+                                            <img v-if="account.equipment.body_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.body_item.icon}`"
                                                  alt="body"
                                                  :title="account.equipment.body_item.name">
-                                            <img v-if="account.equipment.shield > 0"
+                                            <img v-if="account.equipment.shield_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.shield_item.icon}`"
                                                  alt="Shield"
                                                  :title="account.equipment.shield_item.name"
@@ -280,23 +280,23 @@ onMounted(() => {
                                         </div>
 
                                         <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.legs > 0"
+                                            <img v-if="account.equipment.legs_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.legs_item.icon}`"
                                                  alt="Legs"
                                                  :title="account.equipment.legs_item.name">
                                         </div>
 
                                         <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.hands > 0"
+                                            <img v-if="account.equipment.hands_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.hands_item.icon}`"
                                                  alt="Hands"
                                                  :title="account.equipment.hands_item.name"
                                                  style="margin-right: 22.5px;">
-                                            <img v-if="account.equipment.feet > 0"
+                                            <img v-if="account.equipment.feet_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.feet_item.icon}`"
                                                  alt="Feet"
                                                  :title="account.equipment.feet_item.name">
-                                            <img v-if="account.equipment.ring > 0"
+                                            <img v-if="account.equipment.ring_item !== null"
                                                  :src="`data:image/jpeg;base64,${account.equipment.ring_item.icon}`"
                                                  alt="Ring"
                                                  :title="account.equipment.ring_item.name"
