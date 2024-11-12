@@ -30,7 +30,7 @@ class AccountResource extends JsonResource
                 return $this->skills;
             }),
             'equipment' => $this->whenAppended('equipment', function () {
-                return (new EquipmentResource($this->equipment))->resolve();
+                return $this->equipment ? new EquipmentResource($this->equipment) : null;
             }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
