@@ -38,13 +38,13 @@ class LootingBagController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Account $account
+     * @param  Account  $account
      * @return JsonResponse
      */
     public function show(Account $account): JsonResponse
     {
         return response()->json([
-            'looting_bag' => (new LootingBagResource(LootingBag::where('account_id', $account->id)->first()))->resolve(),
+            'looting_bag' => $account->lootingBag ? new LootingBagResource($account->lootingBag) : null,
         ]);
     }
 
@@ -69,11 +69,11 @@ class LootingBagController extends Controller
         ]);
 
         // This does not work for MongoDB
-    //    $account->lootingBag()->updateOrCreate([
-    //        'account_id' => $account->id
-    //    ], [
-    //        'lootingBag' => $request->input('looting_bag')
-    //    ]);
+        //    $account->lootingBag()->updateOrCreate([
+        //        'account_id' => $account->id
+        //    ], [
+        //        'lootingBag' => $request->input('looting_bag')
+        //    ]);
 
         $lootingBag = LootingBag::where('account_id', $account->id)->first();
 

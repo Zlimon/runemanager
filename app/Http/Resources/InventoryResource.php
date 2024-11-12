@@ -20,19 +20,16 @@ class InventoryResource extends JsonResource
             $quantity = $slot[1];
 
             if ($itemId > 0) {
-                $item = Item::find((string)$itemId);
+                $item = Item::find($itemId);
 
-                $item = [
-                    'id' => $item['id'],
-                    'name' => $item['name'],
-                    'lowalch' => $item['lowalch'],
-                    'highalch' => $item['highalch'],
-                    'examine' => $item['examine'],
-                    'icon' => $item['icon'],
-                ];
-            } else {
-                // If the item is not found, we'll just use a dummy item
-                $item = [
+                $item = $item ? [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'lowalch' => $item->lowalch,
+                    'highalch' => $item->highalch,
+                    'examine' => $item->examine,
+                    'icon' => $item->icon,
+                ] : [
                     'id' => -1,
                     'name' => null,
                     'lowalch' => null,

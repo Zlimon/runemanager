@@ -91,14 +91,22 @@ class Account extends Model
         return $this->hasOne($collection->model);
     }
 
-    public function inventory(): HasOne
+    // MongoDB relationship
+    public function getInventoryAttribute(): Inventory
     {
-        return $this->hasOne(Inventory::class);
+        return Inventory::where('account_id', $this->id)->first();
     }
 
-    public function bank(): HasOne
+    // MongoDB relationship
+    public function getLootingBagAttribute(): LootingBag
     {
-        return $this->hasOne(Bank::class);
+        return LootingBag::where('account_id', $this->id)->first() ?? new LootingBag();
+    }
+
+    // MongoDB relationship
+    public function getBankAttribute(): Bank
+    {
+        return Bank::where('account_id', $this->id)->first();
     }
 
     public function equipment(): HasOne
@@ -106,9 +114,10 @@ class Account extends Model
         return $this->hasOne(Equipment::class);
     }
 
-    public function quest(): HasOne
+    // MongoDB relationship
+    public function getQuestAttribute(): Quest
     {
-        return $this->hasOne(Quest::class);
+        return Quest::where('account_id', $this->id)->first();
     }
 
 //    public function log() {

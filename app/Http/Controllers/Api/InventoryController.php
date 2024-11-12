@@ -38,13 +38,13 @@ class InventoryController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Account $account
+     * @param  Account  $account
      * @return JsonResponse
      */
     public function show(Account $account): JsonResponse
     {
         return response()->json([
-            'inventory' => (new InventoryResource(Inventory::where('account_id', $account->id)->first()))->resolve(),
+            'inventory' => $account->inventory ? new InventoryResource($account->inventory) : null,
         ]);
     }
 
@@ -59,8 +59,8 @@ class InventoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param Account $account
+     * @param  Request  $request
+     * @param  Account  $account
      * @return JsonResponse
      */
     public function update(Request $request, Account $account): JsonResponse
@@ -73,11 +73,11 @@ class InventoryController extends Controller
         ]);
 
         // This does not work for MongoDB
-    //    $account->inventory()->updateOrCreate([
-    //        'account_id' => $account->id
-    //    ], [
-    //        'inventory' => $request->input('inventory')
-    //    ]);
+        //    $account->inventory()->updateOrCreate([
+        //        'account_id' => $account->id
+        //    ], [
+        //        'inventory' => $request->input('inventory')
+        //    ]);
 
         $inventory = Inventory::where('account_id', $account->id)->first();
 
