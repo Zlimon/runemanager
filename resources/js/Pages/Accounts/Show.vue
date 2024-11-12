@@ -46,11 +46,11 @@ const searchAccounts = (load = true) => {
     searchAccountForm.per_page = 10;
 
     axios.post(route('api.accounts.search'), searchAccountForm)
-    .then((response) => {
-        accounts.value = response.data;
+        .then((response) => {
+            accounts.value = response.data;
 
-        searchAccountForm.errors = {};
-    }).catch(error => {
+            searchAccountForm.errors = {};
+        }).catch(error => {
         searchAccountForm.errors = error.response.data.errors || {};
 
         console.error(error)
@@ -154,8 +154,9 @@ onMounted(() => {
                                     :messages="searchAccountForm.errors.username"/>
 
                         <div class="relative z-50 flex justify-end">
-                            <div v-if="showSearchAccountsDropdown && (accounts.data !== undefined && accounts.data.length > 0)"
-                                 class="w-[calc(100%+4rem)] absolute overflow-y-auto bg-beige-600 border-2 border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800 ">
+                            <div
+                                v-if="showSearchAccountsDropdown && (accounts.data !== undefined && accounts.data.length > 0)"
+                                class="w-[calc(100%+4rem)] absolute overflow-y-auto bg-beige-600 border-2 border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800 ">
                                 <div v-for="account in accounts.data" :key="account.id">
                                     <Link :href="route('accounts.show', account)"
                                           class="flex flex-row items-center border-b p-2 border-beige-700 space-x-2 hover:bg-beige-200 dark:hover:bg-gray-700">
@@ -238,69 +239,60 @@ onMounted(() => {
 
                                     <div class="mx-auto p-6 w-[168px]"
                                          style="background-image: url('/images/equipment_slots.png'); background-repeat: no-repeat; background-position: center;">
-                                        <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.head_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.head_item.icon}`"
-                                                 alt="Cape"
-                                                 :title="account.equipment.head_item.name">
-                                        </div>
+                                        <div v-if="account.equipment !== null">
+                                            <div class="ml-1 flex justify-center mt-[8px]">
+                                                <img v-if="account.equipment.head_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.head_item.icon}`"
+                                                     :title="account.equipment.head_item.name">
+                                            </div>
 
-                                        <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.cape_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.cape_item.icon}`"
-                                                 alt="Cape"
-                                                 :title="account.equipment.cape_item.name"
-                                                 style="margin-right: 5px;">
-                                            <img v-if="account.equipment.neck_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.neck_item.icon}`"
-                                                 alt="Neck"
-                                                 :title="account.equipment.neck_item.name">
-                                            <img v-if="account.equipment.ammo_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.ammo_item.icon}`"
-                                                 alt="Cape"
-                                                 :title="account.equipment.ammo_item.name"
-                                                 style="margin-left: 5px;">
-                                        </div>
+                                            <div class="ml-1 flex justify-center mt-[8px]">
+                                                <img v-if="account.equipment.cape_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.cape_item.icon}`"
+                                                     :title="account.equipment.cape_item.name"
+                                                     style="margin-right: 5px;">
+                                                <img v-if="account.equipment.neck_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.neck_item.icon}`"
+                                                     :title="account.equipment.neck_item.name">
+                                                <img v-if="account.equipment.ammo_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.ammo_item.icon}`"
+                                                     :title="account.equipment.ammo_item.name"
+                                                     style="margin-left: 5px;">
+                                            </div>
 
-                                        <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.weapon_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.weapon_item.icon}`"
-                                                 alt="Weapon"
-                                                 :title="account.equipment.weapon_item.name"
-                                                 style="margin-right: 20px;">
-                                            <img v-if="account.equipment.body_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.body_item.icon}`"
-                                                 alt="body"
-                                                 :title="account.equipment.body_item.name">
-                                            <img v-if="account.equipment.shield_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.shield_item.icon}`"
-                                                 alt="Shield"
-                                                 :title="account.equipment.shield_item.name"
-                                                 style="margin-left: 20px;">
-                                        </div>
+                                            <div class="ml-1 flex justify-center mt-[8px]">
+                                                <img v-if="account.equipment.weapon_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.weapon_item.icon}`"
+                                                     :title="account.equipment.weapon_item.name"
+                                                     style="margin-right: 20px;">
+                                                <img v-if="account.equipment.body_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.body_item.icon}`"
+                                                     :title="account.equipment.body_item.name">
+                                                <img v-if="account.equipment.shield_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.shield_item.icon}`"
+                                                     :title="account.equipment.shield_item.name"
+                                                     style="margin-left: 20px;">
+                                            </div>
 
-                                        <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.legs_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.legs_item.icon}`"
-                                                 alt="Legs"
-                                                 :title="account.equipment.legs_item.name">
-                                        </div>
+                                            <div class="ml-1 flex justify-center mt-[8px]">
+                                                <img v-if="account.equipment.legs_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.legs_item.icon}`"
+                                                     :title="account.equipment.legs_item.name">
+                                            </div>
 
-                                        <div class="ml-1 flex justify-center mt-[8px]">
-                                            <img v-if="account.equipment.hands_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.hands_item.icon}`"
-                                                 alt="Hands"
-                                                 :title="account.equipment.hands_item.name"
-                                                 style="margin-right: 22.5px;">
-                                            <img v-if="account.equipment.feet_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.feet_item.icon}`"
-                                                 alt="Feet"
-                                                 :title="account.equipment.feet_item.name">
-                                            <img v-if="account.equipment.ring_item !== null"
-                                                 :src="`data:image/jpeg;base64,${account.equipment.ring_item.icon}`"
-                                                 alt="Ring"
-                                                 :title="account.equipment.ring_item.name"
-                                                 style="margin-left: 22.5px;">
+                                            <div class="ml-1 flex justify-center mt-[8px]">
+                                                <img v-if="account.equipment.hands_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.hands_item.icon}`"
+                                                     :title="account.equipment.hands_item.name"
+                                                     style="margin-right: 22.5px;">
+                                                <img v-if="account.equipment.feet_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.feet_item.icon}`"
+                                                     :title="account.equipment.feet_item.name">
+                                                <img v-if="account.equipment.ring_item !== null"
+                                                     :src="`data:image/jpeg;base64,${account.equipment.ring_item.icon}`"
+                                                     :title="account.equipment.ring_item.name"
+                                                     style="margin-left: 22.5px;">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -361,42 +353,46 @@ onMounted(() => {
                                 data-tabs-toggle="#default-tab-content"
                                 role="tablist">
                                 <li role="presentation">
-                                    <button class="inline-block rounded-t-lg p-2 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
-                                            id="inventory-tab"
-                                            data-tabs-target="#inventory"
-                                            type="button"
-                                            role="tab"
-                                            aria-controls="inventory"
-                                            aria-selected="false">
-                                            Inventory
+                                    <button
+                                        class="inline-block rounded-t-lg p-2 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
+                                        id="inventory-tab"
+                                        data-tabs-target="#inventory"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="inventory"
+                                        aria-selected="false">
+                                        Inventory
                                     </button>
                                 </li>
                                 <li role="presentation">
-                                    <button class="inline-block rounded-t-lg p-2 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
-                                            id="looting-bag-tab"
-                                            data-tabs-target="#looting-bag"
-                                            type="button"
-                                            role="tab"
-                                            aria-controls="looting-bag"
-                                            aria-selected="false">
+                                    <button
+                                        class="inline-block rounded-t-lg p-2 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
+                                        id="looting-bag-tab"
+                                        data-tabs-target="#looting-bag"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="looting-bag"
+                                        aria-selected="false">
                                         Looting bag
                                     </button>
                                 </li>
                             </ul>
 
                             <div id="default-tab-content">
-                                <div class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
-                                     id="inventory"
-                                     role="tabpanel"
-                                     aria-labelledby="inventory-tab">
+                                <div
+                                    class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
+                                    id="inventory"
+                                    role="tabpanel"
+                                    aria-labelledby="inventory-tab">
 
                                     <Inventory :accountProp="account"/>
                                 </div>
 
-                                <div class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
-                                     id="looting-bag"
-                                     role="tabpanel"
-                                     aria-labelledby="looting-bag-tab">
+                                <div
+                                    class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
+                                    id="looting-bag"
+                                    role="tabpanel"
+                                    aria-labelledby="looting-bag-tab">
 
                                     <LootingBag :accountProp="account"/>
                                 </div>
