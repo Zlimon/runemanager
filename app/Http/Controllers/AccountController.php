@@ -49,7 +49,7 @@ class AccountController extends Controller
     public function show(Account $account): Response
     {
         return Inertia::render('Accounts/Show', [
-            'accountProp' => (new AccountResource($account->append('skills', 'equipment')))->resolve(),
+            'accountProp' => (new AccountResource($account->load('equipment')->append('skills')))->resolve(),
         ]);
     }
 
