@@ -30,7 +30,7 @@ const getLootingBag = () => {
 
 <template>
     <div v-if="!lootingBagLoading">
-        <div v-if="lootingBag !== undefined">
+        <div v-if="lootingBag !== null">
             <ul class="m-2 grid grid-cols-4 gap-2">
                 <li v-for="(item, slot) in lootingBag.looting_bag" class="flex items-center justify-between">
                     <button :data-tooltip-target="`lootingBag-${slot}-${item.item.id}-tooltip-bottom`"

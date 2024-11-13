@@ -30,7 +30,7 @@ const getQuests = () => {
 
 <template>
     <div v-if="!questsLoading" class="overflow-y-scroll max-h-[15rem]">
-        <div v-if="quests !== undefined">
+        <div v-if="quests !== null && quests.length > 0">
             <div class="m-2">
     <!--            <p>-->
     <!--                {{ (index === 0 ? "Free Quests" : index === 1 ? "Members" : index === 2 ? "Miniquests" : "Secret :o") }}-->

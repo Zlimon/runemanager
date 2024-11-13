@@ -43,7 +43,7 @@ class QuestController extends Controller
     public function show(Account $account): JsonResponse
     {
         return response()->json([
-            'quests' => ((Quest::where('account_id', $account->id)->first())),
+            'quests' => $account->quests,
         ], 200);
     }
 
