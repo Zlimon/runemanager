@@ -13,7 +13,6 @@ class Quest extends Model
 
 
     protected $casts = [
-        '_id' => 'int',
         'account_id' => 'int',
     ];
 

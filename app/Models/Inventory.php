@@ -13,7 +13,6 @@ class Inventory extends Model
 
 
     protected $casts = [
-        '_id' => 'int',
         'account_id' => 'int',
         // 'inventory' => 'array', // Inventory is array with an array of [int itemId, int quantity]
     ];

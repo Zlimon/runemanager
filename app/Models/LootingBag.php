@@ -12,7 +12,6 @@ class LootingBag extends Model
     protected $primaryKey = '_id';
 
     protected $casts = [
-        '_id' => 'int',
         'account_id' => 'int',
     ];
 
