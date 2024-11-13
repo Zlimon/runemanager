@@ -30,7 +30,7 @@ const getInventory = () => {
 
 <template>
     <div v-if="!inventoryLoading">
-        <div v-if="inventory !== undefined">
+        <div v-if="inventory !== null">
             <ul class="m-2 grid grid-cols-4 gap-2">
                 <li v-for="(item, slot) in inventory.inventory" class="flex items-center justify-between">
                     <button :data-tooltip-target="`inventory-${slot}-${item.item.id}-tooltip-bottom`"

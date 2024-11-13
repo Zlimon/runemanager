@@ -43,7 +43,7 @@ class EquipmentController extends Controller
     public function show(Account $account): JsonResponse
     {
         return response()->json([
-            'data' => $account->equipment ? new EquipmentResource($account->equipment) : null,
+            'equipment' => $account->equipment ? new EquipmentResource($account->equipment) : null,
         ]);
     }
 
