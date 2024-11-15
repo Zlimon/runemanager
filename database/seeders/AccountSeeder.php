@@ -6,6 +6,8 @@ use App\Actions\Account\CreateOrUpdateAccount;
 use App\Actions\Account\CreateOrUpdateAccountEquipment;
 use App\Enums\AccountTypesEnum;
 use App\Models\Equipment;
+use App\Models\Inventory;
+use App\Models\Item;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
