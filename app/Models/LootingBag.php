@@ -15,6 +15,10 @@ class LootingBag extends Model
         'account_id' => 'int',
     ];
 
+    protected $fillable = [
+        'looting_bag',
+    ];
+
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);

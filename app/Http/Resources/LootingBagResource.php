@@ -15,41 +15,24 @@ class LootingBagResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $lootingBag = array_map(function ($slot) {
-            $itemId = $slot[0];
-            $quantity = $slot[1];
+        $itemIds = array_map(function ($slot) {
+            return $slot[0];
+        }, $this->looting_bag);
 
-            if ($itemId > 0) {
-                $item = Item::find((string)$itemId);
+        $items = Item::select('_id', 'name', 'lowalch', 'highalch', 'examine', 'icon')->whereIn('_id', $itemIds)->get()->keyBy('_id');
 
-                $item = [
-                    'id' => $item['id'],
-                    'name' => $item['name'],
-                    'lowalch' => $item['lowalch'],
-                    'highalch' => $item['highalch'],
-                    'examine' => $item['examine'],
-                    'icon' => $item['icon'],
-                ];
-            } else {
-                // If the item is not found, we'll just use a dummy item
-                $item = [
-                    'id' => -1,
-                    'name' => null,
-                    'lowalch' => null,
-                    'highalch' => null,
-                    'examine' => null,
-                    'icon' => null,
-                ];
-            }
+        $getItem = fn($id) => $items->get($id);
 
+        $lootingBag = array_map(function ($slot) use ($getItem) {
             return [
-                'item' => $item,
-                'quantity' => $quantity,
+                '_id' => $slot[0],
+                'item' => $getItem($slot[0]),
+                'amount' => $slot[1],
             ];
-        }, $this->lootingBag);
+        }, $this->looting_bag);
 
         return [
-            'id' => $this->_id,
+            '_id' => $this->_id,
             'account_id' => $this->account_id,
             'looting_bag' => $lootingBag,
         ];
