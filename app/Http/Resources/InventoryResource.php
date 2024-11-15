@@ -15,37 +15,24 @@ class InventoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $inventory = array_map(function ($slot) {
-            $itemId = $slot[0];
-            $quantity = $slot[1];
+        $itemIds = array_map(function ($slot) {
+            return $slot[0];
+        }, $this->inventory);
 
-            $item = Item::find($itemId);
+        $items = Item::select('_id', 'name', 'lowalch', 'highalch', 'examine', 'icon')->whereIn('_id', $itemIds)->get()->keyBy('_id');
 
-            $item = $item ? [
-                'id' => $item->id,
-                'name' => $item->name,
-                'lowalch' => $item->lowalch,
-                'highalch' => $item->highalch,
-                'examine' => $item->examine,
-                'icon' => $item->icon,
-            ] : [
-                'id' => -1,
-                'name' => null,
-                'lowalch' => null,
-                'highalch' => null,
-                'examine' => null,
-                'icon' => null,
-            ];
+        $getItem = fn($id) => $items->get($id);
 
-
+        $inventory = array_map(function ($slot) use ($getItem) {
             return [
-                'item' => $item,
-                'quantity' => $quantity,
+                '_id' => $slot[0],
+                'item' => $getItem($slot[0]),
+                'amount' => $slot[1],
             ];
         }, $this->inventory);
 
         return [
-            'id' => $this->_id,
+            '_id' => $this->_id,
             'account_id' => $this->account_id,
             'inventory' => $inventory,
         ];
