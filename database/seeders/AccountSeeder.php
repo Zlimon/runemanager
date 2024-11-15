@@ -92,8 +92,26 @@ class AccountSeeder extends Seeder
 
             $equipment = Equipment::factory(1)->make()->first()->toArray();
             $createOrUpdateAccountEquipment->createOrUpdateAccountEquipment($account, $equipment);
+
+            $account->inventory()->create([
+                'inventory' => $this->generateInventory(),
+            ]);
         } catch (\Exception $e) {
             $this->command->warn($e->getMessage());
         }
+    }
+
+    public function generateInventory(): array
+    {
+        // Generate an array with up to 28 items, each item containing two integers (item id and quantity)
+        return collect(range(1, 28))->map(function () {
+            // 50/50 chance of getting a random item or an empty slot
+            $itemId = rand(0, 1) === 1
+                ? (Item::where([['placeholder', false], ['duplicate', false]])->whereNotNull('release_date')->pluck('_id')->random()
+                ?? -1)
+                : -1;
+
+            return [$itemId, $itemId >= 1 ? rand(1, 100) : 0];
+        })->toArray();
     }
 }
