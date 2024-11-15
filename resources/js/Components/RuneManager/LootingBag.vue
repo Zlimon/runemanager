@@ -40,14 +40,14 @@ const getLootingBag = () => {
                                 type="button"
                                 class=""
                                 :class="{'cursor-default': item._id === -1}">
-                            <span v-if="item.quantity > 1"
+                            <span v-if="item.amount > 1"
                                   class="absolute top-0 left-0 p-1 text-sm">
-                                {{ item.quantity }}
+                                {{ item.amount }}
                             </span>
                             <img v-if="item.item?.icon"
                                  :src="`data:image/jpeg;base64,${item.item.icon}`"
                                  class="mx-auto h-10 w-10 object-contain"
-                                 :class="{ 'opacity-50': item.quantity === 0 }"
+                                 :class="{ 'opacity-50': item.amount === 0 }"
                                  loading="lazy"
                                  @error="handleImageError">
                             <span v-else>
@@ -67,13 +67,13 @@ const getLootingBag = () => {
                         <p>
                             {{ item.item.examine }}
                         </p>
-                        <p v-if="item.quantity > 0 && item.item.highalch">
-                            HA: {{ (item.item.highalch * item.quantity).toLocaleString('en-US') }} gp
-                            <span v-if="item.quantity > 1">({{ item.item.highalch.toLocaleString('en-US') }} ea)</span>
+                        <p v-if="item.amount > 0 && item.item.highalch">
+                            HA: {{ (item.item.highalch * item.amount).toLocaleString('en-US') }} gp
+                            <span v-if="item.amount > 1">({{ item.item.highalch.toLocaleString('en-US') }} ea)</span>
                         </p>
-                        <p v-if="item.quantity > 0 && item.item.lowalch">
-                            LA: {{ (item.item.lowalch * item.quantity).toLocaleString('en-US') }} gp
-                            <span v-if="item.quantity > 1">({{ item.item.lowalch.toLocaleString('en-US') }} ea)</span>
+                        <p v-if="item.amount > 0 && item.item.lowalch">
+                            LA: {{ (item.item.lowalch * item.amount).toLocaleString('en-US') }} gp
+                            <span v-if="item.amount > 1">({{ item.item.lowalch.toLocaleString('en-US') }} ea)</span>
                         </p>
                         <div class="tooltip-arrow" data-popper-arrow></div>
                     </div>
