@@ -284,14 +284,14 @@ onMounted(() => {
                                                 <img v-if="account.equipment.hands_item !== null"
                                                      :src="`data:image/jpeg;base64,${account.equipment.hands_item.icon}`"
                                                      :title="account.equipment.hands_item.name"
-                                                     style="margin-right: 22.5px;">
+                                                     style="margin-right: 20px;">
                                                 <img v-if="account.equipment.feet_item !== null"
                                                      :src="`data:image/jpeg;base64,${account.equipment.feet_item.icon}`"
                                                      :title="account.equipment.feet_item.name">
                                                 <img v-if="account.equipment.ring_item !== null"
                                                      :src="`data:image/jpeg;base64,${account.equipment.ring_item.icon}`"
                                                      :title="account.equipment.ring_item.name"
-                                                     style="margin-left: 22.5px;">
+                                                     style="margin-left: 20px;">
                                             </div>
                                         </div>
                                     </div>
