@@ -11,10 +11,12 @@ class Inventory extends Model
 
     protected $primaryKey = '_id';
 
-
     protected $casts = [
         'account_id' => 'int',
-        // 'inventory' => 'array', // Inventory is array with an array of [int itemId, int quantity]
+    ];
+
+    protected $fillable = [
+        'inventory',
     ];
 
     public function account(): BelongsTo
