@@ -95,25 +95,61 @@ class AccountSeeder extends Seeder
             $equipment = Equipment::factory(1)->make()->first()->toArray();
             $createOrUpdateAccountEquipment->createOrUpdateAccountEquipment($account, $equipment);
 
-            $account->inventory()->create([
+            $account->inventory()->updateOrCreate([
+                'account_id' => $account->id
+            ], [
                 'inventory' => $this->generateInventory(),
+            ]);
+
+            $account->lootingBag()->updateOrCreate([
+                'account_id' => $account->id
+            ], [
+                'looting_bag' => $this->generateInventory(),
             ]);
         } catch (\Exception $e) {
             $this->command->warn($e->getMessage());
         }
     }
 
-    public function generateInventory(): array
+    private function generateInventory(): array
     {
         // Generate an array with up to 28 items, each item containing two integers (item id and quantity)
         return collect(range(1, 28))->map(function () {
             // 50/50 chance of getting a random item or an empty slot
-            $itemId = rand(0, 1) === 1
-                ? (Item::where([['placeholder', false], ['duplicate', false]])->whereNotNull('release_date')->pluck('_id')->random()
-                ?? -1)
-                : -1;
+            if (!rand(0, 1) === 1) {
+                return [-1, 0];
+            }
 
-            return [$itemId, $itemId >= 1 ? rand(1, 100) : 0];
+            // Stackable/noted or single item
+            $amount = rand(0, 1) === 1 ? rand(2, 484) : 0;
+            if ($amount >= 2) {
+                // Stackable or noted item
+                if (rand(0, 1) === 1) {
+                    // Stackable item
+                    return [
+                        Item::where([
+                            ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', true]
+                        ])->whereNotNull('release_date')->pluck('_id')->random(),
+                        $amount
+                    ];
+                } else {
+                    // Noted item
+                    return [
+                        Item::where([
+                            ['placeholder', false], ['duplicate', true], ['noted', true], ['stackable', false]
+                        ])->whereNotNull('release_date')->pluck('_id')->random(),
+                        $amount
+                    ];
+                }
+            }
+
+            // Single item
+            return [
+                Item::where([
+                    ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', false]
+                ])->whereNotNull('release_date')->pluck('_id')->random(),
+                1
+            ];
         })->toArray();
     }
 }
