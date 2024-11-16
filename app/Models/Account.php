@@ -124,13 +124,13 @@ class Account extends Model
         return Bank::where('account_id', $this->id)->first();
     }
 
-    public function quest(): HasOne
+    public function quests(): HasOne
     {
         return $this->hasOne(Quest::class);
     }
 
     // MongoDB relationship
-    public function getQuestAttribute(): ?Quest
+    public function getQuestsAttribute(): ?Quest
     {
         return Quest::where('account_id', $this->id)->first();
     }
