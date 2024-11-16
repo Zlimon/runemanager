@@ -43,6 +43,7 @@ class ResourcePackFetch extends Command implements PromptsForMissingInput
 
     /**
      * Execute the console command.
+     *
      * @throws \Throwable
      */
     public function handle(): int
@@ -60,7 +61,7 @@ class ResourcePackFetch extends Command implements PromptsForMissingInput
 
         $resourcePack = ResourcePack::firstWhere('name', $name);
 
-        if ($resourcePack && File::exists(resource_path('/css/resource-packs-downloaded/' . $name . '.zip'))) {
+        if ($resourcePack && File::exists(resource_path('/css/resource-packs-downloaded/'.$name.'.zip'))) {
             if ($this->option('update') !== 'yes') {
                 $this->fail(sprintf("Resource pack '%s' already exists. Use --update=yes to update it.", $name));
             }
@@ -69,7 +70,7 @@ class ResourcePackFetch extends Command implements PromptsForMissingInput
         $this->info(sprintf("Downloading '%s'...", $name));
 
         // Download resource pack
-        $url = sprintf("https://github.com/melkypie/resource-packs/archive/%s.zip", $name);
+        $url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
         $resourcePack = @file_get_contents($url);
 
         if ($resourcePack === false) {
@@ -79,7 +80,7 @@ class ResourcePackFetch extends Command implements PromptsForMissingInput
         // Put resource pack file to download directory
         try {
             File::put(
-                resource_path(sprintf("/css/resource-packs-downloaded/%s.zip", $name)),
+                resource_path(sprintf('/css/resource-packs-downloaded/%s.zip', $name)),
                 $resourcePack
             );
         } catch (\Exception $e) {
@@ -87,16 +88,16 @@ class ResourcePackFetch extends Command implements PromptsForMissingInput
         }
 
         // Verify resource pack is correctly downloaded, and insert to database
-        if (!File::exists(resource_path(sprintf("/css/resource-packs-downloaded/%s.zip", $name)))) {
+        if (! File::exists(resource_path(sprintf('/css/resource-packs-downloaded/%s.zip', $name)))) {
             $this->fail(sprintf("Resource pack '%s' could not be downloaded.", $name));
         }
 
         $resourcePack = ResourcePack::firstWhere('name', $name);
 
-        if (!$resourcePack) {
+        if (! $resourcePack) {
             $this->info(sprintf('Inserting "%s" to database...', $name));
 
-            $getProperties = Http::get(sprintf("https://raw.githubusercontent.com/melkypie/resource-packs/%s/pack.properties", $name));
+            $getProperties = Http::get(sprintf('https://raw.githubusercontent.com/melkypie/resource-packs/%s/pack.properties', $name));
 
             if ($getProperties->failed()) {
                 $this->warn(sprintf('Could not fetch properties from GitHub! Using default values.'));
@@ -110,7 +111,7 @@ class ResourcePackFetch extends Command implements PromptsForMissingInput
                 }
             }
 
-            $resourcePack = new ResourcePack();
+            $resourcePack = new ResourcePack;
 
             $tags = explode(',', $values['tags'] ?? '');
             $tags = array_map('Str::lower', $tags);

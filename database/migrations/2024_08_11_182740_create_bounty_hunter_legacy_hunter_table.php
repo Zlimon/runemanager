@@ -8,8 +8,6 @@ class CreateBountyHunterLegacyHunterTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateBountyHunterLegacyHunterTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('bounty_hunter_legacy_hunter');
     }
-};
+}

@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property int $id
  * @property int $account_id
  * @property int $rank
@@ -17,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Account $account
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Ranged newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ranged newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ranged query()
@@ -27,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Ranged whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ranged whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ranged whereXp($value)
+ *
  * @mixin \Eloquent
  */
 class Ranged extends Model

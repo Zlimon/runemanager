@@ -17,16 +17,16 @@ class AccountFactory extends Factory
     public function definition(): array
     {
         $accountTypes = array_map(function ($accountType) {
-                return $accountType->value;
-            }, \App\Enums\AccountTypesEnum::cases()
+            return $accountType->value;
+        }, \App\Enums\AccountTypesEnum::cases()
         );
 
         return [
             'account_type' => $accountTypes[array_rand($accountTypes)],
-            'username' => substr($this->faker->userName, 0 ,13), // Limited to 13 characters
+            'username' => substr($this->faker->userName, 0, 13), // Limited to 13 characters
             'rank' => rand(1, 2000),
             'level' => rand(32, 2277),
-            'xp' => rand (0, 200000000),
+            'xp' => rand(0, 200000000),
             'online' => $this->faker->boolean,
         ];
     }

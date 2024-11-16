@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-//        User::factory(15)->withPersonalTeam()->has(Account::factory()->count(rand(1, 5)))->create();
+        //        User::factory(15)->withPersonalTeam()->has(Account::factory()->count(rand(1, 5)))->create();
         User::factory(15)->withPersonalTeam()->create();
 
         User::factory()->withPersonalTeam()->create([

@@ -26,13 +26,13 @@ class EquipmentResource extends JsonResource
             $this->legs,
             $this->hands,
             $this->feet,
-            $this->ring
+            $this->ring,
         ];
 
         $items = Item::whereIn('_id', $itemIds)->get()->keyBy('_id');
 
         // Helper function to get item by ID or return null if not found
-        $getItem = fn($id) => $items->get($id);
+        $getItem = fn ($id) => $items->get($id);
 
         return [
             'id' => $this->id,

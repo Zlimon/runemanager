@@ -37,9 +37,6 @@ class BankController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param Account $account
-     * @return JsonResponse
      */
     public function show(Account $account): JsonResponse
     {
@@ -58,10 +55,6 @@ class BankController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param Account $account
-     * @return JsonResponse
      */
     public function update(Request $request, Account $account): JsonResponse
     {
@@ -73,16 +66,16 @@ class BankController extends Controller
         ]);
 
         // This does not work for MongoDB
-    //    $account->bank()->updateOrCreate([
-    //        'account_id' => $account->id
-    //    ], [
-    //        'bank' => $request->input('bank')
-    //    ]);
+        //    $account->bank()->updateOrCreate([
+        //        'account_id' => $account->id
+        //    ], [
+        //        'bank' => $request->input('bank')
+        //    ]);
 
         $bank = Bank::where('account_id', $account->id)->first();
 
-        if (!$bank) {
-            $bank = new Bank();
+        if (! $bank) {
+            $bank = new Bank;
             $bank->account_id = $account->id;
         }
 
@@ -94,7 +87,6 @@ class BankController extends Controller
             'data' => $account->bank,
         ]);
     }
-
 
     /**
      * Remove the specified resource from storage.

@@ -5,8 +5,6 @@ namespace App\Models;
 use MongoDB\Laravel\Eloquent\Model;
 
 /**
- * 
- *
  * @property string $_id 1000 occurrences
  * @property bool|null $aggressive 1000 occurrences
  * @property int|null $attack_bonus 1000 occurrences
@@ -52,6 +50,7 @@ use MongoDB\Laravel\Eloquent\Model;
  * @property bool|null $venomous 1000 occurrences
  * @property string|null $wiki_name 1000 occurrences
  * @property string|null $wiki_url 1000 occurrences
+ *
  * @method static \MongoDB\Laravel\Eloquent\Builder|Npc addHybridHas(\Illuminate\Database\Eloquent\Relations\Relation $relation, string $operator = '>=', string $count = 1, string $boolean = 'and', ?\Closure $callback = null)
  * @method static \MongoDB\Laravel\Eloquent\Builder|Npc aggregate($function = null, $columns = [])
  * @method static \MongoDB\Laravel\Eloquent\Builder|Npc getConnection()
@@ -105,11 +104,14 @@ use MongoDB\Laravel\Eloquent\Model;
  * @method static \MongoDB\Laravel\Eloquent\Builder|Npc whereVenomous($value)
  * @method static \MongoDB\Laravel\Eloquent\Builder|Npc whereWikiName($value)
  * @method static \MongoDB\Laravel\Eloquent\Builder|Npc whereWikiUrl($value)
+ *
  * @mixin \Eloquent
  */
 class Npc extends Model
 {
     protected $connection = 'mongodb';
+
     protected $table = 'monsters';
+
     protected $primaryKey = 'id';
 }

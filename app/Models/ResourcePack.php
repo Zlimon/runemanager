@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string $alias
@@ -18,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $dark_mode
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack query()
@@ -31,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereVersion($value)
+ *
  * @mixin \Eloquent
  */
 class ResourcePack extends Model

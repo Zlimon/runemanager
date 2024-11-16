@@ -15,7 +15,7 @@ class Item extends Model
     protected $casts = [
         '_id' => 'integer',
         'name' => 'string',
-//        'last_updated' => 'date',
+        //        'last_updated' => 'date',
         'incomplete' => 'boolean',
         'members' => 'boolean',
         'tradeable' => 'boolean',
@@ -43,8 +43,8 @@ class Item extends Model
         'icon' => 'string',
         'wiki_name' => 'string',
         'wiki_url' => 'string',
-//        'equipment' => 'array',
-//        'weapon' => 'array',
+        //        'equipment' => 'array',
+        //        'weapon' => 'array',
     ];
 
     public static function randomItemId(): int

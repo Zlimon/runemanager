@@ -8,8 +8,6 @@ class CreateChambersOfXericChallengeModeTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateChambersOfXericChallengeModeTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('chambers_of_xeric_challenge_mode');
     }
-};
+}

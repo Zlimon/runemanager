@@ -6,10 +6,8 @@ use App\Actions\Account\CreateOrUpdateAccount;
 use App\Actions\Account\CreateOrUpdateAccountEquipment;
 use App\Enums\AccountTypesEnum;
 use App\Models\Equipment;
-use App\Models\Inventory;
 use App\Models\Item;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder
@@ -79,15 +77,15 @@ class AccountSeeder extends Seeder
         foreach ($accounts as $account) {
             $user = User::inRandomOrder()->first();
 
-//            \App\Enums\AccountTypesEnum::returnAllAccountTypes()[rand(0, 3)]
+            //            \App\Enums\AccountTypesEnum::returnAllAccountTypes()[rand(0, 3)]
             $this->createOrUpdateAccount($account, $user, AccountTypesEnum::NORMAL);
         }
     }
 
     private function createOrUpdateAccount(string $account, User $user, AccountTypesEnum $accountType): void
     {
-        $createOrUpdateAccount = new CreateOrUpdateAccount();
-        $createOrUpdateAccountEquipment = new CreateOrUpdateAccountEquipment();
+        $createOrUpdateAccount = new CreateOrUpdateAccount;
+        $createOrUpdateAccountEquipment = new CreateOrUpdateAccountEquipment;
 
         try {
             $account = $createOrUpdateAccount->createOrUpdateAccount($account, $user, $accountType);
@@ -96,13 +94,13 @@ class AccountSeeder extends Seeder
             $createOrUpdateAccountEquipment->createOrUpdateAccountEquipment($account, $equipment);
 
             $account->inventory()->updateOrCreate([
-                'account_id' => $account->id
+                'account_id' => $account->id,
             ], [
                 'inventory' => $this->generateInventory(),
             ]);
 
             $account->lootingBag()->updateOrCreate([
-                'account_id' => $account->id
+                'account_id' => $account->id,
             ], [
                 'looting_bag' => $this->generateInventory(),
             ]);
@@ -116,7 +114,7 @@ class AccountSeeder extends Seeder
         // Generate an array with up to 28 items, each item containing two integers (item id and quantity)
         return collect(range(1, 28))->map(function () {
             // 50/50 chance of getting a random item or an empty slot
-            if (!rand(0, 1) === 1) {
+            if (! rand(0, 1) === 1) {
                 return [-1, 0];
             }
 
@@ -128,17 +126,17 @@ class AccountSeeder extends Seeder
                     // Stackable item
                     return [
                         Item::where([
-                            ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', true]
+                            ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', true],
                         ])->whereNotNull('release_date')->pluck('_id')->random(),
-                        $amount
+                        $amount,
                     ];
                 } else {
                     // Noted item
                     return [
                         Item::where([
-                            ['placeholder', false], ['duplicate', true], ['noted', true], ['stackable', false]
+                            ['placeholder', false], ['duplicate', true], ['noted', true], ['stackable', false],
                         ])->whereNotNull('release_date')->pluck('_id')->random(),
-                        $amount
+                        $amount,
                     ];
                 }
             }
@@ -146,9 +144,9 @@ class AccountSeeder extends Seeder
             // Single item
             return [
                 Item::where([
-                    ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', false]
+                    ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', false],
                 ])->whereNotNull('release_date')->pluck('_id')->random(),
-                1
+                1,
             ];
         })->toArray();
     }

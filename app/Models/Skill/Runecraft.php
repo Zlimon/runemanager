@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property int $id
  * @property int $account_id
  * @property int $rank
@@ -17,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Account $account
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Runecraft newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Runecraft newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Runecraft query()
@@ -27,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Runecraft whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Runecraft whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Runecraft whereXp($value)
+ *
  * @mixin \Eloquent
  */
 class Runecraft extends Model

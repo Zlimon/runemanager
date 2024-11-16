@@ -10,10 +10,6 @@ use Illuminate\Http\Request;
 
 class NpcController extends Controller
 {
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function search(Request $request): JsonResponse
     {
         $request->validate([
@@ -23,7 +19,7 @@ class NpcController extends Controller
 
         $perPage = $request->get('per_page', 18);
 
-        $npcs = Npc::where('name', 'LIKE', '%' . $request->get('search') . '%')
+        $npcs = Npc::where('name', 'LIKE', '%'.$request->get('search').'%')
             ->orderByDesc('combat_level')
             ->paginate($perPage)
             ->through(function ($npc) {

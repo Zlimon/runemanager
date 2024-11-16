@@ -20,9 +20,9 @@ class CreateNewsCategoriesTable extends Migration
 
         DB::table('news_categories')->insert(
             [
-                ["category" => "News"],
-                ["category" => "Event"],
-                ["category" => "Update"]
+                ['category' => 'News'],
+                ['category' => 'Event'],
+                ['category' => 'Update'],
             ]
         );
     }

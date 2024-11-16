@@ -58,7 +58,7 @@ class NpcResource extends JsonResource
             'defence_crush' => $this->defence_crush,
             'defence_magic' => $this->defence_magic,
             'defence_ranged' => $this->defence_ranged,
-//            'drops' => $this->drops,
+            //            'drops' => $this->drops,
             'drops' => DropResource::collection($this->drops), // TODO Should conditionally load
         ];
     }

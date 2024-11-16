@@ -8,8 +8,6 @@ class CreateSharedTreasureTrailRewardsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateSharedTreasureTrailRewardsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('shared_treasure_trail_rewards');
     }
-};
+}

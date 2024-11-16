@@ -10,8 +10,6 @@ class AccountUsernameRule implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -23,24 +21,28 @@ class AccountUsernameRule implements ValidationRule
         $length = mb_strlen($username);
         if ($length < 1 || $length > 12) {
             $fail('The :attribute must be between 1 and 12 characters.');
+
             return;
         }
 
         // Check for allowed characters: letters, numbers, and spaces
-        if (!preg_match('/^[a-zA-Z0-9 ]+$/', $username)) {
+        if (! preg_match('/^[a-zA-Z0-9 ]+$/', $username)) {
             $fail('The :attribute may only contain letters, numbers, and spaces.');
+
             return;
         }
 
         // Check for consecutive spaces
         if (preg_match('/ {2,}/', $username)) {
             $fail('The :attribute may not contain consecutive spaces.');
+
             return;
         }
 
         // Check for leading or trailing spaces
         if (preg_match('/^ | $/', $value)) {
             $fail('The :attribute may not start or end with a space.');
+
             return;
         }
 
@@ -57,6 +59,7 @@ class AccountUsernameRule implements ValidationRule
         foreach ($offensiveWords as $word) {
             if (strpos($usernameLower, strtolower($word)) !== false) {
                 $fail('The :attribute contains inappropriate language.');
+
                 return;
             }
         }

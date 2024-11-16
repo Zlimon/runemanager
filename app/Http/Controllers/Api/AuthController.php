@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function login(Request $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
@@ -30,15 +26,11 @@ class AuthController extends Controller
             ]);
         } else {
             return response()->json([
-                'message' => 'Invalid login details'
+                'message' => 'Invalid login details',
             ], 401);
         }
     }
 
-    /**
-     * @param Request $request
-     * @return mixed
-     */
     public function me(Request $request): mixed
     {
         return $request->user();

@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- *
- *
  * @property int $id
  * @property int $category_id
  * @property int $order
  * @property string $name
  * @property string $slug
  * @property string $model
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Skill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Skill newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Skill query()
@@ -22,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Skill whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Skill whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Skill whereSlug($value)
+ *
  * @mixin \Eloquent
  */
 class Skill extends Model

@@ -36,9 +36,6 @@ class QuestController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param Account $account
-     * @return JsonResponse
      */
     public function show(Account $account): JsonResponse
     {
@@ -57,10 +54,6 @@ class QuestController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param Account $account
-     * @return JsonResponse
      */
     public function update(Request $request, Account $account): JsonResponse
     {
@@ -72,16 +65,16 @@ class QuestController extends Controller
         ]);
 
         // This does not work for MongoDB
-    //    $account->quests()->updateOrCreate([
-    //        'account_id' => $account->id
-    //    ], [
-    //        'quests' => $request->input('quests')
-    //    ]);
+        //    $account->quests()->updateOrCreate([
+        //        'account_id' => $account->id
+        //    ], [
+        //        'quests' => $request->input('quests')
+        //    ]);
 
         $quests = Quest::where('account_id', $account->id)->first();
 
-        if (!$quests) {
-            $quests = new Quest();
+        if (! $quests) {
+            $quests = new Quest;
             $quests->account_id = $account->id;
         }
 

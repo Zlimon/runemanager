@@ -36,9 +36,6 @@ class EquipmentController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param  Account  $account
-     * @return JsonResponse
      */
     public function show(Account $account): JsonResponse
     {
@@ -57,10 +54,6 @@ class EquipmentController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  Request  $request
-     * @param  Account  $account
-     * @return JsonResponse
      */
     public function update(Request $request, Account $account): JsonResponse
     {

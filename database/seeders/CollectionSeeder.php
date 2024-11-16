@@ -18,32 +18,32 @@ class CollectionSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-//    public function run(): void
-//    {
-//        foreach ($this->hiscoreEntries as $category => $hiscore) {
-//            $category = Category::whereSlug($category)->first();
-//
-//            if (!$category) {
-//                $this->command->warn(sprintf("Category '%s' does not exist.", $category));
-//
-//                continue;
-//            }
-//
-//            foreach ($hiscore as $slug => $name) {
-//                try {
-//                    $this->createHiscore($category, $name);
-//                } catch (Exception $e) {
-//                    $this->command->warn($e->getMessage());
-//
-//                    continue;
-//                }
-//            }
-//        }
-//    }
+    //    public function run(): void
+    //    {
+    //        foreach ($this->hiscoreEntries as $category => $hiscore) {
+    //            $category = Category::whereSlug($category)->first();
+    //
+    //            if (!$category) {
+    //                $this->command->warn(sprintf("Category '%s' does not exist.", $category));
+    //
+    //                continue;
+    //            }
+    //
+    //            foreach ($hiscore as $slug => $name) {
+    //                try {
+    //                    $this->createHiscore($category, $name);
+    //                } catch (Exception $e) {
+    //                    $this->command->warn($e->getMessage());
+    //
+    //                    continue;
+    //                }
+    //            }
+    //        }
+    //    }
 
     public function run(): void
     {
-        $collectionLogClient = new CollectionLogClient();
+        $collectionLogClient = new CollectionLogClient;
 
         // Get number 1 player on collectionlog.net hiscores to get all collection log pages
         try {
@@ -51,7 +51,7 @@ class CollectionSeeder extends Seeder
 
             $result = json_decode($response->getBody()->getContents(), true);
 
-            if (!isset($result['hiscores'][0]['username'])) {
+            if (! isset($result['hiscores'][0]['username'])) {
                 throw new Exception('Could not retrieve rank 1 player from collectionlog.net hiscores.');
             }
         } catch (Exception $e) {
@@ -64,7 +64,7 @@ class CollectionSeeder extends Seeder
 
         // Get all collection log entries for rank 1 player
         try {
-            $response = $collectionLogClient->request('GET', '/collectionlog/user/' . $rankOne);
+            $response = $collectionLogClient->request('GET', '/collectionlog/user/'.$rankOne);
 
             $result = json_decode($response->getBody()->getContents(), true);
         } catch (Exception $e) {
@@ -88,7 +88,7 @@ class CollectionSeeder extends Seeder
 
             $category = Category::whereSlug($category)->first();
 
-            if (!$category) {
+            if (! $category) {
                 $this->command->warn(sprintf("Category '%s' does not exist.", $category));
 
                 continue;
@@ -99,17 +99,17 @@ class CollectionSeeder extends Seeder
                 unset($hiscoreEntries[$category->slug][Str::slug($name)]);
 
                 $items = [];
-                if ($storeItems && !empty($hiscore['items'])) {
+                if ($storeItems && ! empty($hiscore['items'])) {
                     // Map items from Item model
                     $itemIds = array_map(function ($item) {
                         return (string) $item['id'];
                     }, $hiscore['items']);
 
-//                    $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
-//                        return Str::slug(Str::snake($item), '_');
-//                    })->toArray();
-//
-//                    $items = Item::whereIn('id', $itemIds)->orderBy('id')->get()->toArray();
+                    //                    $items = Item::whereIn('id', $itemIds)->pluck('name')->map(function ($item) {
+                    //                        return Str::slug(Str::snake($item), '_');
+                    //                    })->toArray();
+                    //
+                    //                    $items = Item::whereIn('id', $itemIds)->orderBy('id')->get()->toArray();
                     // Get items from Item model in same order the items are in the collection log
                     foreach ($itemIds as $itemId) {
                         $item = Item::whereId($itemId)->first();
@@ -134,7 +134,7 @@ class CollectionSeeder extends Seeder
         foreach ($hiscoreEntries as $category => $hiscores) {
             $category = Category::whereSlug($category)->first();
 
-            if (!$category) {
+            if (! $category) {
                 $this->command->warn(sprintf("Category '%s' does not exist.", $category));
 
                 continue;

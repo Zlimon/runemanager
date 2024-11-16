@@ -7,14 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 /**
- * 
- *
  * @property int $id
  * @property string $key
  * @property string $value
  * @property string $type
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Setting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Setting newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Setting query()
@@ -24,6 +23,7 @@ use Illuminate\Support\Collection;
  * @method static \Illuminate\Database\Eloquent\Builder|Setting whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Setting whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Setting whereValue($value)
+ *
  * @mixin \Eloquent
  */
 class Setting extends Model
@@ -40,14 +40,14 @@ class Setting extends Model
     /**
      * Get a settings value
      *
-     * @param $key
-     * @param null $default
+     * @param  null  $default
      * @return bool|int|mixed
      */
     public static function get($key, $default = null): mixed
     {
         if (self::has($key)) {
             $setting = self::getAllSettings()->where('key', $key)->first();
+
             return self::castValue($setting->value, $setting->type);
         }
 
@@ -57,10 +57,7 @@ class Setting extends Model
     /**
      * Add a settings value
      *
-     * @param $key
-     * @param $value
-     * @param string $type
-     * @return bool
+     * @param  string  $type
      */
     public static function add($key, $value, $type = 'string'): bool
     {
@@ -74,10 +71,7 @@ class Setting extends Model
     /**
      * Set a value for setting
      *
-     * @param $key
-     * @param $value
-     * @param string $type
-     * @return bool
+     * @param  string  $type
      */
     public static function set($key, $value, $type = 'string'): bool
     {
@@ -86,7 +80,7 @@ class Setting extends Model
                 [
                     'key' => $key,
                     'value' => $value,
-                    'type' => $type
+                    'type' => $type,
                 ]
             ) ? $value : false;
         }
@@ -96,9 +90,6 @@ class Setting extends Model
 
     /**
      * Remove a setting
-     *
-     * @param $key
-     * @return bool
      */
     public static function remove($key): bool
     {
@@ -111,19 +102,14 @@ class Setting extends Model
 
     /**
      * Check if setting exists
-     *
-     * @param $key
-     * @return bool
      */
     public static function has($key): bool
     {
-        return (boolean)self::getAllSettings()->whereStrict('key', $key)->count();
+        return (bool) self::getAllSettings()->whereStrict('key', $key)->count();
     }
 
     /**
      * Get the validation rules for setting fields
-     *
-     * @return array
      */
     public static function getValidationRules(): array
     {
@@ -137,9 +123,6 @@ class Setting extends Model
 
     /**
      * Get the data type of setting
-     *
-     * @param $field
-     * @return mixed
      */
     public static function getDataType($field): mixed
     {
@@ -152,9 +135,6 @@ class Setting extends Model
 
     /**
      * Get default value for a setting
-     *
-     * @param $field
-     * @return mixed
      */
     public static function getDefaultValueForField($field): mixed
     {
@@ -165,10 +145,6 @@ class Setting extends Model
 
     /**
      * Get default value from config if no value passed
-     *
-     * @param $key
-     * @param $default
-     * @return mixed
      */
     private static function getDefaultValue($key, $default): mixed
     {
@@ -177,8 +153,6 @@ class Setting extends Model
 
     /**
      * Get all the settings fields from config
-     *
-     * @return Collection
      */
     private static function getDefinedSettingFields(): Collection
     {
@@ -187,10 +161,6 @@ class Setting extends Model
 
     /**
      * Caste value into respective type
-     *
-     * @param $value
-     * @param $castTo
-     * @return bool|int
      */
     private static function castValue($value, $castTo): bool|int
     {
@@ -212,8 +182,6 @@ class Setting extends Model
 
     /**
      * Get all the settings
-     *
-     * @return mixed
      */
     public static function getAllSettings(): mixed
     {

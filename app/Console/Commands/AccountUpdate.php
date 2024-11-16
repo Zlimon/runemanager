@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Account\CreateOrUpdateAccount;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -27,6 +26,7 @@ class AccountUpdate extends Command
 
     /**
      * Execute the console command.
+     *
      * @throws \Throwable
      */
     public function handle(): int
@@ -38,11 +38,11 @@ class AccountUpdate extends Command
         if ($username) {
             $account = Account::whereUsername($username)->first();
 
-            if (!$account) {
-                $userName = $this->choice("Choose user to assign account to", User::orderBy('id')->pluck('name')->all());
+            if (! $account) {
+                $userName = $this->choice('Choose user to assign account to', User::orderBy('id')->pluck('name')->all());
 
-                if (!$userName) {
-                    $this->error("No user selected.");
+                if (! $userName) {
+                    $this->error('No user selected.');
 
                     return CommandAlias::FAILURE;
                 }
@@ -62,7 +62,7 @@ class AccountUpdate extends Command
 
             $accounts[] = $account;
         } else {
-            $account = $this->choice("Choose account", array_merge(Account::orderBy('id')->pluck('username')->all(), ['all']));
+            $account = $this->choice('Choose account', array_merge(Account::orderBy('id')->pluck('username')->all(), ['all']));
 
             if ($account == 'all') {
                 $accounts = Account::all();
@@ -71,26 +71,26 @@ class AccountUpdate extends Command
             }
         }
 
-//        if (!is_null($username)) {
-//            $account = Account::whereUsername($username)->first();
-//
-//            if (!$account) {
-//                // TODO this will cause trouble if two or more accounts has the "same" name, but differentiate them using _ or -
-//                // TLDR Command argument needs to support spaces
-//                $username = str_replace(['_', '-'], ' ', $username);
-//                $account = Account::whereUsername($username)->first();
-//
-//                if (!$account) {
-//                    $this->info(sprintf('Could not find any existing account with username "%s".', $username));
-//
-//                    return 1;
-//                }
-//            }
-//
-//            $accounts[] = $account;
-//        } else {
-//            $accounts = Account::all();
-//        }
+        //        if (!is_null($username)) {
+        //            $account = Account::whereUsername($username)->first();
+        //
+        //            if (!$account) {
+        //                // TODO this will cause trouble if two or more accounts has the "same" name, but differentiate them using _ or -
+        //                // TLDR Command argument needs to support spaces
+        //                $username = str_replace(['_', '-'], ' ', $username);
+        //                $account = Account::whereUsername($username)->first();
+        //
+        //                if (!$account) {
+        //                    $this->info(sprintf('Could not find any existing account with username "%s".', $username));
+        //
+        //                    return 1;
+        //                }
+        //            }
+        //
+        //            $accounts[] = $account;
+        //        } else {
+        //            $accounts = Account::all();
+        //        }
 
         foreach ($accounts as $account) {
             if ($account->online !== 0) {

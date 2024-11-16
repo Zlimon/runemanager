@@ -8,8 +8,6 @@ class CreateHardTreasureTrailsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateHardTreasureTrailsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('hard_treasure_trails');
     }
-};
+}

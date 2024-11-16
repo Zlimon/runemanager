@@ -8,8 +8,6 @@ class CreateMagicTrainingArenaTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateMagicTrainingArenaTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('magic_training_arena');
     }
-};
+}

@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 class CreateOrUpdateAccountEquipment
 {
     /**
-     * @param Account $account
-     * @param array $equipment
-     * @return Equipment
      * @throws \Exception
      */
     public function createOrUpdateAccountEquipment(Account $account, array $equipment): Equipment
@@ -21,8 +18,8 @@ class CreateOrUpdateAccountEquipment
         try {
             $accountEquipment = $account->equipment()->first();
 
-            if (!$accountEquipment) {
-                $accountEquipment = new Equipment();
+            if (! $accountEquipment) {
+                $accountEquipment = new Equipment;
             }
 
             $accountEquipment->account_id = $account->id;

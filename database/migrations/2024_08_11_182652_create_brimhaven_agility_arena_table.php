@@ -8,8 +8,6 @@ class CreateBrimhavenAgilityArenaTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateBrimhavenAgilityArenaTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('brimhaven_agility_arena');
     }
-};
+}

@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- *
- *
  * @property int $id
  * @property int $user_id
  * @property AccountTypesEnum $account_type
@@ -23,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\AccountFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Account newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Account newQuery()
@@ -37,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereXp($value)
+ *
  * @mixin \Eloquent
  */
 class Account extends Model
@@ -97,7 +97,7 @@ class Account extends Model
     }
 
     // MongoDB relationship
-    public function getInventoryAttribute(): Inventory|null
+    public function getInventoryAttribute(): ?Inventory
     {
         return Inventory::where('account_id', $this->id)->first();
     }
@@ -108,7 +108,7 @@ class Account extends Model
     }
 
     // MongoDB relationship
-    public function getLootingBagAttribute(): LootingBag|null
+    public function getLootingBagAttribute(): ?LootingBag
     {
         return LootingBag::where('account_id', $this->id)->first();
     }
@@ -119,7 +119,7 @@ class Account extends Model
     }
 
     // MongoDB relationship
-    public function getBankAttribute(): Bank|null
+    public function getBankAttribute(): ?Bank
     {
         return Bank::where('account_id', $this->id)->first();
     }
@@ -130,7 +130,7 @@ class Account extends Model
     }
 
     // MongoDB relationship
-    public function getQuestAttribute(): Quest|null
+    public function getQuestAttribute(): ?Quest
     {
         return Quest::where('account_id', $this->id)->first();
     }
@@ -140,15 +140,15 @@ class Account extends Model
         return $this->hasOne(Equipment::class);
     }
 
-//    public function log() {
-//        return $this->hasMany(Log::class);
-//    }
-//
-//    public function logBroadcast() {
-//        return $this->hasManyThrough(Broadcast::class, Log::class);
-//    }
-//
-//    public function group() {
-//        return $this->belongsToMany(Group::class);
-//    }
+    //    public function log() {
+    //        return $this->hasMany(Log::class);
+    //    }
+    //
+    //    public function logBroadcast() {
+    //        return $this->hasManyThrough(Broadcast::class, Log::class);
+    //    }
+    //
+    //    public function group() {
+    //        return $this->belongsToMany(Group::class);
+    //    }
 }

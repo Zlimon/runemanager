@@ -8,8 +8,6 @@ class CreatePvpArenaRankTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreatePvpArenaRankTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('pvp_arena_rank');
     }
-};
+}

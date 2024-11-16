@@ -25,15 +25,13 @@ class AccountController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse
      * @throws ValidationException
      */
     public function search(Request $request): JsonResponse
     {
-        $request['account_types'] = array_map(function($item) {
+        $request['account_types'] = array_map(function ($item) {
             return Str::replace([' ', '-'], '_', Str::lower($item));
-        },$request->get('account_types', []) ?? []);
+        }, $request->get('account_types', []) ?? []);
 
         try {
             $username = $request->input('username');
@@ -42,14 +40,14 @@ class AccountController extends Controller
 
             // Add the AccountUsernameRule only if the username is not empty
             // This is because the rule should only be applied if a username is being searched for
-            if (!empty($username)) {
-                $rules['username'] = [new AccountUsernameRule()];
+            if (! empty($username)) {
+                $rules['username'] = [new AccountUsernameRule];
             }
 
-            if (!empty($request->get('account_types'))) {
+            if (! empty($request->get('account_types'))) {
                 $accountTypes = implode(',', array_values(AccountTypesEnum::returnAllAccountTypes()));
 
-                $rules['account_types'] = ['array', 'in:' . $accountTypes];
+                $rules['account_types'] = ['array', 'in:'.$accountTypes];
             }
 
             $request->validate($rules);
@@ -68,10 +66,6 @@ class AccountController extends Controller
         ], 200);
     }
 
-    /**
-     * @param array $request
-     * @return Builder
-     */
     private function searchQuery(array $request): Builder
     {
         $accounts = Account::query();
@@ -131,10 +125,6 @@ class AccountController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param Account $account
-     * @return JsonResponse
      */
     public function update(Request $request, Account $account): JsonResponse
     {
@@ -144,13 +134,13 @@ class AccountController extends Controller
             $decompressedData = gzdecode($compressedData);
 
             if ($decompressedData === false) {
-                throw new Exception("Failed to decompress data");
+                throw new Exception('Failed to decompress data');
             }
 
             $data = json_decode($decompressedData);
 
             if (isset($data->equipment)) {
-                $equipmentController = new EquipmentController();
+                $equipmentController = new EquipmentController;
 
                 return $equipmentController->update($data->equipment, $account);
             }
@@ -160,7 +150,7 @@ class AccountController extends Controller
             ], 404);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'An error occurred while updating the account. Message: ' . $e->getMessage(),
+                'message' => 'An error occurred while updating the account. Message: '.$e->getMessage(),
             ], 500);
         }
     }

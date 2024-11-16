@@ -8,8 +8,6 @@ class CreateThermonuclearSmokeDevilTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateThermonuclearSmokeDevilTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('thermonuclear_smoke_devil');
     }
-};
+}

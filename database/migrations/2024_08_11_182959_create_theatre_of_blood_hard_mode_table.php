@@ -8,8 +8,6 @@ class CreateTheatreOfBloodHardModeTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateTheatreOfBloodHardModeTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('theatre_of_blood_hard_mode');
     }
-};
+}

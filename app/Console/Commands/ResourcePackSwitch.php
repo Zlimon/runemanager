@@ -6,12 +6,13 @@ use App\Helpers\SettingHelper;
 use App\Models\ResourcePack;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
-use function Laravel\Prompts\search;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use ZanySoft\Zip\Zip;
 use ZanySoft\Zip\ZipManager;
+
+use function Laravel\Prompts\search;
 
 class ResourcePackSwitch extends Command implements PromptsForMissingInput
 {
@@ -49,6 +50,7 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
 
     /**
      * Execute the console command.
+     *
      * @throws \Throwable
      */
     public function handle(): int
@@ -59,31 +61,31 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
         $name = $resourcePack;
 
         if (is_null($name) || is_null($resourcePack)) {
-            $this->info(sprintf("No resource pack provided! No resource pack will be applied / existing resource pack will be deleted."));
+            $this->info(sprintf('No resource pack provided! No resource pack will be applied / existing resource pack will be deleted.'));
 
             SettingHelper::setSetting('resource_pack_id', 0);
 
             try {
                 File::deleteDirectory(resource_path('/css/resource-pack'));
             } catch (\Exception $e) {
-                $this->error(sprintf("Could not delete current resource pack. Message: %s", $e->getMessage()));
+                $this->error(sprintf('Could not delete current resource pack. Message: %s', $e->getMessage()));
             }
 
             return CommandAlias::SUCCESS;
         }
 
-        if (!$resourcePack || !File::exists(resource_path(sprintf("/css/resource-packs-downloaded/%s.zip", $name)))) {
+        if (! $resourcePack || ! File::exists(resource_path(sprintf('/css/resource-packs-downloaded/%s.zip', $name)))) {
             $this->fail(sprintf("Resource pack '%s' does not exist! Try downloading it again.", $name));
         }
 
-        $extractFrom = resource_path(sprintf("/css/resource-packs-downloaded/%s.zip", $name));
+        $extractFrom = resource_path(sprintf('/css/resource-packs-downloaded/%s.zip', $name));
         $extractTo = resource_path('/css/resource-pack-tmp');
 
         // Clean tmp dir
         File::cleanDirectory(resource_path('/css/resource-pack-tmp'));
 
         try {
-            $manager = new ZipManager();
+            $manager = new ZipManager;
             $manager->addZip((new Zip)->open($extractFrom));
             $extract = $manager->extract($extractTo, true);
         } catch (\Exception $e) {
@@ -100,7 +102,7 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
         try {
             File::delete(resource_path('/css/resource-pack/icon.png'));
         } catch (\Exception $e) {
-            $this->error(sprintf("Could not delete current icon image. Message: %s", $e->getMessage()));
+            $this->error(sprintf('Could not delete current icon image. Message: %s', $e->getMessage()));
         }
 
         // First file in the resource pack dir is the actual resource pack dir
@@ -109,7 +111,7 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
         // Copy resource pack from parent dir in tmp dir, and extract files one level up
         try {
             File::copyDirectory(
-                resource_path('/css/resource-pack-tmp/' . $resourcePackDir),
+                resource_path('/css/resource-pack-tmp/'.$resourcePackDir),
                 resource_path('/css/resource-pack')
             );
         } catch (\Exception $e) {
@@ -121,11 +123,11 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
 
         // Just display a default image if resource pack has no icon image
         try {
-            if (!File::exists(resource_path('/css/resource-pack/icon.png'))) {
+            if (! File::exists(resource_path('/css/resource-pack/icon.png'))) {
                 File::copy(public_path('/images/background.png'), resource_path('/css/resource-pack/icon.png'));
             }
         } catch (\Exception $e) {
-            $this->error(sprintf("Could not copy default icon image. Message: %s", $e->getMessage()));
+            $this->error(sprintf('Could not copy default icon image. Message: %s', $e->getMessage()));
         }
 
         SettingHelper::setSetting('site_hash', Str::random(20));
@@ -134,7 +136,7 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
         try {
             File::cleanDirectory(resource_path('/css/resource-pack-tmp'));
         } catch (\Exception $e) {
-            $this->error(sprintf("Could not clean tmp dir. Message: %s", $e->getMessage()));
+            $this->error(sprintf('Could not clean tmp dir. Message: %s', $e->getMessage()));
         }
 
         $this->info(sprintf("Resource pack '%s' is now ready for use.", $resourcePack->alias));

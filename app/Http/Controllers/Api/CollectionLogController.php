@@ -17,8 +17,6 @@ use Illuminate\Validation\Rule;
 class CollectionLogController extends Controller
 {
     /**
-     * @param Request $request
-     * @return JsonResponse
      * @throws GuzzleException
      */
     public function user(Request $request): JsonResponse
@@ -30,8 +28,8 @@ class CollectionLogController extends Controller
         ]);
 
         try {
-            if (Cache::has('collectionlog_user_' . $request['username'])) {
-                $collectionLog = Cache::get('collectionlog_user_' . $request['username']);
+            if (Cache::has('collectionlog_user_'.$request['username'])) {
+                $collectionLog = Cache::get('collectionlog_user_'.$request['username']);
             } else {
                 $collectionLog = $this->request($request);
             }
@@ -42,7 +40,7 @@ class CollectionLogController extends Controller
         // Only return tabs from collection log based on provided tabs from request
         // Unset the other tabs
         foreach ($collectionLog['collectionLog']['tabs'] as $tabName => $tab) {
-            if (!in_array($tabName, $request['tabs'])) {
+            if (! in_array($tabName, $request['tabs'])) {
                 unset($collectionLog['collectionLog']['tabs'][$tabName]);
             }
         }
@@ -51,20 +49,18 @@ class CollectionLogController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return array
      * @throws GuzzleException
      */
     private function request(Request $request): array
     {
-        if (Cache::has('collectionlog_user_' . $request['username'])) {
-            return Cache::get('collectionlog_user_' . $request['username']);
+        if (Cache::has('collectionlog_user_'.$request['username'])) {
+            return Cache::get('collectionlog_user_'.$request['username']);
         }
 
-        $collectionLogClient = new CollectionLogClient();
+        $collectionLogClient = new CollectionLogClient;
 
         try {
-            $response = $collectionLogClient->request('GET', '/collectionlog/user/' . $request['username']);
+            $response = $collectionLogClient->request('GET', '/collectionlog/user/'.$request['username']);
 
             $result = json_decode($response->getBody()->getContents(), true);
         } catch (Exception $e) {
@@ -77,15 +73,11 @@ class CollectionLogController extends Controller
             throw $e;
         }
 
-        Cache::set('collectionlog_user_' . $request['username'], $result, 60 * 24);
+        Cache::set('collectionlog_user_'.$request['username'], $result, 60 * 24);
 
         return $result;
     }
 
-    /**
-     * @param array $tabs
-     * @return array
-     */
     private function formatTabResult(array $tabs): array
     {
         $reindexCollection = [];

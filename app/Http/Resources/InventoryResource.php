@@ -21,7 +21,7 @@ class InventoryResource extends JsonResource
 
         $items = Item::select('_id', 'name', 'lowalch', 'highalch', 'examine', 'icon')->whereIn('_id', $itemIds)->get()->keyBy('_id');
 
-        $getItem = fn($id) => $items->get($id);
+        $getItem = fn ($id) => $items->get($id);
 
         $inventory = array_map(function ($slot) use ($getItem) {
             return [

@@ -24,17 +24,17 @@ class BankResource extends JsonResource
                 $itemId = $bankItem[0];
                 $quantity = $bankItem[1];
 
-                $dbItem = Item::where('id', (string)$itemId)->first();
+                $dbItem = Item::where('id', (string) $itemId)->first();
 
                 // Query to get the item with the highest stacked value. This is to get the correct item icon.
                 // TODO Need to get item name from plugin
-//                $dbItem = Item::where('name', 'Coins')
-//                    ->where(function($query) {
-//                        $query->where('stacked', '<=', 1500000)
-//                              ->orWhereNull('stacked');
-//                    })
-//                    ->orderBy('stacked', 'desc') // Sort descending, nulls will automatically go to the bottom
-//                    ->get();
+                //                $dbItem = Item::where('name', 'Coins')
+                //                    ->where(function($query) {
+                //                        $query->where('stacked', '<=', 1500000)
+                //                              ->orWhereNull('stacked');
+                //                    })
+                //                    ->orderBy('stacked', 'desc') // Sort descending, nulls will automatically go to the bottom
+                //                    ->get();
 
                 if ($dbItem) {
                     $item = (new ItemResource($dbItem))->resolve();
@@ -42,7 +42,7 @@ class BankResource extends JsonResource
                     $item = [
                         'id' => $item['id'],
                         'name' => $item['name'],
-//                        'cost' => $item['cost'],
+                        //                        'cost' => $item['cost'],
                         'lowalch' => $item['lowalch'],
                         'highalch' => $item['highalch'],
                         'examine' => $item['examine'],
@@ -53,7 +53,7 @@ class BankResource extends JsonResource
                     $item = [
                         'id' => 0,
                         'name' => 'Dwarf remains',
-//                        'cost' => 0,
+                        //                        'cost' => 0,
                         'lowalch' => 0,
                         'highalch' => 0,
                         'examine' => 'The body of a Dwarf savaged by Goblins.',

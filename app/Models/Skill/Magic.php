@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property int $id
  * @property int $account_id
  * @property int $rank
@@ -17,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Account $account
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Magic newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Magic newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Magic query()
@@ -27,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Magic whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Magic whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Magic whereXp($value)
+ *
  * @mixin \Eloquent
  */
 class Magic extends Model

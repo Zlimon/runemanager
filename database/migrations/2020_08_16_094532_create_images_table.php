@@ -25,11 +25,11 @@ class CreateImagesTable extends Migration
         });
 
         // TODO refactor to use Storage facade instead
-        if (!File::exists(public_path('storage'))) {
+        if (! File::exists(public_path('storage'))) {
             Artisan::call('storage:link');
         }
 
-        if (!File::exists(public_path('storage/newspost'))) {
+        if (! File::exists(public_path('storage/newspost'))) {
             File::makeDirectory(public_path('storage/newspost'));
         }
 

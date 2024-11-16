@@ -8,8 +8,6 @@ class CreateTombsOfAmascutExpertModeTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateTombsOfAmascutExpertModeTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('tombs_of_amascut_expert_mode');
     }
-};
+}

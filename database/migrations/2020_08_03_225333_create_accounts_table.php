@@ -1,6 +1,5 @@
 <?php
 
-use App\Helpers\Helper;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,8 +15,8 @@ class CreateAccountsTable extends Migration
     {
 
         $accountTypes = array_map(function ($accountType) {
-                return $accountType->value;
-            }, \App\Enums\AccountTypesEnum::cases()
+            return $accountType->value;
+        }, \App\Enums\AccountTypesEnum::cases()
         );
 
         Schema::create('accounts', function (Blueprint $table) use ($accountTypes) {

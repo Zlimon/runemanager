@@ -37,9 +37,6 @@ class LootingBagController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param  Account  $account
-     * @return JsonResponse
      */
     public function show(Account $account): JsonResponse
     {
@@ -77,8 +74,8 @@ class LootingBagController extends Controller
 
         $lootingBag = LootingBag::where('account_id', $account->id)->first();
 
-        if (!$lootingBag) {
-            $lootingBag = new LootingBag();
+        if (! $lootingBag) {
+            $lootingBag = new LootingBag;
             $lootingBag->account_id = $account->id;
         }
 

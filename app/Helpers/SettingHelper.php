@@ -6,20 +6,12 @@ use App\Models\Setting;
 
 class SettingHelper
 {
-    /**
-     * @param string $key
-     * @param $value
-     * @param string $type
-     * @return bool
-     */
     public static function setSetting(string $key, $value, string $type = 'string'): bool
     {
         return Setting::set($key, $value);
     }
 
     /**
-     * @param $key
-     * @param $default
      * @return Setting|bool|int|mixed
      */
     public static function getSetting($key, $default = null): mixed

@@ -5,14 +5,13 @@ namespace App\Models;
 use Laravel\Jetstream\Membership as JetstreamMembership;
 
 /**
- * 
- *
  * @property int $id
  * @property int $team_id
  * @property int $user_id
  * @property string|null $role
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Membership newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Membership newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Membership query()
@@ -22,6 +21,7 @@ use Laravel\Jetstream\Membership as JetstreamMembership;
  * @method static \Illuminate\Database\Eloquent\Builder|Membership whereTeamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Membership whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Membership whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Membership extends JetstreamMembership

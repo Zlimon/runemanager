@@ -23,35 +23,35 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::prefix('/accounts')->group(function() {
+    Route::prefix('/accounts')->group(function () {
         Route::get('/', [\App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
         Route::get('/{account}', [\App\Http\Controllers\AccountController::class, 'show'])->name('accounts.show');
     });
 
-    Route::prefix('/hiscores')->group(function() {
+    Route::prefix('/hiscores')->group(function () {
         Route::get('/skills/{skill}', [\App\Http\Controllers\SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
-        Route::get('/bosses/{boss}', function() {
+        Route::get('/bosses/{boss}', function () {
             $boss = $this->router->current()->parameters['boss'];
 
-            if (!isset($boss)) {
+            if (! isset($boss)) {
                 abort(404);
             }
 
-            return App::call('\App\Http\Controllers\CollectionHiscoreController@index' , ['category' => 'boss', 'collection' => $boss]);
+            return App::call('\App\Http\Controllers\CollectionHiscoreController@index', ['category' => 'boss', 'collection' => $boss]);
         })->name('hiscores.bosses.index');
-        Route::get('/clues/{clue}', function() {
+        Route::get('/clues/{clue}', function () {
             $clue = $this->router->current()->parameters['clue'];
 
-            if (!isset($clue)) {
+            if (! isset($clue)) {
                 abort(404);
             }
 
-            return App::call('\App\Http\Controllers\CollectionHiscoreController@index' , ['category' => 'clue', 'collection' => $clue]);
+            return App::call('\App\Http\Controllers\CollectionHiscoreController@index', ['category' => 'clue', 'collection' => $clue]);
         })->name('hiscores.clues.index');
     });
 
-    Route::prefix('/admin')->group(function() {
-        Route::prefix('/hiscores')->group(function() {
+    Route::prefix('/admin')->group(function () {
+        Route::prefix('/hiscores')->group(function () {
             Route::get('/create', [\App\Http\Controllers\Admin\HiscoreController::class, 'create'])->name('admin.hiscores.create');
         });
     });

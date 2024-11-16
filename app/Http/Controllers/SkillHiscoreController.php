@@ -12,9 +12,6 @@ class SkillHiscoreController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @param string $skill
-     * @return Response
      */
     public function index(string $skill): Response
     {
@@ -22,7 +19,7 @@ class SkillHiscoreController extends Controller
 
         $modelClass = $skillRecord->model;
 
-        if (!class_exists($modelClass)) {
+        if (! class_exists($modelClass)) {
             abort(404, 'Model not found.');
         }
 

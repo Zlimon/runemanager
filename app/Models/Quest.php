@@ -11,7 +11,6 @@ class Quest extends Model
 
     protected $primaryKey = '_id';
 
-
     protected $casts = [
         'account_id' => 'int',
     ];

@@ -8,8 +8,6 @@ class CreateEliteTreasureTrailsRareTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -27,11 +25,9 @@ class CreateEliteTreasureTrailsRareTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
         Schema::dropIfExists('elite_treasure_trails_rare');
     }
-};
+}

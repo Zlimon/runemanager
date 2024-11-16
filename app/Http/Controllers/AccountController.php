@@ -13,8 +13,6 @@ class AccountController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return Response
      */
     public function index(): Response
     {
@@ -43,8 +41,6 @@ class AccountController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param Account $account
      */
     public function show(Account $account): Response
     {

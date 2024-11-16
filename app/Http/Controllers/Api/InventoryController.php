@@ -37,9 +37,6 @@ class InventoryController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param  Account  $account
-     * @return JsonResponse
      */
     public function show(Account $account): JsonResponse
     {
@@ -58,10 +55,6 @@ class InventoryController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  Request  $request
-     * @param  Account  $account
-     * @return JsonResponse
      */
     public function update(Request $request, Account $account): JsonResponse
     {
@@ -81,8 +74,8 @@ class InventoryController extends Controller
 
         $inventory = Inventory::where('account_id', $account->id)->first();
 
-        if (!$inventory) {
-            $inventory = new Inventory();
+        if (! $inventory) {
+            $inventory = new Inventory;
             $inventory->account_id = $account->id;
         }
 

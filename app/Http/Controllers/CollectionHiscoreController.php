@@ -12,10 +12,6 @@ class CollectionHiscoreController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @param string $category
-     * @param string $collection
-     * @return Response
      */
     public function index(string $category, string $collection): Response
     {
@@ -23,7 +19,7 @@ class CollectionHiscoreController extends Controller
 
         $modelClass = $collectionRecord->model;
 
-        if (!class_exists($modelClass)) {
+        if (! class_exists($modelClass)) {
             abort(404, 'Model not found.');
         }
 
