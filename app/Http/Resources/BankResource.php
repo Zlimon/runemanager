@@ -16,50 +16,43 @@ class BankResource extends JsonResource
     public function toArray(Request $request): array
     {
         $bank = [];
+        $allItemIds = collect($this->bank)
+            ->flatten(1) // Flatten to get all item arrays
+            ->pluck(0)   // Extract only the first element (item ID) of each array
+            ->unique()   // Ensure IDs are unique
+            ->toArray();
+
+        // Fetch all required items in a single query
+        $items = Item::select('_id', 'name', 'lowalch', 'highalch', 'examine', 'icon')
+            ->whereIn('_id', $allItemIds)
+            ->get()
+            ->keyBy('_id');
+
         foreach ($this->bank as $tabIndex => $tabs) {
             $tabIndex = $tabIndex + 1;
-            $bank["tab-$tabIndex"] = $tabs;
+            $bank["tab-$tabIndex"] = [];
 
             foreach ($tabs as $itemIndex => $bankItem) {
                 $itemId = $bankItem[0];
                 $quantity = $bankItem[1];
 
-                $dbItem = Item::where('id', (string) $itemId)->first();
-
-                // Query to get the item with the highest stacked value. This is to get the correct item icon.
-                // TODO Need to get item name from plugin
-                //                $dbItem = Item::where('name', 'Coins')
-                //                    ->where(function($query) {
-                //                        $query->where('stacked', '<=', 1500000)
-                //                              ->orWhereNull('stacked');
-                //                    })
-                //                    ->orderBy('stacked', 'desc') // Sort descending, nulls will automatically go to the bottom
-                //                    ->get();
-
-                if ($dbItem) {
-                    $item = (new ItemResource($dbItem))->resolve();
-
-                    $item = [
-                        'id' => $item['id'],
-                        'name' => $item['name'],
-                        //                        'cost' => $item['cost'],
-                        'lowalch' => $item['lowalch'],
-                        'highalch' => $item['highalch'],
-                        'examine' => $item['examine'],
-                        'icon' => $item['icon'],
-                    ];
-                } else {
-                    // If the item is not found, we'll just use a dummy item
-                    $item = [
-                        'id' => 0,
-                        'name' => 'Dwarf remains',
-                        //                        'cost' => 0,
-                        'lowalch' => 0,
-                        'highalch' => 0,
-                        'examine' => 'The body of a Dwarf savaged by Goblins.',
-                        'icon' => 'iVBORw0KGgoAAAANSUhEUgAAACQAAAAgCAYAAAB6kdqOAAACPElEQVR4Xs2XS0tCQRTHO5',
-                    ];
-                }
+                // Lookup the item in the fetched items or use a dummy item
+                $dbItem = $items->get($itemId);
+                $item = $dbItem ? [
+                    'id' => $dbItem->_id,
+                    'name' => $dbItem->name,
+                    'lowalch' => $dbItem->lowalch,
+                    'highalch' => $dbItem->highalch,
+                    'examine' => $dbItem->examine,
+                    'icon' => $dbItem->icon,
+                ] : [
+                    'id' => 0,
+                    'name' => 'Dwarf remains',
+                    'lowalch' => 0,
+                    'highalch' => 0,
+                    'examine' => 'The body of a Dwarf savaged by Goblins.',
+                    'icon' => 'iVBORw0KGgoAAAANSUhEUgAAACQAAAAgCAYAAAB6kdqOAAACPElEQVR4Xs2XS0tCQRTHO5',
+                ];
 
                 $bank["tab-$tabIndex"][$itemIndex] = [
                     'item' => $item,
