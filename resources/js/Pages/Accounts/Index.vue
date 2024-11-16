@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import debounce from 'lodash/debounce';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import TextInput from "@/Components/TextInput.vue";
@@ -12,9 +12,8 @@ const props = defineProps({
     accountTypesProp: Array,
 });
 
-
-let accounts = ref([]);
 let accountTypes = ref(props.accountTypesProp);
+let accounts = ref([]);
 
 const formatedAccountTypeNames = computed({
     get: () => {
@@ -31,6 +30,10 @@ const formatAccountTypeName = (accountType) => {
 //----------------------------------------------------;
 // searchAccounts
 //----------------------------------------------------;
+onMounted(() => {
+    searchAccounts();
+});
+
 let searchAccountForm = useForm({
     username: '',
     account_types: [],
@@ -73,7 +76,6 @@ const searchAccounts = (load = true) => {
 
     axios.post(route('api.accounts.search'), searchAccountForm)
         .then((response) => {
-            console.log(response)
             accounts.value = response.data;
 
             searchAccountForm.errors = {};
