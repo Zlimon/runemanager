@@ -30,7 +30,7 @@ const getCollectionLog = () => {
         }).catch(error => {
         console.error(error)
     }).finally(() => {
-        getCollectionLogLoading.value = false;
+        //
     });
 };
 
@@ -55,6 +55,7 @@ const showCollectionLog = (tab, collection = null) => {
         }).catch(error => {
         console.error(error)
     }).finally(() => {
+        getCollectionLogLoading.value = false;
         showCollectionLogLoading.value = false;
     });
 };
