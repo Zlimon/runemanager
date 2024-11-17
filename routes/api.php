@@ -39,16 +39,15 @@ Route::middleware([
                 Route::get('/', [App\Http\Controllers\Api\QuestController::class, 'show'])->name('api.accounts.quests.show');
                 Route::put('/update', [App\Http\Controllers\Api\QuestController::class, 'update'])->name('api.accounts.quests.update');
             });
+
+            Route::prefix('/collectionlog')->group(function () {
+                Route::post('/', [App\Http\Controllers\Api\CollectionLogController::class, 'index'])->name('api.accounts.collectionlog.index');
+                Route::get('/{tab}/{collection}', [App\Http\Controllers\Api\CollectionLogController::class, 'show'])->name('api.accounts.collectionlog.show');
+            });
         });
     });
 
     Route::post('/npc/search', [App\Http\Controllers\Api\NpcController::class, 'search'])->name('api.npc.search');
-
-    Route::prefix('/collectionlog')->group(function () {
-        Route::prefix('/user')->group(function () {
-            Route::post('/', [App\Http\Controllers\Api\CollectionLogController::class, 'user'])->name('api.collectionlog.user');
-        });
-    });
 
     Route::prefix('/admin')->group(function () {
         Route::prefix('/hiscores')->group(function () {
