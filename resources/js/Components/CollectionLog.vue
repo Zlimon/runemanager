@@ -36,7 +36,12 @@ const getCollectionLog = () => {
 
 let showCollectionLogLoading = ref([]);
 
-const showCollectionLog = (tab, collection) => {
+const showCollectionLog = (tab, collection = null) => {
+    // Select first collection if none is selected
+    if (collection === null) {
+        collection = Object.keys(collectionLog.value.collection_log[tab])[0];
+    }
+
     // Do not fetch if already loaded
     if (collectionLog.value.collection_log[tab][collection].items !== undefined) {
         return;
@@ -72,6 +77,7 @@ function handleImageError() {
                     role="tablist">
                     <li v-for="tab in tabs" role="presentation">
                         <button
+                            @click="showCollectionLog(tab)"
                             class="inline-block rounded-t-lg p-4 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
                             :id="`${tab}-tab`"
                             :data-tabs-target="`#${tab}`"
