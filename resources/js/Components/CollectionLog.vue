@@ -26,7 +26,7 @@ const getCollectionLog = () => {
         .then((response) => {
             collectionLog.value = response.data;
 
-            showCollectionLog('Bosses', 'abyssal-sire');
+            showCollectionLog(tabs[0]);
         }).catch(error => {
         console.error(error)
     }).finally(() => {
@@ -34,7 +34,7 @@ const getCollectionLog = () => {
     });
 };
 
-let showCollectionLogLoading = ref([]);
+let showCollectionLogLoading = ref(true);
 
 const showCollectionLog = (tab, collection = null) => {
     // Select first collection if none is selected
@@ -49,7 +49,7 @@ const showCollectionLog = (tab, collection = null) => {
 
     showCollectionLogLoading.value = true;
 
-    axios.get(route('api.accounts.collectionlog.show', [account.value, tab, collection]),)
+    axios.get(route('api.accounts.collectionlog.show', [account.value, tab, collection]))
         .then((response) => {
             collectionLog.value.collection_log[tab][collection] = response.data;
         }).catch(error => {
@@ -70,26 +70,24 @@ function handleImageError() {
 <template>
     <div v-if="!getCollectionLogLoading">
         <div v-if="collectionLog !== undefined">
-            <div class="">
-                <ul class="-mb-px flex flex-wrap gap-2 text-center text-sm font-medium"
-                    id="default-tab"
-                    data-tabs-toggle="#default-tab-content"
-                    role="tablist">
-                    <li v-for="tab in tabs" role="presentation">
-                        <button
-                            @click="showCollectionLog(tab)"
-                            class="inline-block rounded-t-lg p-4 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
-                            :id="`${tab}-tab`"
-                            :data-tabs-target="`#${tab}`"
-                            type="button"
-                            role="tab"
-                            :aria-controls="tab"
-                            aria-selected="false">
-                            {{ tab }}
-                        </button>
-                    </li>
-                </ul>
-            </div>
+            <ul class="-mb-px flex flex-wrap gap-2 text-center text-sm font-medium"
+                id="default-tab"
+                data-tabs-toggle="#default-tab-content"
+                role="tablist">
+                <li v-for="tab in tabs" role="presentation">
+                    <button
+                        @click="showCollectionLog(tab)"
+                        class="inline-block rounded-t-lg p-4 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
+                        :id="`${tab}-tab`"
+                        :data-tabs-target="`#${tab}`"
+                        type="button"
+                        role="tab"
+                        :aria-controls="tab"
+                        aria-selected="false">
+                        {{ tab }}
+                    </button>
+                </li>
+            </ul>
 
             <div id="default-tab-content">
                 <div v-for="tab in tabs"
