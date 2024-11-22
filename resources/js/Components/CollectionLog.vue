@@ -44,6 +44,8 @@ const showCollectionLog = (tab, collection = null) => {
 
     // Do not fetch if already loaded
     if (collectionLog.value.collection_log[tab][collection].items !== undefined) {
+        activeCollection.value = collectionLog.value.collection_log[tab][collection];
+
         return;
     }
 
@@ -51,7 +53,8 @@ const showCollectionLog = (tab, collection = null) => {
 
     axios.get(route('api.accounts.collectionlog.show', [account.value, tab, collection]))
         .then((response) => {
-            collectionLog.value.collection_log[tab][collection] = response.data;
+            collectionLog.value.collection_log[tab][collection] = response.data.collection_log;
+            activeCollection.value = collectionLog.value.collection_log[tab][collection];
         }).catch(error => {
         console.error(error)
     }).finally(() => {
@@ -60,128 +63,123 @@ const showCollectionLog = (tab, collection = null) => {
     });
 };
 
-function handleImageError() {
-    document.getElementById('screenshot-container')?.classList.add('!hidden');
-    document.getElementById('docs-card')?.classList.add('!row-span-1');
-    document.getElementById('docs-card-content')?.classList.add('!flex-row');
-    document.getElementById('background')?.classList.add('!hidden');
+let activeTab = ref(tabs[0]);
+let activeCollection = ref(null);
+let activeItem = ref(null);
+
+function setActiveTab(tab) {
+    activeTab.value = tab;
+
+    showCollectionLog(tab);
 }
 </script>
 
 <template>
     <div v-if="!getCollectionLogLoading">
         <div v-if="collectionLog !== undefined">
-            <ul class="-mb-px flex flex-wrap gap-2 text-center text-sm font-medium"
-                id="default-tab"
-                data-tabs-toggle="#default-tab-content"
-                role="tablist">
-                <li v-for="tab in tabs" role="presentation">
-                    <button
-                        @click="showCollectionLog(tab)"
-                        class="inline-block rounded-t-lg p-4 !text-black active bg-beige-300 !border-t !border-b !border-b-beige-300 !border-x !border-beige-700 dark:border-gray-700 dark:bg-gray-800 dark:text-blue-500"
-                        :id="`${tab}-tab`"
-                        :data-tabs-target="`#${tab}`"
-                        type="button"
-                        role="tab"
-                        :aria-controls="tab"
-                        aria-selected="false">
+            <div class="flex flex-col">
+                <!-- Vertical tabs -->
+                <div class="tabs tabs-lifted" role="tablist">
+                    <a v-for="tab in Object.keys(collectionLog.collection_log)"
+                       :class="{ 'tab-active !bg-base-200': activeTab === tab }"
+                       class="tab"
+                       role="tab"
+                       @click="setActiveTab(tab)">
                         {{ tab }}
-                    </button>
-                </li>
-            </ul>
+                    </a>
+                </div>
 
-            <div id="default-tab-content">
-                <div v-for="tab in tabs"
-                     class="hidden rounded-r-lg rounded-b-lg border shadow bg-beige-300 border-beige-700 dark:bg-gray-800"
-                     :id="tab"
-                     role="tabpanel"
-                     :aria-labelledby="`${tab}-tab`">
-                    <div class="h-[454px] md:flex">
-                        <ul class="overflow-y-scroll text-sm font-medium text-gray-500 flex-column dark:text-gray-400 md:me-4 md:mb-0"
-                            id="default-sub-tab"
-                            data-tabs-toggle="#default-sub-tab-content"
-                            role="tablist">
-                            <li v-for="(row, collection) in collectionLog.collection_log[tab]" role="presentation">
-                                <button
-                                    @click="showCollectionLog(tab, collection)"
-                                    class="inline-block w-full !text-black !border-b-2 !border-beige-700 p-4 text-left active hover:bg-beige-300 hover:text-black dark:border-gray-700 dark:text-gray-500 dark:hover:bg-gray-800"
-                                    :id="`${collection}-tab`"
-                                    :data-tabs-target="`#${collection}`"
-                                    type="button"
-                                    role="tab"
-                                    :aria-controls="`${collection}`"
-                                    aria-selected="false">
-                                    {{ row.name }}
-                                    <span :class="{
-                                        'text-green-500': row.obtained === row.total,
-                                        'text-red-500': row.obtained === 0,
-                                        'text-yellow-500': row.obtained >= 1 && row.obtained !== row.total
-                                    }">
-                                        {{ row.obtained }} <span class="text-black">/</span> {{ row.total }}
-                                    </span>
-                                </button>
-                            </li>
-                        </ul>
-                        <div class="overflow-y-scroll w-full" id="default-sub-tab-content">
-                            <div
-                                v-for="(row, collection) in collectionLog.collection_log[tab]"
-                                class="hidden p-4"
-                                :id="collection"
-                                role="tabpanel"
-                                :aria-labelledby="`${collection}-tab`">
-                                <h5>{{ row.name }}</h5>
-                                <p class="text-gray-500 dark:text-gray-400">
-                                    Obtained:
-                                    <span :class="{
-                                            'text-green-500': row.obtained === row.total,
-                                            'text-red-500': row.obtained === 0,
-                                            'text-yellow-500': row.obtained >= 1 && row.obtained !== row.total
-                                        }">
-                                            {{ row.obtained }} <span class="text-black">/</span> {{ row.total }}
-                                    </span>
-                                </p>
-                                <div v-for="killCount in row.killCount">
-                                    <p class="text-gray-500 dark:text-gray-400">
-                                        {{ killCount.name }}: <span class="font-bold">{{ killCount.amount }}</span>
-                                    </p>
-                                </div>
-
-                                <div v-if="!showCollectionLogLoading">
-                                    <ul class="mt-4 grid grid-cols-5 gap-4">
-                                        <li v-for="item in row.items" class="flex items-center justify-between">
-                                            <button :data-tooltip-target="`${collection}-${item.id}-tooltip-bottom`"
-                                                    data-tooltip-placement="bottom"
-                                                    type="button"
-                                                    class="relative h-20 w-20 rounded-lg border p-4 border-beige-700 dark:border-gray-700">
-                                                <span v-if="item.quantity > 0"
-                                                      class="absolute top-0 left-0 p-1 text-sm">
-                                                    {{ item.quantity }}
-                                                </span>
-                                                <img v-if="item.icon"
-                                                     :src="`data:image/jpeg;base64,${item.icon}`"
-                                                     class="mx-auto h-10 w-10 object-contain"
-                                                     :class="{ 'opacity-50': item.obtained === false }"
-                                                     loading="lazy"
-                                                     @error="handleImageError">
-                                                <span v-else>
-                                                    {{ item.name }}
-                                                </span>
-                                            </button>
-
-                                            <div :id="`${collection}-${item.id}-tooltip-bottom`"
-                                                 role="tooltip"
-                                                 class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700">
-                                                <p>{{ item.name }}</p>
-                                                <p>{{ item.examine }}</p>
-                                                <p v-if="item.obtainedAt !== null">
-                                                    {{ dayjs(item.obtainedAt).format('MMM D, YYYY h:mm A') }}</p>
-                                                <div class="tooltip-arrow" data-popper-arrow></div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <Loader :loading="showCollectionLogLoading" :component="true"></Loader>
+                <!-- Tab content -->
+                <div class="flex bg-base-200 border-x border-b border-base-300 rounded-b">
+                    <!-- Tab left panel -->
+                    <div class="h-[454px] overflow-y-scroll rounded-b-lg w-1/3">
+                        <div v-for="tab in Object.keys(collectionLog.collection_log)"
+                             :key="tab">
+                            <div v-show="activeTab === tab">
+                                <ul class="menu">
+                                    <li v-for="collection in collectionLog.collection_log[tab]"
+                                        :key="collection.slug">
+                                        <div :class="{ 'active': activeCollection === collection }"
+                                             class="flex justify-between"
+                                             @click="showCollectionLog(tab, collection.slug)">
+                                            <span class="max-w-32 truncate">{{ collection.name }}</span>
+                                            <span :class="{
+                                                'text-success': collection.obtained === collection.total,
+                                                'text-error': collection.obtained === 0,
+                                                'text-warning': collection.obtained >= 1 && collection.obtained !== collection.total
+                                            }" class="text-right">
+                                                {{ collection.obtained }}
+                                                <span class="text-black"> / </span>
+                                                <span>{{ collection.total }}</span>
+                                            </span>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab right panel -->
+                    <div class="h-[454px] overflow-y-scroll w-2/3">
+                        <div v-if="showCollectionLogLoading" class="pt-4">
+                            <Loader :component="true" :loading="showCollectionLogLoading"></Loader>
+                        </div>
+                        <div v-else class="p-4">
+                            <!-- Tab right panel header -->
+                            <h5>{{ activeCollection.name }}</h5>
+                            <p class="text-gray-500 dark:text-gray-400">
+                                <span>Obtained: </span>
+                                <span :class="{
+                                    'text-success': activeCollection.obtained === activeCollection.total,
+                                    'text-error': activeCollection.obtained === 0,
+                                    'text-warning': activeCollection.obtained >= 1 && activeCollection.obtained !== activeCollection.total
+                                }">
+                                    {{ activeCollection.obtained }} <span
+                                    class="text-black">/</span> {{ activeCollection.total }}
+                            </span>
+                            </p>
+                            <div v-for="killCount in activeCollection.killCount">
+                                <p class="text-gray-500 dark:text-gray-400">
+                                    <span>{{ killCount.name }}: </span>
+                                    <span class="font-bold">{{ killCount.amount }}</span>
+                                </p>
+                            </div>
+
+                            <!-- Tab right panel items -->
+                            <ul v-if="activeCollection.items !== null"
+                                class="m-2 grid grid-cols-6 gap-2">
+                                <li v-for="(item, slot) in activeCollection.items">
+                                    <div class="box h-14 w-14 hover:bg-base-200"
+                                         @mouseleave="activeItem = null"
+                                         @mouseover="item.item !== null ? activeItem = item.item?._id : null">
+                                        <div v-if="item.item !== null">
+                                            <span v-if="item.quantity > 1"
+                                                  class="absolute p-1 text-xs font-bold">
+                                                {{ item.quantity }}
+                                            </span>
+                                            <div class="flex justify-center items-center h-14">
+                                                <img v-if="item.item.icon"
+                                                     :class="{ 'opacity-50': item.obtained === false || item.obtained === 0 }"
+                                                     :src="`data:image/jpeg;base64,${item.item.icon}`"
+                                                     class="object-contain"
+                                                     loading="lazy">
+                                                <span v-else>
+                                                    {{ item.item.name }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="activeItem === item.item?._id"
+                                         class="box-tooltip">
+                                        <p>{{ item.item.name }}</p>
+                                        <p>{{ item.item.examine }}</p>
+                                        <p v-if="item.item.obtainedAt !== undefined">
+                                            {{ dayjs(item.item.obtainedAt).format('MMM D, YYYY h:mm A') }}
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -191,5 +189,5 @@ function handleImageError() {
             <p class="text-gray-500 dark:text-gray-400">No collection log found for this user</p>
         </div>
     </div>
-    <Loader :loading="getCollectionLogLoading" :component="true"></Loader>
+    <Loader :component="true" :loading="getCollectionLogLoading"></Loader>
 </template>
