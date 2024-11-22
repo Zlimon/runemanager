@@ -25,7 +25,7 @@ class InventoryResource extends JsonResource
 
         $inventory = array_map(function ($slot) use ($getItem) {
             return [
-                '_id' => $slot[0],
+                'id' => $slot[0],
                 'item' => $getItem($slot[0]),
                 'amount' => $slot[1],
             ];
@@ -34,7 +34,7 @@ class InventoryResource extends JsonResource
         return [
             '_id' => $this->_id,
             'account_id' => $this->account_id,
-            'inventory' => $inventory,
+            'items' => $inventory,
         ];
     }
 }
