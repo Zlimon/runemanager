@@ -15,7 +15,7 @@ onMounted(() => {
 
 const tabs = ['Bosses', 'Raids', 'Clues'];
 let getCollectionLogLoading = ref(true);
-let collectionLog = ref([]);
+let collectionLog = ref(null);
 
 const getCollectionLog = () => {
     getCollectionLogLoading.value = true;
@@ -25,10 +25,10 @@ const getCollectionLog = () => {
     })
         .then((response) => {
             collectionLog.value = response.data;
-
             showCollectionLog(tabs[0]);
         }).catch(error => {
         console.error(error)
+        getCollectionLogLoading.value = false;
     }).finally(() => {
         //
     });
@@ -76,7 +76,7 @@ function setActiveTab(tab) {
 
 <template>
     <div v-if="!getCollectionLogLoading">
-        <div v-if="collectionLog !== undefined">
+        <div v-if="collectionLog !== null">
             <div class="flex flex-col">
                 <!-- Vertical tabs -->
                 <div class="tabs tabs-lifted" role="tablist">
