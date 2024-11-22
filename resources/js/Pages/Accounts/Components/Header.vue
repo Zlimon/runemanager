@@ -1,7 +1,8 @@
 <script setup>
-import {ref, onMounted} from "vue";
+import {ref} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import dayjs from "dayjs";
+import Icon from "@/Pages/Accounts/Components/Icon.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -13,8 +14,7 @@ let account = ref(props.accountProp);
 <template>
     <div class="flex flex-col justify-between gap-y-7">
         <div class="flex items-center gap-x-5">
-            <img :src="`data:image/jpeg;base64,${account.icon}`"
-                 class="h-16 w-16 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500">
+            <Icon :accountProp="account"/>
             <div class="flex flex-col">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
