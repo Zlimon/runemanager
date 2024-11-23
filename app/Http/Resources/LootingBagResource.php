@@ -27,7 +27,7 @@ class LootingBagResource extends JsonResource
             return [
                 'id' => $slot[0],
                 'item' => $getItem($slot[0]),
-                'amount' => $slot[1],
+                'quantity' => $slot[1],
             ];
         }, $this->looting_bag);
 
