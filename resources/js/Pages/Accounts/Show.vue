@@ -1,19 +1,7 @@
 <script setup>
-import {ref, watch, onMounted} from "vue";
-import debounce from 'lodash/debounce';
-import * as THREE from 'three';
-import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
-import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import {ref} from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
-import {Link, useForm, usePage} from '@inertiajs/vue3';
 import CollectionLog from "@/Components/CollectionLog.vue";
-import TextInput from "@/Components/TextInput.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import dayjs from "dayjs";
-import InputError from "@/Components/InputError.vue";
-import Bank from "@/Components/RuneManager/Bank.vue";
 import Quests from "@/Components/RuneManager/Quests.vue";
 import Inventory from "@/Components/RuneManager/Inventory.vue";
 import LootingBag from "@/Components/RuneManager/LootingBag.vue";
@@ -22,6 +10,8 @@ import Header from "@/Pages/Accounts/Components/Header.vue";
 import Equipment from "@/Pages/Accounts/Components/Equipment.vue";
 import Avatar from "@/Pages/Accounts/Components/Avatar.vue";
 import Summary from "@/Pages/Accounts/Components/Summary.vue";
+import Skills from "@/Pages/Accounts/Components/Skills.vue";
+import Bank from "@/Components/RuneManager/Bank.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -36,13 +26,13 @@ let activeTab = ref('inventory');
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="flex justify-end">
-                    <Search></Search>
+                    <Search/>
                 </div>
 
                 <div class="mt-4 bg-base-100 border border-base-300 rounded p-6 lg:p-8">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
-                            <Header :accountProp="account"></Header>
+                            <Header :accountProp="account"/>
 
                             <div class="flex flex-col items-center">
                                 <div class="my-4 grid grid-cols-2 gap-4">
@@ -55,17 +45,17 @@ let activeTab = ref('inventory');
                             </div>
 
                             <!-- Vertical Inventory and Looting Bag tabs -->
-                            <div class="tabs tabs-lifted" role="tablist">
+                            <div class="mt-4 tabs tabs-lifted" role="tablist">
                                 <a :class="{ 'tab-active !bg-base-200': activeTab === 'inventory' }"
                                    class="tab"
                                    role="tab"
                                    @click="activeTab = 'inventory'">
                                     Inventory
                                 </a>
-                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'lootingBag' }"
+                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'looting-bag' }"
                                    class="tab"
                                    role="tab"
-                                   @click="activeTab = 'lootingBag'">
+                                   @click="activeTab = 'looting-bag'">
                                     Looting bag
                                 </a>
                             </div>
@@ -75,7 +65,7 @@ let activeTab = ref('inventory');
                                 <div v-show="activeTab === 'inventory'">
                                     <Inventory :accountProp="account"/>
                                 </div>
-                                <div v-show="activeTab === 'lootingBag'">
+                                <div v-show="activeTab === 'looting-bag'">
                                     <LootingBag :accountProp="account"/>
                                 </div>
                             </div>
@@ -88,58 +78,7 @@ let activeTab = ref('inventory');
                                         Skills
                                     </h3>
 
-                                    <ul class="mt-4 grid grid-cols-6 gap-1">
-                                        <li>
-                                            <Link :href="route('accounts.index')"
-                                                  class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800"
-                                                  data-tooltip-placement="bottom"
-                                                  data-tooltip-target="total-tooltip-bottom"
-                                                  type="button">
-                                                <img class="h-6 w-6 object-contain"
-                                                     src="/images/skill/total.webp"/>
-                                                <span class="text-xs font-semibold capitalize">
-                                                    {{ account.level }}
-                                                </span>
-                                            </Link>
-
-                                            <div id="total-tooltip-bottom"
-                                                 class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700"
-                                                 role="tooltip">
-                                                <p>
-                                                    Total level
-                                                </p>
-                                                <p>
-                                                    {{ account.xp.toLocaleString('en-US') }}
-                                                </p>
-                                                <div class="tooltip-arrow" data-popper-arrow></div>
-                                            </div>
-                                        </li>
-                                        <li v-for="skill in account.skills" :key="skill.name">
-                                            <Link :data-tooltip-target="`${skill.slug}-tooltip-bottom`"
-                                                  :href="route('hiscores.skills.index', skill.slug)"
-                                                  class="flex items-center justify-center gap-2 rounded-lg border p-1 shadow bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800"
-                                                  data-tooltip-placement="bottom"
-                                                  type="button">
-                                                <img :src="`/images/skill/${skill.slug}.webp`"
-                                                     class="h-6 w-6 object-contain"/>
-                                                <span class="text-xs font-semibold capitalize">
-                                                    {{ skill.level }}
-                                                </span>
-                                            </Link>
-
-                                            <div :id="`${skill.slug}-tooltip-bottom`"
-                                                 class="invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm tooltip dark:bg-gray-700"
-                                                 role="tooltip">
-                                                <p>
-                                                    {{ skill.name }}
-                                                </p>
-                                                <p>
-                                                    {{ skill.xp.toLocaleString('en-US') }}
-                                                </p>
-                                                <div class="tooltip-arrow" data-popper-arrow></div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                    <Skills :accountProp="account"/>
                                 </div>
 
                                 <div class="col-span-1">

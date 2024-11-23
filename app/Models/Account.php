@@ -67,7 +67,7 @@ class Account extends Model
 
     public function getUserIconAttribute(): string
     {
-        return $this->user->icon ?? 'iVBORw0KGgoAAAANSUhEUgAAACQAAAAgCAYAAAB6kdqOAAACPElEQVR4Xs2XW0sCQRTHO0/RY/QQFUE99BBEVEQkRQQRUQkWEhWViYh0FxERu4iIFF3o+hAFic/hdzxxZpxmZ8Yu5uzaHwZ2dtY9v3OZ2WNTk2cC1O80QATBRzK5U7lumABLpSe8v8/jzXUW4/EoAxrq6XEDSnqur0gBA3l8LGChkMbDwwj6/bM//KZmcYhcLomp1B4zUh2MR0ek6fw8g9HoBu7ubNuMEmA2m2AvjMW2MBRaQZ9vlM3T6QMNCvD2NucwDri5GWSRsgp0ehLHyckxR1T4EKA6FBmWxvm6eq8uAR5njrSXAkudMNbS0qxA6YYtwpBkanSvBQjVlpk+V6VGh4wXiw8OSMB8PuU4czwAU0POo0NFTteUUifM8/OlN1BS3DDtHieIiJYodot18514zcjUyHQKIDp75LrrMiHMSABeXZ59nj/qmjWpO8uE0AV4cXHiFhT3mIr1/b3IdtTvjLgCJc+hRCLGhijkn6NEUlOsr9YoYF/tYHAROzraK17yMTI8+GuvLcGQACORdRwY6Ne8BJyenqghSlbEUzQ1NV4l5ICBwJz3QMvL81Vg+Bq1FR4BOQ+0ajD8vvhsmGtWBfj6cs2aMAH2tcGvYOuS3DU0qBFbW11izVhfX6/R5+jPW4ehZpwOLup9aU41Qzuqra1VMSp2VrlcwoWFGfaMCWtFurfq3Amzvxdmkevu6jSe0d9al1TD5lwYF2eRCeupeF2Fw6uNBhECfHu7s/2/ql65WC9/1b+C8Uof5wvhG5Ohd9UAAAAASUVORK5CYII=';
+        return $this->user->icon;
     }
 
     public function skill(Skill $skill): HasOne

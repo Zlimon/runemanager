@@ -7,6 +7,7 @@ import {Link, useForm} from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
 import Select from "@/Components/Select.vue";
 import InputError from "@/Components/InputError.vue";
+import Icon from "@/Pages/Accounts/Components/Icon.vue";
 
 const props = defineProps({
     accountTypesProp: Array,
@@ -37,6 +38,7 @@ onMounted(() => {
 let searchAccountForm = useForm({
     username: '',
     account_types: [],
+    per_page: 16,
 });
 
 const appendAccountTypeSearch = (accountType) => {
@@ -72,18 +74,16 @@ let loading = ref(false);
 const searchAccounts = (load = true) => {
     loading.value = load;
 
-    searchAccountForm.per_page = 16;
-
     axios.post(route('api.accounts.search'), searchAccountForm)
         .then((response) => {
             accounts.value = response.data;
 
             searchAccountForm.errors = {};
         }).catch(error => {
-            console.log(error)
-            searchAccountForm.errors = error.response.data.errors || {};
+        console.log(error)
+        searchAccountForm.errors = error.response.data.errors || {};
 
-            console.error(error)
+        console.error(error)
     }).finally(() => {
         loading.value = false;
     });
@@ -97,82 +97,82 @@ const searchAccounts = (load = true) => {
     <AppLayout title="Profile">
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="card-lg resource-pack-dialog !shadow-lg">
-                    <h3 class="text-left header-chatbox-sword">Search for accounts</h3>
+                <h3 class="text-left header-chatbox-sword">Search for accounts</h3>
 
-                    <div class="mt-2 grid grid-cols-2 gap-12">
-                        <div class="col-span-1 max-w-md">
-                            <InputLabel for="searchAccountForm-username" value="Search for any account by username"/>
-                            <div class="relative">
-                                <div class="pointer-events-none absolute inset-y-0 flex items-center start-0 ps-3">
-                                    <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                              stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                                    </svg>
-                                </div>
-                                <TextInput v-model="searchAccountForm.username"
-                                           type="search"
-                                           id="searchAccountForm-search"
-                                           name="searchAccountForm-search"
-                                           class="block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 ps-10 focus:border-blue-500 focus:ring-blue-500 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                                           :error="searchAccountForm.errors.username !== undefined"
-                                />
+                <div class="mt-2 grid grid-cols-2 gap-12">
+                    <div class="col-span-1 max-w-md">
+                        <InputLabel for="searchAccountForm-username" value="Search for any account by username"/>
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 flex items-center start-0 ps-3">
+                                <svg aria-hidden="true" class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                                     fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" stroke="currentColor"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round" stroke-width="2"/>
+                                </svg>
                             </div>
-                            <InputError v-if="searchAccountForm.errors.username !== undefined"
-                                        :messages="searchAccountForm.errors.username"/>
+                            <TextInput id="searchAccountForm-search"
+                                       v-model="searchAccountForm.username"
+                                       :error="searchAccountForm.errors.username !== undefined"
+                                       class="block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 ps-10 focus:border-blue-500 focus:ring-blue-500 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                                       name="searchAccountForm-search"
+                                       type="search"
+                            />
                         </div>
+                        <InputError v-if="searchAccountForm.errors.username !== undefined"
+                                    :messages="searchAccountForm.errors.username"/>
+                    </div>
 
-                        <div class="col-span-1 max-w-md">
-                            <div>
-                                <InputLabel for="account-type" value="Filter by account type"/>
-                                <Select
-                                    id="account-type"
-                                    :options="formatedAccountTypeNames"
-                                    :optionObject=false
-                                    optionDefault="All"
-                                    @change="appendAccountTypeSearch($event.target.value)"
-                                />
-                                <InputError v-if="searchAccountForm.errors.account_types !== undefined"
-                                            :messages="searchAccountForm.errors.account_types"/>
+                    <div class="col-span-1 max-w-md">
+                        <div>
+                            <InputLabel for="account-type" value="Filter by account type"/>
+                            <Select
+                                id="account-type"
+                                :optionObject=false
+                                :options="formatedAccountTypeNames"
+                                optionDefault="All"
+                                @change="appendAccountTypeSearch($event.target.value)"
+                            />
+                            <InputError v-if="searchAccountForm.errors.account_types !== undefined"
+                                        :messages="searchAccountForm.errors.account_types"/>
 
-                                <div class="flex flex-wrap space-x-2">
-                                    <div v-if="searchAccountForm.account_types.length > 0"
-                                         class="mt-2 flex items-center">
-                                        <span @click="clearAccountTypeSearch"
-                                              class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-800 hover:cursor-pointer dark:bg-gray-700 dark:text-gray-300">
-                                            <svg class="h-2 w-2" aria-hidden="true"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 fill="none" viewBox="0 0 14 14">
-                                                <path stroke="currentColor" stroke-linecap="round"
-                                                      stroke-linejoin="round" stroke-width="2"
-                                                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            <div class="flex flex-wrap space-x-2">
+                                <div v-if="searchAccountForm.account_types.length > 0"
+                                     class="mt-2 flex items-center">
+                                        <span
+                                            class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-800 hover:cursor-pointer dark:bg-gray-700 dark:text-gray-300"
+                                            @click="clearAccountTypeSearch">
+                                            <svg aria-hidden="true" class="h-2 w-2"
+                                                 fill="none"
+                                                 viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" stroke="currentColor"
+                                                      stroke-linecap="round" stroke-linejoin="round"
+                                                      stroke-width="2"/>
                                             </svg>
                                             <span class="sr-only">Clear account type search</span>
                                         </span>
-                                    </div>
+                                </div>
 
-                                    <div v-for="accountType in searchAccountForm.account_types" :key="accountType"
-                                         class="mt-2">
+                                <div v-for="accountType in searchAccountForm.account_types" :key="accountType"
+                                     class="mt-2">
                                         <span :id="`badge-dismiss-${accountType}`"
                                               class="inline-flex grow items-center rounded bg-blue-100 px-2 py-1 text-sm font-medium text-blue-800 text-nowrap dark:bg-blue-900 dark:text-blue-300">
                                             {{ formatAccountTypeName(accountType) }}
-                                            <button @click="removeAccountTypeSearch(accountType)"
-                                                    type="button"
+                                            <button :data-dismiss-target="`#badge-dismiss-${accountType}`"
+                                                    aria-label="Remove"
                                                     class="inline-flex items-center rounded-sm bg-transparent p-1 text-sm text-blue-400 ms-2 hover:bg-blue-200 hover:text-blue-900 dark:hover:bg-blue-800 dark:hover:text-blue-300"
-                                                    :data-dismiss-target="`#badge-dismiss-${accountType}`"
-                                                    aria-label="Remove">
-                                                <svg class="h-2 w-2" aria-hidden="true"
-                                                     xmlns="http://www.w3.org/2000/svg"
-                                                     fill="none" viewBox="0 0 14 14">
-                                                    <path stroke="currentColor" stroke-linecap="round"
-                                                          stroke-linejoin="round" stroke-width="2"
-                                                          d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                                    type="button"
+                                                    @click="removeAccountTypeSearch(accountType)">
+                                                <svg aria-hidden="true" class="h-2 w-2"
+                                                     fill="none"
+                                                     viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" stroke="currentColor"
+                                                          stroke-linecap="round" stroke-linejoin="round"
+                                                          stroke-width="2"/>
                                                 </svg>
                                                 <span class="sr-only">Remove {{ accountType }} account type</span>
                                             </button>
                                         </span>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -182,9 +182,8 @@ const searchAccounts = (load = true) => {
                 <div class="mt-12 grid sm:grid-cols-4 gap-4">
                     <div v-for="account in accounts.data" :key="account.id">
                         <Link :href="route('accounts.show', account)"
-                              class="flex flex-col items-center md:flex-row md:max-w-xl hover:bg-beige-200 dark:hover:bg-gray-700 card-sm resource-pack-dialog !shadow-lg">
-                            <img :src="`data:image/jpeg;base64,${account.icon}`"
-                                 class="h-16 w-16 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500">
+                              class="flex flex-col items-center md:flex-row md:max-w-xl box hover:bg-base-200 px-2 resource-pack-dialog">
+                            <Icon :accountProp="account"/>
                             <div class="flex flex-col justify-between p-4 leading-normal">
                                 <div class="flex items-center space-x-1">
                                     <img v-if="account.account_type === 'ironman'"
@@ -197,8 +196,8 @@ const searchAccounts = (load = true) => {
                                 </div>
 
                                 <div class="flex items-center space-x-1">
-                                    <img src="/images/skill/total.webp"
-                                         class="h-6 w-6 object-contain">
+                                    <img class="h-6 w-6 object-contain"
+                                         src="/images/skill/total.webp">
                                     <p class="font-normal text-gray-700 dark:text-gray-400">{{ account.level }}</p>
                                 </div>
                             </div>

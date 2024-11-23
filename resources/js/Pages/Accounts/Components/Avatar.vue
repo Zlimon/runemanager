@@ -69,5 +69,5 @@ onMounted(() => {
 
 <template>
     <div ref="sceneContainer"
-         class="h-64 rounded-lg border bg-beige-300 border-beige-700 dark:border-gray-700 dark:bg-gray-800"/>
+         class="h-64 box !bg-base-200"/>
 </template>
