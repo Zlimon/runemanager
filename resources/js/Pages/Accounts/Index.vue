@@ -8,6 +8,8 @@ import InputLabel from "@/Components/InputLabel.vue";
 import Select from "@/Components/Select.vue";
 import InputError from "@/Components/InputError.vue";
 import Icon from "@/Pages/Accounts/Components/Icon.vue";
+import TextInputIcon from "@/Components/TextInputIcon.vue";
+import Search from "@/Components/Search.vue";
 
 const props = defineProps({
     accountTypesProp: Array,
@@ -60,7 +62,7 @@ const removeAccountTypeSearch = (accountType) => {
 };
 
 const clearAccountTypeSearch = () => {
-    document.getElementById('account-type').value = 'All';
+    document.getElementById('account_types').value = 'All';
 
     searchAccountForm.account_types = [];
 };
@@ -101,37 +103,25 @@ const searchAccounts = (load = true) => {
 
                 <div class="mt-2 grid grid-cols-2 gap-12">
                     <div class="col-span-1 max-w-md">
-                        <InputLabel for="searchAccountForm-username" value="Search for any account by username"/>
-                        <div class="relative">
-                            <div class="pointer-events-none absolute inset-y-0 flex items-center start-0 ps-3">
-                                <svg aria-hidden="true" class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                                     fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" stroke="currentColor"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round" stroke-width="2"/>
-                                </svg>
-                            </div>
-                            <TextInput id="searchAccountForm-search"
-                                       v-model="searchAccountForm.username"
-                                       :error="searchAccountForm.errors.username !== undefined"
-                                       class="block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 ps-10 focus:border-blue-500 focus:ring-blue-500 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                                       name="searchAccountForm-search"
-                                       type="search"
-                            />
-                        </div>
+                        <InputLabel for="searchAccountForm-username"
+                                    value="Search for any account by username"/>
+                        <Search id="searchAccountForm-username"
+                                v-model="searchAccountForm.username"
+                                :error="searchAccountForm.errors.username !== undefined"
+                                @search="searchAccounts"/>
                         <InputError v-if="searchAccountForm.errors.username !== undefined"
                                     :messages="searchAccountForm.errors.username"/>
                     </div>
 
                     <div class="col-span-1 max-w-md">
                         <div>
-                            <InputLabel for="account-type" value="Filter by account type"/>
-                            <Select
-                                id="account-type"
-                                :optionObject=false
-                                :options="formatedAccountTypeNames"
-                                optionDefault="All"
-                                @change="appendAccountTypeSearch($event.target.value)"
+                            <InputLabel for="account_types"
+                                        value="Filter by account type"/>
+                            <Select id="account_types"
+                                    :optionObject=false
+                                    :options="formatedAccountTypeNames"
+                                    optionDefault="All"
+                                    @change="appendAccountTypeSearch($event.target.value)"
                             />
                             <InputError v-if="searchAccountForm.errors.account_types !== undefined"
                                         :messages="searchAccountForm.errors.account_types"/>
@@ -139,40 +129,29 @@ const searchAccounts = (load = true) => {
                             <div class="flex flex-wrap space-x-2">
                                 <div v-if="searchAccountForm.account_types.length > 0"
                                      class="mt-2 flex items-center">
-                                        <span
-                                            class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-800 hover:cursor-pointer dark:bg-gray-700 dark:text-gray-300"
-                                            @click="clearAccountTypeSearch">
-                                            <svg aria-hidden="true" class="h-2 w-2"
-                                                 fill="none"
-                                                 viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" stroke="currentColor"
-                                                      stroke-linecap="round" stroke-linejoin="round"
-                                                      stroke-width="2"/>
-                                            </svg>
-                                            <span class="sr-only">Clear account type search</span>
-                                        </span>
+                                    <div class="badge badge-info"
+                                         @click="clearAccountTypeSearch()">
+                                        <svg
+                                            class="inline-block h-4 w-4 stroke-current"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M6 18L18 6M6 6l12 12"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"></path>
+                                        </svg>
+                                    </div>
                                 </div>
 
-                                <div v-for="accountType in searchAccountForm.account_types" :key="accountType"
+                                <div v-for="accountType in searchAccountForm.account_types"
+                                     :key="accountType"
                                      class="mt-2">
-                                        <span :id="`badge-dismiss-${accountType}`"
-                                              class="inline-flex grow items-center rounded bg-blue-100 px-2 py-1 text-sm font-medium text-blue-800 text-nowrap dark:bg-blue-900 dark:text-blue-300">
-                                            {{ formatAccountTypeName(accountType) }}
-                                            <button :data-dismiss-target="`#badge-dismiss-${accountType}`"
-                                                    aria-label="Remove"
-                                                    class="inline-flex items-center rounded-sm bg-transparent p-1 text-sm text-blue-400 ms-2 hover:bg-blue-200 hover:text-blue-900 dark:hover:bg-blue-800 dark:hover:text-blue-300"
-                                                    type="button"
-                                                    @click="removeAccountTypeSearch(accountType)">
-                                                <svg aria-hidden="true" class="h-2 w-2"
-                                                     fill="none"
-                                                     viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" stroke="currentColor"
-                                                          stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2"/>
-                                                </svg>
-                                                <span class="sr-only">Remove {{ accountType }} account type</span>
-                                            </button>
-                                        </span>
+                                    <div class="badge badge-primary"
+                                         @click="removeAccountTypeSearch(accountType)">
+                                        {{ formatAccountTypeName(accountType) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -180,7 +159,7 @@ const searchAccounts = (load = true) => {
                 </div>
 
                 <div class="mt-12 grid sm:grid-cols-4 gap-4">
-                    <div v-for="account in accounts.data" :key="account.id">
+                    <div v-for="account in accounts.data" :key="account">
                         <Link :href="route('accounts.show', account)"
                               class="flex flex-col items-center md:flex-row md:max-w-xl box hover:bg-base-200 px-2 resource-pack-dialog">
                             <Icon :accountProp="account"/>
