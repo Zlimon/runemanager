@@ -2,13 +2,11 @@
 import {computed, onMounted, ref, watch} from "vue";
 import debounce from 'lodash/debounce';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import TextInput from "@/Components/TextInput.vue";
 import {Link, useForm} from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
 import Select from "@/Components/Select.vue";
 import InputError from "@/Components/InputError.vue";
 import Icon from "@/Pages/Accounts/Components/Icon.vue";
-import TextInputIcon from "@/Components/TextInputIcon.vue";
 import Search from "@/Components/Search.vue";
 
 const props = defineProps({
