@@ -1,0 +1,33 @@
+/* MAIN */
+.news-post:before,
+.news-post:after
+{
+    position: absolute;
+    top: -11px;
+    left: 0;
+
+    width: 100%;
+    height: 50px;
+
+    content: '';
+
+    background: url('/images/scroll_top.gif') no-repeat center top;
+}
+
+.news-post:after
+{
+    top: auto;
+    bottom: -11px;
+
+    background: url('/images/scroll_bottom.gif') no-repeat center bottom;
+}
+
+.news-post
+{
+    position: relative;
+
+    margin: 0 auto;
+    padding: 75px;
+
+    background: url('/images/scroll_middle.gif') repeat-y top center;
+}
