@@ -24,24 +24,24 @@ class UserSeeder extends Seeder
             'name' => 'Simon',
             'email' => 'simon@runemanager.com',
             'password' => bcrypt('runemanager1234'),
-            'icon_id' => Helper::randomItemId(true),
+            'icon_id' => 333,
         ]);
 
         User::create([
             'name' => 'Simon2',
             'email' => 'simon2@runemanager.com',
             'password' => bcrypt('runemanager1234'),
-            'icon_id' => Helper::randomItemId(true),
+            'icon_id' => 333,
         ]);
 
         User::create([
             'name' => 'Simon3',
             'email' => 'simon3@runemanager.com',
             'password' => bcrypt('runemanager1234'),
-            'icon_id' => Helper::randomItemId(true),
+            'icon_id' => 333,
         ]);
 
-        $accounts = ["Jern Zlimon", "IronicOcelot", "Mmorpg"];
+        $accounts = ["Habski", "IronicOcelot", "Mmorpg"];
 
         foreach (User::get() as $userKey => $user) {
             $playerDataUrl = 'https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' . str_replace(
