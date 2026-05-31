@@ -5,32 +5,30 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "ext-curl": "*",
         "ext-intl": "*",
-        "andreaselia/laravel-api-to-postman": "^2.0",
-        "inertiajs/inertia-laravel": "^1.0",
-        "laracasts/generators": "dev-laravel-11",
-        "laravel/framework": "^11.9",
-        "laravel/jetstream": "^5.1",
+        "ext-zlib": "*",
+        "andreaselia/laravel-api-to-postman": "^2.3",
+        "inertiajs/inertia-laravel": "^3.0",
+        "laravel/boost": "^2.4",
+        "laravel/framework": "^13.0",
+        "laravel/jetstream": "^5.5",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9",
-        "mongodb/laravel-mongodb": "^4.6",
-        "opcodesio/log-viewer": "^3.10",
-        "symfony/dom-crawler": "^7.1",
-        "tightenco/ziggy": "^2.0",
-        "zanysoft/laravel-zip": "dev-laravel-11",
-        "ext-zlib": "*"
+        "laravel/tinker": "^3.0",
+        "mongodb/laravel-mongodb": "^5.7",
+        "opcodesio/log-viewer": "^3.24",
+        "symfony/dom-crawler": "^7.4",
+        "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^3.0",
-        "beyondcode/laravel-dump-server": "^2.0",
-        "fakerphp/faker": "^1.23",
-        "laravel/pint": "^1.13",
-        "laravel/sail": "^1.30",
+        "barryvdh/laravel-ide-helper": "^3.7",
+        "fakerphp/faker": "^1.24",
+        "laravel/pint": "^1.29",
+        "laravel/sail": "^1.61",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.0",
-        "pestphp/pest": "^3.5"
+        "nunomaduro/collision": "^8.9",
+        "pestphp/pest": "^4.0"
     },
     "autoload": {
         "psr-4": {
@@ -76,15 +74,5 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/CalumChamberlain/laravel-zip.git"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/Zlimon/Laravel-5-Generators-Extended.git"
-        }
-    ]
+    "prefer-stable": true
 }

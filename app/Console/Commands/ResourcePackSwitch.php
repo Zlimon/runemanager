@@ -9,8 +9,7 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Command\Command as CommandAlias;
-use ZanySoft\Zip\Zip;
-use ZanySoft\Zip\ZipManager;
+use ZipArchive;
 
 use function Laravel\Prompts\search;
 
@@ -84,16 +83,18 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
         // Clean tmp dir
         File::cleanDirectory(resource_path('/css/resource-pack-tmp'));
 
-        try {
-            $manager = new ZipManager;
-            $manager->addZip((new Zip)->open($extractFrom));
-            $extract = $manager->extract($extractTo, true);
-        } catch (\Exception $e) {
-            $this->fail(sprintf("Could not extract resource pack '%s'. Message: %s", $name, $e->getMessage()));
+        $zip = new ZipArchive;
+
+        if ($zip->open($extractFrom) !== true) {
+            $this->fail(sprintf("Could not open resource pack '%s'.", $name));
         }
 
-        if ($extract !== true) {
-            $this->fail(sprintf("Could not extract resource pack '%s'.", $name));
+        try {
+            if (! $zip->extractTo($extractTo)) {
+                $this->fail(sprintf("Could not extract resource pack '%s'.", $name));
+            }
+        } finally {
+            $zip->close();
         }
 
         $this->info(sprintf('Applying new textures...'));
