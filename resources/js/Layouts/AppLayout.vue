@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import {Head, Link, router, usePage} from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
@@ -34,14 +34,25 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-onMounted(() => {
-    // if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    if (usePage().props.dark_mode === true) {
+function applyTheme() {
+    const props = usePage().props;
+
+    if (props.dark_mode === true) {
         document.documentElement.classList.add('dark');
     } else {
-        document.documentElement.classList.remove('dark')
+        document.documentElement.classList.remove('dark');
     }
-})
+
+    // DaisyUI consumes data-theme on the root. Resolved server-side from the
+    // user's effective resource pack — see HandleInertiaRequests.
+    if (props.theme) {
+        document.documentElement.dataset.theme = props.theme;
+    }
+}
+
+onMounted(applyTheme);
+// Re-apply if the shared prop changes mid-session (e.g. user updates their override).
+watch(() => usePage().props.theme, applyTheme);
 </script>
 
 <template>
