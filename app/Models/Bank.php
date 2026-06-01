@@ -7,7 +7,7 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class Bank extends Model
 {
-    protected $connection = 'mongodb-client';
+    protected $connection = 'mongodb';
 
     protected $primaryKey = '_id';
 

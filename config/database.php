@@ -109,16 +109,16 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
-        'mongodb-admin' => [
+        'mongodb-static' => [
             'driver' => 'mongodb',
-            'dsn' => env('MONGO_DB_ADMIN_URI'),
-            'database' => env('MONGO_DB_ADMIN_DATABASE', 'laravel'),
+            'dsn' => env('MONGODB_STATIC_URI'),
+            'database' => env('MONGODB_STATIC_DATABASE', 'osrsbox-db'),
         ],
 
-        'mongodb-client' => [
+        'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => env('MONGO_DB_CLIENT_URI'),
-            'database' => env('MONGO_DB_CLIENT_DATABASE', 'laravel'),
+            'dsn' => env('MONGODB_URI'),
+            'database' => env('MONGODB_DATABASE', 'runemanager'),
         ],
 
     ],
