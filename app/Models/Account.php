@@ -6,6 +6,7 @@ use App\Enums\AccountTypesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as SupportCollection;
@@ -74,6 +75,11 @@ class Account extends Model
     public function hiscore(): HasOne
     {
         return $this->hasOne(AccountHiscore::class);
+    }
+
+    public function usernameHistory(): HasMany
+    {
+        return $this->hasMany(UsernameHistory::class)->orderByDesc('detected_at');
     }
 
     public function getSkillsAttribute(): SupportCollection
