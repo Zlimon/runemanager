@@ -1,42 +1,92 @@
 /*@import url('resource-pack.css');*/
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer components {
-    @font-face {
-        font-family: 'runescape';
-        src: url('fonts/runescape/runescape.eot');
-        src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
-        url('fonts/runescape/runescape.woff') format('woff'),
-        url('fonts/runescape/runescape.ttf') format('truetype'),
-        url('fonts/runescape/runescape.svg#runescape') format('svg');
-        font-weight: normal;
-        font-style: normal;
-    }
+@plugin "@tailwindcss/typography";
 
-    @font-face {
-        font-family: 'runescape-large';
-        src: url('fonts/runescape-large/runescape-large.eot');
-        src: url('fonts/runescape-large/runescape-large.eot?#iefix') format('embedded-opentype'),
-        url('fonts/runescape-large/runescape-large.woff') format('woff'),
-        url('fonts/runescape-large/runescape-large.ttf') format('truetype'),
-        url('fonts/runescape-large/runescape-large.svg#runescape') format('svg');
-        font-weight: normal;
-        font-style: normal;
-    }
+@plugin "daisyui" {
+    themes: false;
+}
 
-    @font-face {
-        font-family: 'runescape-smooth';
-        src: url('fonts/runescape-smooth/runescape-smooth.eot');
-        src: url('fonts/runescape-smooth/runescape-smooth.eot?#iefix') format('embedded-opentype'),
-        url('fonts/runescape-smooth/runescape-smooth.woff') format('woff'),
-        url('fonts/runescape-smooth/runescape-smooth.ttf') format('truetype'),
-        url('fonts/runescape-smooth/runescape-smooth.svg#runescape') format('svg');
-        font-weight: normal;
-        font-style: normal;
-    }
+@plugin "daisyui/theme" {
+    name: "runemanager";
+    default: true;
+    prefersdark: false;
+    color-scheme: light;
+    --color-primary: #EF9995;
+    --color-primary-content: #282425;
+    --color-secondary: #A4CBB4;
+    --color-secondary-content: #282425;
+    --color-accent: #DC8850;
+    --color-accent-content: #282425;
+    --color-neutral: #2E282A;
+    --color-neutral-content: #EDE6D4;
+    --color-base-100: #d8ccb4;
+    --color-base-200: #E2D9BF;
+    --color-base-300: #94866D;
+    --color-base-content: #282425;
+    --color-info: #2563EB;
+    --color-info-content: #D2E2FF;
+    --color-success: #16A34A;
+    --color-success-content: #000A02;
+    --color-warning: #D97706;
+    --color-warning-content: #110500;
+    --color-error: #F35248;
+    --color-error-content: #140202;
+}
+
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../vendor/laravel/jetstream/**/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../views/**/*.blade.php";
+@source "../js/**/*.vue";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-beige-100: #F5F1E7;
+    --color-beige-200: #EDE7D5;
+    --color-beige-300: #E2D9BF;
+    --color-beige-400: #D8CCB5;
+    --color-beige-500: #C0B29E;
+    --color-beige-600: #A79886;
+    --color-beige-700: #8F7F6E;
+    --color-beige-800: #766556;
+    --color-beige-900: #5E4C3E;
+}
+
+@font-face {
+    font-family: 'runescape';
+    src: url('fonts/runescape/runescape.eot');
+    src: url('fonts/runescape/runescape.eot?#iefix') format('embedded-opentype'),
+    url('fonts/runescape/runescape.woff') format('woff'),
+    url('fonts/runescape/runescape.ttf') format('truetype'),
+    url('fonts/runescape/runescape.svg#runescape') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'runescape-large';
+    src: url('fonts/runescape-large/runescape-large.eot');
+    src: url('fonts/runescape-large/runescape-large.eot?#iefix') format('embedded-opentype'),
+    url('fonts/runescape-large/runescape-large.woff') format('woff'),
+    url('fonts/runescape-large/runescape-large.ttf') format('truetype'),
+    url('fonts/runescape-large/runescape-large.svg#runescape') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'runescape-smooth';
+    src: url('fonts/runescape-smooth/runescape-smooth.eot');
+    src: url('fonts/runescape-smooth/runescape-smooth.eot?#iefix') format('embedded-opentype'),
+    url('fonts/runescape-smooth/runescape-smooth.woff') format('woff'),
+    url('fonts/runescape-smooth/runescape-smooth.ttf') format('truetype'),
+    url('fonts/runescape-smooth/runescape-smooth.svg#runescape') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 
 [x-cloak] {
@@ -62,12 +112,14 @@ h6 {
     @apply text-xs font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-lg lg:text-xl;
 }
 
-.card-lg {
-    @apply bg-beige-400 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-6 lg:p-8;
+.box {
+    @apply bg-base-100 border border-base-300 rounded;
 }
-.card-md {
-    @apply bg-beige-400 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-4 lg:p-6;
+
+.box-tooltip {
+    @apply z-10 absolute rounded px-3 py-2 bg-neutral text-neutral-content text-sm;
 }
-.card-sm {
-    @apply bg-beige-400 border border-beige-700 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 p-2 lg:p-4;
+
+.tab {
+    @apply bg-base-100 border-base-300 focus:ring-0;
 }

@@ -39,14 +39,14 @@ class BankResource extends JsonResource
                 // Lookup the item in the fetched items or use a dummy item
                 $dbItem = $items->get($itemId);
                 $item = $dbItem ? [
-                    'id' => $dbItem->_id,
+                    '_id' => $dbItem->_id,
                     'name' => $dbItem->name,
                     'lowalch' => $dbItem->lowalch,
                     'highalch' => $dbItem->highalch,
                     'examine' => $dbItem->examine,
                     'icon' => $dbItem->icon,
                 ] : [
-                    'id' => 0,
+                    '_id' => 0,
                     'name' => 'Dwarf remains',
                     'lowalch' => 0,
                     'highalch' => 0,
@@ -64,7 +64,7 @@ class BankResource extends JsonResource
         return [
             'id' => $this->_id,
             'account_id' => $this->account_id,
-            'bank' => $bank,
+            'tabs' => $bank,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

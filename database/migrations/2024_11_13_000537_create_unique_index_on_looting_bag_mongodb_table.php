@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up()
     {
-        $client = new Client(config('database.connections.mongodb-client.dsn'));
-        $collection = $client->{config('database.connections.mongodb-client.database')}->{(new LootingBag)->getTable()};
+        $client = new Client(config('database.connections.mongodb.dsn'));
+        $collection = $client->{config('database.connections.mongodb.database')}->{(new LootingBag)->getTable()};
 
         // Ensure unique index on account_id field
         $collection->createIndex(
@@ -26,8 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        $client = new Client(config('database.connections.mongodb-client.dsn'));
-        $collection = $client->{config('database.connections.mongodb-client.database')}->{(new LootingBag)->getTable()};
+        $client = new Client(config('database.connections.mongodb.dsn'));
+        $collection = $client->{config('database.connections.mongodb.database')}->{(new LootingBag)->getTable()};
 
         $collection->dropIndex('account_id_1');
     }

@@ -1,11 +1,11 @@
 services:
     laravel.test:
         build:
-            context: ./docker/8.3
+            context: ./docker/8.4
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: sail-8.3/app
+        image: sail-8.4/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -23,6 +23,69 @@ services:
             - sail
         depends_on:
             - mysql
+            - mongo
+            - osrsbox-mongo
+    osrsbox-mongo:
+        image: 'mongo:7.0'
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: '${OSRSBOX_MONGO_USERNAME:-ruser}'
+            MONGO_INITDB_ROOT_PASSWORD: '${OSRSBOX_MONGO_PASSWORD:-rpasswd}'
+            MONGO_INITDB_DATABASE: '${OSRSBOX_DATABASE_NAME:-osrsbox-db}'
+            DATABASE_NAME: '${OSRSBOX_DATABASE_NAME:-osrsbox-db}'
+            PROJECT_USERNAME: '${OSRSBOX_PROJECT_USERNAME:-puser}'
+            PROJECT_PASSWORD: '${OSRSBOX_PROJECT_PASSWORD:-ppasswd}'
+        volumes:
+            - 'sail-osrsbox-mongo:/data/db'
+            - './docker/osrsbox/create-database.sh:/docker-entrypoint-initdb.d/create-database.sh:ro'
+        networks:
+            - sail
+        healthcheck:
+            test:
+                - CMD
+                - mongosh
+                - --quiet
+                - --eval
+                - 'db.runCommand({ ping: 1 }).ok'
+            retries: 3
+            timeout: 5s
+    osrsbox-populate:
+        build:
+            context: ./docker/osrsbox-api/eve
+        profiles:
+            - populate
+        environment:
+            MONGO_PORT: 27017
+            DATABASE_NAME: '${OSRSBOX_DATABASE_NAME:-osrsbox-db}'
+            PROJECT_USERNAME: '${OSRSBOX_PROJECT_USERNAME:-puser}'
+            PROJECT_PASSWORD: '${OSRSBOX_PROJECT_PASSWORD:-ppasswd}'
+        volumes:
+            - './docker/osrsbox-api/eve/scripts:/scripts'
+        networks:
+            - sail
+        depends_on:
+            - osrsbox-mongo
+        entrypoint: ['python3', '/scripts/mongo_insert_osrsbox.py']
+    mongo:
+        image: 'mongo:7.0'
+        ports:
+            - '${FORWARD_MONGO_PORT:-27017}:27017'
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: sail
+            MONGO_INITDB_ROOT_PASSWORD: password
+            MONGO_INITDB_DATABASE: '${MONGODB_DATABASE:-runemanager}'
+        volumes:
+            - 'sail-mongo:/data/db'
+        networks:
+            - sail
+        healthcheck:
+            test:
+                - CMD
+                - mongosh
+                - --quiet
+                - --eval
+                - 'db.runCommand({ ping: 1 }).ok'
+            retries: 3
+            timeout: 5s
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -51,5 +114,9 @@ networks:
     sail:
         driver: bridge
 volumes:
+    sail-osrsbox-mongo:
+        driver: local
+    sail-mongo:
+        driver: local
     sail-mysql:
         driver: local

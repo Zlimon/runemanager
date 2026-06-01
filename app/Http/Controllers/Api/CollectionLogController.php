@@ -88,27 +88,29 @@ class CollectionLogController extends Controller
 
             $response = $client->request('GET', "/items/user/{$account->username}?pageName={$collection->name}");
 
-            $collectionLog = json_decode($response->getBody()->getContents(), true);
+            $collectionLog['collection_log'] = json_decode($response->getBody()->getContents(), true);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], $e->getCode());
         }
 
-        $collectionLog['name'] = $collection->name;
-        $collectionLog['slug'] = $collection->slug;
-        $collectionLog['obtained'] = $collectionLog['obtainedCount'];
-        $collectionLog['total'] = $collectionLog['itemCount'];
+        $collectionLog['collection_log']['name'] = $collection->name;
+        $collectionLog['collection_log']['slug'] = $collection->slug;
+        $collectionLog['collection_log']['obtained'] = $collectionLog['collection_log']['obtainedCount'];
+        $collectionLog['collection_log']['total'] = $collectionLog['collection_log']['itemCount'];
 
         // Unset the keys that are not needed
-        unset($collectionLog['page'], $collectionLog['obtainedCount'], $collectionLog['itemCount']);
+        unset($collectionLog['collection_log']['page'], $collectionLog['collection_log']['itemCount'], $collectionLog['collection_log']['obtainedCount']);
 
         $items = Item::select('_id', 'name', 'examine', 'icon')->whereIn('_id',
-            array_column($collectionLog['items'], 'id'))->get()->keyBy('_id');
+            array_column($collectionLog['collection_log']['items'], 'id'))->get()->keyBy('_id');
 
-        foreach ($collectionLog['items'] as $key => $item) {
+        foreach ($collectionLog['collection_log']['items'] as $key => &$item) {
+            unset($item['name']);
+
             $dbItem = $items[$item['id']]->toArray();
 
             if ($dbItem) {
-                $collectionLog['items'][$key] = array_merge($dbItem, $item);
+                $collectionLog['collection_log']['items'][$key]['item'] = $dbItem;
             }
         }
 

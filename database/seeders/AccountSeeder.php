@@ -90,6 +90,10 @@ class AccountSeeder extends Seeder
         try {
             $account = $createOrUpdateAccount->createOrUpdateAccount($account, $user, $accountType);
 
+            $account->online = rand(0, 1);
+
+            $account->save();
+
             $equipment = Equipment::factory(1)->make()->first()->toArray();
             $createOrUpdateAccountEquipment->createOrUpdateAccountEquipment($account, $equipment);
 

@@ -9,7 +9,6 @@ import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import {initFlowbite} from "flowbite";
 
 const props = defineProps({
     title: String,
@@ -36,8 +35,6 @@ const logout = () => {
 };
 
 onMounted(() => {
-    initFlowbite();
-
     // if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     if (usePage().props.dark_mode === true) {
         document.documentElement.classList.add('dark');
