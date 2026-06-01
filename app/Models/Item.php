@@ -47,8 +47,28 @@ class Item extends Model
         //        'weapon' => 'array',
     ];
 
+    /**
+     * The Mongo Laravel driver hardcodes an id↔_id alias in projections,
+     * making the document's OSRS `id` field unreachable via Eloquent's
+     * pluck/select. Drop to a raw $sample aggregation to bypass it.
+     */
     public static function randomItemId(): int
     {
-        return static::query()->where([['noted', false], ['placeholder', false], ['duplicate', false]])->whereNotNull('release_date')->pluck('_id')->random();
+        $doc = (new static)->getConnection()
+            ->getDatabase()
+            ->selectCollection((new static)->getTable())
+            ->aggregate([
+                ['$match' => [
+                    'noted' => false,
+                    'placeholder' => false,
+                    'duplicate' => false,
+                    'release_date' => ['$ne' => null],
+                ]],
+                ['$sample' => ['size' => 1]],
+                ['$project' => ['id' => 1, '_id' => 0]],
+            ])
+            ->toArray()[0] ?? null;
+
+        return $doc ? (int) $doc['id'] : 0;
     }
 }
