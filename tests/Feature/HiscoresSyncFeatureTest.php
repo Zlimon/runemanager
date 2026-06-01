@@ -5,10 +5,14 @@ use App\Models\AccountHiscore;
 use App\Models\User;
 use App\Services\Hiscores\HiscoresSync;
 use App\Services\Hiscores\OsrsHiscoresClient;
+use GuzzleHttp\Client;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -84,3 +88,61 @@ it('throws on a malformed payload', function () {
 
     $sync->syncForAccount($account);
 })->throws(RuntimeException::class);
+
+it('hiscores:sync command iterates every account when no username given', function () {
+    $a = makeAccount('Alpha');
+    $b = makeAccount('Bravo');
+
+    $payload = json_encode([
+        'skills' => [['id' => 1, 'name' => 'Attack', 'rank' => 1, 'level' => 99, 'xp' => 1]],
+        'activities' => [],
+    ]);
+    $mock = new MockHandler([
+        new Response(200, [], $payload),
+        new Response(200, [], $payload),
+    ]);
+    $http = new Client(['handler' => HandlerStack::create($mock)]);
+    $this->app->instance(OsrsHiscoresClient::class, new OsrsHiscoresClient($http));
+
+    $this->artisan('hiscores:sync')
+        ->expectsOutputToContain('Alpha')
+        ->expectsOutputToContain('Bravo')
+        ->expectsOutputToContain('Synced 2, failed 0.')
+        ->assertSuccessful();
+
+    expect(AccountHiscore::query()->count())->toBe(2);
+});
+
+it('keeps going past a failed account', function () {
+    makeAccount('Good1');
+    makeAccount('BadAccount');
+    makeAccount('Good2');
+
+    $okBody = json_encode(['skills' => [], 'activities' => []]);
+    $mock = new MockHandler([
+        new Response(200, [], $okBody),
+        new ConnectException(
+            'Network is down',
+            new Request('GET', 'index_lite.json')
+        ),
+        new Response(200, [], $okBody),
+    ]);
+    $http = new Client(['handler' => HandlerStack::create($mock)]);
+    $this->app->instance(OsrsHiscoresClient::class, new OsrsHiscoresClient($http));
+
+    $this->artisan('hiscores:sync')
+        ->expectsOutputToContain('BadAccount')
+        ->expectsOutputToContain('Synced 2, failed 1.')
+        ->assertSuccessful();
+
+    expect(AccountHiscore::query()->count())->toBe(2);
+});
+
+it('registers hiscores:sync to run hourly in the scheduler', function () {
+    $events = collect(app(Schedule::class)->events());
+
+    $hiscoreEvent = $events->first(fn ($e) => str_contains($e->command ?? '', 'hiscores:sync'));
+
+    expect($hiscoreEvent)->not->toBeNull();
+    expect($hiscoreEvent->expression)->toBe('0 * * * *');
+});

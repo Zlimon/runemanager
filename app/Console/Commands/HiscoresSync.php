@@ -8,42 +8,54 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Throwable;
 
-#[Signature('hiscores:sync {username : OSRS username (matches accounts.username)}')]
-#[Description('Fetch the latest hiscores for an account from the official OSRS hiscores API and upsert the JSONB row.')]
+#[Signature('hiscores:sync {username? : Specific OSRS username to sync; if omitted, syncs every account}')]
+#[Description('Fetch the latest hiscores from the official OSRS hiscores API and upsert AccountHiscore rows.')]
 class HiscoresSync extends Command
 {
     public function handle(HiscoresSyncService $sync): int
     {
         $username = $this->argument('username');
 
-        $account = Account::whereUsername($username)->first();
+        $accounts = $username
+            ? Account::whereUsername($username)->get()
+            : Account::all();
 
-        if (! $account) {
+        if ($username && $accounts->isEmpty()) {
             $this->error(sprintf('No account found with username "%s".', $username));
 
             return self::FAILURE;
         }
 
-        try {
-            $hiscore = $sync->syncForAccount($account);
-        } catch (GuzzleException $e) {
-            $this->error(sprintf('Hiscores fetch failed: %s', $e->getMessage()));
+        if ($accounts->isEmpty()) {
+            $this->info('No accounts to sync.');
 
-            return self::FAILURE;
+            return self::SUCCESS;
         }
 
-        $skills = count($hiscore->entries['skills'] ?? []);
-        $activities = count($hiscore->entries['activities'] ?? []);
+        $synced = 0;
+        $failed = 0;
 
-        $this->info(sprintf(
-            'Synced %s — %d skills, %d activities (fetched %s)',
-            $account->username,
-            $skills,
-            $activities,
-            $hiscore->fetched_at->toDateTimeString(),
-        ));
+        foreach ($accounts as $account) {
+            try {
+                $hiscore = $sync->syncForAccount($account);
 
-        return self::SUCCESS;
+                $this->line(sprintf(
+                    '  ✓ %s — %d skills, %d activities',
+                    $account->username,
+                    count($hiscore->entries['skills'] ?? []),
+                    count($hiscore->entries['activities'] ?? []),
+                ));
+                $synced++;
+            } catch (GuzzleException|Throwable $e) {
+                $this->line(sprintf('  ✗ %s — %s', $account->username, $e->getMessage()));
+                $failed++;
+            }
+        }
+
+        $this->info(sprintf('Synced %d, failed %d.', $synced, $failed));
+
+        return $failed > 0 && $synced === 0 ? self::FAILURE : self::SUCCESS;
     }
 }

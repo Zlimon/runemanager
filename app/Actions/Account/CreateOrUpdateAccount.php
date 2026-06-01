@@ -8,7 +8,10 @@ use App\Models\Account;
 use App\Models\Collection;
 use App\Models\Skill;
 use App\Models\User;
+use App\Services\Hiscores\HiscoresSync;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class CreateOrUpdateAccount
 {
@@ -23,7 +26,7 @@ class CreateOrUpdateAccount
             throw new \Exception(sprintf("Could not retrieve player data for '%s' from the official hiscores.", $accountUsername));
         }
 
-        Db::beginTransaction();
+        DB::beginTransaction();
 
         try {
             $account = Account::whereUsername($accountUsername)->first();
@@ -41,12 +44,12 @@ class CreateOrUpdateAccount
 
             $account->save();
         } catch (\Exception $e) {
-            Db::rollback();
+            DB::rollback();
 
             throw new \Exception(sprintf("Could not create or update account '%s'. Message: %s", $accountUsername, $e->getMessage()));
         }
 
-        Db::commit();
+        DB::commit();
 
         try {
             $this->createOrUpdateAccountHiscores($account, $playerData);
@@ -54,6 +57,15 @@ class CreateOrUpdateAccount
             DB::rollback();
 
             throw new \Exception(sprintf("Could not create or update account hiscores for '%s'. Message: %s", $accountUsername, $e->getMessage()));
+        }
+
+        try {
+            app(HiscoresSync::class)->syncForAccount($account);
+        } catch (Throwable $e) {
+            Log::warning('AccountHiscore sync failed', [
+                'account' => $account->username,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return $account;
