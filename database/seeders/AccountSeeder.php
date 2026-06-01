@@ -2,156 +2,97 @@
 
 namespace Database\Seeders;
 
-use App\Actions\Account\CreateOrUpdateAccount;
-use App\Actions\Account\CreateOrUpdateAccountEquipment;
 use App\Enums\AccountTypesEnum;
-use App\Models\Equipment;
-use App\Models\Item;
+use App\Models\Account;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AccountSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * The dev user's three known OSRS accounts. Used by the plugin testing flow.
+     *
+     * @var array<int, array{name: string, type: AccountTypesEnum}>
      */
+    private array $zlimonAccounts = [
+        ['name' => 'Habski', 'type' => AccountTypesEnum::IRONMAN],
+        ['name' => 'Marni', 'type' => AccountTypesEnum::NORMAL],
+        ['name' => 'Hey Jase', 'type' => AccountTypesEnum::NORMAL],
+    ];
+
+    /**
+     * Demo OSRS usernames distributed across the demo users. Realistic-looking
+     * names for browsing the UI; not synced against the live hiscores API.
+     *
+     * @var list<string>
+     */
+    private array $demoAccounts = [
+        'Matilizo', 'wewantrings', 'Nex What', 'Far89', 'CinnaBawns',
+        'Den falahid', 'Zuk Zillion', 'Dyla n fan', 'No Ni', 'Gronky444',
+        'Q R U I Z', 'R O A D MAX6', 'a Gemidish55', 'Ms Effect', 'Max And Ruby',
+        'l0ltit', 'l 54', 'WumbleTeed', 'A N U B I S', 'ZET0 KA1BA',
+        'Jxclusiive22', 'Dynosauur', 'Location', 'Darkrune256', 'Dharoks ass',
+        'Mrs Jesus', 'Spirit2k15', 'Kandarin Kin', 'Didg1t', 'Dessabrine',
+        'spongejoe2', 'Skullzj102', 'ante xoxo', 'zorminis', 'PokketSand',
+        'Fyressence', 'MezDoe', 'highlifeng9', 'Boonana95', 'Reshy HC',
+        'Bigschmoo12', 'Jo Coolest', 'Aquat1cz', 'Varang', 'LOPrGds',
+        'Wigwamjones', 'Unsponsored', 'Muswa', 'GoeieVanHaze', 'TobeTask',
+    ];
+
     public function run(): void
     {
-        $accounts = [
-            'Matilizo',
-            'wewantrings',
-            'Nex What',
-            'Far89',
-            'CinnaBawns',
-            'Den falahid',
-            'Zuk Zillion',
-            'Dyla n fan',
-            'No Ni',
-            'Gronky444',
-            'Q R U I Z',
-            'R O A D MAX6',
-            'a Gemidish55',
-            'Ms Effect',
-            'Max And Ruby',
-            'l0ltit',
-            'l 54',
-            'WumbleTeed',
-            'A N U B I S',
-            'ZET0 KA1BA',
-            'Jxclusiive22',
-            'Dynosauur',
-            'Location',
-            'Darkrune256',
-            'Dharoks ass',
-            'Mrs Jesus',
-            'Spirit2k15',
-            'Kandarin Kin',
-            'Didg1t',
-            'Dessabrine',
-            'spongejoe2',
-            'Skullzj102',
-            'ante xoxo',
-            'zorminis',
-            'PokketSand',
-            'Fyressence',
-            'MezDoe',
-            'highlifeng9',
-            'Boonana95',
-            'Reshy HC',
-            'Bigschmoo12',
-            'Jo Coolest',
-            'Aquat1cz',
-            'Varang',
-            'LOPrGds',
-            'Wigwamjones',
-            'Unsponsored',
-            'Muswa',
-            'GoeieVanHaze',
-            'TobeTask',
-        ];
+        $zlimon = User::where('email', 'zlimon@runemanager.com')->first();
 
-        $this->createOrUpdateAccount('Habski', User::whereName('Zlimon')->first(), AccountTypesEnum::IRONMAN);
-        $this->createOrUpdateAccount('Marni', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
-        $this->createOrUpdateAccount('Hey Jase', User::whereName('Zlimon')->first(), AccountTypesEnum::NORMAL);
+        if (! $zlimon) {
+            $this->command->error('AccountSeeder: Zlimon user not found. Run UserSeeder first.');
 
-        foreach ($accounts as $account) {
-            $user = User::inRandomOrder()->first();
-
-            //            \App\Enums\AccountTypesEnum::returnAllAccountTypes()[rand(0, 3)]
-            $this->createOrUpdateAccount($account, $user, AccountTypesEnum::NORMAL);
+            return;
         }
+
+        $existing = Account::count();
+        if ($existing > 0) {
+            $this->command->info(sprintf('AccountSeeder: %d accounts already present, skipping.', $existing));
+
+            return;
+        }
+
+        $created = 0;
+
+        foreach ($this->zlimonAccounts as $spec) {
+            $this->createAccount($zlimon, $spec['name'], $spec['type']);
+            $created++;
+        }
+
+        $demoUsers = User::where('id', '!=', $zlimon->id)->get();
+        if ($demoUsers->isEmpty()) {
+            $this->command->warn('AccountSeeder: no demo users found; only Zlimon accounts seeded.');
+
+            return;
+        }
+
+        foreach ($this->demoAccounts as $name) {
+            $owner = $demoUsers->random();
+            $this->createAccount($owner, $name, AccountTypesEnum::NORMAL);
+            $created++;
+        }
+
+        $this->command->info(sprintf('AccountSeeder: created %d accounts.', $created));
     }
 
-    private function createOrUpdateAccount(string $account, User $user, AccountTypesEnum $accountType): void
+    private function createAccount(User $user, string $username, AccountTypesEnum $type): void
     {
-        $createOrUpdateAccount = new CreateOrUpdateAccount;
-        $createOrUpdateAccountEquipment = new CreateOrUpdateAccountEquipment;
-
-        try {
-            $account = $createOrUpdateAccount->createOrUpdateAccount($account, $user, $accountType);
-
-            $account->online = rand(0, 1);
-
-            $account->save();
-
-            $equipment = Equipment::factory(1)->make()->first()->toArray();
-            $createOrUpdateAccountEquipment->createOrUpdateAccountEquipment($account, $equipment);
-
-            $account->inventory()->updateOrCreate([
-                'account_id' => $account->id,
-            ], [
-                'inventory' => $this->generateInventory(),
-            ]);
-
-            $account->lootingBag()->updateOrCreate([
-                'account_id' => $account->id,
-            ], [
-                'looting_bag' => $this->generateInventory(),
-            ]);
-        } catch (\Exception $e) {
-            $this->command->warn($e->getMessage());
-        }
-    }
-
-    private function generateInventory(): array
-    {
-        // Generate an array with up to 28 items, each item containing two integers (item id and quantity)
-        return collect(range(1, 28))->map(function () {
-            // 50/50 chance of getting a random item or an empty slot
-            if (! rand(0, 1) === 1) {
-                return [-1, 0];
-            }
-
-            // Stackable/noted or single item
-            $amount = rand(0, 1) === 1 ? rand(2, 484) : 0;
-            if ($amount >= 2) {
-                // Stackable or noted item
-                if (rand(0, 1) === 1) {
-                    // Stackable item
-                    return [
-                        Item::where([
-                            ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', true],
-                        ])->whereNotNull('release_date')->pluck('_id')->random(),
-                        $amount,
-                    ];
-                } else {
-                    // Noted item
-                    return [
-                        Item::where([
-                            ['placeholder', false], ['duplicate', true], ['noted', true], ['stackable', false],
-                        ])->whereNotNull('release_date')->pluck('_id')->random(),
-                        $amount,
-                    ];
-                }
-            }
-
-            // Single item
-            return [
-                Item::where([
-                    ['placeholder', false], ['duplicate', false], ['noted', false], ['stackable', false],
-                ])->whereNotNull('release_date')->pluck('_id')->random(),
-                1,
-            ];
-        })->toArray();
+        Account::query()->forceCreate([
+            'user_id' => $user->id,
+            // RuneLite's Client.getAccountHash() returns a Java long; synthesise something
+            // long-shaped for seed data. The plugin overwrites this with the real hash on first push.
+            'account_hash' => 'seed-'.Str::lower(Str::random(20)),
+            'account_type' => $type,
+            'username' => $username,
+            'rank' => 0,
+            'level' => 0,
+            'xp' => 0,
+            'online' => (bool) random_int(0, 1),
+        ]);
     }
 }
