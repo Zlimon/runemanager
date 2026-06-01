@@ -144,6 +144,17 @@ class Account extends Model
         return $this->hasOne(Equipment::class);
     }
 
+    public function collectionLog(): HasOne
+    {
+        return $this->hasOne(CollectionLog::class);
+    }
+
+    // MongoDB relationship
+    public function getCollectionLogAttribute(): ?CollectionLog
+    {
+        return CollectionLog::where('account_id', $this->id)->first();
+    }
+
     //    public function log() {
     //        return $this->hasMany(Log::class);
     //    }
