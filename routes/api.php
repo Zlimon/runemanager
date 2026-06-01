@@ -32,25 +32,10 @@ Route::middleware([
                 Route::get('/', [InventoryController::class, 'show'])->name('api.accounts.inventory.show');
             });
 
-            Route::prefix('/looting-bag')->group(function () {
-                Route::get('/', [LootingBagController::class, 'show'])->name('api.accounts.looting-bag.show');
-                Route::put('/update', [LootingBagController::class, 'update'])->name('api.accounts.looting-bag.update');
-            });
-
-            Route::prefix('/bank')->group(function () {
-                Route::get('/', [BankController::class, 'show'])->name('api.accounts.bank.show');
-                Route::put('/update', [BankController::class, 'update'])->name('api.accounts.bank.update');
-            });
-
-            Route::prefix('/equipment')->group(function () {
-                Route::get('/', [EquipmentController::class, 'show'])->name('api.accounts.equipment.show');
-                Route::put('/update', [EquipmentController::class, 'update'])->name('api.accounts.equipment.update');
-            });
-
-            Route::prefix('/quests')->group(function () {
-                Route::get('/', [QuestController::class, 'show'])->name('api.accounts.quests.show');
-                Route::put('/update', [QuestController::class, 'update'])->name('api.accounts.quests.update');
-            });
+            Route::get('/looting-bag', [LootingBagController::class, 'show'])->name('api.accounts.looting-bag.show');
+            Route::get('/bank', [BankController::class, 'show'])->name('api.accounts.bank.show');
+            Route::get('/equipment', [EquipmentController::class, 'show'])->name('api.accounts.equipment.show');
+            Route::get('/quests', [QuestController::class, 'show'])->name('api.accounts.quests.show');
 
             Route::prefix('/collectionlog')->group(function () {
                 Route::post('/', [CollectionLogController::class, 'index'])->name('api.accounts.collectionlog.index');
@@ -66,6 +51,10 @@ Route::middleware([
      */
     Route::middleware('plugin.account')->prefix('/plugin')->group(function () {
         Route::put('/inventory', [InventoryController::class, 'update'])->name('api.plugin.inventory');
+        Route::put('/bank', [BankController::class, 'update'])->name('api.plugin.bank');
+        Route::put('/equipment', [EquipmentController::class, 'update'])->name('api.plugin.equipment');
+        Route::put('/quests', [QuestController::class, 'update'])->name('api.plugin.quests');
+        Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
     });
 
     Route::post('/npc/search', [NpcController::class, 'search'])->name('api.npc.search');

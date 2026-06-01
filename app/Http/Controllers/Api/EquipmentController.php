@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EquipmentResource;
 use App\Models\Account;
+use App\Models\Equipment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -53,51 +54,40 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Snapshot upsert from the RuneLite plugin. Account resolved by plugin.account middleware.
+     *
+     * The plugin sends `equipment` as a sparse array indexed by OSRS KitType slot. Each
+     * present slot is a [itemId, quantity] pair; -1 in position 0 means an empty slot.
      */
-    public function update(Request $request, Account $account): JsonResponse
+    public function update(Request $request): JsonResponse
     {
+        $account = $request->attributes->get('account');
+
         $request->validate([
-            'equipment' => 'required|array',
-            'equipment.*' => 'required|array',
-            'equipment.*.*' => 'required|integer',
+            'equipment' => ['required', 'array'],
+            'equipment.*' => ['required', 'array', 'min:1'],
+            'equipment.*.0' => ['required', 'integer'],
         ]);
 
-        try {
-            $head = $request['equipment'][0][0] !== -1 ? $request['equipment'][0][0] : null;
-            $cape = $request['equipment'][1][0] !== -1 ? $request['equipment'][1][0] : null;
-            $neck = $request['equipment'][2][0] !== -1 ? $request['equipment'][2][0] : null;
-            $ammo = $request['equipment'][13][0] !== -1 ? $request['equipment'][13][0] : null;
-            $weapon = $request['equipment'][3][0] !== -1 ? $request['equipment'][3][0] : null;
-            $body = $request['equipment'][4][0] !== -1 ? $request['equipment'][4][0] : null;
-            $shield = $request['equipment'][5][0] !== -1 ? $request['equipment'][5][0] : null;
-            $legs = $request['equipment'][7][0] !== -1 ? $request['equipment'][7][0] : null;
-            $hands = $request['equipment'][9][0] !== -1 ? $request['equipment'][9][0] : null;
-            $feet = $request['equipment'][10][0] !== -1 ? $request['equipment'][10][0] : null;
-            $ring = $request['equipment'][12][0] !== -1 ? $request['equipment'][12][0] : null;
+        $eq = $request->input('equipment');
+        $itemAt = fn (int $slot) => isset($eq[$slot][0]) && $eq[$slot][0] !== -1 ? $eq[$slot][0] : null;
 
-            $account->equipment->head = $head;
-            $account->equipment->cape = $cape;
-            $account->equipment->neck = $neck;
-            $account->equipment->ammo = $ammo;
-            $account->equipment->weapon = $weapon;
-            $account->equipment->body = $body;
-            $account->equipment->shield = $shield;
-            $account->equipment->legs = $legs;
-            $account->equipment->hands = $hands;
-            $account->equipment->feet = $feet;
-            $account->equipment->ring = $ring;
+        $equipment = Equipment::where('account_id', $account->id)->first() ?? new Equipment;
+        $equipment->account_id = $account->id;
+        $equipment->head = $itemAt(0);
+        $equipment->cape = $itemAt(1);
+        $equipment->neck = $itemAt(2);
+        $equipment->weapon = $itemAt(3);
+        $equipment->body = $itemAt(4);
+        $equipment->shield = $itemAt(5);
+        $equipment->legs = $itemAt(7);
+        $equipment->hands = $itemAt(9);
+        $equipment->feet = $itemAt(10);
+        $equipment->ring = $itemAt(12);
+        $equipment->ammo = $itemAt(13);
+        $equipment->save();
 
-            $account->equipment->save();
-
-            return response()->json([
-                'data' => $request,
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred while updating the account. Message: '.$e->getMessage(),
-            ], 500);
-        }
+        return response()->json(['data' => $equipment]);
     }
 
     /**

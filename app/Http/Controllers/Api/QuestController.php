@@ -53,38 +53,29 @@ class QuestController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Snapshot upsert from the RuneLite plugin. Account resolved by plugin.account middleware.
+     *
+     * NB: SPEC §5.2 calls for quests in PostgreSQL; the current Quest model lives in
+     * MongoDB. Keeping the existing model for now — moving it is a separate wedge.
      */
-    public function update(Request $request, Account $account): JsonResponse
+    public function update(Request $request): JsonResponse
     {
+        $account = $request->attributes->get('account');
+
         $request->validate([
             'quests' => ['required', 'array'],
             'quests.*' => ['required', 'array'],
-            'quests.*.0' => ['required', 'string'],
-            'quests.*.1' => ['required', 'integer'],
+            'quests.*.0' => ['required', 'string'],  // quest name
+            'quests.*.1' => ['required', 'integer'], // status (0 = not started, 1 = in progress, 2 = finished)
         ]);
 
-        // This does not work for MongoDB
-        //    $account->quests()->updateOrCreate([
-        //        'account_id' => $account->id
-        //    ], [
-        //        'quests' => $request->input('quests')
-        //    ]);
+        $quests = Quest::where('account_id', $account->id)->first()
+            ?? (new Quest)->forceFill(['account_id' => $account->id]);
 
-        $quests = Quest::where('account_id', $account->id)->first();
-
-        if (! $quests) {
-            $quests = new Quest;
-            $quests->account_id = $account->id;
-        }
-
-        $quests->quests = $request['quests'];
-
+        $quests->quests = $request->input('quests');
         $quests->save();
 
-        return response()->json([
-            'data' => $account->quests,
-        ]);
+        return response()->json(['data' => $quests]);
     }
 
     /**

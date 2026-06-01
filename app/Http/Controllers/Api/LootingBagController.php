@@ -54,10 +54,12 @@ class LootingBagController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Snapshot upsert from the RuneLite plugin. Account resolved by plugin.account middleware.
      */
-    public function update(Request $request, Account $account): JsonResponse
+    public function update(Request $request): JsonResponse
     {
+        $account = $request->attributes->get('account');
+
         $request->validate([
             'looting_bag' => ['required', 'array', 'max:28'],
             'looting_bag.*' => ['required', 'array', 'max:2'],
@@ -65,27 +67,14 @@ class LootingBagController extends Controller
             'looting_bag.*.1' => ['required', 'integer'],
         ]);
 
-        // This does not work for MongoDB
-        //    $account->lootingBag()->updateOrCreate([
-        //        'account_id' => $account->id
-        //    ], [
-        //        'lootingBag' => $request->input('looting_bag')
-        //    ]);
+        $bag = LootingBag::where('account_id', $account->id)->first()
+            ?? (new LootingBag)->forceFill(['account_id' => $account->id]);
 
-        $lootingBag = LootingBag::where('account_id', $account->id)->first();
+        // Store under snake_case to match the model's $fillable and the show()/Resource.
+        $bag->looting_bag = $request->input('looting_bag');
+        $bag->save();
 
-        if (! $lootingBag) {
-            $lootingBag = new LootingBag;
-            $lootingBag->account_id = $account->id;
-        }
-
-        $lootingBag->lootingBag = $request['looting_bag'];
-
-        $lootingBag->save();
-
-        return response()->json([
-            'data' => $account->lootingBag,
-        ]);
+        return response()->json(['data' => $bag]);
     }
 
     /**

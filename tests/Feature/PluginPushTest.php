@@ -1,7 +1,11 @@
 <?php
 
 use App\Models\Account;
+use App\Models\Bank;
+use App\Models\Equipment;
 use App\Models\Inventory;
+use App\Models\LootingBag;
+use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,8 +16,11 @@ use Laravel\Sanctum\Sanctum;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // RefreshDatabase resets SQL; clear the Mongo inventory collection too.
+    // RefreshDatabase only resets SQL; the Mongo collections persist between tests.
     Inventory::query()->delete();
+    Bank::query()->delete();
+    Quest::query()->delete();
+    LootingBag::query()->delete();
 });
 
 function freshUser(string $email = 'plugin@test.local'): User
@@ -120,4 +127,97 @@ it('upserts the Mongo inventory document on push', function () {
 
     expect($inv)->not->toBeNull();
     expect($inv->inventory)->toBe([[4151, 1], [556, 1000]]);
+});
+
+it('upserts the Mongo bank document on PUT /api/plugin/bank', function () {
+    $user = freshUser();
+    Sanctum::actingAs($user);
+
+    $payload = [
+        'bank' => [
+            [[4151, 1], [556, 5000]],  // tab 0
+            [[1163, 1]],               // tab 1
+        ],
+    ];
+
+    $this->putJson('/api/plugin/bank', $payload, pluginHeaders('hash-bank', 'Zlimon'))
+        ->assertSuccessful();
+
+    $account = Account::where('account_hash', 'hash-bank')->first();
+    $bank = Bank::where('account_id', $account->id)->first();
+
+    expect($bank->bank)->toBe([[[4151, 1], [556, 5000]], [[1163, 1]]]);
+});
+
+it('writes equipment slots on PUT /api/plugin/equipment', function () {
+    $user = freshUser();
+    Sanctum::actingAs($user);
+
+    // Plugin shape: sparse array indexed by KitType slot, each [itemId, qty].
+    // -1 in slot 0 = empty. Slots 6, 8, 11 are gaps in KitType and we don't read them.
+    $payload = [
+        'equipment' => [
+            0 => [11832, 1],   // head: bandos chestplate (just illustrative)
+            1 => [21295, 1],   // cape
+            2 => [-1, 0],      // amulet empty
+            3 => [4151, 1],    // weapon: abyssal whip
+            4 => [12437, 1],   // body
+            5 => [1201, 1],    // shield
+            7 => [4087, 1],    // legs
+            9 => [7462, 1],    // hands
+            10 => [11840, 1],  // feet
+            12 => [6735, 1],   // ring
+            13 => [882, 1000], // ammo
+        ],
+    ];
+
+    $this->putJson('/api/plugin/equipment', $payload, pluginHeaders('hash-eq', 'Zlimon'))
+        ->assertSuccessful();
+
+    $account = Account::where('account_hash', 'hash-eq')->first();
+    $eq = Equipment::where('account_id', $account->id)->first();
+
+    expect($eq->weapon)->toBe(4151);
+    expect($eq->neck)->toBeNull();
+    expect($eq->ammo)->toBe(882);
+});
+
+it('upserts the Mongo quest doc on PUT /api/plugin/quests', function () {
+    $user = freshUser();
+    Sanctum::actingAs($user);
+
+    $payload = [
+        'quests' => [
+            ['Cooks Assistant', 2],
+            ['Dragon Slayer II', 1],
+        ],
+    ];
+
+    $this->putJson('/api/plugin/quests', $payload, pluginHeaders('hash-q', 'Zlimon'))
+        ->assertSuccessful();
+
+    $account = Account::where('account_hash', 'hash-q')->first();
+    $q = Quest::where('account_id', $account->id)->first();
+
+    expect($q->quests)->toBe([['Cooks Assistant', 2], ['Dragon Slayer II', 1]]);
+});
+
+it('upserts the Mongo looting bag doc on PUT /api/plugin/looting-bag', function () {
+    $user = freshUser();
+    Sanctum::actingAs($user);
+
+    $payload = [
+        'looting_bag' => [
+            [995, 250000],
+            [560, 100],
+        ],
+    ];
+
+    $this->putJson('/api/plugin/looting-bag', $payload, pluginHeaders('hash-lb', 'Zlimon'))
+        ->assertSuccessful();
+
+    $account = Account::where('account_hash', 'hash-lb')->first();
+    $bag = LootingBag::where('account_id', $account->id)->first();
+
+    expect($bag->looting_bag)->toBe([[995, 250000], [560, 100]]);
 });

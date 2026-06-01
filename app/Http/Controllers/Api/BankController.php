@@ -54,38 +54,26 @@ class BankController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Snapshot upsert from the RuneLite plugin. Account resolved by plugin.account middleware.
      */
-    public function update(Request $request, Account $account): JsonResponse
+    public function update(Request $request): JsonResponse
     {
+        $account = $request->attributes->get('account');
+
         $request->validate([
-            'bank' => ['required', 'array', 'max:10'], // tabs
-            'bank.*' => ['required', 'array'], // items in tabs
-            'bank.*.*' => ['required', 'array', 'size:2'], // itemId and quantity
+            'bank' => ['required', 'array', 'max:10'],            // tabs
+            'bank.*' => ['required', 'array'],                    // items in a tab
+            'bank.*.*' => ['required', 'array', 'size:2'],        // [itemId, quantity]
             'bank.*.*.*' => ['required', 'integer'],
         ]);
 
-        // This does not work for MongoDB
-        //    $account->bank()->updateOrCreate([
-        //        'account_id' => $account->id
-        //    ], [
-        //        'bank' => $request->input('bank')
-        //    ]);
+        $bank = Bank::where('account_id', $account->id)->first()
+            ?? (new Bank)->forceFill(['account_id' => $account->id]);
 
-        $bank = Bank::where('account_id', $account->id)->first();
-
-        if (! $bank) {
-            $bank = new Bank;
-            $bank->account_id = $account->id;
-        }
-
-        $bank->bank = $request['bank'];
-
+        $bank->bank = $request->input('bank');
         $bank->save();
 
-        return response()->json([
-            'data' => $account->bank,
-        ]);
+        return response()->json(['data' => $bank]);
     }
 
     /**
