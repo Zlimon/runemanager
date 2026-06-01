@@ -56,7 +56,17 @@ class ResourcePackSwitch extends Command implements PromptsForMissingInput
     {
         $name = $this->argument('name');
 
-        $resourcePack = ResourcePack::where('name', 'like', "%{$name}%")->orWhere('alias', 'like', "%{$name}%")->orWhere('id', $name)->pluck('name')->first();
+        $query = ResourcePack::where('name', 'like', "%{$name}%")
+            ->orWhere('alias', 'like', "%{$name}%");
+
+        // The argument can be a numeric pack id (e.g. when called from the search prompt
+        // which keys options by id); otherwise it's a name/alias to match. Postgres won't
+        // implicitly cast a string to bigint, so we have to gate the id branch.
+        if (is_numeric($name)) {
+            $query->orWhere('id', (int) $name);
+        }
+
+        $resourcePack = $query->pluck('name')->first();
         $name = $resourcePack;
 
         if (is_null($name) || is_null($resourcePack)) {
