@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\HiscoreController;
+use App\Http\Controllers\SkillHiscoreController;
+use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -24,12 +28,17 @@ Route::middleware([
     })->name('dashboard');
 
     Route::prefix('/accounts')->group(function () {
-        Route::get('/', [\App\Http\Controllers\AccountController::class, 'index'])->name('accounts.index');
-        Route::get('/{account}', [\App\Http\Controllers\AccountController::class, 'show'])->name('accounts.show');
+        Route::get('/', [AccountController::class, 'index'])->name('accounts.index');
+        Route::get('/{account}', [AccountController::class, 'show'])->name('accounts.show');
     });
 
+    // Per-user resource pack override (instance-global pack is set by the
+    // resourcepack:switch artisan, not this endpoint).
+    Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
+        ->name('user.resource-pack.update');
+
     Route::prefix('/hiscores')->group(function () {
-        Route::get('/skills/{skill}', [\App\Http\Controllers\SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
+        Route::get('/skills/{skill}', [SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
         Route::get('/bosses/{boss}', function () {
             $boss = $this->router->current()->parameters['boss'];
 
@@ -52,7 +61,7 @@ Route::middleware([
 
     Route::prefix('/admin')->group(function () {
         Route::prefix('/hiscores')->group(function () {
-            Route::get('/create', [\App\Http\Controllers\Admin\HiscoreController::class, 'create'])->name('admin.hiscores.create');
+            Route::get('/create', [HiscoreController::class, 'create'])->name('admin.hiscores.create');
         });
     });
 });

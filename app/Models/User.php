@@ -3,8 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Helpers\SettingHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -86,6 +88,7 @@ class User extends Authenticatable
         'email',
         'password',
         'icon_id',
+        'resource_pack_id',
     ];
 
     /**
@@ -130,5 +133,29 @@ class User extends Authenticatable
     public function getIconAttribute(): ?string
     {
         return Item::find($this->icon_id)?->icon;
+    }
+
+    public function resourcePack(): BelongsTo
+    {
+        return $this->belongsTo(ResourcePack::class);
+    }
+
+    /**
+     * Resolve the pack that should actually be rendered for this user.
+     *
+     * Hierarchy (first non-null wins):
+     *   1. The user's own override (users.resource_pack_id)
+     *   2. The instance-global default (settings.resource_pack_id, set by `resourcepack:switch`)
+     *   3. null — render with no pack
+     */
+    public function effectiveResourcePackId(): ?int
+    {
+        if ($this->resource_pack_id !== null) {
+            return $this->resource_pack_id;
+        }
+
+        $global = SettingHelper::getSetting('resource_pack_id');
+
+        return $global ? (int) $global : null;
     }
 }
