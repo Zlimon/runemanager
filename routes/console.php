@@ -12,3 +12,8 @@ Schedule::command('hiscores:sync')
     ->hourly()
     ->withoutOverlapping()
     ->runInBackground();
+
+Schedule::command('name-changes:detect')
+    ->hourly()
+    ->withoutOverlapping()
+    ->runInBackground();

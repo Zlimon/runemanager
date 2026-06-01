@@ -39,4 +39,9 @@ return [
         'url' => env('COLLECTION_LOG_API_URL'),
     ],
 
+    'wise_old_man' => [
+        'url' => env('WOM_API_URL', 'https://api.wiseoldman.net/v2'),
+        'user_agent' => env('WOM_USER_AGENT', 'RuneManager/1.0'),
+    ],
+
 ];
