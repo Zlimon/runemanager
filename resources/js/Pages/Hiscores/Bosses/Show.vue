@@ -46,9 +46,6 @@ let hiscores = ref(props.hiscoresProp);
                                 <th scope="col" class="px-6 py-3">
                                     Score
                                 </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Obtained
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -69,9 +66,6 @@ let hiscores = ref(props.hiscoresProp);
                                 </td>
                                 <td class="px-6 py-4">
                                     {{ hiscore.kill_count.toLocaleString('en-US') }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    {{ hiscore.obtained.toLocaleString('en-US') }}
                                 </td>
                             </tr>
                         </tbody>

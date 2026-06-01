@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\SkillResource;
+use App\Http\Resources\AccountResource;
+use App\Models\AccountHiscore;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,29 +11,40 @@ use Inertia\Response;
 
 class SkillHiscoreController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(string $skill): Response
     {
         $skillRecord = Skill::whereSlug($skill)->firstOrFail();
 
-        $modelClass = $skillRecord->model;
+        $hiscores = AccountHiscore::with('account.user')
+            ->get()
+            ->map(function (AccountHiscore $row) use ($skillRecord) {
+                $entry = $row->entries['skills'][$skillRecord->slug] ?? null;
 
-        if (! class_exists($modelClass)) {
-            abort(404, 'Model not found.');
-        }
+                return [
+                    'account' => (new AccountResource($row->account))->resolve(),
+                    'rank' => $entry['rank'] ?? 0,
+                    'level' => $entry['level'] ?? 1,
+                    'xp' => $entry['xp'] ?? 0,
+                ];
+            })
+            ->sort(function (array $a, array $b) {
+                if ($a['rank'] === 0 && $b['rank'] !== 0) {
+                    return 1;
+                }
+                if ($a['rank'] !== 0 && $b['rank'] === 0) {
+                    return -1;
+                }
+                if ($a['rank'] !== $b['rank']) {
+                    return $a['rank'] <=> $b['rank'];
+                }
+                if ($a['level'] !== $b['level']) {
+                    return $b['level'] <=> $a['level'];
+                }
 
-        $modelInstance = new $modelClass;
-
-        $hiscores = $modelInstance->with('account.user')
-            ->orderByRaw('CASE WHEN "rank" = 0 THEN 0 ELSE 1 END DESC, "rank" ASC')
-            ->orderByDesc('level')
-            ->orderByDesc('xp')
-            ->orderByDesc('id')
-            ->get();
-
-        $hiscores = SkillResource::collection($hiscores)->resolve();
+                return $b['xp'] <=> $a['xp'];
+            })
+            ->values()
+            ->all();
 
         return Inertia::render('Hiscores/Skills/Show', [
             'recordTypeProp' => 'skill',

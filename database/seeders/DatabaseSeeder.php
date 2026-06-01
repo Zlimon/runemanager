@@ -35,10 +35,6 @@ class DatabaseSeeder extends Seeder
             'current_team_id' => null,
         ]);
 
-        $this->call([
-            CollectionSeeder::class,
-        ]);
-
         Artisan::call('migrate');
 
         $this->call([

@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Enums\AccountTypesEnum;
-use App\Http\Resources\SkillResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as SupportCollection;
 
 /**
  * @property int $id
@@ -18,9 +19,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $level
  * @property int $xp
  * @property int $online
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
  *
  * @method static \Database\Factories\AccountFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Account newModelQuery()
@@ -65,30 +66,27 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getUserIconAttribute(): string
+    public function getUserIconAttribute(): ?string
     {
         return $this->user->icon;
     }
 
-    public function skill(Skill $skill): HasOne
+    public function hiscore(): HasOne
     {
-        return $this->hasOne($skill->model);
+        return $this->hasOne(AccountHiscore::class);
     }
 
-    public function getSkillsAttribute()
+    public function getSkillsAttribute(): SupportCollection
     {
-        return Skill::all()->map(function ($skill) {
-            $skills = (new SkillResource($this->skill($skill)->first()))->resolve();
-            $skills['name'] = $skill['name'];
-            $skills['slug'] = $skill['slug'];
+        $entries = $this->hiscore?->entries['skills'] ?? [];
 
-            return $skills;
-        });
-    }
-
-    public function collection(Collection $collection): HasOne
-    {
-        return $this->hasOne($collection->model);
+        return Skill::all()->map(fn (Skill $skill) => [
+            'name' => $skill->name,
+            'slug' => $skill->slug,
+            'rank' => $entries[$skill->slug]['rank'] ?? 0,
+            'level' => $entries[$skill->slug]['level'] ?? 1,
+            'xp' => $entries[$skill->slug]['xp'] ?? 0,
+        ]);
     }
 
     public function inventory(): HasOne
