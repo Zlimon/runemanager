@@ -30,7 +30,6 @@ Route::middleware([
 
             Route::prefix('/inventory')->group(function () {
                 Route::get('/', [InventoryController::class, 'show'])->name('api.accounts.inventory.show');
-                Route::put('/update', [InventoryController::class, 'update'])->name('api.accounts.inventory.update');
             });
 
             Route::prefix('/looting-bag')->group(function () {
@@ -58,6 +57,15 @@ Route::middleware([
                 Route::get('/{tab}/{collection}', [CollectionLogController::class, 'show'])->name('api.accounts.collectionlog.show');
             });
         });
+    });
+
+    /*
+     * Plugin push endpoints. The OSRS account is resolved by the plugin.account
+     * middleware from the X-Account-Hash + X-Account-Username headers, not from
+     * the URL — usernames change but the hash is stable.
+     */
+    Route::middleware('plugin.account')->prefix('/plugin')->group(function () {
+        Route::put('/inventory', [InventoryController::class, 'update'])->name('api.plugin.inventory');
     });
 
     Route::post('/npc/search', [NpcController::class, 'search'])->name('api.npc.search');

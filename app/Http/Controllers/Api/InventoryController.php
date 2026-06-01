@@ -54,10 +54,15 @@ class InventoryController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Snapshot upsert from the RuneLite plugin.
+     *
+     * The Account is resolved by the plugin.account middleware (see X-Account-Hash
+     * + X-Account-Username headers) and attached to the request.
      */
-    public function update(Request $request, Account $account): JsonResponse
+    public function update(Request $request): JsonResponse
     {
+        $account = $request->attributes->get('account');
+
         $request->validate([
             'inventory' => ['required', 'array', 'max:28'],
             'inventory.*' => ['required', 'array', 'max:2'],
@@ -65,27 +70,13 @@ class InventoryController extends Controller
             'inventory.*.1' => ['required', 'integer'],
         ]);
 
-        // This does not work for MongoDB
-        //    $account->inventory()->updateOrCreate([
-        //        'account_id' => $account->id
-        //    ], [
-        //        'inventory' => $request->input('inventory')
-        //    ]);
+        $inventory = Inventory::where('account_id', $account->id)->first()
+            ?? (new Inventory)->forceFill(['account_id' => $account->id]);
 
-        $inventory = Inventory::where('account_id', $account->id)->first();
-
-        if (! $inventory) {
-            $inventory = new Inventory;
-            $inventory->account_id = $account->id;
-        }
-
-        $inventory->inventory = $request['inventory'];
-
+        $inventory->inventory = $request->input('inventory');
         $inventory->save();
 
-        return response()->json([
-            'data' => $account->inventory,
-        ]);
+        return response()->json(['data' => $inventory]);
     }
 
     /**
