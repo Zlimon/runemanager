@@ -62,7 +62,7 @@ class AccountController extends Controller
 
     public function show(Request $request, Account $account): Response
     {
-        $account->load('equipment')->append('skills');
+        $account->load('equipment', 'hiscore')->append('skills');
 
         return Inertia::render('Accounts/Show', [
             'account' => (new AccountResource($account))->resolve(),
@@ -84,6 +84,18 @@ class AccountController extends Controller
             // External API — defer so the page paints first, then the client
             // pulls this in via a follow-up partial reload.
             'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request)),
+
+            // Per SPEC §5.3 — one timestamp per data type, plus the staleness
+            // threshold the UI uses to flag old data.
+            'freshness' => fn () => [
+                'hiscores' => optional($account->hiscore)->fetched_at?->toIso8601String(),
+                'inventory' => optional($account->inventory)->updated_at?->toIso8601String(),
+                'bank' => optional($account->bank)->updated_at?->toIso8601String(),
+                'looting_bag' => optional($account->lootingBag)->updated_at?->toIso8601String(),
+                'quests' => optional($account->quests)->updated_at?->toIso8601String(),
+                'equipment' => optional($account->equipment)->updated_at?->toIso8601String(),
+                'stale_after_minutes' => (int) config('runemanager.freshness.stale_after_minutes'),
+            ],
         ]);
     }
 

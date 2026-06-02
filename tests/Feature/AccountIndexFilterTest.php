@@ -94,6 +94,42 @@ it('show renders the Inertia component with the `account` prop and per-tab data 
         );
 });
 
+it('exposes a freshness prop with per-data-type timestamps and the staleness threshold', function () {
+    config()->set('runemanager.freshness.stale_after_minutes', 90);
+    $account = Account::factory()->for($this->user)->create(['username' => 'Fresh']);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.show', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('freshness', fn ($freshness) => $freshness
+                ->where('stale_after_minutes', 90)
+                ->where('hiscores', null)
+                ->where('inventory', null)
+                ->where('bank', null)
+                ->where('looting_bag', null)
+                ->where('quests', null)
+                ->where('equipment', null),
+            ),
+        );
+});
+
+it('reports the hiscores timestamp once a sync has happened', function () {
+    $account = Account::factory()->for($this->user)->create(['username' => 'Synced']);
+    \App\Models\AccountHiscore::create([
+        'account_id' => $account->id,
+        'entries' => ['skills' => [], 'activities' => []],
+        'fetched_at' => now()->subMinutes(5),
+    ]);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.show', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('freshness.hiscores'),
+        );
+});
+
 it('exposes accountSearchResults as an optional shared prop (absent unless requested)', function () {
     Account::factory()->for($this->user)->create(['username' => 'Needle One']);
 

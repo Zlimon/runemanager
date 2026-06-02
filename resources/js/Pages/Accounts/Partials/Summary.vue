@@ -1,12 +1,17 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
+import Freshness from "@/Components/Freshness.vue";
 import dayjs from "dayjs";
 
-defineProps({
+const props = defineProps({
     account: {
         type: Object,
         required: true,
+    },
+    freshness: {
+        type: Object,
+        default: () => ({ stale_after_minutes: 60 }),
     },
 });
 
@@ -32,6 +37,12 @@ const page = usePage();
         </div>
 
         <hr class="my-6 border border-beige-700 bg-beige-700">
+
+        <div class="mb-2 flex items-baseline justify-between">
+            <InputLabel class="text-sm" value="Hiscores" />
+            <Freshness :updated-at="freshness.hiscores"
+                       :stale-after-minutes="freshness.stale_after_minutes ?? 60" />
+        </div>
 
         <div class="grid grid-cols-2 gap-6">
             <div class="col-span-1">

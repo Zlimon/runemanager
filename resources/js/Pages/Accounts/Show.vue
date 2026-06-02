@@ -1,11 +1,12 @@
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Deferred } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CollectionLog from "@/Components/Game/CollectionLog.vue";
 import Quests from "@/Components/Game/Quests.vue";
 import Inventory from "@/Components/Game/Inventory.vue";
 import LootingBag from "@/Components/Game/LootingBag.vue";
+import Freshness from "@/Components/Freshness.vue";
 import Loader from "@/Components/Loader.vue";
 import Search from "@/Pages/Accounts/Partials/Search.vue";
 import Header from "@/Pages/Accounts/Partials/Header.vue";
@@ -15,7 +16,7 @@ import Summary from "@/Pages/Accounts/Partials/Summary.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
 import Bank from "@/Components/Game/Bank.vue";
 
-defineProps({
+const props = defineProps({
     account: {
         type: Object,
         required: true,
@@ -40,9 +41,15 @@ defineProps({
         type: Object,
         default: null,
     },
+    freshness: {
+        type: Object,
+        default: () => ({ stale_after_minutes: 60 }),
+    },
 });
 
 const activeTab = ref('inventory');
+
+const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
 </script>
 
 <template>
@@ -64,7 +71,7 @@ const activeTab = ref('inventory');
                                     <Equipment :account="account" />
                                 </div>
 
-                                <Summary :account="account" />
+                                <Summary :account="account" :freshness="freshness" />
                             </div>
 
                             <!-- Vertical Inventory and Looting Bag tabs -->
@@ -83,11 +90,17 @@ const activeTab = ref('inventory');
                                 </a>
                             </div>
 
-                            <div class="flex bg-base-200 border-x border-b border-base-300 rounded-b">
+                            <div class="flex flex-col bg-base-200 border-x border-b border-base-300 rounded-b">
                                 <div v-show="activeTab === 'inventory'">
+                                    <div class="flex justify-end px-3 pt-2">
+                                        <Freshness :updated-at="freshness.inventory" :stale-after-minutes="staleAfter" />
+                                    </div>
                                     <Inventory :inventory="inventory" />
                                 </div>
                                 <div v-show="activeTab === 'looting-bag'">
+                                    <div class="flex justify-end px-3 pt-2">
+                                        <Freshness :updated-at="freshness.looting_bag" :stale-after-minutes="staleAfter" />
+                                    </div>
                                     <LootingBag :looting-bag="lootingBag" />
                                 </div>
                             </div>
@@ -101,7 +114,10 @@ const activeTab = ref('inventory');
                                 </div>
 
                                 <div class="col-span-1">
-                                    <h3 class="header-chatbox-sword">Quests</h3>
+                                    <div class="flex items-baseline justify-between">
+                                        <h3 class="header-chatbox-sword">Quests</h3>
+                                        <Freshness :updated-at="freshness.quests" :stale-after-minutes="staleAfter" />
+                                    </div>
                                     <div class="mt-4 bg-base-200 border border-base-300 rounded">
                                         <Quests :quests="quests" />
                                     </div>
@@ -121,7 +137,10 @@ const activeTab = ref('inventory');
                                 </Deferred>
                             </div>
 
-                            <h3 class="mt-4 header-chatbox-sword">Bank</h3>
+                            <div class="mt-4 flex items-baseline justify-between">
+                                <h3 class="header-chatbox-sword">Bank</h3>
+                                <Freshness :updated-at="freshness.bank" :stale-after-minutes="staleAfter" />
+                            </div>
                             <div class="mt-4">
                                 <Bank :bank="bank" />
                             </div>
