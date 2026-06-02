@@ -4,6 +4,8 @@
 /public/hot
 /public/storage
 /public/models
+/public/resource-packs
+/storage/app/resource-packs
 /storage/*.key
 /vendor
 .env

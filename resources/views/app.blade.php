@@ -14,6 +14,21 @@
         @routes
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/app.css', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
+
+        @php
+            // Resolve the effective resource pack for the current viewer.
+            // Authenticated user override → instance default → none.
+            $pack = null;
+            if ($user = auth()->user()) {
+                $pack = $user->effectiveResourcePack();
+            } else {
+                $globalId = \App\Helpers\SettingHelper::getSetting('resource_pack_id');
+                $pack = $globalId ? \App\Models\ResourcePack::find($globalId) : null;
+            }
+        @endphp
+        @if ($pack && file_exists(public_path("resource-packs/{$pack->name}/resource-pack.css")))
+            <link rel="stylesheet" href="{{ asset("resource-packs/{$pack->name}/resource-pack.css") }}?v={{ optional($pack->updated_at)->timestamp }}">
+        @endif
     </head>
     <body class="font-sans antialiased">
         @inertia

@@ -1,11 +1,18 @@
 <?php
 
 use App\Helpers\SettingHelper;
+use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Services\ResourcePacks\InstallResourcePack;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
+
+beforeEach(function () {
+    Queue::fake();
+});
 
 uses(RefreshDatabase::class);
 
@@ -112,28 +119,71 @@ it('does not touch the global setting when a user updates their override', funct
     expect(SettingHelper::getSetting('resource_pack_id'))->toEqual($globalPack->id);
 });
 
-it('plugin push: sets the user override by pack name', function () {
+it('plugin push: 200 + no job queued when pack is already installed', function () {
     $user = freshPackUser();
     $pack = makePack('sample-vanilla');
+
+    // Pretend the assets are on disk.
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     Sanctum::actingAs($user);
 
     $this->putJson('/api/plugin/resource-pack', ['name' => 'sample-vanilla'])
-        ->assertSuccessful()
+        ->assertStatus(200)
         ->assertJsonPath('resource_pack_id', $pack->id)
-        ->assertJsonPath('effective_resource_pack_id', $pack->id);
+        ->assertJsonPath('installed', true)
+        ->assertJsonPath('queued', false);
 
+    Queue::assertNothingPushed();
     expect($user->fresh()->resource_pack_id)->toBe($pack->id);
 });
 
-it('plugin push: returns 404 on unknown pack name', function () {
+it('plugin push: 202 + queues install when DB row exists but assets are missing', function () {
     $user = freshPackUser();
+    $pack = makePack('sample-vanilla');
+
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+
     Sanctum::actingAs($user);
 
-    $this->putJson('/api/plugin/resource-pack', ['name' => 'pack-that-does-not-exist'])
-        ->assertNotFound();
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'sample-vanilla'])
+        ->assertStatus(202)
+        ->assertJsonPath('queued', true);
 
-    expect($user->fresh()->resource_pack_id)->toBeNull();
+    Queue::assertPushed(FetchResourcePackJob::class, fn ($job) => $job->packName === 'sample-vanilla');
+    expect($user->fresh()->resource_pack_id)->toBe($pack->id);
+});
+
+it('plugin push: 202 + stub-creates row + queues install for an unknown pack', function () {
+    $user = freshPackUser();
+
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+
+    Sanctum::actingAs($user);
+
+    expect(ResourcePack::count())->toBe(0);
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'brand-new-pack'])
+        ->assertStatus(202)
+        ->assertJsonPath('queued', true);
+
+    expect(ResourcePack::count())->toBe(1);
+    $stub = ResourcePack::first();
+    expect($stub->name)->toBe('brand-new-pack');
+    expect($stub->version)->toBe('pending');
+    expect($user->fresh()->resource_pack_id)->toBe($stub->id);
+
+    Queue::assertPushed(FetchResourcePackJob::class, fn ($job) => $job->packName === 'brand-new-pack');
+});
+
+it('plugin push: rejects names with disallowed characters', function () {
+    Sanctum::actingAs(freshPackUser());
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => '../etc/passwd'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['name']);
+
+    Queue::assertNothingPushed();
 });
 
 it('plugin push: rejects unauthenticated requests', function () {

@@ -158,4 +158,11 @@ class User extends Authenticatable
 
         return $global ? (int) $global : null;
     }
+
+    public function effectiveResourcePack(): ?ResourcePack
+    {
+        $id = $this->effectiveResourcePackId();
+
+        return $id ? ResourcePack::find($id) : null;
+    }
 }

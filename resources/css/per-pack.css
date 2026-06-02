@@ -1,0 +1,142 @@
+/*
+ * Per-pack CSS template. This file is copied into every public/resource-packs/{name}/
+ * directory on `resourcepack:fetch`, where the relative url(...) paths resolve to that
+ * pack's extracted assets. The blade root emits a <link> at
+ * /resource-packs/{name}/resource-pack.css when the user has an effective pack.
+ */
+
+.dropdown-bank-tag-down-arrow {
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: all .2s ease-in;
+    background: url('bank/tag_down_arrow.png') no-repeat;
+    background-position: center center;
+    background-size: contain !important;
+}
+
+.header-chatbox-sword:after {
+    display: block;
+    max-width: 10rem;
+    height: 1rem;
+    margin: auto;
+    content: '';
+    background: url('chatbox/sword_pointed_left.png') no-repeat,
+                url('options/round_check_box.png') no-repeat,
+                url('chatbox/sword_pointed_right.png') no-repeat;
+    background-position: left, center, right;
+}
+
+.resource-pack-dialog {
+    background: url('dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat,
+                url('dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat,
+                url('dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat,
+                url('dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,
+                url('dialog/bottom_line_mode_side_panel_edge_top.png') repeat-x,
+                url('dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y,
+                url('dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y,
+                url('dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top -13px left, left -13px top 10px, right -12px top 10px,
+                         bottom -12px left, center;
+}
+
+.resource-pack-iron-rivets {
+    background: url('dialog/iron_rivets_corner_top_left.png') no-repeat,
+                url('dialog/iron_rivets_corner_top_right.png') no-repeat,
+                url('dialog/iron_rivets_corner_bottom_left.png') no-repeat,
+                url('dialog/iron_rivets_corner_bottom_right.png') no-repeat,
+                url('dialog/iron_rivets_edge_top.png') repeat-x,
+                url('dialog/iron_rivets_vertical.png') repeat-y,
+                url('dialog/iron_rivets_edge_right.png') repeat-y,
+                url('dialog/iron_rivets_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top -15px left, left -15px top 10px, right -15px top 10px,
+                         bottom -15px left, center;
+}
+
+.resource-pack-world-map {
+    background: url('button/world_map_metal_corner_top_left.png') no-repeat,
+                url('button/world_map_metal_corner_top_right.png') no-repeat,
+                url('button/world_map_metal_corner_bottom_left.png') no-repeat,
+                url('button/world_map_metal_corner_bottom_right.png') no-repeat,
+                url('button/world_map_edge_top.png') repeat-x,
+                url('button/world_map_edge_left.png') repeat-y,
+                url('button/world_map_edge_right.png') repeat-y,
+                url('button/world_map_edge_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top 0 left, left 0 top 10px, right, bottom, center;
+}
+
+.icon-radio [type=radio] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.icon-radio [type=radio] + img {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.icon-radio [type=radio] + img:hover {
+    background: url('button/world_map_metal_corner_top_left.png') no-repeat,
+                url('button/world_map_metal_corner_top_right.png') no-repeat,
+                url('button/world_map_metal_corner_bottom_left.png') no-repeat,
+                url('button/world_map_metal_corner_bottom_right.png') no-repeat,
+                url('button/world_map_edge_top.png') repeat-x,
+                url('button/world_map_edge_left.png') repeat-y,
+                url('button/world_map_edge_right.png') repeat-y,
+                url('button/world_map_edge_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top 0 left, left 0 top 10px, right, bottom, center;
+}
+
+.icon-radio [type=radio]:checked + img {
+    background: url('button/world_map_metal_corner_top_left.png') no-repeat,
+                url('button/world_map_metal_corner_top_right.png') no-repeat,
+                url('button/world_map_metal_corner_bottom_left.png') no-repeat,
+                url('button/world_map_metal_corner_bottom_right.png') no-repeat,
+                url('button/world_map_edge_top.png') repeat-x,
+                url('button/world_map_edge_left.png') repeat-y,
+                url('button/world_map_edge_right.png') repeat-y,
+                url('button/world_map_edge_bottom.png') repeat-x,
+                url('dialog/background_brighter.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top 0 left, left 0 top 10px, right, bottom, center;
+}
+
+::-webkit-scrollbar {
+    width: 16px;
+}
+
+::-webkit-scrollbar-track {
+    background: url('scrollbar/thumb_middle_dark.png');
+}
+
+::-webkit-scrollbar-thumb {
+    background: url('scrollbar/thumb_top.png') no-repeat,
+                url('scrollbar/thumb_bottom.png') no-repeat,
+                url('scrollbar/thumb_middle.png');
+    background-position: top, bottom, center;
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(255, 0, 0, 0.4);
+}
+
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background: url('scrollbar/arrow_up.png');
+}
+
+::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+    border-color: transparent transparent #777777 transparent;
+}
+
+::-webkit-scrollbar-button:single-button:vertical:increment {
+    background: url('scrollbar/arrow_down.png');
+}

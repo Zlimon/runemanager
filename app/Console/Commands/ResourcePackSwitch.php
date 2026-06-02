@@ -4,153 +4,89 @@ namespace App\Console\Commands;
 
 use App\Helpers\SettingHelper;
 use App\Models\ResourcePack;
+use App\Services\ResourcePacks\InstallResourcePack;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Command\Command as CommandAlias;
-use ZipArchive;
 
 use function Laravel\Prompts\search;
 
+/**
+ * Sets the instance-wide default resource pack (settings.resource_pack_id).
+ *
+ * Per-user packs are managed through {@code users.resource_pack_id} via the
+ * /user/resource-pack and /api/plugin/resource-pack endpoints, and the actual
+ * asset extraction is done by {@see InstallResourcePack}
+ * (via the resourcepack:fetch artisan or the FetchResourcePackJob).
+ *
+ * This command only flips the global fallback used when a user has no override.
+ */
 class ResourcePackSwitch extends Command implements PromptsForMissingInput
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'resourcepack:switch
-                            {name : Filename of resource pack located on GitHub}';
+                            {name : Name of an already-installed resource pack}';
+
+    protected $description = 'Set the instance-wide default resource pack.';
 
     /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Switch and apply resource pack to current textures';
-
-    /**
-     * Prompt for missing input arguments using the returned questions.
-     *
-     * @return array<string, string>
+     * @return array<string, string|callable>
      */
     protected function promptForMissingArgumentsUsing(): array
     {
         return [
             'name' => fn () => search(
                 label: 'Search for a resource pack:',
-                options: fn ($value) => (strlen($value) > 0
-                    ? array_merge(['None'], (ResourcePack::where('name', 'like', "%{$value}%")->orWhere('alias', 'like', "%{$value}%")->pluck('name', 'id')->all()) ?: ([ResourcePack::pluck('name', 'id')->first()]))
-                    : ['None']),
+                options: function ($value) {
+                    if (! is_string($value) || $value === '') {
+                        return ['None'];
+                    }
+
+                    return array_merge(
+                        ['None'],
+                        ResourcePack::query()
+                            ->where('name', 'like', "%{$value}%")
+                            ->orWhere('alias', 'like', "%{$value}%")
+                            ->pluck('name', 'id')
+                            ->all(),
+                    );
+                },
             ),
         ];
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @throws \Throwable
-     */
     public function handle(): int
     {
         $name = $this->argument('name');
 
-        $query = ResourcePack::where('name', 'like', "%{$name}%")
-            ->orWhere('alias', 'like', "%{$name}%");
-
-        // The argument can be a numeric pack id (e.g. when called from the search prompt
-        // which keys options by id); otherwise it's a name/alias to match. Postgres won't
-        // implicitly cast a string to bigint, so we have to gate the id branch.
-        if (is_numeric($name)) {
-            $query->orWhere('id', (int) $name);
-        }
-
-        $resourcePack = $query->pluck('name')->first();
-        $name = $resourcePack;
-
-        if (is_null($name) || is_null($resourcePack)) {
-            $this->info(sprintf('No resource pack provided! No resource pack will be applied / existing resource pack will be deleted.'));
-
-            SettingHelper::setSetting('resource_pack_id', 0);
-
-            try {
-                File::deleteDirectory(resource_path('/css/resource-pack'));
-            } catch (\Exception $e) {
-                $this->error(sprintf('Could not delete current resource pack. Message: %s', $e->getMessage()));
-            }
+        // "None" clears the global default.
+        if ($name === 'None' || $name === '' || $name === null) {
+            SettingHelper::setSetting('resource_pack_id', 0, 'int');
+            $this->info('Cleared instance-wide default resource pack.');
 
             return CommandAlias::SUCCESS;
         }
 
-        if (! $resourcePack || ! File::exists(resource_path(sprintf('/css/resource-packs-downloaded/%s.zip', $name)))) {
-            $this->fail(sprintf("Resource pack '%s' does not exist! Try downloading it again.", $name));
+        // Resolve to a row. Numeric input is treated as the id; everything else
+        // is matched against name/alias.
+        $query = ResourcePack::query()
+            ->where('name', 'like', "%{$name}%")
+            ->orWhere('alias', 'like', "%{$name}%");
+
+        if (is_numeric($name)) {
+            $query->orWhere('id', (int) $name);
         }
 
-        $extractFrom = resource_path(sprintf('/css/resource-packs-downloaded/%s.zip', $name));
-        $extractTo = resource_path('/css/resource-pack-tmp');
+        $pack = $query->first();
 
-        // Clean tmp dir
-        File::cleanDirectory(resource_path('/css/resource-pack-tmp'));
+        if (! $pack) {
+            $this->error(sprintf("No resource pack matches '%s'. Run resourcepack:fetch first.", $name));
 
-        $zip = new ZipArchive;
-
-        if ($zip->open($extractFrom) !== true) {
-            $this->fail(sprintf("Could not open resource pack '%s'.", $name));
+            return CommandAlias::FAILURE;
         }
 
-        try {
-            if (! $zip->extractTo($extractTo)) {
-                $this->fail(sprintf("Could not extract resource pack '%s'.", $name));
-            }
-        } finally {
-            $zip->close();
-        }
+        SettingHelper::setSetting('resource_pack_id', $pack->id, 'int');
 
-        $this->info(sprintf('Applying new textures...'));
-
-        // Remove current icon image in case the new resource pack does not contain any icon image
-        try {
-            File::delete(resource_path('/css/resource-pack/icon.png'));
-        } catch (\Exception $e) {
-            $this->error(sprintf('Could not delete current icon image. Message: %s', $e->getMessage()));
-        }
-
-        // First file in the resource pack dir is the actual resource pack dir
-        $resourcePackDir = File::allFiles(resource_path('/css/resource-pack-tmp'))[0]->getRelativePath();
-
-        // Copy resource pack from parent dir in tmp dir, and extract files one level up
-        try {
-            File::copyDirectory(
-                resource_path('/css/resource-pack-tmp/'.$resourcePackDir),
-                resource_path('/css/resource-pack')
-            );
-        } catch (\Exception $e) {
-            $this->fail(sprintf("Could not copy resource pack '%s' to resource pack dir. Message: %s", $name, $e->getMessage()));
-        }
-
-        $resourcePack = ResourcePack::whereName($name)->first();
-        SettingHelper::setSetting('resource_pack_id', $resourcePack->id, 'int');
-
-        // Just display a default image if resource pack has no icon image
-        try {
-            if (! File::exists(resource_path('/css/resource-pack/icon.png'))) {
-                File::copy(public_path('/images/background.png'), resource_path('/css/resource-pack/icon.png'));
-            }
-        } catch (\Exception $e) {
-            $this->error(sprintf('Could not copy default icon image. Message: %s', $e->getMessage()));
-        }
-
-        SettingHelper::setSetting('site_hash', Str::random(20));
-
-        // Clean tmp dir
-        try {
-            File::cleanDirectory(resource_path('/css/resource-pack-tmp'));
-        } catch (\Exception $e) {
-            $this->error(sprintf('Could not clean tmp dir. Message: %s', $e->getMessage()));
-        }
-
-        $this->info(sprintf("Resource pack '%s' is now ready for use.", $resourcePack->alias));
+        $this->info(sprintf("Instance default is now '%s'.", $pack->alias));
 
         return CommandAlias::SUCCESS;
     }
