@@ -8,6 +8,7 @@ use App\Http\Resources\AccountResource;
 use App\Http\Resources\BankResource;
 use App\Http\Resources\InventoryResource;
 use App\Http\Resources\LootingBagResource;
+use App\Http\Resources\LootResource;
 use App\Models\Account;
 use App\Models\Collection;
 use App\Models\Item;
@@ -81,6 +82,10 @@ class AccountController extends Controller
 
             'quests' => fn () => $account->quests,
 
+            // SPEC §5.2 Loot — append-only history. Latest 25 drops with hydrated
+            // item details for the recent-loot panel.
+            'recentLoot' => fn () => LootResource::collectionWith($account->recentLoot(25))->resolve(),
+
             // External API — defer so the page paints first, then the client
             // pulls this in via a follow-up partial reload.
             'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request)),
@@ -94,6 +99,7 @@ class AccountController extends Controller
                 'looting_bag' => optional($account->lootingBag)->updated_at?->toIso8601String(),
                 'quests' => optional($account->quests)->updated_at?->toIso8601String(),
                 'equipment' => optional($account->equipment)->updated_at?->toIso8601String(),
+                'loot' => $account->latestLootKilledAt()?->toIso8601String(),
                 'stale_after_minutes' => (int) config('runemanager.freshness.stale_after_minutes'),
             ],
         ]);

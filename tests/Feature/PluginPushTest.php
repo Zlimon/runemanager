@@ -4,6 +4,7 @@ use App\Models\Account;
 use App\Models\Bank;
 use App\Models\Equipment;
 use App\Models\Inventory;
+use App\Models\Loot;
 use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\User;
@@ -21,6 +22,7 @@ beforeEach(function () {
     Bank::query()->delete();
     Quest::query()->delete();
     LootingBag::query()->delete();
+    Loot::query()->delete();
 });
 
 function freshUser(string $email = 'plugin@test.local'): User
@@ -220,4 +222,83 @@ it('upserts the Mongo looting bag doc on PUT /api/plugin/looting-bag', function 
     $bag = LootingBag::where('account_id', $account->id)->first();
 
     expect($bag->looting_bag)->toBe([[995, 250000], [560, 100]]);
+});
+
+it('appends loot entries on POST /api/plugin/loot', function () {
+    $user = freshUser();
+    Sanctum::actingAs($user);
+
+    $payload = [
+        'loot' => [
+            [
+                'source' => 'Abyssal demon',
+                'items' => [
+                    ['id' => 4151, 'quantity' => 1],
+                    ['id' => 995, 'quantity' => 10000],
+                ],
+                'total_value' => 2_500_000,
+                'killed_at' => '2026-06-02T17:30:00Z',
+            ],
+            [
+                'source' => 'Vorkath',
+                'items' => [['id' => 21907, 'quantity' => 1]],
+                'killed_at' => '2026-06-02T17:35:00Z',
+            ],
+        ],
+    ];
+
+    $this->postJson('/api/plugin/loot', $payload, pluginHeaders('hash-loot', 'Zlimon'))
+        ->assertCreated()
+        ->assertJsonPath('data.inserted', 2);
+
+    $account = Account::where('account_hash', 'hash-loot')->first();
+    $entries = Loot::where('account_id', $account->id)->orderBy('killed_at')->get();
+
+    expect($entries)->toHaveCount(2);
+    expect($entries[0]->source)->toBe('Abyssal demon');
+    // Mongo BSON doesn't preserve assoc-array key order; use loose equality (==)
+    // so the assertion isn't sensitive to id/quantity coming back in either order.
+    expect($entries[0]->items)->toEqual([
+        ['id' => 4151, 'quantity' => 1],
+        ['id' => 995, 'quantity' => 10000],
+    ]);
+    expect($entries[0]->total_value)->toBe(2_500_000);
+    expect($entries[1]->source)->toBe('Vorkath');
+    expect($entries[1]->total_value)->toBe(0);
+});
+
+it('does NOT replace prior loot — successive pushes accumulate', function () {
+    $user = freshUser();
+    Sanctum::actingAs($user);
+
+    $headers = pluginHeaders('hash-acc', 'Zlimon');
+
+    $this->postJson('/api/plugin/loot', [
+        'loot' => [[
+            'source' => 'Abyssal demon',
+            'items' => [['id' => 4151, 'quantity' => 1]],
+            'killed_at' => '2026-06-02T17:00:00Z',
+        ]],
+    ], $headers)->assertCreated();
+
+    $this->postJson('/api/plugin/loot', [
+        'loot' => [[
+            'source' => 'Zulrah',
+            'items' => [['id' => 12934, 'quantity' => 1]],
+            'killed_at' => '2026-06-02T17:05:00Z',
+        ]],
+    ], $headers)->assertCreated();
+
+    $account = Account::where('account_hash', 'hash-acc')->first();
+    expect(Loot::where('account_id', $account->id)->count())->toBe(2);
+});
+
+it('rejects loot pushes that are missing required fields', function () {
+    Sanctum::actingAs(freshUser());
+
+    $this->postJson('/api/plugin/loot', [
+        'loot' => [['source' => 'No items here', 'killed_at' => '2026-06-02T17:00:00Z']],
+    ], pluginHeaders('hash-x', 'Zlimon'))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['loot.0.items']);
 });

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Account;
+use App\Models\AccountHiscore;
+use App\Models\Loot;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -89,9 +91,41 @@ it('show renders the Inertia component with the `account` prop and per-tab data 
             ->where('bank', null)
             ->where('lootingBag', null)
             ->where('quests', null)
+            ->where('recentLoot', [])
             // collectionLog is deferred — not present on the initial render
             ->missing('collectionLog'),
         );
+});
+
+it('exposes recentLoot newest-first with hydrated item names where available', function () {
+    Loot::query()->delete();
+    $account = Account::factory()->for($this->user)->create(['username' => 'Looter']);
+
+    Loot::create([
+        'account_id' => $account->id,
+        'source' => 'Older Kill',
+        'items' => [['id' => 4151, 'quantity' => 1]],
+        'total_value' => 1000,
+        'killed_at' => now()->subHours(2),
+    ]);
+    Loot::create([
+        'account_id' => $account->id,
+        'source' => 'Newer Kill',
+        'items' => [['id' => 4151, 'quantity' => 2]],
+        'total_value' => 2000,
+        'killed_at' => now()->subMinutes(5),
+    ]);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.show', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('recentLoot', 2)
+            ->where('recentLoot.0.source', 'Newer Kill')
+            ->where('recentLoot.1.source', 'Older Kill'),
+        );
+
+    Loot::query()->delete();
 });
 
 it('exposes a freshness prop with per-data-type timestamps and the staleness threshold', function () {
@@ -109,14 +143,15 @@ it('exposes a freshness prop with per-data-type timestamps and the staleness thr
                 ->where('bank', null)
                 ->where('looting_bag', null)
                 ->where('quests', null)
-                ->where('equipment', null),
+                ->where('equipment', null)
+                ->where('loot', null),
             ),
         );
 });
 
 it('reports the hiscores timestamp once a sync has happened', function () {
     $account = Account::factory()->for($this->user)->create(['username' => 'Synced']);
-    \App\Models\AccountHiscore::create([
+    AccountHiscore::create([
         'account_id' => $account->id,
         'entries' => ['skills' => [], 'activities' => []],
         'fetched_at' => now()->subMinutes(5),

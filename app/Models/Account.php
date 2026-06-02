@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AccountTypesEnum;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -153,6 +154,32 @@ class Account extends Model
     public function getCollectionLogAttribute(): ?CollectionLog
     {
         return CollectionLog::where('account_id', $this->id)->first();
+    }
+
+    /**
+     * SPEC §5.2 — append-only loot history. Cross-database (Mongo) so it's a
+     * direct query rather than an Eloquent relation. Newest-first because every
+     * read path (recent drops panel, future live feed) wants chronological order.
+     *
+     * @return Collection<int, Loot>
+     */
+    public function recentLoot(int $limit = 25): Collection
+    {
+        return Loot::where('account_id', $this->id)
+            ->orderBy('killed_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function latestLootKilledAt(): ?Carbon
+    {
+        // Selective `first(['killed_at'])` combined with orderByDesc trips the
+        // Mongo driver's enum serialisation; pull the whole doc instead.
+        $row = Loot::where('account_id', $this->id)
+            ->orderBy('killed_at', 'desc')
+            ->first();
+
+        return $row?->killed_at;
     }
 
     //    public function log() {

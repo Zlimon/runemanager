@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { Deferred } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CollectionLog from "@/Components/Game/CollectionLog.vue";
+import Loot from "@/Components/Game/Loot.vue";
 import Quests from "@/Components/Game/Quests.vue";
 import Inventory from "@/Components/Game/Inventory.vue";
 import LootingBag from "@/Components/Game/LootingBag.vue";
@@ -40,6 +41,10 @@ const props = defineProps({
     collectionLog: {
         type: Object,
         default: null,
+    },
+    recentLoot: {
+        type: Array,
+        default: () => [],
     },
     freshness: {
         type: Object,
@@ -143,6 +148,14 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                             </div>
                             <div class="mt-4">
                                 <Bank :bank="bank" />
+                            </div>
+
+                            <div class="mt-4 flex items-baseline justify-between">
+                                <h3 class="header-chatbox-sword">Recent Loot</h3>
+                                <Freshness :updated-at="freshness.loot" :stale-after-minutes="staleAfter" />
+                            </div>
+                            <div class="mt-4">
+                                <Loot :entries="recentLoot" />
                             </div>
                         </div>
                     </div>

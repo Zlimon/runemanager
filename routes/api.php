@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\InventoryController;
+use App\Http\Controllers\Api\LootController;
 use App\Http\Controllers\Api\LootingBagController;
 use App\Http\Controllers\Api\QuestController;
 use App\Http\Controllers\UserResourcePackController;
@@ -28,6 +29,8 @@ Route::middleware([
         Route::put('/equipment', [EquipmentController::class, 'update'])->name('api.plugin.equipment');
         Route::put('/quests', [QuestController::class, 'update'])->name('api.plugin.quests');
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
+        // Loot is append-only — POST, not the snapshot PUT used by the others.
+        Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');
     });
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it
