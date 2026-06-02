@@ -1,10 +1,11 @@
 <?php
 
+use App\Services\Feed\RecordFeedEvent;
 use App\Services\Hiscores\HiscoresSync;
 use App\Services\Hiscores\OsrsHiscoresClient;
 
 beforeEach(function () {
-    $this->sync = new HiscoresSync(new OsrsHiscoresClient);
+    $this->sync = new HiscoresSync(new OsrsHiscoresClient, new RecordFeedEvent);
 });
 
 it('normalises skills and activities into a snake_keyed jsonb shape', function () {

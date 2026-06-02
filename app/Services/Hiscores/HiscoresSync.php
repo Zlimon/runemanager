@@ -4,13 +4,17 @@ namespace App\Services\Hiscores;
 
 use App\Models\Account;
 use App\Models\AccountHiscore;
+use App\Services\Feed\RecordFeedEvent;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
 use RuntimeException;
 
 class HiscoresSync
 {
-    public function __construct(protected OsrsHiscoresClient $client) {}
+    public function __construct(
+        protected OsrsHiscoresClient $client,
+        protected RecordFeedEvent $feed,
+    ) {}
 
     /**
      * @throws GuzzleException
@@ -27,10 +31,19 @@ class HiscoresSync
 
         $entries = $this->normalise($payload);
 
+        // Capture the pre-sync skill snapshot so the feed recorder can diff
+        // for level-up milestones. First sync -> empty array, so the recorder
+        // sees "no previous levels" and stays quiet (a level can't cross a
+        // threshold without a strictly-greater-than comparison against prior).
+        $existing = AccountHiscore::where('account_id', $account->id)->first();
+        $previousSkills = $existing?->entries['skills'] ?? [];
+
         $hiscore = AccountHiscore::updateOrCreate(
             ['account_id' => $account->id],
             ['entries' => $entries, 'fetched_at' => now()],
         );
+
+        $this->feed->recordLevelUps($account, $previousSkills, $entries['skills']);
 
         // Denormalise the "overall" entry onto the parent Account so the Summary
         // and Index cards have something to show without joining account_hiscores.

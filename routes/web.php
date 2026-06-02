@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,9 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// SPEC §8 — the live feed is intentionally public (no auth middleware).
+Route::get('/feed', [FeedController::class, 'index'])->name('feed.index');
 
 Route::middleware([
     'auth:sanctum',

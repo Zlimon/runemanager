@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\User;
+use App\Services\Feed\RecordFeedEvent;
 use App\Services\Hiscores\HiscoresSync;
 use App\Services\Hiscores\OsrsHiscoresClient;
 use GuzzleHttp\Client;
@@ -24,7 +25,7 @@ function makeMockedSync(array $payload): HiscoresSync
     ]);
     $http = new HttpClient(['handler' => HandlerStack::create($mock)]);
 
-    return new HiscoresSync(new OsrsHiscoresClient($http));
+    return new HiscoresSync(new OsrsHiscoresClient($http), new RecordFeedEvent);
 }
 
 function makeAccount(string $username = 'Zlimon'): Account

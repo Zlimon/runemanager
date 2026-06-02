@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quest;
+use App\Services\Feed\RecordFeedEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class QuestController extends Controller
 {
+    public function __construct(private RecordFeedEvent $feed) {}
+
     /**
      * Snapshot upsert from the RuneLite plugin. Account resolved by plugin.account middleware.
      *
@@ -26,11 +29,15 @@ class QuestController extends Controller
             'quests.*.1' => ['required', 'integer'], // status (0 = not started, 1 = in progress, 2 = finished)
         ]);
 
-        $quests = Quest::where('account_id', $account->id)->first()
-            ?? (new Quest)->forceFill(['account_id' => $account->id]);
+        $existing = Quest::where('account_id', $account->id)->first();
+        $previous = $existing?->quests ?? [];
 
+        $quests = $existing ?? (new Quest)->forceFill(['account_id' => $account->id]);
         $quests->quests = $request->input('quests');
         $quests->save();
+
+        // SPEC §8 — emit QUEST_COMPLETE for every quest that flipped to finished.
+        $this->feed->recordQuestCompletions($account, $previous, $request->input('quests'));
 
         return response()->json(['data' => $quests]);
     }
