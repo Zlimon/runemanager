@@ -6,7 +6,7 @@ import {Link, useForm} from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
 import Select from "@/Components/Select.vue";
 import InputError from "@/Components/InputError.vue";
-import Icon from "@/Pages/Accounts/Components/Icon.vue";
+import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 import Search from "@/Components/Search.vue";
 
 const props = defineProps({

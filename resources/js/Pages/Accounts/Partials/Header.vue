@@ -1,8 +1,8 @@
 <script setup>
 import {ref} from "vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PackButton from "@/Components/PackButton.vue";
 import dayjs from "dayjs";
-import Icon from "@/Pages/Accounts/Components/Icon.vue";
+import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 
 const props = defineProps({
     accountProp: Object,
@@ -30,9 +30,9 @@ let account = ref(props.accountProp);
                     </div>
 
                     <div class="flex shrink-0 items-center">
-                        <PrimaryButton>
+                        <PackButton type="button">
                             Update
-                        </PrimaryButton>
+                        </PackButton>
                     </div>
                 </div>
 

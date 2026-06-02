@@ -1,7 +1,7 @@
 <script setup>
 import {ref, onMounted} from "vue";
 import Loader from "@/Components/Loader.vue";
-import ItemSlot from "@/Components/RuneManager/ItemSlot.vue";
+import ItemSlot from "@/Components/Game/ItemSlot.vue";
 
 const props = defineProps({
     accountProp: Object,

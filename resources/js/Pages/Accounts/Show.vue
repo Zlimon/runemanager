@@ -1,17 +1,17 @@
 <script setup>
 import {ref} from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
-import CollectionLog from "@/Components/CollectionLog.vue";
-import Quests from "@/Components/RuneManager/Quests.vue";
-import Inventory from "@/Components/RuneManager/Inventory.vue";
-import LootingBag from "@/Components/RuneManager/LootingBag.vue";
-import Search from "@/Pages/Accounts/Components/Search.vue";
-import Header from "@/Pages/Accounts/Components/Header.vue";
-import Equipment from "@/Pages/Accounts/Components/Equipment.vue";
-import Avatar from "@/Pages/Accounts/Components/Avatar.vue";
-import Summary from "@/Pages/Accounts/Components/Summary.vue";
-import Skills from "@/Pages/Accounts/Components/Skills.vue";
-import Bank from "@/Components/RuneManager/Bank.vue";
+import CollectionLog from "@/Components/Game/CollectionLog.vue";
+import Quests from "@/Components/Game/Quests.vue";
+import Inventory from "@/Components/Game/Inventory.vue";
+import LootingBag from "@/Components/Game/LootingBag.vue";
+import Search from "@/Pages/Accounts/Partials/Search.vue";
+import Header from "@/Pages/Accounts/Partials/Header.vue";
+import Equipment from "@/Pages/Accounts/Partials/Equipment.vue";
+import Avatar from "@/Pages/Accounts/Partials/Avatar.vue";
+import Summary from "@/Pages/Accounts/Partials/Summary.vue";
+import Skills from "@/Pages/Accounts/Partials/Skills.vue";
+import Bank from "@/Components/Game/Bank.vue";
 
 const props = defineProps({
     accountProp: Object,
