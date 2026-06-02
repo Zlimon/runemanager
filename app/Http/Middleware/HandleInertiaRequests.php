@@ -3,10 +3,13 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\SettingHelper;
+use App\Http\Resources\AccountResource;
+use App\Models\Account;
 use App\Models\Collection;
 use App\Models\ResourcePack;
 use App\Models\Skill;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -56,6 +59,23 @@ class HandleInertiaRequests extends Middleware
             'skills' => fn () => Skill::distinct()->select('name', 'slug')->get()->toArray() ?? [],
             'bosses' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 5)->get()->toArray() ?? [],
             'clues' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 3)->get()->toArray() ?? [],
+
+            // Header typeahead — only evaluated when a partial reload includes it
+            // (router.reload({ only: ['accountSearchResults'], data: { account_search: ... } })).
+            'accountSearchResults' => Inertia::optional(function () use ($request) {
+                $query = trim((string) $request->query('account_search', ''));
+                if ($query === '') {
+                    return [];
+                }
+
+                return AccountResource::collection(
+                    Account::query()
+                        ->where('username', 'LIKE', '%'.$query.'%')
+                        ->orderBy('username')
+                        ->limit(10)
+                        ->get(),
+                )->resolve();
+            }),
         ]);
     }
 }

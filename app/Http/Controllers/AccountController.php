@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Clients\CollectionLogClient;
 use App\Enums\AccountTypesEnum;
 use App\Http\Resources\AccountResource;
+use App\Http\Resources\BankResource;
+use App\Http\Resources\InventoryResource;
+use App\Http\Resources\LootingBagResource;
 use App\Models\Account;
+use App\Models\Collection;
+use App\Models\Item;
 use App\Rules\AccountUsernameRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class AccountController extends Controller
 {
@@ -53,10 +60,143 @@ class AccountController extends Controller
         ]);
     }
 
-    public function show(Account $account): Response
+    public function show(Request $request, Account $account): Response
     {
+        $account->load('equipment')->append('skills');
+
         return Inertia::render('Accounts/Show', [
-            'account' => (new AccountResource($account->load('equipment')->append('skills')))->resolve(),
+            'account' => (new AccountResource($account))->resolve(),
+
+            'inventory' => fn () => $account->inventory
+                ? (new InventoryResource($account->inventory))->resolve()
+                : null,
+
+            'bank' => fn () => $account->bank
+                ? (new BankResource($account->bank))->resolve()
+                : null,
+
+            'lootingBag' => fn () => $account->lootingBag
+                ? (new LootingBagResource($account->lootingBag))->resolve()
+                : null,
+
+            'quests' => fn () => $account->quests,
+
+            // External API — defer so the page paints first, then the client
+            // pulls this in via a follow-up partial reload.
+            'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request)),
         ]);
+    }
+
+    /**
+     * @return array{tabs: array<string, mixed>, activeTab: ?string, activeCollection: ?array<string, mixed>}|null
+     */
+    private function buildCollectionLog(Account $account, Request $request): ?array
+    {
+        try {
+            $client = new CollectionLogClient;
+            $response = $client->request('GET', "/collectionlog/user/{$account->username}");
+            $payload = json_decode($response->getBody()->getContents(), true);
+        } catch (Throwable $e) {
+            report($e);
+
+            return null;
+        }
+
+        $allowedTabs = ['Bosses', 'Raids', 'Clues'];
+        $tabs = [];
+
+        foreach ($payload['collectionLog']['tabs'] ?? [] as $tabName => $tab) {
+            if (! in_array($tabName, $allowedTabs, true)) {
+                continue;
+            }
+
+            foreach ($tab as $collectionName => $collection) {
+                $slug = Str::slug($collectionName);
+                $obtained = count(array_filter(
+                    $collection['items'] ?? [],
+                    fn ($item) => ($item['obtained'] ?? false) === true,
+                ));
+
+                $tabs[$tabName][$slug] = [
+                    'name' => $collectionName,
+                    'slug' => $slug,
+                    'obtained' => $obtained,
+                    'total' => count($collection['items'] ?? []),
+                ];
+            }
+        }
+
+        $requestedTab = $request->query('ctab');
+        $requestedCollection = $request->query('ccollection');
+
+        $activeTab = ($requestedTab && isset($tabs[$requestedTab]))
+            ? $requestedTab
+            : (array_key_first($tabs) ?: null);
+
+        $activeCollection = null;
+        if ($activeTab !== null) {
+            $availableSlugs = array_keys($tabs[$activeTab] ?? []);
+            $slug = ($requestedCollection && in_array($requestedCollection, $availableSlugs, true))
+                ? $requestedCollection
+                : ($availableSlugs[0] ?? null);
+
+            if ($slug !== null) {
+                $activeCollection = $this->loadCollectionItems($account, $activeTab, $slug, $tabs[$activeTab][$slug]);
+            }
+        }
+
+        return [
+            'tabs' => $tabs,
+            'activeTab' => $activeTab,
+            'activeCollection' => $activeCollection,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $summary
+     * @return array<string, mixed>|null
+     */
+    private function loadCollectionItems(Account $account, string $tab, string $slug, array $summary): ?array
+    {
+        $collection = Collection::whereSlug($slug)->first();
+        if (! $collection) {
+            return null;
+        }
+
+        try {
+            $client = new CollectionLogClient;
+            $response = $client->request('GET', "/items/user/{$account->username}?pageName={$collection->name}");
+            $payload = json_decode($response->getBody()->getContents(), true);
+        } catch (Throwable $e) {
+            report($e);
+
+            return null;
+        }
+
+        $items = Item::select('_id', 'name', 'examine', 'icon')
+            ->whereIn('_id', array_column($payload['items'] ?? [], 'id'))
+            ->get()
+            ->keyBy('_id');
+
+        $slots = [];
+        foreach (($payload['items'] ?? []) as $item) {
+            $dbItem = $items[$item['id']] ?? null;
+            $slots[] = [
+                'id' => $item['id'],
+                'quantity' => $item['quantity'] ?? 0,
+                'obtained' => $item['obtained'] ?? false,
+                'item' => $dbItem ? $dbItem->toArray() : null,
+            ];
+        }
+
+        return [
+            'name' => $collection->name,
+            'slug' => $collection->slug,
+            'tab' => $tab,
+            'obtained' => $payload['obtainedCount'] ?? $summary['obtained'],
+            'total' => $payload['itemCount'] ?? $summary['total'],
+            'killCount' => $payload['killCount'] ?? [],
+            'items' => $slots,
+        ];
     }
 }

@@ -1,58 +1,45 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import Loader from "@/Components/Loader.vue";
+import { computed, ref, watch } from "vue";
 import ItemSlot from "@/Components/Game/ItemSlot.vue";
 
 const props = defineProps({
-    account: {
+    bank: {
         type: Object,
-        required: true,
+        default: null,
     },
 });
 
-const bankLoading = ref(true);
-const bank = ref(null);
 const activeTab = ref(null);
-const activeTabItems = ref(null);
 
-const setActiveTab = (tab, items) => {
-    activeTab.value = tab;
-    activeTabItems.value = items;
-};
+const firstTab = computed(() =>
+    props.bank ? Object.keys(props.bank.tabs)[0] ?? null : null,
+);
 
-const getBank = () => {
-    bankLoading.value = true;
+watch(firstTab, (tab) => {
+    if (tab && !activeTab.value) {
+        activeTab.value = tab;
+    }
+}, { immediate: true });
 
-    axios.get(route('api.accounts.bank.show', props.account))
-        .then((response) => {
-            bank.value = response.data.bank;
-
-            const firstTab = Object.keys(bank.value.tabs)[0];
-            setActiveTab(firstTab, bank.value.tabs[firstTab]);
-        })
-        .catch((error) => {
-            console.error(error);
-        })
-        .finally(() => {
-            bankLoading.value = false;
-        });
-};
-
-onMounted(getBank);
+const activeTabItems = computed(() => {
+    if (!props.bank || !activeTab.value) {
+        return null;
+    }
+    return props.bank.tabs[activeTab.value] ?? null;
+});
 </script>
 
 <template>
-    <div v-if="!bankLoading">
-        <div v-if="bank !== null">
-            <div class="flex flex-col">
-                <!-- Vertical tabs -->
-                <div class="tabs tabs-lifted" role="tablist">
-                    <a v-for="(items, tab, index) in bank.tabs"
-                       :key="tab"
-                       :class="{ 'tab-active !bg-base-200': activeTab === tab }"
-                       class="tab !h-12"
-                       role="tab"
-                       @click="setActiveTab(tab, items)">
+    <div v-if="bank">
+        <div class="flex flex-col">
+            <!-- Vertical tabs -->
+            <div class="tabs tabs-lifted" role="tablist">
+                <a v-for="(items, tab, index) in bank.tabs"
+                   :key="tab"
+                   :class="{ 'tab-active !bg-base-200': activeTab === tab }"
+                   class="tab !h-12"
+                   role="tab"
+                   @click="activeTab = tab">
                         <img v-if="index >= 1 && items[0].item"
                              :src="`data:image/jpeg;base64,${items[0].item.icon}`"
                              class="object-contain"
@@ -62,22 +49,20 @@ onMounted(getBank);
                              class="object-contain"
                              loading="lazy">
                     </a>
-                </div>
-            </div>
-
-            <!-- Tab content -->
-            <div class="bg-base-200 border-x border-b border-base-300 rounded-b">
-                <ul v-if="activeTab !== null"
-                    class="grid grid-cols-8 gap-2 p-4">
-                    <li v-for="(slotItem, slot) in activeTabItems" :key="slot">
-                        <ItemSlot :item="slotItem" />
-                    </li>
-                </ul>
             </div>
         </div>
-        <div v-else class="flex h-96 items-center justify-center">
-            <p class="text-gray-500 dark:text-gray-400">No bank found for this account</p>
+
+        <!-- Tab content -->
+        <div class="bg-base-200 border-x border-b border-base-300 rounded-b">
+            <ul v-if="activeTabItems"
+                class="grid grid-cols-8 gap-2 p-4">
+                <li v-for="(slotItem, slot) in activeTabItems" :key="slot">
+                    <ItemSlot :item="slotItem" />
+                </li>
+            </ul>
         </div>
     </div>
-    <Loader :component="true" :loading="bankLoading"></Loader>
+    <div v-else class="flex h-96 items-center justify-center">
+        <p class="text-gray-500 dark:text-gray-400">No bank found for this account</p>
+    </div>
 </template>
