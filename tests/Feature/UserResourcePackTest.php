@@ -5,6 +5,7 @@ use App\Models\ResourcePack;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
@@ -107,6 +108,54 @@ it('does not touch the global setting when a user updates their override', funct
     $this->actingAs($user)
         ->putJson('/user/resource-pack', ['resource_pack_id' => $userPack->id])
         ->assertSuccessful();
+
+    expect(SettingHelper::getSetting('resource_pack_id'))->toEqual($globalPack->id);
+});
+
+it('plugin push: sets the user override by pack name', function () {
+    $user = freshPackUser();
+    $pack = makePack('sample-vanilla');
+
+    Sanctum::actingAs($user);
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'sample-vanilla'])
+        ->assertSuccessful()
+        ->assertJsonPath('resource_pack_id', $pack->id)
+        ->assertJsonPath('effective_resource_pack_id', $pack->id);
+
+    expect($user->fresh()->resource_pack_id)->toBe($pack->id);
+});
+
+it('plugin push: returns 404 on unknown pack name', function () {
+    $user = freshPackUser();
+    Sanctum::actingAs($user);
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'pack-that-does-not-exist'])
+        ->assertNotFound();
+
+    expect($user->fresh()->resource_pack_id)->toBeNull();
+});
+
+it('plugin push: rejects unauthenticated requests', function () {
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'anything'])->assertUnauthorized();
+});
+
+it('plugin push: rejects missing name field', function () {
+    Sanctum::actingAs(freshPackUser());
+
+    $this->putJson('/api/plugin/resource-pack', [])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['name']);
+});
+
+it('plugin push: does not touch the global setting', function () {
+    $user = freshPackUser();
+    $userPack = makePack('user-pack');
+    $globalPack = makePack('global-pack');
+    SettingHelper::setSetting('resource_pack_id', $globalPack->id, 'int');
+
+    Sanctum::actingAs($user);
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'user-pack'])->assertSuccessful();
 
     expect(SettingHelper::getSetting('resource_pack_id'))->toEqual($globalPack->id);
 });
