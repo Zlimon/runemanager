@@ -27,10 +27,23 @@ class HiscoresSync
 
         $entries = $this->normalise($payload);
 
-        return AccountHiscore::updateOrCreate(
+        $hiscore = AccountHiscore::updateOrCreate(
             ['account_id' => $account->id],
             ['entries' => $entries, 'fetched_at' => now()],
         );
+
+        // Denormalise the "overall" entry onto the parent Account so the Summary
+        // and Index cards have something to show without joining account_hiscores.
+        $overall = $entries['skills']['overall'] ?? null;
+        if (is_array($overall)) {
+            $account->forceFill([
+                'rank' => max(0, (int) ($overall['rank'] ?? 0)),
+                'level' => max(0, (int) ($overall['level'] ?? 0)),
+                'xp' => max(0, (int) ($overall['xp'] ?? 0)),
+            ])->save();
+        }
+
+        return $hiscore;
     }
 
     /**

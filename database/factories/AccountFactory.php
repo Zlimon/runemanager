@@ -2,32 +2,37 @@
 
 namespace Database\Factories;
 
+use App\Enums\AccountTypesEnum;
+use App\Models\Account;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Account>
+ * @extends Factory<Account>
  */
 class AccountFactory extends Factory
 {
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
-        $accountTypes = array_map(function ($accountType) {
-            return $accountType->value;
-        }, \App\Enums\AccountTypesEnum::cases()
-        );
+        $types = array_map(fn ($case) => $case->value, AccountTypesEnum::cases());
 
         return [
-            'account_type' => $accountTypes[array_rand($accountTypes)],
-            'username' => substr($this->faker->userName, 0, 13), // Limited to 13 characters
-            'rank' => rand(1, 2000),
-            'level' => rand(32, 2277),
-            'xp' => rand(0, 200000000),
-            'online' => $this->faker->boolean,
+            'user_id' => User::factory(),
+            // accounts.account_hash has a unique constraint; a short random
+            // marker keeps factory rows from colliding when many are created.
+            'account_hash' => 'fac-'.Str::lower(Str::random(20)),
+            'account_type' => $this->faker->randomElement($types),
+            // The schema caps usernames at 13 chars and enforces uniqueness, so
+            // pull a unique username from the faker pool and trim defensively.
+            'username' => substr($this->faker->unique()->userName(), 0, 13),
+            'rank' => $this->faker->numberBetween(1, 2_000_000),
+            'level' => $this->faker->numberBetween(32, 2277),
+            'xp' => $this->faker->numberBetween(0, 200_000_000),
+            'online' => $this->faker->boolean(),
         ];
     }
 }

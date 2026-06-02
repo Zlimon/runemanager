@@ -186,6 +186,13 @@ class CreateSkillsTable extends Migration
                     'slug' => 'construction',
                     'model' => 'App\Models\Skill\Construction',
                 ],
+                [
+                    'category_id' => 1,
+                    'order' => 24,
+                    'name' => 'Sailing',
+                    'slug' => 'sailing',
+                    'model' => 'App\Models\Skill\Sailing',
+                ],
             ]
         );
     }

@@ -46,6 +46,45 @@ function makeAccount(string $username = 'Zlimon'): Account
     ]);
 }
 
+it('denormalises the overall entry onto the parent Account', function () {
+    $account = makeAccount();
+    expect($account->level)->toBe(0)->and($account->rank)->toBe(0)->and($account->xp)->toBe(0);
+
+    $sync = makeMockedSync([
+        'skills' => [
+            ['id' => 0, 'name' => 'Overall', 'rank' => 12345, 'level' => 1500, 'xp' => 99_999_999],
+            ['id' => 1, 'name' => 'Attack', 'rank' => 500, 'level' => 99, 'xp' => 200_000_000],
+        ],
+        'activities' => [],
+    ]);
+
+    $sync->syncForAccount($account);
+
+    $account->refresh();
+    expect($account->rank)->toBe(12345)
+        ->and($account->level)->toBe(1500)
+        ->and($account->xp)->toBe(99_999_999);
+});
+
+it('leaves Account stats untouched when no overall entry is returned', function () {
+    $account = makeAccount();
+    $account->forceFill(['rank' => 42, 'level' => 1500, 'xp' => 999])->save();
+
+    $sync = makeMockedSync([
+        'skills' => [
+            ['id' => 1, 'name' => 'Attack', 'rank' => 500, 'level' => 99, 'xp' => 200_000_000],
+        ],
+        'activities' => [],
+    ]);
+
+    $sync->syncForAccount($account);
+
+    $account->refresh();
+    expect($account->rank)->toBe(42)
+        ->and($account->level)->toBe(1500)
+        ->and($account->xp)->toBe(999);
+});
+
 it('upserts an AccountHiscore row on first sync', function () {
     $account = makeAccount();
     $sync = makeMockedSync([

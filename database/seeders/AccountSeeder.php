@@ -5,8 +5,10 @@ namespace Database\Seeders;
 use App\Enums\AccountTypesEnum;
 use App\Models\Account;
 use App\Models\User;
+use App\Services\Hiscores\HiscoresSync;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Throwable;
 
 class AccountSeeder extends Seeder
 {
@@ -23,7 +25,8 @@ class AccountSeeder extends Seeder
 
     /**
      * Demo OSRS usernames distributed across the demo users. Realistic-looking
-     * names for browsing the UI; not synced against the live hiscores API.
+     * names for browsing the UI; synced against the live hiscores API on a
+     * best-effort basis (names that don't exist on hiscores keep their default zeroed stats).
      *
      * @var list<string>
      */
@@ -40,7 +43,7 @@ class AccountSeeder extends Seeder
         'Wigwamjones', 'Unsponsored', 'Muswa', 'GoeieVanHaze', 'TobeTask',
     ];
 
-    public function run(): void
+    public function run(HiscoresSync $sync): void
     {
         $zlimon = User::where('email', 'zlimon@runemanager.com')->first();
 
@@ -57,32 +60,29 @@ class AccountSeeder extends Seeder
             return;
         }
 
-        $created = 0;
+        $created = [];
 
         foreach ($this->zlimonAccounts as $spec) {
-            $this->createAccount($zlimon, $spec['name'], $spec['type']);
-            $created++;
+            $created[] = $this->createAccount($zlimon, $spec['name'], $spec['type']);
         }
 
         $demoUsers = User::where('id', '!=', $zlimon->id)->get();
         if ($demoUsers->isEmpty()) {
             $this->command->warn('AccountSeeder: no demo users found; only Zlimon accounts seeded.');
-
-            return;
+        } else {
+            foreach ($this->demoAccounts as $name) {
+                $owner = $demoUsers->random();
+                $created[] = $this->createAccount($owner, $name, AccountTypesEnum::NORMAL);
+            }
         }
 
-        foreach ($this->demoAccounts as $name) {
-            $owner = $demoUsers->random();
-            $this->createAccount($owner, $name, AccountTypesEnum::NORMAL);
-            $created++;
-        }
-
-        $this->command->info(sprintf('AccountSeeder: created %d accounts.', $created));
+        $this->command->info(sprintf('AccountSeeder: created %d accounts.', count($created)));
+        $this->syncHiscores($sync, $created);
     }
 
-    private function createAccount(User $user, string $username, AccountTypesEnum $type): void
+    private function createAccount(User $user, string $username, AccountTypesEnum $type): Account
     {
-        Account::query()->forceCreate([
+        return Account::query()->create([
             'user_id' => $user->id,
             // RuneLite's Client.getAccountHash() returns a Java long; synthesise something
             // long-shaped for seed data. The plugin overwrites this with the real hash on first push.
@@ -94,5 +94,36 @@ class AccountSeeder extends Seeder
             'xp' => 0,
             'online' => (bool) random_int(0, 1),
         ]);
+    }
+
+    /**
+     * Best-effort fetch from the official OSRS hiscores API. Failures (404 for
+     * names not on the hiscores, network blips) are reported but don't abort
+     * the seed — the account stays around with zeroed stats.
+     *
+     * @param  list<Account>  $accounts
+     */
+    private function syncHiscores(HiscoresSync $sync, array $accounts): void
+    {
+        if ($accounts === []) {
+            return;
+        }
+
+        $this->command->info(sprintf('AccountSeeder: fetching hiscores for %d accounts...', count($accounts)));
+
+        $synced = 0;
+        $missed = 0;
+
+        foreach ($accounts as $account) {
+            try {
+                $sync->syncForAccount($account);
+                $synced++;
+            } catch (Throwable $e) {
+                $missed++;
+                $this->command->line(sprintf('  ✗ %s — %s', $account->username, $e->getMessage()));
+            }
+        }
+
+        $this->command->info(sprintf('AccountSeeder: hiscores synced for %d, missed %d.', $synced, $missed));
     }
 }
