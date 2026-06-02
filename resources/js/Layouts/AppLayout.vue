@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref, watch} from 'vue';
+import {onMounted, onUnmounted, ref, watch} from 'vue';
 import {Head, Link, router, usePage} from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
@@ -50,9 +50,36 @@ function applyTheme() {
     }
 }
 
-onMounted(applyTheme);
-// Re-apply if the shared prop changes mid-session (e.g. user updates their override).
+// Pull the latest theme + dark_mode props from the server without a real navigation.
+// Used when the tab regains focus, so a pack pushed by the RuneLite plugin while the
+// user was in-game shows up the moment they switch back to the browser.
+function refreshThemeFromServer() {
+    router.reload({
+        only: ['theme', 'dark_mode'],
+        preserveState: true,
+        preserveScroll: true,
+    });
+}
+
+function onVisibilityChange() {
+    if (document.visibilityState === 'visible') {
+        refreshThemeFromServer();
+    }
+}
+
+onMounted(() => {
+    applyTheme();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+});
+
+// Re-apply whenever the shared prop changes — either from a real navigation,
+// the manual /user/resource-pack endpoint, or the visibilitychange reload.
 watch(() => usePage().props.theme, applyTheme);
+watch(() => usePage().props.dark_mode, applyTheme);
 </script>
 
 <template>
