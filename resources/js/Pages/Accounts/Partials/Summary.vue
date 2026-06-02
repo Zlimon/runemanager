@@ -1,28 +1,30 @@
 <script setup>
-import {ref} from "vue";
-import {Link, useForm, usePage} from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
 import dayjs from "dayjs";
 
-const props = defineProps({
-    accountProp: Object,
+defineProps({
+    account: {
+        type: Object,
+        required: true,
+    },
 });
 
-let account = ref(props.accountProp);
+const page = usePage();
 </script>
 
 <template>
     <div class="flex flex-col justify-between">
         <div class="grid grid-cols-2 gap-6">
             <div class="col-span-1">
-                <InputLabel :value="`${usePage().props.app.name} rank`" class="text-sm"/>
+                <InputLabel :value="`${page.props.app.name} rank`" class="text-sm"/>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
                     {{ account.rank.toLocaleString('en-US') }}
                 </p>
             </div>
 
             <div class="col-span-1">
-                <InputLabel :value="`Joined ${usePage().props.app.name}`" class="text-sm"/>
+                <InputLabel :value="`Joined ${page.props.app.name}`" class="text-sm"/>
                 <p class="text-xl font-bold text-gray-900 dark:text-white">
                     {{ dayjs(account.created_at).format('MMM D, YYYY') }}
                 </p>

@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\Admin\HiscoreController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Foundation\Application;
@@ -57,11 +56,5 @@ Route::middleware([
 
             return App::call('\App\Http\Controllers\CollectionHiscoreController@index', ['category' => 'clue', 'collection' => $clue]);
         })->name('hiscores.clues.index');
-    });
-
-    Route::prefix('/admin')->group(function () {
-        Route::prefix('/hiscores')->group(function () {
-            Route::get('/create', [HiscoreController::class, 'create'])->name('admin.hiscores.create');
-        });
     });
 });

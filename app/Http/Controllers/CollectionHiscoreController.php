@@ -44,10 +44,10 @@ class CollectionHiscoreController extends Controller
             ->all();
 
         return Inertia::render('Hiscores/Bosses/Show', [
-            'recordTypeProp' => $category,
-            'collectionNameProp' => $displayName,
-            'collectionSlugProp' => $collection,
-            'hiscoresProp' => $hiscores,
+            'recordType' => $category,
+            'collectionName' => $displayName,
+            'collectionSlug' => $collection,
+            'hiscores' => $hiscores,
         ]);
     }
 

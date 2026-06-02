@@ -5,9 +5,18 @@ import HiscoresHeader from "@/Pages/Hiscores/Partials/HiscoresHeader.vue";
 import HiscoresTable from "@/Pages/Hiscores/Partials/HiscoresTable.vue";
 
 const props = defineProps({
-    skillNameProp: String,
-    skillSlugProp: String,
-    hiscoresProp: Array,
+    skillName: {
+        type: String,
+        required: true,
+    },
+    skillSlug: {
+        type: String,
+        required: true,
+    },
+    hiscores: {
+        type: Array,
+        required: true,
+    },
 });
 
 const columns = [
@@ -19,22 +28,22 @@ const columns = [
 const search = ref('');
 const filteredHiscores = computed(() => {
     if (!search.value) {
-        return props.hiscoresProp;
+        return props.hiscores;
     }
 
     const needle = search.value.toLowerCase();
-    return props.hiscoresProp.filter((hiscore) =>
+    return props.hiscores.filter((hiscore) =>
         hiscore.account.username.toLowerCase().includes(needle),
     );
 });
 </script>
 
 <template>
-    <AppLayout :title="skillNameProp">
+    <AppLayout :title="skillName">
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="relative overflow-x-auto sm:rounded-lg">
-                    <HiscoresHeader :title="skillNameProp" v-model:search="search" />
+                    <HiscoresHeader :title="skillName" v-model:search="search" />
                     <HiscoresTable :columns="columns" :hiscores="filteredHiscores" />
                 </div>
             </div>

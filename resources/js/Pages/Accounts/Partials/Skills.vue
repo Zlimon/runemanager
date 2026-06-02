@@ -1,13 +1,15 @@
 <script setup>
-import {ref} from "vue";
-import {Link} from '@inertiajs/vue3';
+import { ref } from "vue";
+import { Link } from '@inertiajs/vue3';
 
-const props = defineProps({
-    accountProp: Object,
+defineProps({
+    account: {
+        type: Object,
+        required: true,
+    },
 });
 
-let account = ref(props.accountProp);
-let activeSkill = ref(null);
+const activeSkill = ref(null);
 </script>
 
 <template>

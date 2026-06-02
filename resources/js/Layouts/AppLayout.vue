@@ -1,26 +1,21 @@
 <script setup>
-import {onMounted, ref, watch} from 'vue';
-import {Head, Link, router, usePage} from '@inertiajs/vue3';
-import ApplicationMark from '@/Components/ApplicationMark.vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import Banner from '@/Components/Banner.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 
-const props = defineProps({
+defineProps({
     title: String,
 });
 
+const page = usePage();
+
 const showingNavigationDropdown = ref(false);
+const selectedHiscore = ref(null);
 
-let selectedHiscore = ref(null);
-
-let skills = usePage().props.skills;
-let bosses = usePage().props.bosses;
-let clues = usePage().props.clues;
+const skills = computed(() => page.props.skills ?? []);
+const bosses = computed(() => page.props.bosses ?? []);
+const clues = computed(() => page.props.clues ?? []);
 
 const switchToTeam = (team) => {
     router.put(route('current-team.update'), {
@@ -37,12 +32,12 @@ const logout = () => {
 // The resource pack CSS itself is included by the Blade root via a server-rendered
 // <link> tag (see resources/views/app.blade.php). Vue's only job here is to flip
 // Tailwind's `dark` class on <html> so `dark:` variants compile correctly.
-function applyDarkMode() {
-    document.documentElement.classList.toggle('dark', usePage().props.dark_mode === true);
-}
+const applyDarkMode = () => {
+    document.documentElement.classList.toggle('dark', page.props.dark_mode === true);
+};
 
 onMounted(applyDarkMode);
-watch(() => usePage().props.dark_mode, applyDarkMode);
+watch(() => page.props.dark_mode, applyDarkMode);
 </script>
 
 <template>
@@ -58,7 +53,7 @@ watch(() => usePage().props.dark_mode, applyDarkMode);
                     <Link :href="route('dashboard')" class="flex items-center space-x-3 rtl:space-x-reverse">
                         <span class="self-center whitespace-nowrap text-2xl text-6xl font-bold dark:text-white md:text-7xl"
                               style="font-family: 'runescape-smooth', sans-serif">
-                            {{ usePage().props.app.name }}
+                            {{ page.props.app.name }}
                         </span>
                     </Link>
                     <button data-collapse-toggle="mega-menu-full" type="button"
@@ -123,13 +118,13 @@ watch(() => usePage().props.dark_mode, applyDarkMode);
                     <div class="mx-auto flex max-w-screen-md justify-between px-4 py-5 text-gray-900 dark:text-white md:px-6">
                         <div @mouseover="selectedHiscore = 'skill'"
                              class="h-20 w-20 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500 bg-[url('/images/skill/total.webp')] bg-center bg-no-repeat bg-[length:40px_40px]"
-                             :class="{ '!bg-beige-200': selectedHiscore === 'skill' || usePage().props.recordTypeProp === 'skill' }" />
+                             :class="{ '!bg-beige-200': selectedHiscore === 'skill' || page.props.recordType === 'skill' }" />
                         <div @mouseover="selectedHiscore = 'boss'"
                              class="h-20 w-20 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500 bg-[url('/images/boss/boss.png')] bg-center bg-no-repeat bg-[length:40px_40px]"
-                             :class="{ '!bg-beige-200': selectedHiscore === 'boss' || usePage().props.recordTypeProp === 'boss' }" />
+                             :class="{ '!bg-beige-200': selectedHiscore === 'boss' || page.props.recordType === 'boss' }" />
                         <div @mouseover="selectedHiscore = 'clue'"
                              class="h-20 w-20 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500 bg-[url('/images/clue/clue.png')] bg-center bg-no-repeat bg-[length:40px_40px]"
-                             :class="{ '!bg-beige-200': selectedHiscore === 'clue' || usePage().props.recordTypeProp === 'clue' }" />
+                             :class="{ '!bg-beige-200': selectedHiscore === 'clue' || page.props.recordType === 'clue' }" />
                     </div>
 
                     <div v-if="selectedHiscore === 'skill'"
@@ -137,7 +132,7 @@ watch(() => usePage().props.dark_mode, applyDarkMode);
                         <Link v-for="skill in skills" :key="skill"
                               :href="route('hiscores.skills.index', skill.slug)"
                               class="flex items-center justify-center rounded-lg p-2 space-x-2 w-[50%] hover:bg-beige-400 sm:justify-start lg:p-4 hover:dark:bg-gray-800"
-                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': usePage().props.skillSlugProp === skill.slug }">
+                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': page.props.skillSlug === skill.slug }">
                             <img :src="`/images/skill/${skill.slug}.webp`"
                                  class="h-8 w-8 object-contain"/>
                             <div class="hidden font-semibold capitalize sm:block">{{ skill.name }}</div>
@@ -149,7 +144,7 @@ watch(() => usePage().props.dark_mode, applyDarkMode);
                         <Link v-for="boss in bosses" :key="boss"
                               :href="route('hiscores.bosses.index', boss.slug)"
                               class="flex items-center justify-center rounded-lg p-2 space-x-2 w-[75%] hover:bg-beige-400 sm:justify-start lg:p-4 hover:dark:bg-gray-800"
-                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': usePage().props.collectionSlugProp === boss.slug }">
+                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': page.props.collectionSlug === boss.slug }">
                             <img :src="`/images/boss/${boss.slug}.png`"
                                  class="h-8 w-8 object-contain"/>
                             <div class="hidden font-semibold capitalize sm:block">{{ boss.name }}</div>
@@ -161,7 +156,7 @@ watch(() => usePage().props.dark_mode, applyDarkMode);
                         <Link v-for="clue in clues" :key="clue"
                               :href="route('hiscores.clues.index', clue.slug)"
                               class="flex items-center justify-center rounded-lg p-2 space-x-2 w-[75%] hover:bg-beige-400 sm:justify-start lg:p-4 hover:dark:bg-gray-800"
-                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': usePage().props.collectionSlugProp === clue.slug }">
+                              :class="{ 'bg-beige-400 border border-beige-700 shadow dark:border-gray-700 dark:bg-gray-800': page.props.collectionSlug === clue.slug }">
                             <img :src="`/images/clue/${clue.slug}.png`"
                                  class="h-8 w-8 object-contain"/>
                             <div class="hidden font-semibold capitalize sm:block">{{ clue.name }}</div>

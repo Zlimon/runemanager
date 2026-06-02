@@ -5,9 +5,18 @@ import HiscoresHeader from "@/Pages/Hiscores/Partials/HiscoresHeader.vue";
 import HiscoresTable from "@/Pages/Hiscores/Partials/HiscoresTable.vue";
 
 const props = defineProps({
-    collectionNameProp: String,
-    collectionSlugProp: String,
-    hiscoresProp: Array,
+    collectionName: {
+        type: String,
+        required: true,
+    },
+    collectionSlug: {
+        type: String,
+        required: true,
+    },
+    hiscores: {
+        type: Array,
+        required: true,
+    },
 });
 
 const columns = [
@@ -18,22 +27,22 @@ const columns = [
 const search = ref('');
 const filteredHiscores = computed(() => {
     if (!search.value) {
-        return props.hiscoresProp;
+        return props.hiscores;
     }
 
     const needle = search.value.toLowerCase();
-    return props.hiscoresProp.filter((hiscore) =>
+    return props.hiscores.filter((hiscore) =>
         hiscore.account.username.toLowerCase().includes(needle),
     );
 });
 </script>
 
 <template>
-    <AppLayout :title="collectionNameProp">
+    <AppLayout :title="collectionName">
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="relative overflow-x-auto sm:rounded-lg">
-                    <HiscoresHeader :title="collectionNameProp" v-model:search="search" />
+                    <HiscoresHeader :title="collectionName" v-model:search="search" />
                     <HiscoresTable :columns="columns" :hiscores="filteredHiscores" />
                 </div>
             </div>

@@ -1,77 +1,70 @@
 <script setup>
-import {ref, onMounted} from "vue";
+import { ref, onMounted } from "vue";
 import Loader from "@/Components/Loader.vue";
 import dayjs from "dayjs";
 
 const props = defineProps({
-    accountProp: Object,
-});
-
-let account = ref(props.accountProp);
-
-onMounted(() => {
-    getCollectionLog();
+    account: {
+        type: Object,
+        required: true,
+    },
 });
 
 const tabs = ['Bosses', 'Raids', 'Clues'];
-let getCollectionLogLoading = ref(true);
-let collectionLog = ref(null);
 
-const getCollectionLog = () => {
-    getCollectionLogLoading.value = true;
-
-    axios.post(route('api.accounts.collectionlog.index', account.value), {
-        tabs: tabs,
-    })
-        .then((response) => {
-            collectionLog.value = response.data;
-            showCollectionLog(tabs[0]);
-        }).catch(error => {
-        console.error(error)
-        getCollectionLogLoading.value = false;
-    }).finally(() => {
-        //
-    });
-};
-
-let showCollectionLogLoading = ref(true);
+const getCollectionLogLoading = ref(true);
+const showCollectionLogLoading = ref(true);
+const collectionLog = ref(null);
+const activeTab = ref(tabs[0]);
+const activeCollection = ref(null);
+const activeItem = ref(null);
 
 const showCollectionLog = (tab, collection = null) => {
-    // Select first collection if none is selected
     if (collection === null) {
         collection = Object.keys(collectionLog.value.collection_log[tab])[0];
     }
 
-    // Do not fetch if already loaded
     if (collectionLog.value.collection_log[tab][collection].items !== undefined) {
         activeCollection.value = collectionLog.value.collection_log[tab][collection];
-
         return;
     }
 
     showCollectionLogLoading.value = true;
 
-    axios.get(route('api.accounts.collectionlog.show', [account.value, tab, collection]))
+    axios.get(route('api.accounts.collectionlog.show', [props.account, tab, collection]))
         .then((response) => {
             collectionLog.value.collection_log[tab][collection] = response.data.collection_log;
             activeCollection.value = collectionLog.value.collection_log[tab][collection];
-        }).catch(error => {
-        console.error(error)
-    }).finally(() => {
-        getCollectionLogLoading.value = false;
-        showCollectionLogLoading.value = false;
-    });
+        })
+        .catch((error) => {
+            console.error(error);
+        })
+        .finally(() => {
+            getCollectionLogLoading.value = false;
+            showCollectionLogLoading.value = false;
+        });
 };
 
-let activeTab = ref(tabs[0]);
-let activeCollection = ref(null);
-let activeItem = ref(null);
+const getCollectionLog = () => {
+    getCollectionLogLoading.value = true;
 
-function setActiveTab(tab) {
+    axios.post(route('api.accounts.collectionlog.index', props.account), { tabs })
+        .then((response) => {
+            collectionLog.value = response.data;
+            showCollectionLog(tabs[0]);
+        })
+        .catch((error) => {
+            console.error(error);
+            getCollectionLogLoading.value = false;
+        });
+};
+
+const setActiveTab = (tab) => {
     activeTab.value = tab;
-
     showCollectionLog(tab);
-}
+};
+
+onMounted(getCollectionLog);
 </script>
 
 <template>

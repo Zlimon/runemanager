@@ -1,41 +1,44 @@
 <script setup>
-import {ref, onMounted} from "vue";
+import { ref, onMounted } from "vue";
 import Loader from "@/Components/Loader.vue";
 import ItemSlot from "@/Components/Game/ItemSlot.vue";
 
 const props = defineProps({
-    accountProp: Object,
+    account: {
+        type: Object,
+        required: true,
+    },
 });
 
-let account = ref(props.accountProp);
+const bankLoading = ref(true);
+const bank = ref(null);
+const activeTab = ref(null);
+const activeTabItems = ref(null);
 
-onMounted(() => {
-    getBank();
-});
-
-let bankLoading = ref(true);
-let bank = ref(null);
-let activeTab = ref(null);
-let activeTabItems = ref(null);
+const setActiveTab = (tab, items) => {
+    activeTab.value = tab;
+    activeTabItems.value = items;
+};
 
 const getBank = () => {
     bankLoading.value = true;
 
-    axios.get(route('api.accounts.bank.show', account.value))
+    axios.get(route('api.accounts.bank.show', props.account))
         .then((response) => {
             bank.value = response.data.bank;
-            setActiveTab(Object.keys(bank.value.tabs)[0], bank.value.tabs[Object.keys(bank.value.tabs)[0]]);
-        }).catch(error => {
-        console.error(error)
-    }).finally(() => {
-        bankLoading.value = false;
-    });
+
+            const firstTab = Object.keys(bank.value.tabs)[0];
+            setActiveTab(firstTab, bank.value.tabs[firstTab]);
+        })
+        .catch((error) => {
+            console.error(error);
+        })
+        .finally(() => {
+            bankLoading.value = false;
+        });
 };
 
-function setActiveTab(tab, items) {
-    activeTab.value = tab;
-    activeTabItems.value = items;
-}
+onMounted(getBank);
 </script>
 
 <template>
@@ -45,6 +48,7 @@ function setActiveTab(tab, items) {
                 <!-- Vertical tabs -->
                 <div class="tabs tabs-lifted" role="tablist">
                     <a v-for="(items, tab, index) in bank.tabs"
+                       :key="tab"
                        :class="{ 'tab-active !bg-base-200': activeTab === tab }"
                        class="tab !h-12"
                        role="tab"
@@ -65,8 +69,8 @@ function setActiveTab(tab, items) {
             <div class="bg-base-200 border-x border-b border-base-300 rounded-b">
                 <ul v-if="activeTab !== null"
                     class="grid grid-cols-8 gap-2 p-4">
-                    <li v-for="(item, slot) in activeTabItems">
-                        <ItemSlot :itemProp="item"/>
+                    <li v-for="(slotItem, slot) in activeTabItems" :key="slot">
+                        <ItemSlot :item="slotItem" />
                     </li>
                 </ul>
             </div>

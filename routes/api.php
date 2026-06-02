@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\Api\HiscoreController;
 use App\Http\Controllers\Api\AccountController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BankController;
@@ -8,7 +7,6 @@ use App\Http\Controllers\Api\CollectionLogController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\LootingBagController;
-use App\Http\Controllers\Api\NpcController;
 use App\Http\Controllers\Api\QuestController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Support\Facades\Route;
@@ -63,12 +61,4 @@ Route::middleware([
     // backend resolves to an id and writes users.resource_pack_id.
     Route::put('/plugin/resource-pack', [UserResourcePackController::class, 'updateFromPlugin'])
         ->name('api.plugin.resource-pack');
-
-    Route::post('/npc/search', [NpcController::class, 'search'])->name('api.npc.search');
-
-    Route::prefix('/admin')->group(function () {
-        Route::prefix('/hiscores')->group(function () {
-            Route::post('/store', [HiscoreController::class, 'store'])->name('admin.api.hiscores.store');
-        });
-    });
 });

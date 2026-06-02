@@ -1,15 +1,16 @@
 <script setup>
-import {ref, onMounted} from "vue";
+import { ref, onMounted } from "vue";
 import * as THREE from 'three';
-import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
-import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader';
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const props = defineProps({
-    accountProp: Object,
+defineProps({
+    account: {
+        type: Object,
+        required: true,
+    },
 });
-
-let account = ref(props.accountProp);
 
 const sceneContainer = ref(null);
 

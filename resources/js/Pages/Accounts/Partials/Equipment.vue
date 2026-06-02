@@ -1,11 +1,10 @@
 <script setup>
-import {ref} from "vue";
-
-const props = defineProps({
-    accountProp: Object,
+defineProps({
+    account: {
+        type: Object,
+        required: true,
+    },
 });
-
-let account = ref(props.accountProp);
 </script>
 
 <template>

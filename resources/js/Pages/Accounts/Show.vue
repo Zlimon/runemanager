@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import { ref } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CollectionLog from "@/Components/Game/CollectionLog.vue";
 import Quests from "@/Components/Game/Quests.vue";
@@ -13,12 +13,14 @@ import Summary from "@/Pages/Accounts/Partials/Summary.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
 import Bank from "@/Components/Game/Bank.vue";
 
-const props = defineProps({
-    accountProp: Object,
+defineProps({
+    account: {
+        type: Object,
+        required: true,
+    },
 });
 
-let account = ref(props.accountProp);
-let activeTab = ref('inventory');
+const activeTab = ref('inventory');
 </script>
 
 <template>
@@ -32,16 +34,16 @@ let activeTab = ref('inventory');
                 <div class="mt-4 bg-base-100 border border-base-300 rounded p-6 lg:p-8">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
-                            <Header :accountProp="account"/>
+                            <Header :account="account"/>
 
                             <div class="flex flex-col items-center">
                                 <div class="my-4 grid grid-cols-2 gap-4">
-                                    <Avatar :accountProp="account"/>
+                                    <Avatar :account="account"/>
 
-                                    <Equipment :accountProp="account"/>
+                                    <Equipment :account="account"/>
                                 </div>
 
-                                <Summary :accountProp="account"/>
+                                <Summary :account="account"/>
                             </div>
 
                             <!-- Vertical Inventory and Looting Bag tabs -->
@@ -63,10 +65,10 @@ let activeTab = ref('inventory');
                             <!-- Inventory or Looting Bag tab content -->
                             <div class="flex bg-base-200 border-x border-b border-base-300 rounded-b">
                                 <div v-show="activeTab === 'inventory'">
-                                    <Inventory :accountProp="account"/>
+                                    <Inventory :account="account"/>
                                 </div>
                                 <div v-show="activeTab === 'looting-bag'">
-                                    <LootingBag :accountProp="account"/>
+                                    <LootingBag :account="account"/>
                                 </div>
                             </div>
                         </div>
@@ -78,7 +80,7 @@ let activeTab = ref('inventory');
                                         Skills
                                     </h3>
 
-                                    <Skills :accountProp="account"/>
+                                    <Skills :account="account"/>
                                 </div>
 
                                 <div class="col-span-1">
@@ -87,7 +89,7 @@ let activeTab = ref('inventory');
                                     </h3>
 
                                     <div class="mt-4 bg-base-200 border border-base-300 rounded">
-                                        <Quests :accountProp="account"/>
+                                        <Quests :account="account"/>
                                     </div>
                                 </div>
                             </div>
@@ -97,7 +99,7 @@ let activeTab = ref('inventory');
                             </h3>
 
                             <div class="mt-4">
-                                <CollectionLog :accountProp="account"/>
+                                <CollectionLog :account="account"/>
                             </div>
 
                             <h3 class="mt-4 header-chatbox-sword">
@@ -105,7 +107,7 @@ let activeTab = ref('inventory');
                             </h3>
 
                             <div class="mt-4">
-                                <Bank :accountProp="account"/>
+                                <Bank :account="account"/>
                             </div>
                         </div>
                     </div>

@@ -1,13 +1,14 @@
 <script setup>
-import {ref} from "vue";
+import { ref } from "vue";
 
-const props = defineProps({
-    itemProp: Object,
+defineProps({
+    item: {
+        type: Object,
+        required: true,
+    },
 });
 
-let item = ref(props.itemProp);
-
-let activeItem = ref(null);
+const activeItem = ref(null);
 </script>
 
 <template>

@@ -5,71 +5,58 @@ namespace App\Http\Controllers;
 use App\Enums\AccountTypesEnum;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
+use App\Rules\AccountUsernameRule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class AccountController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $accountTypes = array_values(AccountTypesEnum::returnAllAccountTypes());
+        $allAccountTypes = array_values(AccountTypesEnum::returnAllAccountTypes());
+
+        $validated = $request->validate([
+            'username' => ['nullable', 'string', new AccountUsernameRule],
+            'account_types' => ['nullable', 'array'],
+            'account_types.*' => ['string', 'in:'.implode(',', $allAccountTypes)],
+            'per_page' => ['nullable', 'integer', 'min:4', 'max:64'],
+        ]);
+
+        $query = Account::query();
+
+        if (! empty($validated['username'] ?? null)) {
+            $query->where('username', 'LIKE', '%'.$validated['username'].'%');
+        }
+
+        if (! empty($validated['account_types'] ?? [])) {
+            $normalized = array_map(
+                fn (string $type): string => Str::replace([' ', '-'], '_', Str::lower($type)),
+                $validated['account_types'],
+            );
+            $query->whereIn('account_type', $normalized);
+        }
+
+        $accounts = AccountResource::collection(
+            $query->orderBy('username')->paginate($validated['per_page'] ?? 16)->withQueryString(),
+        );
 
         return Inertia::render('Accounts/Index', [
-            'accountTypesProp' => $accountTypes,
+            'accountTypes' => $allAccountTypes,
+            'accounts' => $accounts,
+            'filters' => [
+                'username' => $validated['username'] ?? '',
+                'account_types' => $validated['account_types'] ?? [],
+                'per_page' => $validated['per_page'] ?? 16,
+            ],
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Account $account): Response
     {
         return Inertia::render('Accounts/Show', [
-            'accountProp' => (new AccountResource($account->load('equipment')->append('skills')))->resolve(),
+            'account' => (new AccountResource($account->load('equipment')->append('skills')))->resolve(),
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

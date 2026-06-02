@@ -47,10 +47,10 @@ class SkillHiscoreController extends Controller
             ->all();
 
         return Inertia::render('Hiscores/Skills/Show', [
-            'recordTypeProp' => 'skill',
-            'skillNameProp' => $skillRecord->name,
-            'skillSlugProp' => $skillRecord->slug,
-            'hiscoresProp' => $hiscores,
+            'recordType' => 'skill',
+            'skillName' => $skillRecord->name,
+            'skillSlug' => $skillRecord->slug,
+            'hiscores' => $hiscores,
         ]);
     }
 

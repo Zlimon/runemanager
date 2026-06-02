@@ -1,45 +1,49 @@
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import { computed, ref, watch } from "vue";
 import debounce from 'lodash/debounce';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import {Link, useForm} from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
 import Select from "@/Components/Select.vue";
-import InputError from "@/Components/InputError.vue";
-import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 import Search from "@/Components/Search.vue";
+import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 
 const props = defineProps({
-    accountTypesProp: Array,
+    accountTypes: {
+        type: Array,
+        required: true,
+    },
+    accounts: {
+        type: Object,
+        required: true,
+    },
+    filters: {
+        type: Object,
+        required: true,
+    },
 });
 
-let accountTypes = ref(props.accountTypesProp);
-let accounts = ref([]);
+const formatAccountTypeName = (accountType) =>
+    accountType.replace(/_/g, " ").replace(/(^\w|\s\w)(\S*)/g, (_, m1, m2) => m1.toUpperCase() + m2.toLowerCase());
 
-const formatedAccountTypeNames = computed({
-    get: () => {
-        return accountTypes.value.map((accountType) => {
-            return formatAccountTypeName(accountType);
-        });
-    }
-})
+const formattedAccountTypeNames = computed(() => props.accountTypes.map(formatAccountTypeName));
 
-const formatAccountTypeName = (accountType) => {
-    return accountType.replace(/_/g, " ").replace(/(^\w|\s\w)(\S*)/g, (_, m1, m2) => m1.toUpperCase() + m2.toLowerCase());
-};
-
-//----------------------------------------------------;
-// searchAccounts
-//----------------------------------------------------;
-onMounted(() => {
-    searchAccounts();
+const form = ref({
+    username: props.filters.username ?? '',
+    account_types: props.filters.account_types ?? [],
+    per_page: props.filters.per_page ?? 16,
 });
 
-let searchAccountForm = useForm({
-    username: '',
-    account_types: [],
-    per_page: 16,
-});
+const reload = debounce(() => {
+    router.get(route('accounts.index'), form.value, {
+        only: ['accounts', 'filters'],
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+}, 300);
+
+watch(form, reload, { deep: true });
 
 const appendAccountTypeSearch = (accountType) => {
     if (accountType === 'All') {
@@ -47,109 +51,73 @@ const appendAccountTypeSearch = (accountType) => {
         return;
     }
 
-    // Check if the account type is already in the search
-    if (searchAccountForm.account_types.includes(accountType)) {
+    if (form.value.account_types.includes(accountType)) {
         return;
     }
 
-    searchAccountForm.account_types.push(accountType);
+    form.value.account_types.push(accountType);
 };
 
 const removeAccountTypeSearch = (accountType) => {
-    searchAccountForm.account_types = searchAccountForm.account_types.filter((item) => item !== accountType);
+    form.value.account_types = form.value.account_types.filter((item) => item !== accountType);
 };
 
 const clearAccountTypeSearch = () => {
-    document.getElementById('account_types').value = 'All';
-
-    searchAccountForm.account_types = [];
+    const select = document.getElementById('account_types');
+    if (select) {
+        select.value = 'All';
+    }
+    form.value.account_types = [];
 };
-
-watch(() => [searchAccountForm.username, searchAccountForm.account_types, searchAccountForm.per_page], debounce((value) => {
-    searchAccounts();
-}, 500), {deep: true});
-
-let loading = ref(false);
-
-const searchAccounts = (load = true) => {
-    loading.value = load;
-
-    axios.post(route('api.accounts.search'), searchAccountForm)
-        .then((response) => {
-            accounts.value = response.data;
-
-            searchAccountForm.errors = {};
-        }).catch(error => {
-        console.log(error)
-        searchAccountForm.errors = error.response.data.errors || {};
-
-        console.error(error)
-    }).finally(() => {
-        loading.value = false;
-    });
-};
-//----------------------------------------------------;
-// End of searchAccounts
-//----------------------------------------------------;
 </script>
 
 <template>
-    <AppLayout title="Profile">
+    <AppLayout title="Accounts">
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <h3 class="text-left header-chatbox-sword">Search for accounts</h3>
 
                 <div class="mt-2 grid grid-cols-2 gap-12">
                     <div class="col-span-1 max-w-md">
-                        <InputLabel for="searchAccountForm-username"
-                                    value="Search for any account by username"/>
-                        <Search id="searchAccountForm-username"
-                                v-model="searchAccountForm.username"
-                                :error="searchAccountForm.errors.username !== undefined"
-                                @search="searchAccounts"/>
-                        <InputError v-if="searchAccountForm.errors.username !== undefined"
-                                    :messages="searchAccountForm.errors.username"/>
+                        <InputLabel for="form-username"
+                                    value="Search for any account by username" />
+                        <Search id="form-username"
+                                v-model="form.username"
+                                placeholder="Username" />
                     </div>
 
                     <div class="col-span-1 max-w-md">
-                        <div>
-                            <InputLabel for="account_types"
-                                        value="Filter by account type"/>
-                            <Select id="account_types"
-                                    :optionObject=false
-                                    :options="formatedAccountTypeNames"
-                                    optionDefault="All"
-                                    @change="appendAccountTypeSearch($event.target.value)"
-                            />
-                            <InputError v-if="searchAccountForm.errors.account_types !== undefined"
-                                        :messages="searchAccountForm.errors.account_types"/>
+                        <InputLabel for="account_types"
+                                    value="Filter by account type" />
+                        <Select id="account_types"
+                                :optionObject="false"
+                                :options="formattedAccountTypeNames"
+                                optionDefault="All"
+                                @change="appendAccountTypeSearch($event.target.value)" />
 
-                            <div class="flex flex-wrap space-x-2">
-                                <div v-if="searchAccountForm.account_types.length > 0"
-                                     class="mt-2 flex items-center">
-                                    <div class="badge badge-info"
-                                         @click="clearAccountTypeSearch()">
-                                        <svg
-                                            class="inline-block h-4 w-4 stroke-current"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M6 18L18 6M6 6l12 12"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"></path>
-                                        </svg>
-                                    </div>
+                        <div class="flex flex-wrap space-x-2">
+                            <div v-if="form.account_types.length > 0"
+                                 class="mt-2 flex items-center">
+                                <div class="badge badge-info cursor-pointer"
+                                     @click="clearAccountTypeSearch()">
+                                    <svg class="inline-block h-4 w-4 stroke-current"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6 18L18 6M6 6l12 12"
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              stroke-width="2" />
+                                    </svg>
                                 </div>
+                            </div>
 
-                                <div v-for="accountType in searchAccountForm.account_types"
-                                     :key="accountType"
-                                     class="mt-2">
-                                    <div class="badge badge-primary"
-                                         @click="removeAccountTypeSearch(accountType)">
-                                        {{ formatAccountTypeName(accountType) }}
-                                    </div>
+                            <div v-for="accountType in form.account_types"
+                                 :key="accountType"
+                                 class="mt-2">
+                                <div class="badge badge-primary cursor-pointer"
+                                     @click="removeAccountTypeSearch(accountType)">
+                                    {{ formatAccountTypeName(accountType) }}
                                 </div>
                             </div>
                         </div>
@@ -157,19 +125,19 @@ const searchAccounts = (load = true) => {
                 </div>
 
                 <div class="mt-12 grid sm:grid-cols-4 gap-4">
-                    <div v-for="account in accounts.data" :key="account">
+                    <div v-for="account in accounts.data" :key="account.username">
                         <Link :href="route('accounts.show', account)"
                               class="flex flex-col items-center md:flex-row md:max-w-xl box hover:bg-base-200 px-2 resource-pack-dialog">
-                            <Icon :accountProp="account"/>
+                            <Icon :account="account" />
                             <div class="flex flex-col justify-between p-4 leading-normal">
                                 <div class="flex items-center space-x-1">
                                     <img v-if="account.account_type === 'ironman'"
-                                         :src="`/images/ironman.png`"
+                                         src="/images/ironman.png"
                                          class="h-6 w-6 object-contain">
                                     <img v-else-if="account.account_type !== 'normal'"
                                          :src="`/images/${account.account_type}_ironman.png`"
                                          class="h-6 w-6 object-contain">
-                                    <h5 class="">{{ account.username }}</h5>
+                                    <h5>{{ account.username }}</h5>
                                 </div>
 
                                 <div class="flex items-center space-x-1">
@@ -179,6 +147,11 @@ const searchAccounts = (load = true) => {
                                 </div>
                             </div>
                         </Link>
+                    </div>
+
+                    <div v-if="accounts.data.length === 0"
+                         class="col-span-full text-center text-gray-500 dark:text-gray-400 py-12">
+                        No accounts match these filters
                     </div>
                 </div>
             </div>

@@ -1,25 +1,25 @@
 <script setup>
-import {ref} from "vue";
 import PackButton from "@/Components/PackButton.vue";
 import dayjs from "dayjs";
 import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 
-const props = defineProps({
-    accountProp: Object,
+defineProps({
+    account: {
+        type: Object,
+        required: true,
+    },
 });
-
-let account = ref(props.accountProp);
 </script>
 
 <template>
     <div class="flex flex-col justify-between gap-y-7">
         <div class="flex items-center gap-x-5">
-            <Icon :accountProp="account"/>
+            <Icon :account="account" />
             <div class="flex flex-col">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <img v-if="account.account_type === 'ironman'"
-                             :src="`/images/ironman.png`"
+                             src="/images/ironman.png"
                              class="h-8 w-8 object-contain">
                         <img v-else-if="account.account_type !== 'normal'"
                              :src="`/images/${account.account_type}_ironman.png`"
