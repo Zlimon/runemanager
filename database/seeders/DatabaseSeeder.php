@@ -25,19 +25,18 @@ class DatabaseSeeder extends Seeder
     }
 
     /**
-     * Best-effort: pull the sample resource pack so the UI has something to render
-     * with. Wrapped in try/catch so a network blip doesn't kill the whole seed.
+     * Best-effort: install the sample resource pack and set it as the instance
+     * default so unauthenticated visitors and users with no override see it.
+     * Wrapped in try/catch so a network blip doesn't kill the whole seed.
      */
     private function tryFetchDefaultResourcePack(): void
     {
         try {
-            Artisan::call('resourcepack:fetch', [
-                'name' => 'sample-vanilla',
-                '--use' => 'yes',
-            ]);
-            $this->command->info('DatabaseSeeder: fetched sample-vanilla resource pack.');
+            Artisan::call('resourcepack:fetch', ['name' => 'sample-vanilla']);
+            Artisan::call('resourcepack:switch', ['name' => 'sample-vanilla']);
+            $this->command->info('DatabaseSeeder: installed sample-vanilla as the instance default.');
         } catch (\Throwable $e) {
-            $this->command->warn(sprintf('DatabaseSeeder: resourcepack:fetch failed (continuing): %s', $e->getMessage()));
+            $this->command->warn(sprintf('DatabaseSeeder: resource pack install failed (continuing): %s', $e->getMessage()));
         }
     }
 }

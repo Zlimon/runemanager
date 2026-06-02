@@ -39,31 +39,23 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $resourcePack = $this->resolveResourcePack($request);
+        // Resource pack CSS is rendered server-side from app.blade.php as a <link>;
+        // we only forward `dark_mode` to drive Tailwind's `dark:` variants in Vue.
+        $packId = $request->user()?->effectiveResourcePackId()
+            ?? SettingHelper::getSetting('resource_pack_id');
+        $darkMode = $packId
+            ? (bool) (ResourcePack::find($packId)?->dark_mode)
+            : false;
 
         return array_merge(parent::share($request), [
             'app' => [
                 'name' => config('app.name'),
                 //                'url' => config('app.url'),
             ],
-            'dark_mode' => (bool) ($resourcePack?->dark_mode),
-            'theme' => $resourcePack?->daisyui_theme ?? 'runemanager',
+            'dark_mode' => $darkMode,
             'skills' => fn () => Skill::distinct()->select('name', 'slug')->get()->toArray() ?? [],
             'bosses' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 5)->get()->toArray() ?? [],
             'clues' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 3)->get()->toArray() ?? [],
         ]);
-    }
-
-    /**
-     * Walk the resource-pack hierarchy and return the pack that should drive
-     * the current request's theming. Order is: authenticated user override →
-     * instance global setting → null.
-     */
-    private function resolveResourcePack(Request $request): ?ResourcePack
-    {
-        $packId = $request->user()?->effectiveResourcePackId()
-            ?? SettingHelper::getSetting('resource_pack_id');
-
-        return $packId ? ResourcePack::find($packId) : null;
     }
 }

@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, onUnmounted, ref, watch} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import {Head, Link, router, usePage} from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
@@ -34,52 +34,15 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-function applyTheme() {
-    const props = usePage().props;
-
-    if (props.dark_mode === true) {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
-
-    // DaisyUI consumes data-theme on the root. Resolved server-side from the
-    // user's effective resource pack — see HandleInertiaRequests.
-    if (props.theme) {
-        document.documentElement.dataset.theme = props.theme;
-    }
+// The resource pack CSS itself is included by the Blade root via a server-rendered
+// <link> tag (see resources/views/app.blade.php). Vue's only job here is to flip
+// Tailwind's `dark` class on <html> so `dark:` variants compile correctly.
+function applyDarkMode() {
+    document.documentElement.classList.toggle('dark', usePage().props.dark_mode === true);
 }
 
-// Pull the latest theme + dark_mode props from the server without a real navigation.
-// Used when the tab regains focus, so a pack pushed by the RuneLite plugin while the
-// user was in-game shows up the moment they switch back to the browser.
-function refreshThemeFromServer() {
-    router.reload({
-        only: ['theme', 'dark_mode'],
-        preserveState: true,
-        preserveScroll: true,
-    });
-}
-
-function onVisibilityChange() {
-    if (document.visibilityState === 'visible') {
-        refreshThemeFromServer();
-    }
-}
-
-onMounted(() => {
-    applyTheme();
-    document.addEventListener('visibilitychange', onVisibilityChange);
-});
-
-onUnmounted(() => {
-    document.removeEventListener('visibilitychange', onVisibilityChange);
-});
-
-// Re-apply whenever the shared prop changes — either from a real navigation,
-// the manual /user/resource-pack endpoint, or the visibilitychange reload.
-watch(() => usePage().props.theme, applyTheme);
-watch(() => usePage().props.dark_mode, applyTheme);
+onMounted(applyDarkMode);
+watch(() => usePage().props.dark_mode, applyDarkMode);
 </script>
 
 <template>
