@@ -17,3 +17,8 @@ Schedule::command('name-changes:detect')
     ->hourly()
     ->withoutOverlapping()
     ->runInBackground();
+
+Schedule::command('resourcepack:update')
+    ->daily()
+    ->withoutOverlapping()
+    ->runInBackground();

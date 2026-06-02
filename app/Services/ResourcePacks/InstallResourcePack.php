@@ -48,6 +48,18 @@ class InstallResourcePack
         return File::exists(public_path("resource-packs/{$name}/resource-pack.css"));
     }
 
+    /**
+     * Fetch the {@code compatibleVersion} from the pack's upstream {@code pack.properties}.
+     * Returns null if upstream is unreachable or the properties file is missing — callers
+     * should treat that as "no information; don't change anything".
+     */
+    public function latestUpstreamVersion(string $name): ?string
+    {
+        $properties = $this->fetchProperties($name);
+
+        return $properties['compatibleVersion'] ?? null;
+    }
+
     private function ensureDirectories(): void
     {
         File::ensureDirectoryExists(storage_path('app/resource-packs'));
