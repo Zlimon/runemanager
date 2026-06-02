@@ -103,6 +103,12 @@ watch(() => page.props.dark_mode, applyDarkMode);
                                 </ResponsiveNavLink>
                             </li>
                             <li>
+                                <ResponsiveNavLink :href="route('calendar.index')"
+                                                   :active="route().current('calendar.*')">
+                                    Calendar
+                                </ResponsiveNavLink>
+                            </li>
+                            <li>
                                 <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
                                                    :href="route('api-tokens.index')"
                                                    :active="route().current('api-tokens.index')">

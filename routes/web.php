@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserResourcePackController;
@@ -21,6 +22,9 @@ Route::get('/', function () {
 // SPEC §8 — the live feed is intentionally public (no auth middleware).
 Route::get('/feed', [FeedController::class, 'index'])->name('feed.index');
 
+// SPEC §10 — calendar viewing is public; mutation routes are auth-gated below.
+Route::get('/calendar', [CalendarEventController::class, 'index'])->name('calendar.index');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -34,6 +38,12 @@ Route::middleware([
         Route::get('/', [AccountController::class, 'index'])->name('accounts.index');
         Route::get('/{account}', [AccountController::class, 'show'])->name('accounts.show');
     });
+
+    // SPEC §10.2 — creation & deletion require auth (proper role checks land
+    // alongside §3.4 + §12).
+    Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
+    Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])
+        ->name('calendar.destroy');
 
     // Per-user resource pack override (instance-global pack is set by the
     // resourcepack:switch artisan, not this endpoint).
