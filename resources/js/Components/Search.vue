@@ -5,6 +5,7 @@ const props = defineProps({
     modelValue: String,
     error: Boolean,
     disabled: Boolean,
+    placeholder: String,
 });
 
 defineEmits(['update:modelValue']);
@@ -25,6 +26,7 @@ defineExpose({focus: () => input.value.focus()});
            class="input input-bordered flex items-center gap-2">
         <input ref="input"
                :disabled="disabled"
+               :placeholder="placeholder"
                :value="modelValue"
                class="grow"
                type="search"
