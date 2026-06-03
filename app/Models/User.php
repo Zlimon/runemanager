@@ -137,7 +137,7 @@ class User extends Authenticatable
 
     public function getIconAttribute(): ?string
     {
-        return Item::find($this->icon_id)?->icon;
+        return data_get(Item::lookupByOsrsId($this->icon_id), 'icon');
     }
 
     public function resourcePack(): BelongsTo

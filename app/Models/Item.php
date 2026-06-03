@@ -131,4 +131,35 @@ class Item extends Model
 
         return $out;
     }
+
+    public static function lookupByOsrsId(int|string $osrsId): array
+    {
+        $doc = (new static)->getConnection()
+            ->getDatabase()
+            ->selectCollection((new static)->getTable())
+            ->aggregate([
+                ['$match' => ['id' => (string) $osrsId]],
+                ['$project' => [
+                    '_id' => 0,
+                    'id' => 1,
+                    'name' => 1,
+                    'examine' => 1,
+                    'icon' => 1,
+                    'lowalch' => 1,
+                    'highalch' => 1,
+                ]],
+            ])
+            ->toArray()[0] ?? null;
+
+        $intId = (int) ($doc['id'] ?? 0);
+
+        return [
+            '_id' => $intId,
+            'name' => (string) ($doc['name'] ?? ''),
+            'examine' => $doc['examine'] ?? null,
+            'icon' => $doc['icon'] ?? null,
+            'lowalch' => isset($doc['lowalch']) ? (int) $doc['lowalch'] : null,
+            'highalch' => isset($doc['highalch']) ? (int) $doc['highalch'] : null,
+        ];
+    }
 }
