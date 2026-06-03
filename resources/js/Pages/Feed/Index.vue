@@ -56,7 +56,7 @@ const hasEvents = computed(() => props.events.length > 0);
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="flex items-baseline justify-between">
-                    <h1 class="text-2xl font-bold dark:text-white">Live Feed</h1>
+                    <h1 class="header-chatbox-sword text-2xl font-bold dark:text-white">Live Feed</h1>
                     <span class="text-xs text-gray-500 dark:text-gray-400">
                         Auto-refreshing every {{ Math.round(pollIntervalMs / 1000) }}s
                     </span>
@@ -64,7 +64,7 @@ const hasEvents = computed(() => props.events.length > 0);
 
                 <ul v-if="hasEvents" class="mt-4 space-y-2">
                     <li v-for="event in events" :key="event.id"
-                        class="bg-base-100 border border-base-300 rounded p-3">
+                        class="bg-base-100 border border-base-300 rounded resource-pack-dialog p-3">
                         <div class="flex items-baseline justify-between">
                             <Link :href="route('accounts.show', { account: event.account.username })"
                                   class="flex items-center gap-2 font-semibold hover:underline">

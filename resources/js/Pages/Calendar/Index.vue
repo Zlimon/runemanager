@@ -64,7 +64,7 @@ const eventTypeOptions = computed(() =>
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="flex items-baseline justify-between">
-                    <h1 class="text-2xl font-bold dark:text-white">Calendar</h1>
+                    <h1 class="header-chatbox-sword text-2xl font-bold dark:text-white">Calendar</h1>
                     <PrimaryButton v-if="currentUserId" @click="openCreate">
                         New event
                     </PrimaryButton>
@@ -77,7 +77,7 @@ const eventTypeOptions = computed(() =>
                 </div>
                 <ul v-else class="space-y-2">
                     <li v-for="event in upcoming" :key="event.id"
-                        class="bg-base-100 border border-base-300 rounded p-4">
+                        class="bg-base-100 border border-base-300 rounded resource-pack-dialog p-4">
                         <div class="flex items-baseline justify-between gap-2">
                             <div class="flex items-baseline gap-2">
                                 <span class="badge badge-primary">{{ event.event_type_label }}</span>
@@ -106,7 +106,7 @@ const eventTypeOptions = computed(() =>
                 <h2 v-if="past.length > 0" class="mt-8 mb-2 text-lg font-semibold dark:text-white">Past</h2>
                 <ul v-if="past.length > 0" class="space-y-2">
                     <li v-for="event in past" :key="event.id"
-                        class="bg-base-100 border border-base-300 rounded p-4 opacity-70">
+                        class="bg-base-100 border border-base-300 rounded resource-pack-dialog p-4 opacity-70">
                         <div class="flex items-baseline gap-2">
                             <span class="badge">{{ event.event_type_label }}</span>
                             <h3 class="font-semibold">{{ event.title }}</h3>

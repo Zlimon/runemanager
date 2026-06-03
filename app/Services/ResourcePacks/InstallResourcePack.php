@@ -18,9 +18,13 @@ use ZipArchive;
  * {@code https://github.com/melkypie/resource-packs/archive/{name}.zip}.
  *
  * Disk layout (per pack):
- *   storage/app/resource-packs/{name}.zip     ← the downloaded archive
- *   public/resource-packs/{name}/             ← extracted, served as static assets
+ *   {system tmp}/rpz_*.zip                          ← downloaded archive (deleted after extract)
+ *   public/resource-packs/{name}/                   ← extracted, served as static assets
  *   public/resource-packs/{name}/resource-pack.css  ← copied from resources/css/per-pack.css
+ *
+ * The ZIP and the extraction scratch space live in the system temp dir rather
+ * than under storage/, so a stale-perms staging directory can't permanently
+ * block installs — temp is always writable by the running user.
  */
 class InstallResourcePack
 {
@@ -31,14 +35,21 @@ class InstallResourcePack
      */
     public function install(string $name): ResourcePack
     {
-        $this->ensureDirectories();
+        File::ensureDirectoryExists(public_path('resource-packs'));
 
-        $zipPath = storage_path("app/resource-packs/{$name}.zip");
+        $zipPath = tempnam(sys_get_temp_dir(), 'rpz_');
+        if ($zipPath === false) {
+            throw new RuntimeException('Could not allocate temp file for pack download');
+        }
         $extractTarget = public_path("resource-packs/{$name}");
 
-        $this->download($name, $zipPath);
-        $this->extract($zipPath, $extractTarget);
-        $this->copyTemplateCss($extractTarget);
+        try {
+            $this->download($name, $zipPath);
+            $this->extract($zipPath, $extractTarget);
+            $this->copyTemplateCss($extractTarget);
+        } finally {
+            @unlink($zipPath);
+        }
 
         return $this->upsertRow($name);
     }
@@ -58,12 +69,6 @@ class InstallResourcePack
         $properties = $this->fetchProperties($name);
 
         return $properties['compatibleVersion'] ?? null;
-    }
-
-    private function ensureDirectories(): void
-    {
-        File::ensureDirectoryExists(storage_path('app/resource-packs'));
-        File::ensureDirectoryExists(public_path('resource-packs'));
     }
 
     private function download(string $name, string $zipPath): void
@@ -93,7 +98,7 @@ class InstallResourcePack
         }
         File::ensureDirectoryExists($extractTarget);
 
-        $tmpDir = storage_path('app/resource-packs/tmp-'.Str::random(8));
+        $tmpDir = sys_get_temp_dir().'/rpx_'.Str::random(8);
         File::ensureDirectoryExists($tmpDir);
 
         $zip = new ZipArchive;
