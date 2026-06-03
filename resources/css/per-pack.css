@@ -66,6 +66,24 @@
                          bottom -12px left;
 }
 
+/*
+ * Variant for panels that sit directly under a row of tabs — drops the two
+ * top corners and the top edge so the panel reads as one shape with the tabs
+ * above instead of closing off with its own frame. Same dialog asset family
+ * as .resource-pack-dialog.
+ */
+.resource-pack-dialog-tabbed {
+    background: url('dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat,
+                url('dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,
+                url('dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y,
+                url('dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y,
+                url('dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: bottom left, bottom right,
+                         left -13px top, right -12px top,
+                         bottom -12px left, center;
+}
+
 .resource-pack-iron-rivets {
     background: url('dialog/iron_rivets_corner_top_left.png') no-repeat,
                 url('dialog/iron_rivets_corner_top_right.png') no-repeat,

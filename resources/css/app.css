@@ -121,7 +121,9 @@ h6 {
 }
 
 .tab {
-    @apply bg-base-100 border-base-300 focus:ring-0;
+    /* Same dark-mode foreground logic as the page headers — keeps tab labels
+       readable when a pack tints the background dark. */
+    @apply bg-base-100 border-base-300 focus:ring-0 text-gray-900 dark:text-white;
 }
 
 /*
