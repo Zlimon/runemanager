@@ -77,7 +77,7 @@ const eventTypeOptions = computed(() =>
                 </div>
                 <ul v-else class="space-y-2">
                     <li v-for="event in upcoming" :key="event.id"
-                        class="rounded p-4 pack-bg resource-pack-border">
+                        class="rounded p-4 pack-bg-card resource-pack-border">
                         <div class="flex items-baseline justify-between gap-2">
                             <div class="flex items-baseline gap-2">
                                 <span class="badge badge-primary">{{ event.event_type_label }}</span>

@@ -127,7 +127,7 @@ const clearAccountTypeSearch = () => {
                 <div class="mt-12 grid sm:grid-cols-4 gap-4">
                     <div v-for="account in accounts.data" :key="account.username">
                         <Link :href="route('accounts.show', account)"
-                              class="flex flex-col items-center md:flex-row md:max-w-xl rounded px-2 py-3 pack-bg resource-pack-border hover:opacity-90">
+                              class="flex flex-col items-center md:flex-row md:max-w-xl rounded px-2 py-3 pack-bg-card resource-pack-border hover:opacity-90">
                             <Icon :account="account" />
                             <div class="flex flex-col justify-between p-4 leading-normal">
                                 <div class="flex items-center space-x-1">

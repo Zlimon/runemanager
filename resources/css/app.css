@@ -140,6 +140,23 @@ h6 {
     background-color: var(--pack-bg, theme(colors.gray-800));
 }
 
+/*
+ * A darker shade of --pack-bg for cards / sub-panels, so the body and the
+ * cards aren't flat against each other. Derived via color-mix so adding a
+ * new pack doesn't require a third DB column; for the no-pack case the
+ * mix falls back to the body palette and bottoms out a step deeper.
+ */
+:root {
+    --pack-bg-card: color-mix(in srgb, var(--pack-bg, theme(colors.beige-300)) 88%, black);
+}
+.dark {
+    --pack-bg-card: color-mix(in srgb, var(--pack-bg, theme(colors.gray-800)) 88%, black);
+}
+
+.pack-bg-card {
+    background-color: var(--pack-bg-card);
+}
+
 .pack-bg-soft {
     background-color: var(--pack-bg, theme(colors.base-200));
 }

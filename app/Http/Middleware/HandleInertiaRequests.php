@@ -43,12 +43,13 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         // Resource pack CSS is rendered server-side from app.blade.php as a <link>;
-        // we only forward `dark_mode` to drive Tailwind's `dark:` variants in Vue.
+        // we forward `dark_mode` to drive Tailwind's `dark:` variants and `pack`
+        // (name + updated_at timestamp) so Vue components can resolve pack-shipped
+        // assets like /resource-packs/{name}/skill/{slug}.png with cache busting.
         $packId = $request->user()?->effectiveResourcePackId()
             ?? SettingHelper::getSetting('resource_pack_id');
-        $darkMode = $packId
-            ? (bool) (ResourcePack::find($packId)?->dark_mode)
-            : false;
+        $pack = $packId ? ResourcePack::find($packId) : null;
+        $darkMode = (bool) ($pack?->dark_mode);
 
         return array_merge(parent::share($request), [
             'app' => [
@@ -56,6 +57,10 @@ class HandleInertiaRequests extends Middleware
                 //                'url' => config('app.url'),
             ],
             'dark_mode' => $darkMode,
+            'pack' => $pack ? [
+                'name' => $pack->name,
+                'version' => $pack->updated_at?->timestamp,
+            ] : null,
             'skills' => fn () => Skill::distinct()->select('name', 'slug')->get()->toArray() ?? [],
             'bosses' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 5)->get()->toArray() ?? [],
             'clues' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 3)->get()->toArray() ?? [],
