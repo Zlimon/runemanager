@@ -126,6 +126,15 @@ h6 {
     @apply bg-base-100 border-base-300 focus:ring-0 text-gray-900 dark:text-white;
 }
 
+/* The bg-base-100 on .tab above also flattens DaisyUI's default tab-active
+ * distinction, so the selected tab is invisible for no-pack viewers. Restore
+ * with a two-class selector that out-specifies .tab. With a pack active the
+ * `.tab.resource-pack-tab` rule in per-pack.css also has two classes but
+ * carries !important, so the pack texture still wins. */
+.tab.tab-active {
+    @apply bg-base-200 font-bold;
+}
+
 /*
  * Pack-aware utilities — picked up automatically when the active resource pack
  * has had its palette extracted (see InstallResourcePack::extractPaletteColors).
