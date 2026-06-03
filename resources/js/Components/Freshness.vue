@@ -48,7 +48,7 @@ const exact = computed(() =>
     <span :title="exact"
           :class="{
               'text-error': isStale,
-              'text-gray-500 dark:text-gray-400': !isStale,
+              'text-gray-700 dark:text-gray-200': !isStale,
           }"
           class="text-xs">
         {{ label }}

@@ -53,7 +53,7 @@ const activeTabItems = computed(() => {
         </div>
 
         <!-- Tab content -->
-        <div class="bg-base-200 border-x border-b border-base-300 rounded-b resource-pack-dialog-tabbed p-2">
+        <div class="bg-base-200 rounded-b resource-pack-dialog-tabbed p-2">
             <ul v-if="activeTabItems"
                 class="grid grid-cols-8 gap-2 p-4">
                 <li v-for="(slotItem, slot) in activeTabItems" :key="slot">
@@ -63,6 +63,6 @@ const activeTabItems = computed(() => {
         </div>
     </div>
     <div v-else class="flex h-96 items-center justify-center">
-        <p class="text-gray-500 dark:text-gray-400">No bank found for this account</p>
+        <p class="text-gray-700 dark:text-gray-200">No bank found for this account</p>
     </div>
 </template>

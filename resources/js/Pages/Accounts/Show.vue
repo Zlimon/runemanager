@@ -95,7 +95,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                                 </a>
                             </div>
 
-                            <div class="flex flex-col bg-base-200 border-x border-b border-base-300 rounded-b resource-pack-dialog-tabbed p-3">
+                            <div class="flex flex-col bg-base-200 rounded-b resource-pack-dialog-tabbed p-3">
                                 <div v-show="activeTab === 'inventory'">
                                     <div class="flex justify-end">
                                         <Freshness :updated-at="freshness.inventory" :stale-after-minutes="staleAfter" />
@@ -123,7 +123,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                                         <h3 class="header-chatbox-sword">Quests</h3>
                                         <Freshness :updated-at="freshness.quests" :stale-after-minutes="staleAfter" />
                                     </div>
-                                    <div class="mt-4 bg-base-200 border border-base-300 rounded resource-pack-dialog p-2">
+                                    <div class="mt-4 bg-base-200 rounded resource-pack-dialog p-2">
                                         <Quests :quests="quests" />
                                     </div>
                                 </div>

@@ -81,7 +81,7 @@ const switchTo = (tab, slug = null) => {
                     <Loader v-if="reloading" :component="true" :loading="true" />
                     <div v-else-if="activeCollection" class="p-4">
                         <h5>{{ activeCollection.name }}</h5>
-                        <p class="text-gray-500 dark:text-gray-400">
+                        <p class="text-gray-700 dark:text-gray-200">
                             <span>Obtained: </span>
                             <span :class="{
                                 'text-success': activeCollection.obtained === activeCollection.total,
@@ -94,7 +94,7 @@ const switchTo = (tab, slug = null) => {
                             </span>
                         </p>
                         <div v-for="killCount in (activeCollection.killCount ?? [])" :key="killCount.name">
-                            <p class="text-gray-500 dark:text-gray-400">
+                            <p class="text-gray-700 dark:text-gray-200">
                                 <span>{{ killCount.name }}: </span>
                                 <span class="font-bold">{{ killCount.amount }}</span>
                             </p>
@@ -103,7 +103,7 @@ const switchTo = (tab, slug = null) => {
                         <ul v-if="activeCollection.items && activeCollection.items.length > 0"
                             class="m-2 grid grid-cols-6 gap-2">
                             <li v-for="(slotItem, slot) in activeCollection.items" :key="slot">
-                                <div class="box h-14 w-14 hover:bg-base-200"
+                                <div class="h-14 w-14 rounded hover:bg-white/10"
                                      @mouseleave="activeItem = null"
                                      @mouseover="slotItem.item !== null ? activeItem = slotItem.item?._id : null">
                                     <div v-if="slotItem.item !== null">
@@ -137,6 +137,6 @@ const switchTo = (tab, slug = null) => {
         </div>
     </div>
     <div v-else class="flex h-96 items-center justify-center">
-        <p class="text-gray-500 dark:text-gray-400">No collection log found for this user</p>
+        <p class="text-gray-700 dark:text-gray-200">No collection log found for this user</p>
     </div>
 </template>
