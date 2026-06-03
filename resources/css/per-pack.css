@@ -116,13 +116,31 @@
     background-image: url('bank/tab_selected.png');
 }
 
-/* Small textured cell — skill stat tiles on Account/Show, generic chips. */
+/* Small textured cell — skill stat tiles on Account/Show, generic chips.
+ * Uses the in-game stats panel's left + right half tile pair so the cell
+ * reads as a single OSRS stat tile rather than a generic button. */
 .resource-pack-box {
-    background: url('chatbox/button.png');
+    background: url('stats/tile_half_left.png') no-repeat left center,
+                url('stats/tile_half_right.png') no-repeat right center;
+    background-size: 50% 100%, 50% 100%;
     border: 0 !important;
 }
 .resource-pack-box:hover {
-    background-image: url('chatbox/button_hovered.png');
+    background-image: url('stats/tile_half_left_selected.png'),
+                      url('stats/tile_half_right_selected.png');
+}
+
+/*
+ * Whenever a pack is active and applying its own textured frame, the static
+ * Tailwind border-base-300 fallback that surrounds the panel should step
+ * aside. Apps with no pack rely on those Tailwind borders for visual
+ * separation; this rule lives in per-pack.css (loaded only when a pack is
+ * active) so toggling a pack on/off automatically swaps which frame paints.
+ */
+.resource-pack-dialog,
+.resource-pack-dialog-tabbed,
+.resource-pack-border {
+    border: 0 !important;
 }
 
 /* Section panel — repeating chatbox background suited for large container
