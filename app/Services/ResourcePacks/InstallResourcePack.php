@@ -51,7 +51,9 @@ class InstallResourcePack
             @unlink($zipPath);
         }
 
-        return $this->upsertRow($name);
+        $colors = $this->extractPaletteColors($extractTarget);
+
+        return $this->upsertRow($name, $colors);
     }
 
     public function isInstalled(string $name): bool
@@ -137,7 +139,10 @@ class InstallResourcePack
         File::copy($template, $extractTarget.'/resource-pack.css');
     }
 
-    private function upsertRow(string $name): ResourcePack
+    /**
+     * @param  array{background_color: ?string, accent_color: ?string}  $colors
+     */
+    private function upsertRow(string $name, array $colors): ResourcePack
     {
         $properties = $this->fetchProperties($name);
         $tags = $properties ? array_map('trim', explode(',', $properties['tags'] ?? '')) : [];
@@ -152,9 +157,139 @@ class InstallResourcePack
         $pack->url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
         $pack->tags = implode(',', $tags);
         $pack->dark_mode = in_array('dark', $tags, true);
+        $pack->background_color = $colors['background_color'];
+        $pack->accent_color = $colors['accent_color'];
         $pack->save();
 
         return $pack;
+    }
+
+    /**
+     * Sample a representative background color from the pack's PNG assets, then
+     * derive an accent by shifting luminance away from it. Tries a handful of
+     * known-large-area assets in order; the first one that loads wins.
+     *
+     * @return array{background_color: ?string, accent_color: ?string}
+     */
+    private function extractPaletteColors(string $packDir): array
+    {
+        if (! extension_loaded('gd')) {
+            return ['background_color' => null, 'accent_color' => null];
+        }
+
+        $candidates = [
+            'dialog/background.png',
+            'chatbox/background.png',
+            'fixed_mode/side_panel_background.png',
+        ];
+
+        foreach ($candidates as $rel) {
+            $path = $packDir.'/'.$rel;
+            if (! is_file($path)) {
+                continue;
+            }
+
+            $bg = $this->averageColor($path);
+            if ($bg === null) {
+                continue;
+            }
+
+            return [
+                'background_color' => $bg,
+                'accent_color' => $this->shiftAgainstLuminance($bg, 0.35),
+            ];
+        }
+
+        return ['background_color' => null, 'accent_color' => null];
+    }
+
+    /**
+     * Average the RGB of a 3×3 grid of interior pixels, skipping near-transparent
+     * ones. Returns a `#rrggbb` hex string, or null when nothing usable was found.
+     */
+    private function averageColor(string $path): ?string
+    {
+        $info = @getimagesize($path);
+        if ($info === false) {
+            return null;
+        }
+
+        $image = @imagecreatefrompng($path);
+        if ($image === false) {
+            return null;
+        }
+
+        try {
+            [$width, $height] = $info;
+            $samples = [];
+
+            for ($i = 1; $i <= 3; $i++) {
+                for ($j = 1; $j <= 3; $j++) {
+                    $x = (int) ($width * $i / 4);
+                    $y = (int) ($height * $j / 4);
+                    $rgba = imagecolorat($image, $x, $y);
+
+                    // GD's alpha runs 0 (opaque) .. 127 (fully transparent).
+                    $alpha = ($rgba >> 24) & 0x7F;
+                    if ($alpha > 64) {
+                        continue;
+                    }
+
+                    $samples[] = [
+                        ($rgba >> 16) & 0xFF,
+                        ($rgba >> 8) & 0xFF,
+                        $rgba & 0xFF,
+                    ];
+                }
+            }
+
+            if ($samples === []) {
+                return null;
+            }
+
+            $count = count($samples);
+            $r = (int) round(array_sum(array_column($samples, 0)) / $count);
+            $g = (int) round(array_sum(array_column($samples, 1)) / $count);
+            $b = (int) round(array_sum(array_column($samples, 2)) / $count);
+
+            return sprintf('#%02x%02x%02x', $r, $g, $b);
+        } finally {
+            imagedestroy($image);
+        }
+    }
+
+    /**
+     * Shift the given hex color toward white if it's dark, toward black if it's
+     * light — perceived-luminance threshold (Rec. 709 coefficients) decides which
+     * direction. `$amount` is a 0..1 fraction of the gap to traverse.
+     */
+    private function shiftAgainstLuminance(string $hex, float $amount): string
+    {
+        $hex = ltrim($hex, '#');
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+
+        $luminance = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+
+        if ($luminance < 128) {
+            // Dark background → lighter accent.
+            $r += (255 - $r) * $amount;
+            $g += (255 - $g) * $amount;
+            $b += (255 - $b) * $amount;
+        } else {
+            // Light background → darker accent.
+            $r *= (1 - $amount);
+            $g *= (1 - $amount);
+            $b *= (1 - $amount);
+        }
+
+        return sprintf(
+            '#%02x%02x%02x',
+            max(0, min(255, (int) round($r))),
+            max(0, min(255, (int) round($g))),
+            max(0, min(255, (int) round($b))),
+        );
     }
 
     /**

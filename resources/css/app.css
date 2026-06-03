@@ -123,3 +123,28 @@ h6 {
 .tab {
     @apply bg-base-100 border-base-300 focus:ring-0;
 }
+
+/*
+ * Pack-aware utilities — picked up automatically when the active resource pack
+ * has had its palette extracted (see InstallResourcePack::extractPaletteColors).
+ * Fall back to the matching DaisyUI base colour when --pack-* isn't defined,
+ * so anonymous visitors and packs without extractable assets keep the default
+ * theme.
+ */
+.pack-bg {
+    background-color: var(--pack-bg, theme(colors.base-100));
+}
+
+.pack-bg-soft {
+    /* A slightly translucent overlay so the pack background reads as a tinted
+       version of base-200 rather than a flat fill — useful for inset panels. */
+    background-color: var(--pack-bg, theme(colors.base-200));
+}
+
+.pack-accent-border {
+    border-color: var(--pack-accent, theme(colors.base-300));
+}
+
+.pack-accent-text {
+    color: var(--pack-accent, theme(colors.base-content));
+}

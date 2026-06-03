@@ -65,7 +65,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                     <Search />
                 </div>
 
-                <div class="mt-4 bg-base-100 border border-base-300 rounded p-6 lg:p-8">
+                <div class="mt-4 bg-base-100 pack-bg border border-base-300 rounded p-6 lg:p-8">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
                             <Header :account="account" />
