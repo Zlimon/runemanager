@@ -65,7 +65,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                     <Search />
                 </div>
 
-                <div class="mt-4 bg-base-100 border border-base-300 rounded resource-pack-panel p-6 lg:p-8">
+                <div class="mt-4 bg-base-100 border border-base-300 rounded p-6 lg:p-8">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
                             <Header :account="account" />
@@ -95,15 +95,15 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                                 </a>
                             </div>
 
-                            <div class="flex flex-col bg-base-200 border-x border-b border-base-300 rounded-b">
+                            <div class="flex flex-col bg-base-200 border-x border-b border-base-300 rounded-b resource-pack-dialog p-3">
                                 <div v-show="activeTab === 'inventory'">
-                                    <div class="flex justify-end px-3 pt-2">
+                                    <div class="flex justify-end">
                                         <Freshness :updated-at="freshness.inventory" :stale-after-minutes="staleAfter" />
                                     </div>
                                     <Inventory :inventory="inventory" />
                                 </div>
                                 <div v-show="activeTab === 'looting-bag'">
-                                    <div class="flex justify-end px-3 pt-2">
+                                    <div class="flex justify-end">
                                         <Freshness :updated-at="freshness.looting_bag" :stale-after-minutes="staleAfter" />
                                     </div>
                                     <LootingBag :looting-bag="lootingBag" />

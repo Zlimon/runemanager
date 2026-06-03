@@ -53,7 +53,7 @@ const activeTabItems = computed(() => {
         </div>
 
         <!-- Tab content -->
-        <div class="bg-base-200 border-x border-b border-base-300 rounded-b">
+        <div class="bg-base-200 border-x border-b border-base-300 rounded-b resource-pack-dialog p-2">
             <ul v-if="activeTabItems"
                 class="grid grid-cols-8 gap-2 p-4">
                 <li v-for="(slotItem, slot) in activeTabItems" :key="slot">

@@ -27,7 +27,7 @@ const hasEntries = computed(() => props.entries.length > 0);
 
 <template>
     <div v-if="hasEntries"
-         class="max-h-[28rem] overflow-y-scroll bg-base-200 border border-base-300 rounded">
+         class="max-h-[28rem] overflow-y-scroll bg-base-200 border border-base-300 rounded resource-pack-dialog p-3">
         <ul class="divide-y divide-base-300">
             <li v-for="(entry, index) in entries" :key="index"
                 class="p-3">
