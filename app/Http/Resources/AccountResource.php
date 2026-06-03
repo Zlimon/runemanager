@@ -29,6 +29,12 @@ class AccountResource extends JsonResource
             'skills' => $this->whenAppended('skills', function () {
                 return $this->skills;
             }),
+            'bosses' => $this->whenAppended('bosses', function () {
+                return $this->bosses;
+            }),
+            'clues' => $this->whenAppended('clues', function () {
+                return $this->clues;
+            }),
             'equipment' => $this->whenLoaded('equipment', function () {
                 return $this->equipment ? (new EquipmentResource($this->equipment))->resolve() : null;
             }),

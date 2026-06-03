@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -94,6 +95,55 @@ class Account extends Model
             'level' => $entries[$skill->slug]['level'] ?? 1,
             'xp' => $entries[$skill->slug]['xp'] ?? 0,
         ]);
+    }
+
+    /**
+     * Standalone activity slugs the OSRS hiscores expose that AREN'T bosses —
+     * minigame rankings, point counters, chest opens, etc. Used to filter the
+     * Bosses tab to only NPC-style entries.
+     */
+    private const NON_BOSS_ACTIVITY_SLUGS = [
+        'lms_rank', 'pvp_arena_rank', 'soul_wars_zeal', 'rifts_closed',
+        'colosseum_glory', 'collections_logged', 'league_points', 'grid_points',
+        'deadman_points', 'lunar_chests', 'barrows_chests',
+        'bounty_hunter_hunter', 'bounty_hunter_rogue',
+    ];
+
+    public function getBossesAttribute(): SupportCollection
+    {
+        $entries = $this->hiscore?->entries['activities'] ?? [];
+
+        return collect($entries)
+            ->reject(fn ($_, string $slug) => str_starts_with($slug, 'clue_scrolls_')
+                || in_array($slug, self::NON_BOSS_ACTIVITY_SLUGS, true))
+            ->map(fn ($entry, string $slug) => [
+                'name' => Str::title(str_replace('_', ' ', $slug)),
+                'slug' => $slug,
+                'rank' => $entry['rank'] ?? 0,
+                'score' => $entry['score'] ?? 0,
+            ])
+            ->values();
+    }
+
+    /**
+     * Clue scrolls in tier order — present every tier even if the player has
+     * no kc yet so the UI grid is always the same shape.
+     */
+    public function getCluesAttribute(): SupportCollection
+    {
+        $entries = $this->hiscore?->entries['activities'] ?? [];
+        $tiers = ['beginner', 'easy', 'medium', 'hard', 'elite', 'master', 'all'];
+
+        return collect($tiers)->map(function (string $tier) use ($entries) {
+            $slug = "clue_scrolls_{$tier}";
+
+            return [
+                'name' => Str::title($tier),
+                'slug' => $slug,
+                'rank' => $entries[$slug]['rank'] ?? 0,
+                'score' => $entries[$slug]['score'] ?? 0,
+            ];
+        });
     }
 
     public function inventory(): HasOne

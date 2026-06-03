@@ -42,6 +42,8 @@ const emptyAsset = {
     ring: 'slot_ring.png',
 };
 
+const hasPack = computed(() => Boolean(page.props.pack?.name));
+
 const packAsset = (path) => {
     const pack = page.props.pack;
     if (!pack?.name) {
@@ -51,11 +53,23 @@ const packAsset = (path) => {
 };
 
 const slotTileBg = computed(() => {
+    if (!hasPack.value) {
+        return {};
+    }
     const url = packAsset('slot_tile.png');
-    return url
-        ? { backgroundImage: `url(${url})`, backgroundSize: '100% 100%' }
-        : {};
+    return url ? { backgroundImage: `url(${url})`, backgroundSize: '100% 100%' } : {};
 });
+
+// No-pack fallback uses the single bundled equipment_slots.png as the outer
+// background; the per-slot grid sits on top with transparent cells so the
+// empty-slot icons drawn by the bg image show through where no item is equipped.
+const noPackOuter = computed(() => hasPack.value
+    ? {}
+    : {
+        backgroundImage: "url('/images/equipment_slots.png')",
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+    });
 
 const equippedItem = (key) => props.account?.equipment?.[`${key}_item`] ?? null;
 
@@ -63,7 +77,9 @@ const emptySrc = (key) => packAsset(emptyAsset[key]);
 </script>
 
 <template>
-    <div class="mx-auto w-[168px] p-3">
+    <div class="mx-auto w-[168px]"
+         :class="hasPack ? 'p-3' : 'p-6'"
+         :style="noPackOuter">
         <div v-if="account.equipment !== null" class="flex flex-col items-center gap-1">
             <div v-for="(row, rowIndex) in rows" :key="rowIndex"
                  class="flex justify-center gap-1">

@@ -117,11 +117,13 @@
 }
 
 /* Small textured cell — skill stat tiles on Account/Show, generic chips.
- * Uses the in-game stats panel's left + right half tile pair so the cell
- * reads as a single OSRS stat tile rather than a generic button. */
+ * Each in-game stat tile is a left+right half pair (36×36 each); we use
+ * longhand background-* so the `background:` shorthand doesn't reset
+ * background-size and break the 50% / 50% stretch. */
 .resource-pack-box {
-    background: url('stats/tile_half_left.png') no-repeat left center,
-                url('stats/tile_half_right.png') no-repeat right center;
+    background-image: url('stats/tile_half_left.png'), url('stats/tile_half_right.png');
+    background-repeat: no-repeat, no-repeat;
+    background-position: left center, right center;
     background-size: 50% 100%, 50% 100%;
     border: 0 !important;
 }
