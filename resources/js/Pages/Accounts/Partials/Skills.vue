@@ -31,7 +31,7 @@ const packIcon = (kind, slug) => {
 };
 
 const skillIconSrc = (slug) =>
-    packIcon('skill', slug) ?? `/images/skill/${slug}.webp`;
+    packIcon('skill', slug) ?? `/images/skill/${slug}.png`;
 
 const bossIconSrc = (slug) =>
     packIcon('boss', slug) ?? `/images/boss/${slug.replace(/_/g, '-')}.png`;
@@ -58,11 +58,11 @@ const onIconError = (event, fallback) => {
 const skillCells = computed(() => [
     {
         href: route('accounts.index'),
-        slug: 'total',
+        slug: 'overall',
         label: props.account.level,
         tooltip: { name: 'Total level', value: props.account.xp.toLocaleString('en-US') },
-        iconSrc: () => skillIconSrc('total'),
-        fallback: '/images/skill/total.webp',
+        iconSrc: () => skillIconSrc('overall'),
+        fallback: '/images/skill/overall.png',
     },
     ...props.account.skills.map((skill) => ({
         href: route('hiscores.skills.index', skill.slug),
@@ -70,7 +70,7 @@ const skillCells = computed(() => [
         label: skill.level,
         tooltip: { name: skill.name, value: skill.xp.toLocaleString('en-US') },
         iconSrc: () => skillIconSrc(skill.slug),
-        fallback: `/images/skill/${skill.slug}.webp`,
+        fallback: `/images/skill/${skill.slug}.png`,
     })),
 ]);
 
@@ -113,9 +113,13 @@ const tabs = [
     <div>
         <!-- Sub-tab strip for switching between the hiscore categories. -->
         <div class="tabs tabs-lifted mt-4" role="tablist">
+            <!-- `tab-active` is the DaisyUI class for the selected tab visual; the
+                 pack-side `.resource-pack-tab.tab-active` rule keys off the same
+                 class to swap in bank/tab_selected.png. No `!bg-base-200` here —
+                 it was the brown fallback bleeding through the pack texture. -->
             <a v-for="tab in tabs" :key="tab.key"
                class="tab resource-pack-tab"
-               :class="{ 'tab-active !bg-base-200 is-active': activeTab === tab.key }"
+               :class="{ 'tab-active': activeTab === tab.key }"
                role="tab"
                @click="activeTab = tab.key">
                 {{ tab.label }}
@@ -128,8 +132,12 @@ const tabs = [
         <ul class="mt-2 flex flex-wrap justify-center gap-1"
             :class="activeTab === 'bosses' ? 'max-h-96 overflow-y-auto' : ''">
             <li v-for="cell in cells" :key="cell.slug" class="relative w-[72px]">
+                <!-- `box` provides the no-pack bg + border + rounded; pack CSS
+                     resets bg to transparent and paints the stats-tile texture
+                     in its place. !bg-base-200 was painting the same brown bleed
+                     as the tabs. -->
                 <Link :href="cell.href"
-                      class="flex h-9 items-center justify-center gap-1 box !bg-base-200 resource-pack-box px-1"
+                      class="flex h-9 items-center justify-center gap-1 box resource-pack-box px-1"
                       @mouseleave="activeKey = null"
                       @mouseover="activeKey = cell.slug">
                     <img :src="cell.iconSrc()"
