@@ -56,6 +56,38 @@
                          bottom -15px left, center;
 }
 
+/* Tabs — Inventory / Looting bag header, Bank per-tab strip, anywhere the UI
+ * uses a labelled tab. Add `.is-active` (or `.tab-active`) for the selected tab.
+ */
+.resource-pack-tab {
+    background: url('bank/tab.png') no-repeat;
+    background-size: 100% 100%;
+    color: inherit;
+    border: 0 !important;
+}
+.resource-pack-tab:hover {
+    background-image: url('bank/tab_hovered.png');
+}
+.resource-pack-tab.is-active,
+.resource-pack-tab.tab-active {
+    background-image: url('bank/tab_selected.png');
+}
+
+/* Small textured cell — skill stat tiles on Account/Show, generic chips. */
+.resource-pack-box {
+    background: url('chatbox/button.png');
+    border: 0 !important;
+}
+.resource-pack-box:hover {
+    background-image: url('chatbox/button_hovered.png');
+}
+
+/* Section panel — repeating chatbox background suited for large container
+ * areas (the outer Account/Show card, the inner section bodies). */
+.resource-pack-panel {
+    background: url('chatbox/background.png');
+}
+
 .resource-pack-world-map {
     background: url('button/world_map_metal_corner_top_left.png') no-repeat,
                 url('button/world_map_metal_corner_top_right.png') no-repeat,

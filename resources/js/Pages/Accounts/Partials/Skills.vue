@@ -16,7 +16,7 @@ const activeSkill = ref(null);
     <ul class="mt-4 grid grid-cols-6 gap-1">
         <li>
             <Link :href="route('accounts.index')"
-                  class="flex items-center justify-center gap-2 box !bg-base-200 p-1"
+                  class="flex items-center justify-center gap-2 box !bg-base-200 resource-pack-box p-1"
                   @mouseleave="activeSkill = null"
                   @mouseover="activeSkill = 'total'">
                 <img class="h-6 w-6 object-contain"
@@ -39,7 +39,7 @@ const activeSkill = ref(null);
         </li>
         <li v-for="skill in account.skills" :key="skill.slug">
             <Link :href="route('hiscores.skills.index', skill.slug)"
-                  class="flex items-center justify-center gap-2 box !bg-base-200 p-1"
+                  class="flex items-center justify-center gap-2 box !bg-base-200 resource-pack-box p-1"
                   @mouseleave="activeSkill = null"
                   @mouseover="activeSkill = skill.slug">
                 <img :src="`/images/skill/${skill.slug}.webp`"

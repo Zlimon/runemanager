@@ -65,7 +65,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                     <Search />
                 </div>
 
-                <div class="mt-4 bg-base-100 border border-base-300 rounded p-6 lg:p-8">
+                <div class="mt-4 bg-base-100 border border-base-300 rounded resource-pack-panel p-6 lg:p-8">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
                             <Header :account="account" />
@@ -81,14 +81,14 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
 
                             <!-- Vertical Inventory and Looting Bag tabs -->
                             <div class="mt-4 tabs tabs-lifted" role="tablist">
-                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'inventory' }"
-                                   class="tab"
+                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'inventory', 'is-active': activeTab === 'inventory' }"
+                                   class="tab resource-pack-tab"
                                    role="tab"
                                    @click="activeTab = 'inventory'">
                                     Inventory
                                 </a>
-                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'looting-bag' }"
-                                   class="tab"
+                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'looting-bag', 'is-active': activeTab === 'looting-bag' }"
+                                   class="tab resource-pack-tab"
                                    role="tab"
                                    @click="activeTab = 'looting-bag'">
                                     Looting bag

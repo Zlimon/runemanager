@@ -36,8 +36,8 @@ const activeTabItems = computed(() => {
             <div class="tabs tabs-lifted" role="tablist">
                 <a v-for="(items, tab, index) in bank.tabs"
                    :key="tab"
-                   :class="{ 'tab-active !bg-base-200': activeTab === tab }"
-                   class="tab !h-12"
+                   :class="{ 'tab-active !bg-base-200': activeTab === tab, 'is-active': activeTab === tab }"
+                   class="tab resource-pack-tab !h-12"
                    role="tab"
                    @click="activeTab = tab">
                         <img v-if="index >= 1 && items[0].item"
