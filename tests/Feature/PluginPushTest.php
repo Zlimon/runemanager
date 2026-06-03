@@ -107,6 +107,49 @@ it('records a UsernameHistory row when the supplied username drifts', function (
     expect($history->first()->new_username)->toBe('NewName');
 });
 
+it('adopts an existing seeded row (hash placeholder) when the username matches the same user', function () {
+    $user = freshUser('seed@test.local');
+
+    // Simulate the seeder having created the account with a placeholder hash
+    // before the real plugin connects with the actual Java-long hash.
+    $seeded = Account::query()->forceCreate([
+        'user_id' => $user->id,
+        'account_hash' => 'seed-placeholder-xxx',
+        'account_type' => 'normal',
+        'username' => 'Habski',
+        'rank' => 0,
+        'level' => 0,
+        'xp' => 0,
+    ]);
+
+    pushInventoryAs($user, '-3217384136573234808', 'Habski')->assertSuccessful();
+
+    expect(Account::count())->toBe(1);
+    $adopted = Account::find($seeded->id);
+    expect($adopted->account_hash)->toBe('-3217384136573234808');
+    expect($adopted->user_id)->toBe($user->id);
+});
+
+it('forbids adopting a username already owned by a different user', function () {
+    $owner = freshUser('owner@test.local');
+    $intruder = freshUser('intruder@test.local');
+
+    Account::query()->forceCreate([
+        'user_id' => $owner->id,
+        'account_hash' => 'seed-placeholder-yyy',
+        'account_type' => 'normal',
+        'username' => 'Habski',
+        'rank' => 0,
+        'level' => 0,
+        'xp' => 0,
+    ]);
+
+    pushInventoryAs($intruder, 'real-plugin-hash', 'Habski')->assertForbidden();
+
+    expect(Account::count())->toBe(1);
+    expect(Account::first()->user_id)->toBe($owner->id);
+});
+
 it('rejects with 403 when the hash is linked to a different user', function () {
     $userA = freshUser('a@test.local');
     $userB = freshUser('b@test.local');

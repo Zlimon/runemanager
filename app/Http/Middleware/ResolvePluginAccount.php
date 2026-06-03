@@ -63,15 +63,34 @@ class ResolvePluginAccount
         }
 
         if (! $account) {
-            $account = new Account;
-            $account->user_id = $user->id;
-            $account->account_hash = $hash;
-            $account->account_type = AccountTypesEnum::NORMAL;
-            $account->username = $username;
-            $account->rank = 0;
-            $account->level = 0;
-            $account->xp = 0;
-            $account->save();
+            // No hash match — fall through to a username lookup so the plugin can
+            // adopt an existing row whose hash is a placeholder (seeded data, or
+            // a previously-failed first push). The username column is globally
+            // unique, so either we find one row or none.
+            $byUsername = Account::where('username', $username)->first();
+
+            if ($byUsername && $byUsername->user_id !== $user->id) {
+                // Someone else owns this in-game name — don't let the caller hijack it.
+                return response()->json([
+                    'message' => 'This account is linked to a different user.',
+                ], 403);
+            }
+
+            if ($byUsername) {
+                $byUsername->account_hash = $hash;
+                $byUsername->save();
+                $account = $byUsername;
+            } else {
+                $account = new Account;
+                $account->user_id = $user->id;
+                $account->account_hash = $hash;
+                $account->account_type = AccountTypesEnum::NORMAL;
+                $account->username = $username;
+                $account->rank = 0;
+                $account->level = 0;
+                $account->xp = 0;
+                $account->save();
+            }
         } elseif ($account->username !== $username) {
             $this->recorder->record($account, $username);
             $account->refresh();
