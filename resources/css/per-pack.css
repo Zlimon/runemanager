@@ -150,12 +150,16 @@
  * darker bank/tab_selected.png where white text reads cleanly. Overrides
  * `.tab @apply text-gray-900 dark:text-white` from app.css with !important.
  */
-.resource-pack-tab {
+/* Two-class specificity to beat Tailwind's single-class `.bg-base-200`
+ * (also !important) that the Vue template applies to the active tab as a
+ * no-pack fallback. Both rules have !important, so cascade falls back to
+ * specificity — `.tab.resource-pack-tab` (2 classes) wins. */
+.tab.resource-pack-tab {
     background-color: transparent !important;
     color: theme(colors.gray-900) !important;
 }
-.resource-pack-tab.is-active,
-.resource-pack-tab.tab-active {
+.tab.resource-pack-tab.is-active,
+.tab.resource-pack-tab.tab-active {
     color: theme(colors.white) !important;
 }
 
