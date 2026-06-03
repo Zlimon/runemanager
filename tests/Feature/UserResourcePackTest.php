@@ -27,9 +27,9 @@ function freshPackUser(string $email = 'pack@test.local'): User
     ]);
 }
 
-function makePack(string $name): ResourcePack
+function makePack(string $name, array $overrides = []): ResourcePack
 {
-    return ResourcePack::query()->forceCreate([
+    return ResourcePack::query()->forceCreate(array_merge([
         'name' => $name,
         'alias' => ucfirst($name),
         'version' => '1.0.0',
@@ -37,7 +37,7 @@ function makePack(string $name): ResourcePack
         'url' => "https://example.test/{$name}.zip",
         'tags' => '',
         'dark_mode' => false,
-    ]);
+    ], $overrides));
 }
 
 it('rejects unauthenticated requests', function () {
@@ -151,6 +151,54 @@ it('plugin push: 202 + queues install when DB row exists but assets are missing'
         ->assertJsonPath('queued', true);
 
     Queue::assertPushed(FetchResourcePackJob::class, fn ($job) => $job->packName === 'sample-vanilla');
+    expect($user->fresh()->resource_pack_id)->toBe($pack->id);
+});
+
+it('plugin push: 202 + queues install when DB row is a pending stub (even with assets on disk)', function () {
+    // A previously installed pack survived a migrate:fresh / row purge — the
+    // CSS file sits on disk but the new row carries version=pending and
+    // background_color=null. Hitting the endpoint should re-run the install
+    // pipeline so the row gets metadata and the palette gets extracted.
+    $user = freshPackUser();
+    $stub = makePack('sample-vanilla', [
+        'version' => 'pending',
+        'background_color' => null,
+        'accent_color' => null,
+    ]);
+
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+
+    Sanctum::actingAs($user);
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'sample-vanilla'])
+        ->assertStatus(202)
+        ->assertJsonPath('queued', true)
+        ->assertJsonPath('installed', false);
+
+    Queue::assertPushed(FetchResourcePackJob::class, fn ($job) => $job->packName === 'sample-vanilla');
+    expect($user->fresh()->resource_pack_id)->toBe($stub->id);
+});
+
+it('plugin push: 200 + does not re-queue when pack row is fully populated', function () {
+    // Real installed pack — version is set + colours extracted — should NOT
+    // re-fetch on subsequent pushes.
+    $user = freshPackUser();
+    $pack = makePack('sample-vanilla', [
+        'version' => '1.0.0',
+        'background_color' => '#483f33',
+        'accent_color' => '#88827a',
+    ]);
+
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+
+    Sanctum::actingAs($user);
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'sample-vanilla'])
+        ->assertStatus(200)
+        ->assertJsonPath('queued', false)
+        ->assertJsonPath('installed', true);
+
+    Queue::assertNothingPushed();
     expect($user->fresh()->resource_pack_id)->toBe($pack->id);
 });
 

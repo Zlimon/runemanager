@@ -81,7 +81,13 @@ class UserResourcePackController extends Controller
         $user->resource_pack_id = $pack->id;
         $user->save();
 
-        $installed = $installer->isInstalled($name);
+        // "Installed" means BOTH assets on disk AND a fully populated DB row.
+        // A stub row (just created above, or carried over from a previous
+        // migrate:fresh while public/resource-packs/ survived) carries
+        // version=pending and null colour columns — the install pipeline needs
+        // to run to fetch metadata + extract the palette even if the CSS file
+        // happens to already be sitting on disk.
+        $installed = $installer->isInstalled($name) && $pack->version !== 'pending';
 
         if (! $installed) {
             FetchResourcePackJob::dispatch($name);
