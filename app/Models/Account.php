@@ -107,6 +107,7 @@ class Account extends Model
         'colosseum_glory', 'collections_logged', 'league_points', 'grid_points',
         'deadman_points', 'lunar_chests', 'barrows_chests',
         'bounty_hunter_hunter', 'bounty_hunter_rogue',
+        'bounty_hunter_legacy_hunter', 'bounty_hunter_legacy_rogue',
     ];
 
     public function getBossesAttribute(): SupportCollection
