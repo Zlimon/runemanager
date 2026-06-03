@@ -42,8 +42,11 @@ const activeSkill = ref(null);
                   class="flex items-center justify-center gap-2 box !bg-base-200 resource-pack-box p-1"
                   @mouseleave="activeSkill = null"
                   @mouseover="activeSkill = skill.slug">
-                <img :src="`/images/skill/${skill.slug}.webp`"
-                     class="h-6 w-6 object-contain"/>
+                <object data="https://not-existing-url/not-existing-image.jpeg" type="image/jpg">
+                    <img :src="`/images/skill/${skill.slug}.webp`"
+                         class="h-6 w-6 object-contain"/>
+                </object>
+
                 <span class="text-xs font-semibold capitalize">
                     {{ skill.level }}
                 </span>

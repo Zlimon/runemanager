@@ -32,15 +32,15 @@ class AccountSeeder extends Seeder
      */
     private array $demoAccounts = [
         'Matilizo', 'wewantrings', 'Nex What', 'Far89', 'CinnaBawns',
-        'Den falahid', 'Zuk Zillion', 'Dyla n fan', 'No Ni', 'Gronky444',
-        'Q R U I Z', 'R O A D MAX6', 'a Gemidish55', 'Ms Effect', 'Max And Ruby',
-        'l0ltit', 'l 54', 'WumbleTeed', 'A N U B I S', 'ZET0 KA1BA',
-        'Jxclusiive22', 'Dynosauur', 'Location', 'Darkrune256', 'Dharoks ass',
-        'Mrs Jesus', 'Spirit2k15', 'Kandarin Kin', 'Didg1t', 'Dessabrine',
-        'spongejoe2', 'Skullzj102', 'ante xoxo', 'zorminis', 'PokketSand',
-        'Fyressence', 'MezDoe', 'highlifeng9', 'Boonana95', 'Reshy HC',
-        'Bigschmoo12', 'Jo Coolest', 'Aquat1cz', 'Varang', 'LOPrGds',
-        'Wigwamjones', 'Unsponsored', 'Muswa', 'GoeieVanHaze', 'TobeTask',
+        //        'Den falahid', 'Zuk Zillion', 'Dyla n fan', 'No Ni', 'Gronky444',
+        //        'Q R U I Z', 'R O A D MAX6', 'a Gemidish55', 'Ms Effect', 'Max And Ruby',
+        //        'l0ltit', 'l 54', 'WumbleTeed', 'A N U B I S', 'ZET0 KA1BA',
+        //        'Jxclusiive22', 'Dynosauur', 'Location', 'Darkrune256', 'Dharoks ass',
+        //        'Mrs Jesus', 'Spirit2k15', 'Kandarin Kin', 'Didg1t', 'Dessabrine',
+        //        'spongejoe2', 'Skullzj102', 'ante xoxo', 'zorminis', 'PokketSand',
+        //        'Fyressence', 'MezDoe', 'highlifeng9', 'Boonana95', 'Reshy HC',
+        //        'Bigschmoo12', 'Jo Coolest', 'Aquat1cz', 'Varang', 'LOPrGds',
+        //        'Wigwamjones', 'Unsponsored', 'Muswa', 'GoeieVanHaze', 'TobeTask',
     ];
 
     public function run(HiscoresSync $sync): void

@@ -41,6 +41,31 @@
                          bottom -12px left, center;
 }
 
+/*
+ * Border-only variant of .resource-pack-dialog — paints the same dialog
+ * corners + edges but skips the center background fill. Lets the underlying
+ * element's background-color (e.g. .pack-bg) show through unchanged.
+ *
+ * Uses background-image / -repeat / -position longhand instead of the
+ * `background:` shorthand on purpose: shorthand would reset background-color
+ * to its initial value and wipe out whatever .pack-bg painted.
+ */
+.resource-pack-border {
+    background-image: url('dialog/bottom_line_mode_side_panel_corner_top_left.png'),
+                      url('dialog/bottom_line_mode_side_panel_corner_top_right.png'),
+                      url('dialog/bottom_line_mode_side_panel_corner_bottom_left.png'),
+                      url('dialog/bottom_line_mode_side_panel_corner_bottom_right.png'),
+                      url('dialog/bottom_line_mode_side_panel_edge_top.png'),
+                      url('dialog/bottom_line_mode_side_panel_edge_left.png'),
+                      url('dialog/bottom_line_mode_side_panel_edge_right.png'),
+                      url('dialog/bottom_line_mode_side_panel_edge_bottom.png');
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat,
+                       repeat-x, repeat-y, repeat-y, repeat-x;
+    background-position: top left, top right, bottom left, bottom right,
+                         top -13px left, left -13px top 10px, right -12px top 10px,
+                         bottom -12px left;
+}
+
 .resource-pack-iron-rivets {
     background: url('dialog/iron_rivets_corner_top_left.png') no-repeat,
                 url('dialog/iron_rivets_corner_top_right.png') no-repeat,

@@ -46,7 +46,7 @@ watch(() => page.props.dark_mode, applyDarkMode);
 
         <Banner/>
 
-        <div class="min-h-screen bg-beige-300 dark:bg-gray-800">
+        <div class="min-h-screen pack-bg">
             <nav @mouseleave="selectedHiscore = null"
                  class="border-gray-200 bg-beige-600 dark:border-gray-600 dark:bg-gray-900">
                 <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">

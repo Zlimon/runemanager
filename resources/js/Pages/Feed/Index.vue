@@ -64,7 +64,7 @@ const hasEvents = computed(() => props.events.length > 0);
 
                 <ul v-if="hasEvents" class="mt-4 space-y-2">
                     <li v-for="event in events" :key="event.id"
-                        class="bg-base-100 border border-base-300 rounded resource-pack-dialog p-3">
+                        class="rounded p-3 pack-bg resource-pack-border">
                         <div class="flex items-baseline justify-between">
                             <Link :href="route('accounts.show', { account: event.account.username })"
                                   class="flex items-center gap-2 font-semibold hover:underline">

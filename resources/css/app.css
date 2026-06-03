@@ -132,12 +132,15 @@ h6 {
  * theme.
  */
 .pack-bg {
-    background-color: var(--pack-bg, theme(colors.base-100));
+    /* Fallback mirrors the pre-pack body palette so dropping the original
+       bg-beige-300 / dark:bg-gray-800 doesn't regress the no-pack look. */
+    background-color: var(--pack-bg, theme(colors.beige-300));
+}
+.dark .pack-bg {
+    background-color: var(--pack-bg, theme(colors.gray-800));
 }
 
 .pack-bg-soft {
-    /* A slightly translucent overlay so the pack background reads as a tinted
-       version of base-200 rather than a flat fill — useful for inset panels. */
     background-color: var(--pack-bg, theme(colors.base-200));
 }
 

@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             $this->command->info('DatabaseSeeder: created 15 news posts.');
         }
 
-        $this->tryFetchDefaultResourcePack();
+        //        $this->tryFetchDefaultResourcePack();
     }
 
     /**
