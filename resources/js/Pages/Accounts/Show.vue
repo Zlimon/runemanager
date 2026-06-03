@@ -16,6 +16,7 @@ import Avatar from "@/Pages/Accounts/Partials/Avatar.vue";
 import Summary from "@/Pages/Accounts/Partials/Summary.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
 import Bank from "@/Components/Game/Bank.vue";
+import TabbedCard from "@/Components/TabbedCard.vue";
 
 const props = defineProps({
     account: {
@@ -54,6 +55,11 @@ const props = defineProps({
 
 const activeTab = ref('inventory');
 
+const inventoryTabs = [
+    { key: 'inventory', label: 'Inventory' },
+    { key: 'looting-bag', label: 'Looting bag' },
+];
+
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
 </script>
 
@@ -80,35 +86,20 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                             </div>
 
                             <!-- Vertical Inventory and Looting Bag tabs -->
-                            <div class="mt-4 tabs tabs-lifted" role="tablist">
-                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'inventory', 'is-active': activeTab === 'inventory' }"
-                                   class="tab resource-pack-tab"
-                                   role="tab"
-                                   @click="activeTab = 'inventory'">
-                                    Inventory
-                                </a>
-                                <a :class="{ 'tab-active !bg-base-200': activeTab === 'looting-bag', 'is-active': activeTab === 'looting-bag' }"
-                                   class="tab resource-pack-tab"
-                                   role="tab"
-                                   @click="activeTab = 'looting-bag'">
-                                    Looting bag
-                                </a>
-                            </div>
-
-                            <div class="flex flex-col bg-base-200 border-x border-b border-base-300 rounded-b resource-pack-dialog-tabbed p-3">
-                                <div v-show="activeTab === 'inventory'">
+                            <TabbedCard :tabs="inventoryTabs" v-model="activeTab" class="mt-4">
+                                <template #inventory>
                                     <div class="flex justify-end">
                                         <Freshness :updated-at="freshness.inventory" :stale-after-minutes="staleAfter" />
                                     </div>
                                     <Inventory :inventory="inventory" />
-                                </div>
-                                <div v-show="activeTab === 'looting-bag'">
+                                </template>
+                                <template #looting-bag>
                                     <div class="flex justify-end">
                                         <Freshness :updated-at="freshness.looting_bag" :stale-after-minutes="staleAfter" />
                                     </div>
                                     <LootingBag :looting-bag="lootingBag" />
-                                </div>
-                            </div>
+                                </template>
+                            </TabbedCard>
                         </div>
 
                         <div class="col-span-2">

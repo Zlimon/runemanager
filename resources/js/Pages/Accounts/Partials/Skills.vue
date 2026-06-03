@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { Link, usePage } from '@inertiajs/vue3';
+import TabbedCard from "@/Components/TabbedCard.vue";
 
 const props = defineProps({
     account: {
@@ -34,15 +35,11 @@ const skillIconSrc = (slug) =>
     packIcon('skill', slug) ?? `/images/skill/${slug}.png`;
 
 const bossIconSrc = (slug) =>
-    packIcon('boss', slug) ?? `/images/boss/${slug.replace(/_/g, '-')}.png`;
+    `/images/boss/${slug.replace(/_/g, '-')}.png`;
 
 // Clue tier slugs from the hiscore API are `clue_scrolls_{tier}`; the bundled
 // /images/clue/ files use `{tier}-treasure-trails.png`.
 const clueIconSrc = (slug) => {
-    const fromPack = packIcon('clue', slug);
-    if (fromPack) {
-        return fromPack;
-    }
     const tier = slug.replace(/^clue_scrolls_/, '');
     return `/images/clue/${tier}-treasure-trails.png`;
 };
@@ -78,7 +75,10 @@ const bossCells = computed(() => (props.account.bosses ?? []).map((boss) => ({
     href: route('hiscores.bosses.index', boss.slug),
     slug: boss.slug,
     label: boss.score > 0 ? boss.score.toLocaleString('en-US') : '—',
-    tooltip: { name: boss.name, value: `Rank ${boss.rank > 0 ? boss.rank.toLocaleString('en-US') : '—'}` },
+    tooltip: {
+        name: boss.name,
+        value: `Rank ${boss.rank > 0 ? boss.rank.toLocaleString('en-US') : '—'}`,
+    },
     iconSrc: () => bossIconSrc(boss.slug),
     fallback: '/images/boss/boss.png',
 })));
@@ -87,7 +87,10 @@ const clueCells = computed(() => (props.account.clues ?? []).map((clue) => ({
     href: route('hiscores.clues.index', clue.slug),
     slug: clue.slug,
     label: clue.score > 0 ? clue.score.toLocaleString('en-US') : '—',
-    tooltip: { name: `${clue.name} clues`, value: `Rank ${clue.rank > 0 ? clue.rank.toLocaleString('en-US') : '—'}` },
+    tooltip: {
+        name: `${clue.name} clues`,
+        value: `Rank ${clue.rank > 0 ? clue.rank.toLocaleString('en-US') : '—'}`,
+    },
     iconSrc: () => clueIconSrc(clue.slug),
     fallback: '/images/clue/clue.png',
 })));
@@ -110,32 +113,18 @@ const tabs = [
 </script>
 
 <template>
-    <div>
-        <!-- Sub-tab strip for switching between the hiscore categories. -->
-        <div class="tabs tabs-lifted mt-4" role="tablist">
-            <!-- `tab-active` is the DaisyUI class for the selected tab visual; the
-                 pack-side `.resource-pack-tab.tab-active` rule keys off the same
-                 class to swap in bank/tab_selected.png. No `!bg-base-200` here —
-                 it was the brown fallback bleeding through the pack texture. -->
-            <a v-for="tab in tabs" :key="tab.key"
-               class="tab resource-pack-tab"
-               :class="{ 'tab-active': activeTab === tab.key }"
-               role="tab"
-               @click="activeTab = tab.key">
-                {{ tab.label }}
-            </a>
-        </div>
-
+    <!-- Sub-tabs for switching between the hiscore categories; same chrome as
+         Show.vue's Inventory/Looting Bag via the shared TabbedCard. -->
+    <TabbedCard :tabs="tabs" v-model="activeTab">
         <!-- Fixed 72px-wide cells so the pack's tile_half_left/right.png pair
              (36px each) join seam-to-seam instead of stretching. flex-wrap
              keeps the row count flexible across screen widths. -->
-        <ul class="mt-2 flex flex-wrap justify-center gap-1"
+        <ul class="flex flex-wrap justify-center gap-1"
             :class="activeTab === 'bosses' ? 'max-h-96 overflow-y-auto' : ''">
             <li v-for="cell in cells" :key="cell.slug" class="relative w-[72px]">
                 <!-- `box` provides the no-pack bg + border + rounded; pack CSS
                      resets bg to transparent and paints the stats-tile texture
-                     in its place. !bg-base-200 was painting the same brown bleed
-                     as the tabs. -->
+                     in its place. -->
                 <Link :href="cell.href"
                       class="flex h-9 items-center justify-center gap-1 box resource-pack-box px-1"
                       @mouseleave="activeKey = null"
@@ -155,5 +144,5 @@ const tabs = [
                 </div>
             </li>
         </ul>
-    </div>
+    </TabbedCard>
 </template>
