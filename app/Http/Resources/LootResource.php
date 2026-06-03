@@ -34,12 +34,7 @@ class LootResource extends JsonResource
             }
         }
 
-        $itemsById = Item::select('_id', 'name', 'icon')
-            ->whereIn('_id', array_values(array_unique($itemIds)))
-            ->get()
-            ->keyBy('_id')
-            ->map(fn ($i) => $i->toArray())
-            ->all();
+        $itemsById = Item::lookupByOsrsIds(array_values(array_unique($itemIds)));
 
         return self::collection(
             collect($loots)->map(fn ($loot) => new self($loot, $itemsById)),

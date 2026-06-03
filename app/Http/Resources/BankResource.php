@@ -9,53 +9,30 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class BankResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        $bank = [];
         $allItemIds = collect($this->bank)
-            ->flatten(1) // Flatten to get all item arrays
-            ->pluck(0)   // Extract only the first element (item ID) of each array
-            ->unique()   // Ensure IDs are unique
-            ->toArray();
+            ->flatten(1)
+            ->pluck(0)
+            ->unique()
+            ->map(fn ($id) => (int) $id)
+            ->all();
 
-        // Fetch all required items in a single query
-        $items = Item::select('_id', 'name', 'lowalch', 'highalch', 'examine', 'icon')
-            ->whereIn('_id', $allItemIds)
-            ->get()
-            ->keyBy('_id');
+        $items = Item::lookupByOsrsIds($allItemIds);
 
+        $bank = [];
         foreach ($this->bank as $tabIndex => $tabs) {
-            $tabIndex = $tabIndex + 1;
-            $bank["tab-$tabIndex"] = [];
+            $tabKey = 'tab-'.($tabIndex + 1);
+            $bank[$tabKey] = [];
 
             foreach ($tabs as $itemIndex => $bankItem) {
-                $itemId = $bankItem[0];
-                $quantity = $bankItem[1];
+                $itemId = (int) $bankItem[0];
+                $quantity = (int) $bankItem[1];
 
-                // Lookup the item in the fetched items or use a dummy item
-                $dbItem = $items->get($itemId);
-                $item = $dbItem ? [
-                    '_id' => $dbItem->_id,
-                    'name' => $dbItem->name,
-                    'lowalch' => $dbItem->lowalch,
-                    'highalch' => $dbItem->highalch,
-                    'examine' => $dbItem->examine,
-                    'icon' => $dbItem->icon,
-                ] : [
-                    '_id' => 0,
-                    'name' => 'Dwarf remains',
-                    'lowalch' => 0,
-                    'highalch' => 0,
-                    'examine' => 'The body of a Dwarf savaged by Goblins.',
-                    'icon' => 'iVBORw0KGgoAAAANSUhEUgAAACQAAAAgCAYAAAB6kdqOAAACPElEQVR4Xs2XS0tCQRTHO5',
-                ];
-
-                $bank["tab-$tabIndex"][$itemIndex] = [
-                    'item' => $item,
+                $bank[$tabKey][$itemIndex] = [
+                    'item' => $items[$itemId] ?? null,
                     'quantity' => $quantity,
                 ];
             }

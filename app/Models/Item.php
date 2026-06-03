@@ -71,4 +71,64 @@ class Item extends Model
 
         return $doc ? (int) $doc['id'] : 0;
     }
+
+    /**
+     * Bulk lookup by OSRS item id (the document's `id` field, NOT Mongo's `_id`
+     * ObjectId). The Laravel-Mongo driver auto-aliases id↔_id in WHERE clauses,
+     * which makes Eloquent's where()/whereIn() against `id` silently match
+     * nothing — so we drop to a raw aggregation here.
+     *
+     * Returns an associative array keyed by integer OSRS id so call sites can
+     * do $items[$slotId] without a Collection wrapper. `_id` in the returned
+     * shape is the OSRS id (also as int) — the existing Vue components index
+     * tooltip state on `item._id`, so preserving that key keeps the contract.
+     *
+     * @param  list<int|string>  $osrsIds
+     * @return array<int, array{_id: int, name: string, examine: ?string, icon: ?string, lowalch: ?int, highalch: ?int}>
+     */
+    public static function lookupByOsrsIds(array $osrsIds): array
+    {
+        if ($osrsIds === []) {
+            return [];
+        }
+
+        // Documents store id as a string; coerce defensively.
+        $needles = array_values(array_unique(array_map(
+            fn ($id): string => (string) $id,
+            $osrsIds,
+        )));
+
+        $docs = (new static)->getConnection()
+            ->getDatabase()
+            ->selectCollection((new static)->getTable())
+            ->aggregate([
+                ['$match' => ['id' => ['$in' => $needles]]],
+                ['$project' => [
+                    '_id' => 0,
+                    'id' => 1,
+                    'name' => 1,
+                    'examine' => 1,
+                    'icon' => 1,
+                    'lowalch' => 1,
+                    'highalch' => 1,
+                ]],
+            ])
+            ->toArray();
+
+        $out = [];
+        foreach ($docs as $doc) {
+            $arr = (array) $doc;
+            $intId = (int) ($arr['id'] ?? 0);
+            $out[$intId] = [
+                '_id' => $intId,
+                'name' => (string) ($arr['name'] ?? ''),
+                'examine' => $arr['examine'] ?? null,
+                'icon' => $arr['icon'] ?? null,
+                'lowalch' => isset($arr['lowalch']) ? (int) $arr['lowalch'] : null,
+                'highalch' => isset($arr['highalch']) ? (int) $arr['highalch'] : null,
+            ];
+        }
+
+        return $out;
+    }
 }
