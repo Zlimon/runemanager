@@ -122,9 +122,12 @@ const tabs = [
             </a>
         </div>
 
-        <ul class="mt-2 grid grid-cols-7 gap-1"
+        <!-- Fixed 72px-wide cells so the pack's tile_half_left/right.png pair
+             (36px each) join seam-to-seam instead of stretching. flex-wrap
+             keeps the row count flexible across screen widths. -->
+        <ul class="mt-2 flex flex-wrap justify-center gap-1"
             :class="activeTab === 'bosses' ? 'max-h-96 overflow-y-auto' : ''">
-            <li v-for="cell in cells" :key="cell.slug" class="relative">
+            <li v-for="cell in cells" :key="cell.slug" class="relative w-[72px]">
                 <Link :href="cell.href"
                       class="flex h-9 items-center justify-center gap-1 box !bg-base-200 resource-pack-box px-1"
                       @mouseleave="activeKey = null"
@@ -133,7 +136,9 @@ const tabs = [
                          class="h-5 w-5 object-contain"
                          :alt="cell.tooltip.name"
                          @error="onIconError($event, cell.fallback)">
-                    <span class="text-xs font-semibold capitalize">{{ cell.label }}</span>
+                    <span class="text-xs font-semibold capitalize text-gray-900 dark:text-white">
+                        {{ cell.label }}
+                    </span>
                 </Link>
 
                 <div v-if="activeKey === cell.slug" class="box-tooltip">

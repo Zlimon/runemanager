@@ -116,20 +116,47 @@
     background-image: url('bank/tab_selected.png');
 }
 
-/* Small textured cell — skill stat tiles on Account/Show, generic chips.
- * Each in-game stat tile is a left+right half pair (36×36 each); we use
- * longhand background-* so the `background:` shorthand doesn't reset
- * background-size and break the 50% / 50% stretch. */
+/*
+ * Small textured cell — skill stat tiles on Account/Show, generic chips.
+ *
+ * Each in-game stat tile is a 72×36 pair built from two 36×36 self-contained
+ * halves (rounded on the outer side, straight on the inner). They join cleanly
+ * only at their natural 36px width; stretching distorts the rounded corner.
+ * Cells are pinned to w-[72px] in the Vue so the two halves meet exactly in
+ * the middle.
+ *
+ * The `box !bg-base-200` no-pack fallback on the cell gets overridden to
+ * transparent here so it doesn't paint a brown rectangle behind the texture.
+ * Text inside the cell forces white because the in-game stone tiles are dark.
+ */
 .resource-pack-box {
     background-image: url('stats/tile_half_left.png'), url('stats/tile_half_right.png');
     background-repeat: no-repeat, no-repeat;
     background-position: left center, right center;
-    background-size: 50% 100%, 50% 100%;
+    background-size: 36px 100%, 36px 100%;
+    background-color: transparent !important;
     border: 0 !important;
+    color: theme(colors.white) !important;
 }
 .resource-pack-box:hover {
     background-image: url('stats/tile_half_left_selected.png'),
                       url('stats/tile_half_right_selected.png');
+}
+
+/*
+ * Tab text colour follows the active state rather than the global dark-mode
+ * flag — inactive tabs paint the lighter bank/tab.png texture (typically pink
+ * or beige in the packs) where dark text reads cleanly, active tabs use the
+ * darker bank/tab_selected.png where white text reads cleanly. Overrides
+ * `.tab @apply text-gray-900 dark:text-white` from app.css with !important.
+ */
+.resource-pack-tab {
+    background-color: transparent !important;
+    color: theme(colors.gray-900) !important;
+}
+.resource-pack-tab.is-active,
+.resource-pack-tab.tab-active {
+    color: theme(colors.white) !important;
 }
 
 /*
