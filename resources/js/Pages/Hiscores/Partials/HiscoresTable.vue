@@ -1,5 +1,6 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
 
 defineProps({
     columns: {
@@ -11,6 +12,11 @@ defineProps({
         required: true,
     },
 });
+
+const page = usePage();
+
+// SPEC §7.3 — highlight the viewer's own accounts in the ranking.
+const ownUserId = computed(() => page.props.auth?.user?.id ?? null);
 
 const formatValue = (value, format) => {
     if (value === null || value === undefined) {
@@ -26,39 +32,35 @@ const formatValue = (value, format) => {
 </script>
 
 <template>
-    <table class="w-full text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
-        <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3">Name</th>
-                <th v-for="column in columns" :key="column.key" scope="col" class="px-6 py-3">
-                    {{ column.label }}
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-if="hiscores.length === 0">
-                <td :colspan="columns.length + 1"
-                    class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                    No hiscores found
-                </td>
-            </tr>
-            <tr v-for="hiscore in hiscores" :key="hiscore.account.username"
-                class="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600">
-                <th scope="row">
-                    <Link :href="route('accounts.show', hiscore.account)"
-                          class="flex items-center whitespace-nowrap px-6 py-4 text-gray-900 dark:text-white">
-                        <img :src="`data:image/jpeg;base64,${hiscore.account.user.icon}`"
-                             class="h-10 w-10 object-contain"
-                             alt="">
-                        <div class="ps-3">
-                            <div class="text-base font-semibold">{{ hiscore.account.username }}</div>
-                        </div>
-                    </Link>
-                </th>
-                <td v-for="column in columns" :key="column.key" class="px-6 py-4">
-                    {{ formatValue(hiscore[column.key], column.format) }}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="overflow-x-auto rounded pack-bg-card resource-pack-border">
+        <table class="table">
+            <thead>
+                <tr class="text-base-content/70">
+                    <th>Name</th>
+                    <th v-for="column in columns" :key="column.key">{{ column.label }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-if="hiscores.length === 0">
+                    <td :colspan="columns.length + 1" class="py-8 text-center text-base-content/60">
+                        No hiscores found
+                    </td>
+                </tr>
+                <tr v-for="hiscore in hiscores" :key="hiscore.account.username"
+                    :class="hiscore.account.user_id === ownUserId ? 'bg-primary/15' : 'hover:bg-base-200'">
+                    <td>
+                        <Link :href="route('accounts.show', hiscore.account)"
+                              class="flex items-center gap-3 whitespace-nowrap font-semibold text-base-content">
+                            <img :src="`data:image/jpeg;base64,${hiscore.account.user?.icon ?? hiscore.account.icon}`"
+                                 class="h-9 w-9 object-contain" alt="">
+                            {{ hiscore.account.username }}
+                        </Link>
+                    </td>
+                    <td v-for="column in columns" :key="column.key">
+                        {{ formatValue(hiscore[column.key], column.format) }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </template>

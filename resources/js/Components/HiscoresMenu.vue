@@ -45,6 +45,17 @@ const items = computed(() => lists.value[activeKey.value]);
 
         <div tabindex="0"
              class="dropdown-content z-50 mt-2 w-[32rem] max-w-[90vw] rounded border border-base-300 bg-base-200 p-3 shadow-xl resource-pack-dialog">
+            <Link :href="route('hiscores.loot.index')"
+                  class="mb-3 flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                <svg class="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="currentColor"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="12" cy="6" rx="8" ry="3" />
+                    <path d="M4 6v4c0 1.66 3.58 3 8 3s8-1.34 8-3V6c0 1.66-3.58 3-8 3S4 7.66 4 6Z" />
+                    <path d="M4 12v4c0 1.66 3.58 3 8 3s8-1.34 8-3v-4c0 1.66-3.58 3-8 3s-8-1.34-8-3Z" opacity="0.7" />
+                </svg>
+                Loot
+            </Link>
+
             <div role="tablist" class="tabs tabs-boxed mb-3">
                 <a v-for="category in categories" :key="category.key"
                    role="tab" class="tab"

@@ -5,9 +5,12 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CollectionHiscoreController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\LootHiscoreController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
+use App\Http\Resources\AnnouncementResource;
+use App\Models\Announcement;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -38,8 +41,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard', [
             // SPEC §9.2 — surface the latest active announcements on the homepage.
-            'announcements' => \App\Http\Resources\AnnouncementResource::collection(
-                \App\Models\Announcement::with('user:id,name')->active()->limit(5)->get(),
+            'announcements' => AnnouncementResource::collection(
+                Announcement::with('user:id,name')->active()->limit(5)->get(),
             )->resolve(),
         ]);
     })->name('dashboard');
@@ -77,5 +80,7 @@ Route::middleware([
         Route::get('/clues/{collection}', [CollectionHiscoreController::class, 'index'])
             ->defaults('category', 'clue')
             ->name('hiscores.clues.index');
+        // SPEC §7.1 — Loot leaderboard (total value).
+        Route::get('/loot', [LootHiscoreController::class, 'index'])->name('hiscores.loot.index');
     });
 });
