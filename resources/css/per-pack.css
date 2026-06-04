@@ -263,6 +263,12 @@
     border: 0 !important;
 }
 
+/* The modal footer paints a solid base-200 bar for no-pack viewers; under a
+ * pack, drop the fill so the textured .modal-box parchment runs through it. */
+.resource-pack-dialog-footer {
+    background-color: transparent !important;
+}
+
 /* Section panel — repeating chatbox background suited for large container
  * areas (the outer Account/Show card, the inner section bodies). */
 .resource-pack-panel {

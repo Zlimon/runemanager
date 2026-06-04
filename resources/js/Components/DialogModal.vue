@@ -40,7 +40,7 @@ const close = () => {
             </div>
         </div>
 
-        <div class="flex flex-row justify-end px-6 py-4 bg-base-200 text-end">
+        <div class="flex flex-row justify-end px-6 py-4 bg-base-200 text-end resource-pack-dialog-footer">
             <slot name="footer" />
         </div>
     </Modal>

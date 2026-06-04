@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
     show: {
@@ -17,81 +17,53 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close']);
-const dialog = ref();
-const showSlot = ref(props.show);
+const dialog = ref(null);
 
-watch(() => props.show, () => {
-    if (props.show) {
-        document.body.style.overflow = 'hidden';
-        showSlot.value = true;
+watch(() => props.show, (show) => {
+    if (show) {
         dialog.value?.showModal();
     } else {
-        document.body.style.overflow = null;
-        setTimeout(() => {
-            dialog.value?.close();
-            showSlot.value = false;
-        }, 200);
+        dialog.value?.close();
     }
 });
 
-const close = () => {
-    if (props.closeable) {
+onMounted(() => {
+    if (props.show) {
+        dialog.value?.showModal();
+    }
+});
+
+// Native <dialog> emits `close` when dismissed by the backdrop button or Esc;
+// keep the parent's `show` in sync (no-op when we closed it ourselves).
+const onClose = () => {
+    if (props.show) {
         emit('close');
     }
 };
 
-const closeOnEscape = (e) => {
-    if (e.key === 'Escape' && props.show) {
-        close();
+// Esc triggers `cancel`; block it for non-closeable modals.
+const onCancel = (e) => {
+    if (!props.closeable) {
+        e.preventDefault();
     }
 };
 
-onMounted(() => document.addEventListener('keydown', closeOnEscape));
-
-onUnmounted(() => {
-    document.removeEventListener('keydown', closeOnEscape);
-    document.body.style.overflow = null;
-});
-
-const maxWidthClass = computed(() => {
-    return {
-        'sm': 'sm:max-w-sm',
-        'md': 'sm:max-w-md',
-        'lg': 'sm:max-w-lg',
-        'xl': 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
-    }[props.maxWidth];
-});
+const maxWidthClass = computed(() => ({
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
+    '2xl': 'max-w-2xl',
+}[props.maxWidth]));
 </script>
 
 <template>
-    <dialog class="z-50 m-0 min-h-full min-w-full overflow-y-auto bg-transparent backdrop:bg-transparent" ref="dialog">
-        <div class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50" scroll-region>
-            <transition
-                enter-active-class="ease-out duration-300"
-                enter-from-class="opacity-0"
-                enter-to-class="opacity-100"
-                leave-active-class="ease-in duration-200"
-                leave-from-class="opacity-100"
-                leave-to-class="opacity-0"
-            >
-                <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                    <div class="absolute inset-0 bg-gray-500 opacity-75" />
-                </div>
-            </transition>
-
-            <transition
-                enter-active-class="ease-out duration-300"
-                enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enter-to-class="opacity-100 translate-y-0 sm:scale-100"
-                leave-active-class="ease-in duration-200"
-                leave-from-class="opacity-100 translate-y-0 sm:scale-100"
-                leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            >
-                <div v-show="show" class="mb-6 bg-base-100 rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto resource-pack-dialog" :class="maxWidthClass">
-                    <slot v-if="showSlot"/>
-                </div>
-            </transition>
+    <dialog ref="dialog" class="modal" @close="onClose" @cancel="onCancel">
+        <div class="modal-box w-full p-0" :class="maxWidthClass">
+            <slot />
         </div>
+        <form v-if="closeable" method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
     </dialog>
 </template>
