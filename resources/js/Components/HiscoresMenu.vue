@@ -1,0 +1,64 @@
+<script setup>
+import { computed, ref } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
+
+defineProps({
+    active: Boolean,
+});
+
+const page = usePage();
+
+// Category metadata drives the tab strip, the route, and the icon path so the
+// three lists share one template instead of three near-identical blocks.
+const categories = [
+    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => `/images/skill/${slug}.webp` },
+    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: (slug) => `/images/boss/${slug}.png` },
+    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: (slug) => `/images/clue/${slug}.png` },
+];
+
+const lists = computed(() => ({
+    skill: page.props.skills ?? [],
+    boss: page.props.bosses ?? [],
+    clue: page.props.clues ?? [],
+}));
+
+const activeKey = ref('skill');
+const activeCategory = computed(() => categories.find((c) => c.key === activeKey.value));
+const items = computed(() => lists.value[activeKey.value]);
+</script>
+
+<template>
+    <div class="dropdown">
+        <div tabindex="0" role="button"
+             class="flex items-center gap-1 py-2 px-3 rounded cursor-pointer md:p-0"
+             :class="active ? 'text-accent font-semibold' : 'text-base-content hover:text-accent'">
+            Hiscores
+            <svg class="h-2.5 w-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 10 6">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2" d="m1 1 4 4 4-4" />
+            </svg>
+        </div>
+
+        <div tabindex="0"
+             class="dropdown-content z-50 mt-2 w-[32rem] max-w-[90vw] rounded border border-base-300 bg-base-200 p-3 shadow-xl resource-pack-dialog">
+            <div role="tablist" class="tabs tabs-boxed mb-3">
+                <a v-for="category in categories" :key="category.key"
+                   role="tab" class="tab"
+                   :class="{ 'tab-active': activeKey === category.key }"
+                   @click="activeKey = category.key">
+                    {{ category.label }}
+                </a>
+            </div>
+
+            <div class="grid max-h-80 grid-cols-2 gap-1 overflow-y-auto sm:grid-cols-3">
+                <Link v-for="item in items" :key="item.slug"
+                      :href="route(activeCategory.route, item.slug)"
+                      class="flex items-center gap-2 rounded p-2 hover:bg-base-300">
+                    <img :src="activeCategory.icon(item.slug)" class="h-6 w-6 object-contain" :alt="item.name">
+                    <span class="truncate text-sm capitalize text-base-content">{{ item.name }}</span>
+                </Link>
+            </div>
+        </div>
+    </div>
+</template>
