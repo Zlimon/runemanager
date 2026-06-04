@@ -151,6 +151,17 @@ h6 {
     @apply bg-base-100 border border-base-300 rounded;
 }
 
+/* DaisyUI inputs fill with base-100 and carry only a faint border, so on a
+ * base-100 surface (and on the beige theme generally) they vanish. Give the
+ * form controls a clear base-300 outline. Packs override the border colour via
+ * per-pack.css when active. */
+.input,
+.select,
+.textarea,
+.checkbox {
+    @apply border border-base-300;
+}
+
 .box-tooltip {
     @apply z-10 absolute rounded px-3 py-2 bg-neutral text-neutral-content text-sm;
 }
