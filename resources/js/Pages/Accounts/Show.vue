@@ -17,6 +17,7 @@ import Summary from "@/Pages/Accounts/Partials/Summary.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
 import Bank from "@/Components/Game/Bank.vue";
 import TabbedCard from "@/Components/TabbedCard.vue";
+import Card from "@/Components/Card.vue";
 
 const props = defineProps({
     account: {
@@ -75,7 +76,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                     <Search />
                 </div>
 
-                <div class="mt-4 pack-bg-card border pack-accent-border rounded p-6 lg:p-8">
+                <Card class="mt-4" padding="p-6 lg:p-8">
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
                             <Header :account="account" />
@@ -154,7 +155,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AppLayout>
