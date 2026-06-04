@@ -22,7 +22,7 @@ use Illuminate\Support\Str;
  * @property int $rank
  * @property int $level
  * @property int $xp
- * @property int $online
+ * @property Carbon|null $last_seen_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
@@ -35,7 +35,6 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereLevel($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereOnline($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereUserId($value)

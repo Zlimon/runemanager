@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Account\CreateOrUpdateAccount;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -33,7 +34,7 @@ class AccountUpdate extends Command
     {
         $username = $this->option('username');
 
-        $createOrUpdateAccount = new \App\Actions\Account\CreateOrUpdateAccount;
+        $createOrUpdateAccount = new CreateOrUpdateAccount;
 
         if ($username) {
             $account = Account::whereUsername($username)->first();
@@ -93,7 +94,7 @@ class AccountUpdate extends Command
         //        }
 
         foreach ($accounts as $account) {
-            if ($account->online !== 0) {
+            if ($account->isOnline()) {
                 $this->warn(sprintf("'%s' is logged in to the game! Not updating.", $account->username));
 
                 continue;

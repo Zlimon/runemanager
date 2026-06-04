@@ -92,7 +92,6 @@ class AccountSeeder extends Seeder
             'rank' => 0,
             'level' => 0,
             'xp' => 0,
-            'online' => (bool) random_int(0, 1),
             'last_seen_at' => random_int(0, 1) ? now()->subSeconds(random_int(0, 120)) : now()->subHours(random_int(1, 48)),
         ]);
     }
