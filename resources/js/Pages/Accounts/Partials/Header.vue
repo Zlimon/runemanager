@@ -1,5 +1,6 @@
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import OnlineStatus from "@/Components/OnlineStatus.vue";
 import dayjs from "dayjs";
 import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 
@@ -27,6 +28,7 @@ defineProps({
                         <h1 class="text-xl font-bold md:text-3xl">
                             {{ account.username }}
                         </h1>
+                        <OnlineStatus :online="account.online" class="ms-3" />
                     </div>
 
                     <PrimaryButton type="button">

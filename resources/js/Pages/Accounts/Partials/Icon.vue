@@ -1,4 +1,6 @@
 <script setup>
+import OnlineStatus from "@/Components/OnlineStatus.vue";
+
 defineProps({
     account: {
         type: Object,
@@ -9,8 +11,8 @@ defineProps({
 
 <template>
     <div class="indicator">
-        <span v-show="account.online === 1"
-              class="indicator-item badge badge-secondary"/>
+        <OnlineStatus :online="account.online" :show-label="false"
+                      class="indicator-item" />
         <img :src="`data:image/jpeg;base64,${account.icon}`"
              class="h-16 w-16 rounded-full p-2 ring-2 ring-base-300">
     </div>
