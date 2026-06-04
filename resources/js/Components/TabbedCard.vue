@@ -31,6 +31,11 @@ const props = defineProps({
         type: String,
         default: "p-3",
     },
+    // Extra classes for each tab anchor (e.g. taller icon tabs on the Bank).
+    tabClass: {
+        type: String,
+        default: "",
+    },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -56,10 +61,12 @@ const hasNamedSlots = computed(() => props.tabs.some((tab) => slots[tab.key]));
         <div class="tabs tabs-lifted" role="tablist">
             <a v-for="tab in tabs" :key="tab.key"
                class="tab resource-pack-tab"
-               :class="{ 'tab-active': active === tab.key }"
+               :class="[tabClass, { 'tab-active': active === tab.key }]"
                role="tab"
                @click="active = tab.key">
-                {{ tab.label }}
+                <!-- Custom tab markup (e.g. the Bank's per-tab item icons);
+                     defaults to the plain text label. -->
+                <slot name="tab" :tab="tab" :active="active">{{ tab.label }}</slot>
             </a>
         </div>
 
