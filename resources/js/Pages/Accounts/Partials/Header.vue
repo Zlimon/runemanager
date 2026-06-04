@@ -1,5 +1,5 @@
 <script setup>
-import PackButton from "@/Components/PackButton.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import dayjs from "dayjs";
 import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 
@@ -29,11 +29,9 @@ defineProps({
                         </h1>
                     </div>
 
-                    <div class="flex shrink-0 items-center">
-                        <PackButton type="button">
-                            Update
-                        </PackButton>
-                    </div>
+                    <PrimaryButton type="button">
+                        Update
+                    </PrimaryButton>
                 </div>
 
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">

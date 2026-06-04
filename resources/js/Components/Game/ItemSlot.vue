@@ -12,7 +12,7 @@ const activeItem = ref(null);
 </script>
 
 <template>
-    <div class="h-14 w-14 rounded hover:bg-white/10"
+    <div class="h-14 w-14 rounded"
          @mouseleave="activeItem = null"
          @mouseover="item.item !== null ? activeItem = item.item?._id : null">
         <div v-if="item.item !== null">

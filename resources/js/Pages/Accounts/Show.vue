@@ -77,10 +77,10 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
                 </div>
 
                 <Card class="mt-4" padding="p-6 lg:p-8">
+                    <Header :account="account" />
+
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
-                            <Header :account="account" />
-
                             <div class="flex flex-col items-center">
                                 <div class="my-4 grid grid-cols-2 gap-4">
                                     <Avatar :avatar="avatar" />

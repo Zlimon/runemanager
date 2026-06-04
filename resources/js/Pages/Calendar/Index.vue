@@ -73,22 +73,22 @@ const dt = (iso) => dayjs(iso).format('ddd MMM D, YYYY h:mm A');
                 <ul v-else class="space-y-2">
                     <li v-for="event in upcoming" :key="event.id"
                         class="rounded p-4 pack-bg-card resource-pack-border">
-                        <div class="flex items-baseline justify-between gap-2">
-                            <div class="flex items-baseline gap-2">
-                                <span class="badge badge-primary">{{ event.event_type_label }}</span>
-                                <h3 class="font-semibold">{{ event.title }}</h3>
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-primary badge-lg">{{ event.event_type_label }}</span>
+                                <h3 class="text-base font-semibold">{{ event.title }}</h3>
                             </div>
                             <DangerButton v-if="currentUserId === event.created_by.id"
-                                          type="button" class="!py-1 !px-2 text-xs"
+                                          type="button" class="btn-xs"
                                           @click="destroy(event)">
                                 Delete
                             </DangerButton>
                         </div>
                         <p v-if="event.description"
-                           class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                           class="mt-1 text-sm text-base-content/70">
                             {{ event.description }}
                         </p>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <p class="mt-1 text-xs text-base-content/60">
                             {{ dt(event.starts_at) }}
                             <template v-if="event.ends_at">
                                 → {{ dt(event.ends_at) }}
@@ -102,11 +102,11 @@ const dt = (iso) => dayjs(iso).format('ddd MMM D, YYYY h:mm A');
                 <ul v-if="past.length > 0" class="space-y-2">
                     <li v-for="event in past" :key="event.id"
                         class="rounded p-4 opacity-70 pack-bg resource-pack-border">
-                        <div class="flex items-baseline gap-2">
-                            <span class="badge">{{ event.event_type_label }}</span>
-                            <h3 class="font-semibold">{{ event.title }}</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-lg">{{ event.event_type_label }}</span>
+                            <h3 class="text-base font-semibold">{{ event.title }}</h3>
                         </div>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <p class="mt-1 text-xs text-base-content/60">
                             {{ dt(event.starts_at) }} · by {{ event.created_by.name }}
                         </p>
                     </li>

@@ -199,6 +199,11 @@
                          top, left, right, bottom, center;
     border: 0 !important;
     box-shadow: none !important;
+    /* The DaisyUI variant's content colour (e.g. btn-error's near-black) is
+     * unreadable over the pack's button face, which varies per pack. Force a
+     * light cream with a hard shadow — readable on any texture, OSRS-style. */
+    color: #f0e6d2 !important;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.85);
 }
 .btn:hover,
 .btn:focus,
