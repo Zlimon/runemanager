@@ -22,6 +22,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Presence
+    |--------------------------------------------------------------------------
+    |
+    | An account is "online" while its last plugin heartbeat (accounts.last_seen_at)
+    | is within this window. The plugin pings roughly once a minute, so a few
+    | minutes of grace covers a missed beat without showing stale presence.
+    |
+    */
+
+    'presence' => [
+        'online_within_minutes' => (int) env('PRESENCE_ONLINE_WITHIN_MINUTES', 3),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Live Feed (SPEC §8)
     |--------------------------------------------------------------------------
     |

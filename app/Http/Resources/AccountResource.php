@@ -25,7 +25,7 @@ class AccountResource extends JsonResource
             'rank' => $this->rank,
             'level' => $this->level,
             'xp' => $this->xp,
-            'online' => $this->online,
+            'online' => $this->isOnline(),
             'skills' => $this->whenAppended('skills', function () {
                 return $this->skills;
             }),

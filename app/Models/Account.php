@@ -63,7 +63,19 @@ class Account extends Model
         return [
             'account_type' => AccountTypesEnum::class,
             'avatar_uploaded_at' => 'datetime',
+            'last_seen_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Online while the most recent plugin heartbeat is within the configured
+     * presence window (see config/runemanager.php). Derived rather than stored
+     * so it expires on its own when the plugin stops pinging.
+     */
+    public function isOnline(): bool
+    {
+        return $this->last_seen_at !== null
+            && $this->last_seen_at->gt(now()->subMinutes((int) config('runemanager.presence.online_within_minutes')));
     }
 
     public function user(): BelongsTo

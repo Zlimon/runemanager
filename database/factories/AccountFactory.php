@@ -33,6 +33,11 @@ class AccountFactory extends Factory
             'level' => $this->faker->numberBetween(32, 2277),
             'xp' => $this->faker->numberBetween(0, 200_000_000),
             'online' => $this->faker->boolean(),
+            // Presence is derived from last_seen_at: a recent stamp reads as
+            // online, an old one as offline.
+            'last_seen_at' => $this->faker->boolean()
+                ? now()->subSeconds($this->faker->numberBetween(0, 120))
+                : now()->subHours($this->faker->numberBetween(1, 48)),
         ];
     }
 }

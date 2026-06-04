@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\EquipmentController;
+use App\Http\Controllers\Api\HeartbeatController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\LootController;
 use App\Http\Controllers\Api\LootingBagController;
@@ -34,6 +35,8 @@ Route::middleware([
         Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');
         // Player 3D model from the RuneLite plugin (multipart OBJ + MTL).
         Route::post('/avatar', [AvatarController::class, 'update'])->name('api.plugin.avatar');
+        // Presence ping — stamps last_seen_at; "online" is derived from it.
+        Route::put('/heartbeat', [HeartbeatController::class, 'update'])->name('api.plugin.heartbeat');
     });
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it
