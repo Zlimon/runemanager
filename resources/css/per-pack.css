@@ -27,18 +27,18 @@
 }
 
 .resource-pack-dialog {
-    background: url('dialog/bottom_line_mode_side_panel_corner_top_left.png') no-repeat,
-                url('dialog/bottom_line_mode_side_panel_corner_top_right.png') no-repeat,
-                url('dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat,
-                url('dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,
-                url('dialog/bottom_line_mode_side_panel_edge_top.png') repeat-x,
-                url('dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y,
-                url('dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y,
-                url('dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x,
+    background: url('dialog/iron_rivets_corner_top_left.png') no-repeat,
+                url('dialog/iron_rivets_corner_top_right.png') no-repeat,
+                url('dialog/iron_rivets_corner_bottom_left.png') no-repeat,
+                url('dialog/iron_rivets_corner_bottom_right.png') no-repeat,
+                url('dialog/iron_rivets_edge_top.png') repeat-x,
+                url('dialog/iron_rivets_vertical.png') repeat-y,
+                url('dialog/iron_rivets_edge_right.png') repeat-y,
+                url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
-                         top -13px left, left -13px top 10px, right -12px top 10px,
-                         bottom -12px left, center;
+                         top -15px left, left -15px top 10px, right -15px top 10px,
+                         bottom -15px left, center;
 }
 
 /*
@@ -69,19 +69,19 @@
 /*
  * Variant for panels that sit directly under a row of tabs — drops the two
  * top corners and the top edge so the panel reads as one shape with the tabs
- * above instead of closing off with its own frame. Same dialog asset family
- * as .resource-pack-dialog.
+ * above instead of closing off with its own frame. Same iron-rivets asset
+ * family as .resource-pack-dialog.
  */
 .resource-pack-dialog-tabbed {
-    background: url('dialog/bottom_line_mode_side_panel_corner_bottom_left.png') no-repeat,
-                url('dialog/bottom_line_mode_side_panel_corner_bottom_right.png') no-repeat,
-                url('dialog/bottom_line_mode_side_panel_edge_left.png') repeat-y,
-                url('dialog/bottom_line_mode_side_panel_edge_right.png') repeat-y,
-                url('dialog/bottom_line_mode_side_panel_edge_bottom.png') repeat-x,
+    background: url('dialog/iron_rivets_corner_bottom_left.png') no-repeat,
+                url('dialog/iron_rivets_corner_bottom_right.png') no-repeat,
+                url('dialog/iron_rivets_vertical.png') repeat-y,
+                url('dialog/iron_rivets_edge_right.png') repeat-y,
+                url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: bottom left, bottom right,
-                         left -13px top, right -12px top,
-                         bottom -12px left, center;
+                         left -15px top, right -15px top,
+                         bottom -15px left, center;
 }
 
 .resource-pack-iron-rivets {
@@ -236,33 +236,68 @@
                          top 0 left, left 0 top 10px, right, bottom, center;
 }
 
+/*
+ * Themed scrollbars (WebKit/Blink). The thumb is a 3-slice — fixed top/bottom
+ * caps with a repeating middle — and the single-button arrows use the pack's
+ * arrow sprites. Both axes are covered using the matching horizontal_* assets.
+ */
 ::-webkit-scrollbar {
     width: 16px;
+    height: 16px;
 }
 
 ::-webkit-scrollbar-track {
     background: url('scrollbar/thumb_middle_dark.png');
+    background-size: 16px auto;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: url('scrollbar/thumb_top.png') no-repeat,
-                url('scrollbar/thumb_bottom.png') no-repeat,
-                url('scrollbar/thumb_middle.png');
-    background-position: top, bottom, center;
+    background: url('scrollbar/thumb_top.png') top center no-repeat,
+                url('scrollbar/thumb_bottom.png') bottom center no-repeat,
+                url('scrollbar/thumb_middle.png') center repeat-y;
+    background-size: 16px auto, 16px auto, 16px auto;
 }
 
-::-webkit-scrollbar-thumb:window-inactive {
-    background: rgba(255, 0, 0, 0.4);
+::-webkit-scrollbar-thumb:horizontal {
+    background: url('scrollbar/horizontal_thumb_left.png') left center no-repeat,
+                url('scrollbar/horizontal_thumb_right.png') right center no-repeat,
+                url('scrollbar/horizontal_thumb_middle.png') center repeat-x;
+    background-size: auto 16px, auto 16px, auto 16px;
 }
 
 ::-webkit-scrollbar-button:single-button:vertical:decrement {
-    background: url('scrollbar/arrow_up.png');
-}
-
-::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
-    border-color: transparent transparent #777777 transparent;
+    height: 16px;
+    background: url('scrollbar/arrow_up.png') center no-repeat;
+    background-size: contain;
 }
 
 ::-webkit-scrollbar-button:single-button:vertical:increment {
-    background: url('scrollbar/arrow_down.png');
+    height: 16px;
+    background: url('scrollbar/arrow_down.png') center no-repeat;
+    background-size: contain;
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    width: 16px;
+    background: url('scrollbar/arrow_left.png') center no-repeat;
+    background-size: contain;
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:increment {
+    width: 16px;
+    background: url('scrollbar/arrow_right.png') center no-repeat;
+    background-size: contain;
+}
+
+/*
+ * Firefox can't paint image-based scrollbars (no ::-webkit-scrollbar support),
+ * so fall back to colouring the scrollbar with the pack's palette. Scoped to
+ * "supports standard scrollbar props but NOT the webkit selector" so it only
+ * targets Firefox — adding scrollbar-color in Chrome would disable the textured
+ * webkit scrollbars above. --pack-accent / --pack-bg are emitted per pack.
+ */
+@supports (scrollbar-width: auto) and (not selector(::-webkit-scrollbar)) {
+    html {
+        scrollbar-color: var(--pack-accent, #94866d) var(--pack-bg, #e2d9bf);
+    }
 }
