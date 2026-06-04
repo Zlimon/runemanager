@@ -37,7 +37,7 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right -15px top 10px,
+                         top -15px left, left -15px top 10px, right top 10px,
                          bottom -15px left, center;
 }
 
@@ -80,7 +80,7 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: bottom left, bottom right,
-                         left -15px top, right -15px top,
+                         left -15px top, right top,
                          bottom -15px left, center;
 }
 
@@ -95,7 +95,7 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right -15px top 10px,
+                         top -15px left, left -15px top 10px, right top 10px,
                          bottom -15px left, center;
 }
 
@@ -257,7 +257,7 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right -15px top 10px,
+                         top -15px left, left -15px top 10px, right top 10px,
                          bottom -15px left, center;
     border: 0 !important;
 }
