@@ -153,13 +153,13 @@ const deleteApiToken = () => {
 
                                     <button
                                         v-if="availablePermissions.length > 0"
-                                        class="cursor-pointer ms-6 text-sm text-gray-400 underline"
+                                        class="cursor-pointer ms-6 text-sm link link-hover text-base-content/70"
                                         @click="manageApiTokenPermissions(token)"
                                     >
                                         Permissions
                                     </button>
 
-                                    <button class="cursor-pointer ms-6 text-sm text-red-500" @click="confirmApiTokenDeletion(token)">
+                                    <button class="cursor-pointer ms-6 text-sm link link-hover text-error" @click="confirmApiTokenDeletion(token)">
                                         Delete
                                     </button>
                                 </div>
