@@ -144,6 +144,7 @@ it('exposes a freshness prop with per-data-type timestamps and the staleness thr
                 ->where('looting_bag', null)
                 ->where('quests', null)
                 ->where('equipment', null)
+                ->where('avatar', null)
                 ->where('loot', null),
             ),
         );
