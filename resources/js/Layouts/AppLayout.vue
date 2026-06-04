@@ -10,7 +10,8 @@ defineProps({
 
 const page = usePage();
 
-const showingNavigationDropdown = ref(false);
+const mobileMenuOpen = ref(false);
+const hiscoresOpen = ref(false);
 const selectedHiscore = ref(null);
 
 const skills = computed(() => page.props.skills ?? []);
@@ -67,9 +68,10 @@ watch(() => page.props.dark_mode, applyDarkMode);
                             {{ page.props.app.name }}
                         </span>
                     </Link>
-                    <button data-collapse-toggle="mega-menu-full" type="button"
-                            class="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 md:hidden dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                            aria-controls="mega-menu-full" aria-expanded="false">
+                    <button type="button"
+                            class="btn btn-ghost btn-circle md:hidden"
+                            :aria-expanded="mobileMenuOpen"
+                            @click="mobileMenuOpen = !mobileMenuOpen">
                         <span class="sr-only">Open main menu</span>
                         <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                              viewBox="0 0 17 14">
@@ -77,8 +79,8 @@ watch(() => page.props.dark_mode, applyDarkMode);
                                   d="M1 1h15M1 7h15M1 13h15"/>
                         </svg>
                     </button>
-                    <div id="mega-menu-full"
-                         class="hidden w-full items-center justify-between font-medium md:order-1 md:flex md:w-auto">
+                    <div class="w-full items-center justify-between font-medium md:order-1 md:flex md:w-auto"
+                         :class="mobileMenuOpen ? 'flex' : 'hidden'">
                         <ul class="mt-4 flex flex-col rounded-lg border border-gray-100 p-4 bg-beige-100 rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 md:space-x-8 md:bg-beige-600 md:mt-0 md:flex-row md:border-0 md:p-0 md:dark:bg-gray-900">
                             <li>
                                 <ResponsiveNavLink :href="route('dashboard')"
@@ -89,8 +91,7 @@ watch(() => page.props.dark_mode, applyDarkMode);
                             <li>
                                 <ResponsiveNavLink :active="route().current('hiscores.*')"
                                                    as="button"
-                                                   id="hiscores-menu-dropdown-button"
-                                                   data-collapse-toggle="hiscores-menu-dropdown">
+                                                   @click="hiscoresOpen = !hiscoresOpen">
                                     <div class="flex items-center">
                                         Hiscores
                                         <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true"
@@ -154,8 +155,8 @@ watch(() => page.props.dark_mode, applyDarkMode);
                         </ul>
                     </div>
                 </div>
-                <div id="hiscores-menu-dropdown"
-                     class="hidden border-y border-gray-200 shadow-sm bg-beige-100 dark:border-gray-600 dark:bg-gray-800">
+                <div v-show="hiscoresOpen"
+                     class="border-y border-base-300 shadow-sm bg-base-200">
                     <div class="mx-auto flex max-w-screen-md justify-between px-4 py-5 text-gray-900 dark:text-white md:px-6">
                         <div @mouseover="selectedHiscore = 'skill'"
                              class="h-20 w-20 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500 bg-[url('/images/skill/total.webp')] bg-center bg-no-repeat bg-[length:40px_40px]"
