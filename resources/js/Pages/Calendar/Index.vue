@@ -9,7 +9,6 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
-import Select from "@/Components/Select.vue";
 import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
@@ -53,10 +52,6 @@ const destroy = (event) => {
 };
 
 const dt = (iso) => dayjs(iso).format('ddd MMM D, YYYY h:mm A');
-
-const eventTypeOptions = computed(() =>
-    props.eventTypes.map((t) => ({ label: t.label, value: t.value })),
-);
 </script>
 
 <template>
@@ -136,11 +131,13 @@ const eventTypeOptions = computed(() =>
 
                     <div>
                         <InputLabel for="event-type" value="Type" />
-                        <Select id="event-type"
+                        <select id="event-type"
                                 v-model="form.event_type"
-                                :options="eventTypeOptions"
-                                :optionObject="true"
-                                class="mt-1 block w-full" />
+                                class="select select-bordered mt-1 block w-full">
+                            <option v-for="type in eventTypes" :key="type.value" :value="type.value">
+                                {{ type.label }}
+                            </option>
+                        </select>
                         <InputError v-if="form.errors.event_type" :messages="form.errors.event_type" />
                     </div>
 
