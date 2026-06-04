@@ -137,6 +137,11 @@ class User extends Authenticatable
         return $this->hasMany(CalendarEvent::class);
     }
 
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
+    }
+
     public function getIconAttribute(): ?string
     {
         return data_get(Item::lookupByOsrsId($this->icon_id), 'icon');

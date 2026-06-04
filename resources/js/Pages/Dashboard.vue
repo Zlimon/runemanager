@@ -1,6 +1,14 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
+import dayjs from 'dayjs';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Welcome from '@/Components/Welcome.vue';
+import Card from '@/Components/Card.vue';
+
+defineProps({
+    announcements: { type: Array, default: () => [] },
+});
+
+const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
 </script>
 
 <template>
@@ -37,9 +45,28 @@ import Welcome from '@/Components/Welcome.vue';
             </div>
         </section>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div v-if="announcements.length" class="py-12">
+            <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+                <div class="flex items-baseline justify-between">
+                    <h2 class="header-chatbox-sword text-xl font-bold">Announcements</h2>
+                    <Link :href="route('announcements.index')" class="link link-hover text-sm text-base-content/70">
+                        View all
+                    </Link>
+                </div>
 
+                <ul class="mt-4 space-y-4">
+                    <li v-for="announcement in announcements" :key="announcement.id">
+                        <Card padding="p-4">
+                            <h3 class="text-base font-semibold">{{ announcement.title }}</h3>
+                            <p class="mt-2 whitespace-pre-line text-sm text-base-content/80">
+                                {{ announcement.body }}
+                            </p>
+                            <p class="mt-2 text-xs text-base-content/60">
+                                {{ dt(announcement.created_at) }} · by {{ announcement.created_by.name }}
+                            </p>
+                        </Card>
+                    </li>
+                </ul>
             </div>
         </div>
     </AppLayout>

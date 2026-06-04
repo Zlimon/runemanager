@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\SkillHiscoreController;
@@ -26,13 +27,21 @@ Route::get('/feed', [FeedController::class, 'index'])->name('feed.index');
 // SPEC §10 — calendar viewing is public; mutation routes are auth-gated below.
 Route::get('/calendar', [CalendarEventController::class, 'index'])->name('calendar.index');
 
+// SPEC §9 — announcements are viewable in all modes; mutation is auth-gated below.
+Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('Dashboard', [
+            // SPEC §9.2 — surface the latest active announcements on the homepage.
+            'announcements' => \App\Http\Resources\AnnouncementResource::collection(
+                \App\Models\Announcement::with('user:id,name')->active()->limit(5)->get(),
+            )->resolve(),
+        ]);
     })->name('dashboard');
 
     Route::prefix('/accounts')->group(function () {
@@ -45,6 +54,11 @@ Route::middleware([
     Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
     Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])
         ->name('calendar.destroy');
+
+    // SPEC §9 — admins create/delete announcements (role checks land with §3.4 + §12).
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+        ->name('announcements.destroy');
 
     // Per-user resource pack override (instance-global pack is set by the
     // resourcepack:switch artisan, not this endpoint).
