@@ -241,6 +241,20 @@
  * caps with a repeating middle — and the single-button arrows use the pack's
  * arrow sprites. Both axes are covered using the matching horizontal_* assets.
  */
+
+/*
+ * DaisyUI sets `scrollbar-color` on :root, and Chrome 121+ ignores the legacy
+ * ::-webkit-scrollbar pseudo-elements whenever a non-auto scrollbar-color is in
+ * effect (it inherits, so it reaches in-page scrollers too). Reset it to auto —
+ * only in engines that actually support ::-webkit-scrollbar — so the textured
+ * scrollbars below take effect. Firefox keeps its own scrollbar-color block.
+ */
+@supports selector(::-webkit-scrollbar) {
+    :root {
+        scrollbar-color: auto !important;
+    }
+}
+
 ::-webkit-scrollbar {
     width: 16px;
     height: 16px;
