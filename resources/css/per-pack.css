@@ -37,8 +37,8 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right top 10px,
-                         bottom -15px left, center;
+                         top, left, right,
+                         bottom, center;
 }
 
 /*
@@ -80,8 +80,8 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: bottom left, bottom right,
-                         left -15px top, right top,
-                         bottom -15px left, center;
+                         left, right,
+                         bottom, center;
 }
 
 .resource-pack-iron-rivets {
@@ -95,8 +95,8 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right top 10px,
-                         bottom -15px left, center;
+                         top, left, right,
+                         bottom, center;
 }
 
 /* Tabs — Inventory / Looting bag header, Bank per-tab strip, anywhere the UI
@@ -257,8 +257,8 @@
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right top 10px,
-                         bottom -15px left, center;
+                         top, left, right,
+                         bottom, center;
     border: 0 !important;
 }
 .menu,
