@@ -22,12 +22,14 @@ class CreateAccountsTable extends Migration
         Schema::create('accounts', function (Blueprint $table) use ($accountTypes) {
             $table->id();
             $table->foreignId('user_id')->constrained();
+            $table->string('account_hash')->nullable()->unique()->after('user_id');
             $table->enum('account_type', $accountTypes);
             $table->string('username', 13)->unique();
             $table->integer('rank')->default(0);
             $table->integer('level')->default(32); // Minimum total level
             $table->bigInteger('xp')->default(0);
             $table->boolean('online')->default(false);
+            $table->timestamp('avatar_uploaded_at')->nullable()->after('xp');
             $table->timestamps();
         });
     }
