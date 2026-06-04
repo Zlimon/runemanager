@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
@@ -37,6 +38,10 @@ Route::middleware([
         Route::post('/avatar', [AvatarController::class, 'update'])->name('api.plugin.avatar');
         // Presence ping — stamps last_seen_at; "online" is derived from it.
         Route::put('/heartbeat', [HeartbeatController::class, 'update'])->name('api.plugin.heartbeat');
+        // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
+        Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
+        Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])
+            ->name('api.plugin.announcements.acknowledge');
     });
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -39,6 +40,15 @@ class Announcement extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * OSRS accounts that have seen this announcement in-game (so the plugin
+     * doesn't show it again). SPEC §9.2.
+     */
+    public function acknowledgedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(Account::class, 'announcement_account')->withTimestamps();
     }
 
     /**
