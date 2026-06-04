@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CalendarEventController;
+use App\Http\Controllers\CollectionHiscoreController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -57,23 +57,11 @@ Route::middleware([
 
     Route::prefix('/hiscores')->group(function () {
         Route::get('/skills/{skill}', [SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
-        Route::get('/bosses/{boss}', function () {
-            $boss = $this->router->current()->parameters['boss'];
-
-            if (! isset($boss)) {
-                abort(404);
-            }
-
-            return App::call('\App\Http\Controllers\CollectionHiscoreController@index', ['category' => 'boss', 'collection' => $boss]);
-        })->name('hiscores.bosses.index');
-        Route::get('/clues/{clue}', function () {
-            $clue = $this->router->current()->parameters['clue'];
-
-            if (! isset($clue)) {
-                abort(404);
-            }
-
-            return App::call('\App\Http\Controllers\CollectionHiscoreController@index', ['category' => 'clue', 'collection' => $clue]);
-        })->name('hiscores.clues.index');
+        Route::get('/bosses/{collection}', [CollectionHiscoreController::class, 'index'])
+            ->defaults('category', 'boss')
+            ->name('hiscores.bosses.index');
+        Route::get('/clues/{collection}', [CollectionHiscoreController::class, 'index'])
+            ->defaults('category', 'clue')
+            ->name('hiscores.clues.index');
     });
 });
