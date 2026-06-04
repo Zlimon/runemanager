@@ -49,7 +49,11 @@ class HandleInertiaRequests extends Middleware
         $packId = $request->user()?->effectiveResourcePackId()
             ?? SettingHelper::getSetting('resource_pack_id');
         $pack = $packId ? ResourcePack::find($packId) : null;
-        $darkMode = (bool) ($pack?->dark_mode);
+
+        // A pack (user or instance-global) carries its own dark_mode and wins;
+        // only when no pack is in effect does the user's own preference apply,
+        // and only then may they toggle it.
+        $darkMode = $pack ? (bool) $pack->dark_mode : (bool) $request->user()?->dark_mode;
 
         return array_merge(parent::share($request), [
             'app' => [
@@ -57,6 +61,7 @@ class HandleInertiaRequests extends Middleware
                 //                'url' => config('app.url'),
             ],
             'dark_mode' => $darkMode,
+            'can_toggle_dark_mode' => $request->user() !== null && $pack === null,
             'pack' => $pack ? [
                 'name' => $pack->name,
                 'version' => $pack->updated_at?->timestamp,

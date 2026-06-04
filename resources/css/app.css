@@ -8,6 +8,14 @@
     themes: false;
 }
 
+/*
+ * Two base themes, both modelled on the OSRS Wiki:
+ *   - runemanager       (light) — the wiki's brown/beige parchment palette
+ *   - runemanager-dark  (dark)  — the wiki's dark-blue palette
+ * Selected via the `data-theme` attribute set on <html> in AppLayout.vue, which
+ * tracks the effective dark_mode flag. Resource packs layer their textures over
+ * whichever base theme is active.
+ */
 @plugin "daisyui/theme" {
     name: "runemanager";
     default: true;
@@ -33,6 +41,33 @@
     --color-warning-content: #110500;
     --color-error: #F35248;
     --color-error-content: #140202;
+}
+
+@plugin "daisyui/theme" {
+    name: "runemanager-dark";
+    default: false;
+    prefersdark: false;
+    color-scheme: dark;
+    --color-primary: #5D8BC7;
+    --color-primary-content: #0B1118;
+    --color-secondary: #6FA890;
+    --color-secondary-content: #0B1118;
+    --color-accent: #E0A93B;
+    --color-accent-content: #1A1206;
+    --color-neutral: #16212E;
+    --color-neutral-content: #E8EDF2;
+    --color-base-100: #2A3B4D;
+    --color-base-200: #223141;
+    --color-base-300: #1A2735;
+    --color-base-content: #D9E1EA;
+    --color-info: #3B82F6;
+    --color-info-content: #04122B;
+    --color-success: #22C55E;
+    --color-success-content: #00120A;
+    --color-warning: #D97706;
+    --color-warning-content: #110500;
+    --color-error: #EF4444;
+    --color-error-content: #150202;
 }
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";

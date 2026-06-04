@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\SkillHiscoreController;
+use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
@@ -49,6 +50,10 @@ Route::middleware([
     // resourcepack:switch artisan, not this endpoint).
     Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
         ->name('user.resource-pack.update');
+
+    // Per-user light/dark preference (ignored while a pack is in effect).
+    Route::put('/user/dark-mode', [UserDarkModeController::class, 'update'])
+        ->name('user.dark-mode.update');
 
     Route::prefix('/hiscores')->group(function () {
         Route::get('/skills/{skill}', [SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
