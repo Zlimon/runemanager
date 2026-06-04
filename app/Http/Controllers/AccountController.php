@@ -82,6 +82,8 @@ class AccountController extends Controller
 
             'quests' => fn () => $account->quests,
 
+            'avatar' => fn () => $account->avatarPayload(),
+
             // SPEC §5.2 Loot — append-only history. Latest 25 drops with hydrated
             // item details for the recent-loot panel.
             'recentLoot' => fn () => LootResource::collectionWith($account->recentLoot(25))->resolve(),
@@ -99,6 +101,7 @@ class AccountController extends Controller
                 'looting_bag' => optional($account->lootingBag)->updated_at?->toIso8601String(),
                 'quests' => optional($account->quests)->updated_at?->toIso8601String(),
                 'equipment' => optional($account->equipment)->updated_at?->toIso8601String(),
+                'avatar' => $account->avatar_uploaded_at?->toIso8601String(),
                 'loot' => $account->latestLootKilledAt()?->toIso8601String(),
                 'stale_after_minutes' => (int) config('runemanager.freshness.stale_after_minutes'),
             ],

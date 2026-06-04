@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\InventoryController;
@@ -31,6 +32,8 @@ Route::middleware([
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
         // Loot is append-only — POST, not the snapshot PUT used by the others.
         Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');
+        // Player 3D model from the RuneLite plugin (multipart OBJ + MTL).
+        Route::post('/avatar', [AvatarController::class, 'update'])->name('api.plugin.avatar');
     });
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it

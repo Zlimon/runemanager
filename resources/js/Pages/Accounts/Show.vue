@@ -39,6 +39,10 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    avatar: {
+        type: Object,
+        default: null,
+    },
     collectionLog: {
         type: Object,
         default: null,
@@ -78,7 +82,7 @@ const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
 
                             <div class="flex flex-col items-center">
                                 <div class="my-4 grid grid-cols-2 gap-4">
-                                    <Avatar :account="account" />
+                                    <Avatar :avatar="avatar" />
                                     <Equipment :account="account" />
                                 </div>
 

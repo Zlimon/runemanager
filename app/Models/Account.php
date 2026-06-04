@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -61,6 +62,7 @@ class Account extends Model
     {
         return [
             'account_type' => AccountTypesEnum::class,
+            'avatar_uploaded_at' => 'datetime',
         ];
     }
 
@@ -77,6 +79,32 @@ class Account extends Model
     public function hiscore(): HasOne
     {
         return $this->hasOne(AccountHiscore::class);
+    }
+
+    /**
+     * Public URLs for the player 3D model uploaded by the RuneLite plugin,
+     * or null when no avatar has been pushed yet. The MTL is optional (colour-
+     * only exports may omit it). ?v= busts the browser cache on re-upload.
+     *
+     * @return array{obj_url: string, mtl_url: ?string, updated_at: string}|null
+     */
+    public function avatarPayload(): ?array
+    {
+        if (! $this->avatar_uploaded_at) {
+            return null;
+        }
+
+        $disk = Storage::disk('public');
+        $directory = "avatars/{$this->id}";
+        $version = $this->avatar_uploaded_at->timestamp;
+
+        return [
+            'obj_url' => $disk->url("{$directory}/avatar.obj")."?v={$version}",
+            'mtl_url' => $disk->exists("{$directory}/avatar.mtl")
+                ? $disk->url("{$directory}/avatar.mtl")."?v={$version}"
+                : null,
+            'updated_at' => $this->avatar_uploaded_at->toIso8601String(),
+        ];
     }
 
     public function usernameHistory(): HasMany
