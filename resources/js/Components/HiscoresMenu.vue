@@ -9,11 +9,14 @@ defineProps({
 const page = usePage();
 
 // Category metadata drives the tab strip, the route, and the icon path so the
-// three lists share one template instead of three near-identical blocks.
+// three lists share one template instead of three near-identical blocks. Icon
+// paths mirror the bundled /images conventions: skills are plain png, boss
+// slugs are underscore from the hiscores API but the files use dashes, and clue
+// tiers map to {tier}-treasure-trails.png.
 const categories = [
-    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => `/images/skill/${slug}.webp` },
-    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: (slug) => `/images/boss/${slug}.png` },
-    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: (slug) => `/images/clue/${slug}.png` },
+    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => `/images/skill/${slug}.png` },
+    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png` },
+    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: (slug) => `/images/clue/${slug.replace('clue_scrolls_', '')}-treasure-trails.png` },
 ];
 
 const lists = computed(() => ({

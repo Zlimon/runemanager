@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Helpers\SettingHelper;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
-use App\Models\Collection;
 use App\Models\ResourcePack;
 use App\Models\Skill;
 use Illuminate\Http\Request;
@@ -67,8 +66,23 @@ class HandleInertiaRequests extends Middleware
                 'version' => $pack->updated_at?->timestamp,
             ] : null,
             'skills' => fn () => Skill::distinct()->select('name', 'slug')->get()->toArray() ?? [],
-            'bosses' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 5)->get()->toArray() ?? [],
-            'clues' => fn () => Collection::distinct()->select('name', 'slug')->where('category_id', 3)->get()->toArray() ?? [],
+
+            // Boss list for the Hiscores nav — derived from a representative
+            // account's hiscore activities (the OSRS API returns the full set on
+            // every account), reusing the Account boss filter. Empty until at
+            // least one account has synced.
+            'bosses' => function () {
+                $account = Account::query()->whereHas('hiscore')->with('hiscore')->first();
+
+                return $account
+                    ? $account->bosses->map(fn ($boss) => ['name' => $boss['name'], 'slug' => $boss['slug']])->all()
+                    : [];
+            },
+
+            // Clues are the fixed seven tiers regardless of synced data.
+            'clues' => fn () => collect(['beginner', 'easy', 'medium', 'hard', 'elite', 'master', 'all'])
+                ->map(fn (string $tier) => ['name' => ucfirst($tier), 'slug' => "clue_scrolls_{$tier}"])
+                ->all(),
 
             // Header typeahead — only evaluated when a partial reload includes it
             // (router.reload({ only: ['accountSearchResults'], data: { account_search: ... } })).
