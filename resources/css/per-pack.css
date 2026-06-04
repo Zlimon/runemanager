@@ -176,6 +176,93 @@
     border: 0 !important;
 }
 
+/*
+ * --- DaisyUI component textures ---
+ * Keyed off DaisyUI's own class names so every component picks up the active
+ * pack automatically. Only loaded when a pack is active, so the plain
+ * runemanager / runemanager-dark themes remain the no-pack fallback.
+ */
+
+/* Buttons — 9-slice metal frame from button/, dialog fill in the centre; the
+ * _selected sprites + brighter fill on hover/focus/active. */
+.btn {
+    background: url('button/corner_top_left.png') no-repeat,
+                url('button/corner_top_right.png') no-repeat,
+                url('button/corner_bottom_left.png') no-repeat,
+                url('button/corner_bottom_right.png') no-repeat,
+                url('button/edge_top.png') repeat-x,
+                url('button/edge_left.png') repeat-y,
+                url('button/edge_right.png') repeat-y,
+                url('button/edge_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top, left, right, bottom, center;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+.btn:hover,
+.btn:focus,
+.btn:focus-visible,
+.btn:active,
+.btn.btn-active {
+    background: url('button/corner_top_left_selected.png') no-repeat,
+                url('button/corner_top_right_selected.png') no-repeat,
+                url('button/corner_bottom_left_selected.png') no-repeat,
+                url('button/corner_bottom_right_selected.png') no-repeat,
+                url('button/edge_top_selected.png') repeat-x,
+                url('button/edge_left_selected.png') repeat-y,
+                url('button/edge_right_selected.png') repeat-y,
+                url('button/edge_bottom_selected.png') repeat-x,
+                url('dialog/background_brighter.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top, left, right, bottom, center;
+}
+
+/* Checkboxes — swap DaisyUI's drawn box for the in-game checkbox sprites. */
+.checkbox {
+    -webkit-appearance: none;
+    appearance: none;
+    background: url('options/checkbox_empty.png') center / contain no-repeat;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+.checkbox:checked {
+    background: url('options/checkbox_checked_red.png') center / contain no-repeat;
+}
+
+/* Text fields — no dedicated in-game sprite, so just tint the border with the
+ * pack accent and let the base theme handle the fill (keeps text legible and
+ * preserves the select chevron). */
+.input,
+.select,
+.textarea {
+    border-color: var(--pack-accent, #94866d) !important;
+}
+
+/* Modals reuse the dialog (iron-rivet) frame; menus / dropdowns / alerts take
+ * the dialog parchment fill. */
+.modal-box {
+    background: url('dialog/iron_rivets_corner_top_left.png') no-repeat,
+                url('dialog/iron_rivets_corner_top_right.png') no-repeat,
+                url('dialog/iron_rivets_corner_bottom_left.png') no-repeat,
+                url('dialog/iron_rivets_corner_bottom_right.png') no-repeat,
+                url('dialog/iron_rivets_edge_top.png') repeat-x,
+                url('dialog/iron_rivets_vertical.png') repeat-y,
+                url('dialog/iron_rivets_edge_right.png') repeat-y,
+                url('dialog/iron_rivets_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top -15px left, left -15px top 10px, right -15px top 10px,
+                         bottom -15px left, center;
+    border: 0 !important;
+}
+.menu,
+.dropdown-content,
+.alert {
+    background: url('dialog/background.png');
+    border: 0 !important;
+}
+
 /* Section panel — repeating chatbox background suited for large container
  * areas (the outer Account/Show card, the inner section bodies). */
 .resource-pack-panel {
