@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
 jobs:
   build:
     runs-on: "ubuntu-22.04"
@@ -59,9 +59,9 @@ jobs:
           path: ~/artifacts.tar.gz
           retention-days: 1
 
-  deploy-main:
+  deploy-master:
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: "ubuntu-22.04"
     steps:
       - name: Download deployment artifacts
