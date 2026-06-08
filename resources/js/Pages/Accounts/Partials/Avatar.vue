@@ -17,6 +17,11 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    // Taller, full-column viewer — used for the combat tableau (player + NPC).
+    expanded: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const sceneContainer = ref(null);
@@ -242,7 +247,8 @@ onBeforeUnmount(disposeScene);
          the pack background + border when a pack is active, otherwise it falls
          back to the bg-base-200 + border. The WebGL canvas clears transparent so
          the texture shows through behind the model. -->
-    <div class="relative h-64 bg-base-200 border border-base-300 rounded resource-pack-dialog p-2">
+    <div class="relative bg-base-200 border border-base-300 rounded resource-pack-dialog p-2"
+         :class="expanded ? 'h-[30rem]' : 'h-64'">
         <!-- Canvas host: visible once we have a model and it hasn't errored. -->
         <div v-show="avatar && status !== 'error'" ref="sceneContainer" class="h-full w-full" />
 

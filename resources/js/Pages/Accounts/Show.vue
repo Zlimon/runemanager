@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { Deferred, router } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CollectionLog from "@/Components/Game/CollectionLog.vue";
@@ -89,6 +89,12 @@ const inventoryTabs = [
 
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
 
+// When the avatar includes an opponent, give it the whole column and tuck the
+// equipment away (toggleable above the model) so the fight has room to breathe.
+const hasNpc = computed(() => !!props.avatar?.npc_obj_url);
+const showEquipment = ref(true);
+watch(hasNpc, (npc) => { showEquipment.value = !npc; }, { immediate: true });
+
 // Live updates: the backend broadcasts a DataUpdated event on the account's
 // channel whenever a plugin push changes one of these data sets. We reload only
 // the affected Inertia prop (plus freshness) so the open profile updates itself.
@@ -168,9 +174,26 @@ onBeforeUnmount(() => {
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
                             <div class="flex flex-col items-center">
-                                <div class="my-4 grid grid-cols-2 gap-4">
-                                    <Avatar :avatar="avatar" />
-                                    <Equipment :account="account" />
+                                <div class="my-4 w-full">
+                                    <div class="mb-2 flex justify-end">
+                                        <button type="button"
+                                                class="text-xs text-base-content/60 hover:text-base-content"
+                                                @click="showEquipment = !showEquipment">
+                                            {{ showEquipment ? 'Hide equipment' : 'Show equipment' }}
+                                        </button>
+                                    </div>
+
+                                    <!-- Side by side when there's no opponent and equipment is shown. -->
+                                    <div v-if="!hasNpc && showEquipment" class="grid grid-cols-2 gap-4">
+                                        <Avatar :avatar="avatar" />
+                                        <Equipment :account="account" />
+                                    </div>
+
+                                    <!-- Otherwise the model fills the column; equipment stacks above. -->
+                                    <div v-else>
+                                        <Equipment v-if="showEquipment" :account="account" class="mb-3" />
+                                        <Avatar :avatar="avatar" :expanded="true" />
+                                    </div>
                                 </div>
 
                                 <Summary :account="account" :freshness="freshness" />
