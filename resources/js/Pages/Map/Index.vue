@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref } from "vue";
+import { createApp, onMounted, onBeforeUnmount, ref } from "vue";
+import { router } from "@inertiajs/vue3";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import AccountCard from "@/Components/AccountCard.vue";
 
 const props = defineProps({
     accounts: {
@@ -30,8 +32,19 @@ const mapEl = ref(null);
 const onlineCount = ref(0);
 
 let map = null;
-const markers = new Map(); // username -> { marker, lastSeen }
+const markers = new Map(); // username -> { marker, app, lastSeen }
 let sweepTimer = null;
+
+// Build the floating label: the same AccountCard box used on the Accounts index,
+// mounted into a detached element so Leaflet can render it as the tooltip.
+const buildCard = (account) => {
+    const el = document.createElement("div");
+    el.className = "map-card cursor-pointer";
+    el.addEventListener("click", () => router.visit(route("accounts.show", account.username)));
+    const app = createApp(AccountCard, { account });
+    app.mount(el);
+    return { el, app };
+};
 
 // Centre of the game tile -> latLng (the maintained BegOsrs toCentreLatLng:
 // x gets a quarter-tile nudge, y does not).
@@ -53,11 +66,12 @@ const upsert = (account) => {
     const existing = markers.get(account.username);
 
     if (existing) {
+        // Card content doesn't change as a player moves — just reposition the dot.
         existing.marker.setLatLng(latLng).setStyle({ fillColor: colourFor(account.account_type) });
         existing.lastSeen = Date.now();
     } else {
         // circleMarker is drawn exactly at the projected coordinate — no icon
-        // anchor offset to get wrong.
+        // anchor offset to get wrong. The AccountCard rides along as a tooltip.
         const marker = L.circleMarker(latLng, {
             radius: 5,
             color: "#000",
@@ -65,23 +79,31 @@ const upsert = (account) => {
             fillColor: colourFor(account.account_type),
             fillOpacity: 1,
         }).addTo(map);
-        marker.bindTooltip(account.username, {
+
+        const { el, app } = buildCard(account);
+        marker.bindTooltip(el, {
             permanent: true,
-            direction: "right",
-            offset: [6, 0],
-            className: "map-label",
+            direction: "top",
+            offset: [0, -6],
+            interactive: true,
+            className: "map-card-tip",
         });
-        markers.set(account.username, { marker, lastSeen: Date.now() });
+        markers.set(account.username, { marker, app, lastSeen: Date.now() });
     }
     onlineCount.value = markers.size;
+};
+
+const removeMarker = (username, entry) => {
+    map.removeLayer(entry.marker);
+    entry.app.unmount();
+    markers.delete(username);
 };
 
 const sweepStale = () => {
     const now = Date.now();
     for (const [username, entry] of markers) {
         if (now - entry.lastSeen > STALE_MS) {
-            map.removeLayer(entry.marker);
-            markers.delete(username);
+            removeMarker(username, entry);
         }
     }
     onlineCount.value = markers.size;
@@ -121,6 +143,10 @@ onBeforeUnmount(() => {
         window.clearInterval(sweepTimer);
     }
     window.Echo.leave("map");
+    for (const entry of markers.values()) {
+        entry.app.unmount();
+    }
+    markers.clear();
     if (map) {
         map.remove();
     }
@@ -142,18 +168,21 @@ onBeforeUnmount(() => {
 </template>
 
 <style>
-.map-label.leaflet-tooltip {
+/* Strip Leaflet's default tooltip chrome so only the AccountCard box shows. */
+.map-card-tip.leaflet-tooltip {
     background: transparent;
     border: none;
     box-shadow: none;
     padding: 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: #f0e6d2;
-    text-shadow: 0 0 3px #000, 0 0 3px #000;
+    white-space: nowrap;
 }
-.map-label.leaflet-tooltip::before {
+.map-card-tip.leaflet-tooltip::before {
     display: none;
+}
+/* The card is compact as a map label. */
+.map-card-tip .h-16 {
+    height: 2.5rem;
+    width: 2.5rem;
 }
 .leaflet-container {
     background: #0b1722;

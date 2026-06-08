@@ -17,10 +17,14 @@ class MapController extends Controller
     public function index(): Response
     {
         $accounts = Account::onMap()
+            ->with('user')
             ->get()
             ->map(fn (Account $account): array => [
                 'username' => $account->username,
                 'account_type' => $account->account_type->value,
+                'icon' => $account->userIcon,
+                'level' => $account->level,
+                'online' => true,
                 'x' => $account->world_x,
                 'y' => $account->world_y,
                 'plane' => $account->world_plane,

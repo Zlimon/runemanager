@@ -5,7 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
 import Search from "@/Components/Search.vue";
-import Icon from "@/Pages/Accounts/Partials/Icon.vue";
+import AccountCard from "@/Components/AccountCard.vue";
 
 const props = defineProps({
     accountTypes: {
@@ -124,26 +124,8 @@ const clearAccountTypeSearch = () => {
 
                 <div class="mt-12 grid sm:grid-cols-4 gap-4">
                     <div v-for="account in accounts.data" :key="account.username">
-                        <Link :href="route('accounts.show', account)"
-                              class="flex flex-col items-center md:flex-row md:max-w-xl rounded px-2 py-3 pack-bg-card resource-pack-border hover:opacity-90">
-                            <Icon :account="account" />
-                            <div class="flex flex-col justify-between p-4 leading-normal">
-                                <div class="flex items-center space-x-1">
-                                    <img v-if="account.account_type === 'ironman'"
-                                         src="/images/ironman.png"
-                                         class="h-6 w-6 object-contain">
-                                    <img v-else-if="account.account_type !== 'normal'"
-                                         :src="`/images/${account.account_type}_ironman.png`"
-                                         class="h-6 w-6 object-contain">
-                                    <h5>{{ account.username }}</h5>
-                                </div>
-
-                                <div class="flex items-center space-x-1">
-                                    <img class="h-6 w-6 object-contain"
-                                         src="/images/skill/total.webp">
-                                    <p class="font-normal text-gray-700 dark:text-gray-400">{{ account.level }}</p>
-                                </div>
-                            </div>
+                        <Link :href="route('accounts.show', account)" class="block hover:opacity-90">
+                            <AccountCard :account="account" />
                         </Link>
                     </div>
 
