@@ -37,6 +37,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Live Map
+    |--------------------------------------------------------------------------
+    |
+    | An account appears on the Live Map while its last position push
+    | (accounts.position_updated_at) is within this window. The plugin pushes
+    | frequently while sharing is enabled, so a short window keeps the map
+    | current and drops players quickly once they stop sharing or log out.
+    |
+    */
+
+    'map' => [
+        'visible_within_minutes' => (int) env('MAP_VISIBLE_WITHIN_MINUTES', 2),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Live Feed (SPEC §8)
     |--------------------------------------------------------------------------
     |

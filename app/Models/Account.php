@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AccountTypesEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -63,7 +64,31 @@ class Account extends Model
             'account_type' => AccountTypesEnum::class,
             'avatar_uploaded_at' => 'datetime',
             'last_seen_at' => 'datetime',
+            'position_updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * On the Live Map while the most recent position push is within the
+     * configured window (see config/runemanager.php). Derived, like online
+     * status, so it disappears on its own when sharing stops or the player
+     * logs out.
+     */
+    public function isOnMap(): bool
+    {
+        return $this->world_x !== null
+            && $this->position_updated_at !== null
+            && $this->position_updated_at->gt(now()->subMinutes((int) config('runemanager.map.visible_within_minutes')));
+    }
+
+    /**
+     * Accounts currently sharing a recent enough position to appear on the map.
+     */
+    public function scopeOnMap(Builder $query): Builder
+    {
+        return $query
+            ->whereNotNull('world_x')
+            ->where('position_updated_at', '>=', now()->subMinutes((int) config('runemanager.map.visible_within_minutes')));
     }
 
     /**

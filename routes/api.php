@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\HeartbeatController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\LootController;
 use App\Http\Controllers\Api\LootingBagController;
+use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\QuestController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,8 @@ Route::middleware([
         Route::post('/avatar', [AvatarController::class, 'update'])->name('api.plugin.avatar');
         // Presence ping — stamps last_seen_at; "online" is derived from it.
         Route::put('/heartbeat', [HeartbeatController::class, 'update'])->name('api.plugin.heartbeat');
+        // Live Map position push — latest WorldPoint while sharing is enabled.
+        Route::put('/position', [PositionController::class, 'update'])->name('api.plugin.position');
         // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
         Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])
