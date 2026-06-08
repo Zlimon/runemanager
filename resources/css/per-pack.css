@@ -413,3 +413,28 @@
         scrollbar-color: var(--pack-accent, #94866d) var(--pack-bg, #e2d9bf);
     }
 }
+
+/*
+ * Account Show status orbs (HP/prayer/run/special). Texture the sphere with the
+ * pack's own minimap-orb sprites (icon layered over the orb body). The flat
+ * colour set inline stays as the fallback for packs that don't ship these.
+ */
+.status-orb__sphere {
+    box-shadow: none;
+}
+
+.status-orb--hp .status-orb__sphere {
+    background-image: url('other/minimap_orb_hitpoints_icon.png'), url('other/minimap_orb_hitpoints.png');
+}
+
+.status-orb--prayer .status-orb__sphere {
+    background-image: url('other/minimap_orb_prayer_icon.png'), url('other/minimap_orb_prayer.png');
+}
+
+.status-orb--run .status-orb__sphere {
+    background-image: url('other/minimap_orb_run_icon.png'), url('other/minimap_orb_run.png');
+}
+
+.status-orb--spec .status-orb__sphere {
+    background-image: url('other/minimap_orb_special_icon.png'), url('other/minimap_orb_special.png');
+}
