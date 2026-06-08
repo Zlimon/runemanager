@@ -29,6 +29,13 @@ use ZipArchive;
 class InstallResourcePack
 {
     /**
+     * The complete baseline pack (the instance default). Any sprite a custom pack
+     * doesn't ship falls back to this one's version (see {@see completeFromVanilla}),
+     * so a partial pack never leaves a textured element blank.
+     */
+    public const VANILLA_PACK = 'sample-vanilla';
+
+    /**
      * @return ResourcePack the upserted row
      *
      * @throws RuntimeException on download / extract failure
@@ -47,6 +54,7 @@ class InstallResourcePack
             $this->download($name, $zipPath);
             $this->extract($zipPath, $extractTarget);
             $this->copyTemplateCss($extractTarget);
+            $this->completeFromVanilla($name, $extractTarget);
         } finally {
             @unlink($zipPath);
         }
@@ -54,6 +62,65 @@ class InstallResourcePack
         $colors = $this->extractPaletteColors($extractTarget);
 
         return $this->upsertRow($name, $colors);
+    }
+
+    /**
+     * Fill in any per-pack.css-referenced sprite this pack doesn't ship by copying
+     * the vanilla default's version. Packs only override the sprites they change,
+     * so without this a pack that omits (say) the orb sprites would render those
+     * elements blank instead of falling back to the standard look.
+     */
+    private function completeFromVanilla(string $name, string $extractTarget): void
+    {
+        if ($name === self::VANILLA_PACK) {
+            return;
+        }
+
+        $vanilla = public_path('resource-packs/'.self::VANILLA_PACK);
+        if (! File::isDirectory($vanilla)) {
+            return; // Default not installed yet — nothing to borrow from.
+        }
+
+        self::fillMissingAssets($extractTarget, $vanilla, $this->referencedAssets());
+    }
+
+    /**
+     * Copy every $relativeAssets file the pack is missing from the vanilla dir
+     * (never overwriting one the pack ships). Returns how many were filled in.
+     *
+     * @param  array<int, string>  $relativeAssets
+     */
+    public static function fillMissingAssets(string $packDir, string $vanillaDir, array $relativeAssets): int
+    {
+        $copied = 0;
+
+        foreach ($relativeAssets as $relative) {
+            $dest = $packDir.'/'.$relative;
+            $src = $vanillaDir.'/'.$relative;
+
+            if (File::exists($dest) || ! File::exists($src)) {
+                continue;
+            }
+
+            File::ensureDirectoryExists(dirname($dest));
+            File::copy($src, $dest);
+            $copied++;
+        }
+
+        return $copied;
+    }
+
+    /**
+     * The relative sprite paths the per-pack CSS template loads via url(...).
+     *
+     * @return array<int, string>
+     */
+    public function referencedAssets(): array
+    {
+        $css = File::get(resource_path('css/per-pack.css'));
+        preg_match_all("/url\\('([^']+\\.png)'\\)/", $css, $matches);
+
+        return array_values(array_unique($matches[1]));
     }
 
     public function isInstalled(string $name): bool

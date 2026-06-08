@@ -80,24 +80,49 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="relative h-48 w-48">
-        <!-- Round frame, tinted by the active resource pack's accent colour. -->
-        <div class="minimap-frame h-full w-full rounded-full p-[6px]">
-            <div v-if="position" ref="mapEl" class="h-full w-full overflow-hidden rounded-full"></div>
-            <div v-else
-                 class="flex h-full w-full items-center justify-center rounded-full bg-base-200 p-3 text-center text-xs text-base-content/60">
+    <!-- Sized to the OSRS fixed-mode minimap-and-compass frame (172x156). The
+         round map disc sits in the frame's circular hole; the frame sprite (from
+         the active pack, see per-pack.css) overlays on top. -->
+    <div class="minimap">
+        <div class="minimap__disc">
+            <div v-if="position" ref="mapEl" class="h-full w-full"></div>
+            <div v-else class="flex h-full w-full items-center justify-center bg-base-200 p-3 text-center text-xs text-base-content/60">
                 Location not shared
             </div>
         </div>
 
+        <div class="minimap__frame" aria-hidden="true"></div>
+
         <Link v-if="href && position" :href="href" title="Open the Live Map"
-              class="absolute inset-0 z-[1000] rounded-full" />
+              class="absolute inset-0 z-[1000]" />
     </div>
 </template>
 
-<style scoped>
-.minimap-frame {
-    background: var(--pack-accent, #94866d);
-    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.5);
+<!-- Unscoped so per-pack.css can paint the frame sprite onto .minimap__frame. -->
+<style>
+.minimap {
+    position: relative;
+    width: 172px;
+    height: 156px;
+}
+.minimap__disc {
+    position: absolute;
+    top: 6px;
+    left: 22px;
+    height: 148px;
+    width: 148px;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: #0b1722;
+    /* Pack-accent ring as the no-frame fallback; hidden under the frame sprite. */
+    box-shadow: inset 0 0 0 2px var(--pack-accent, #6b6048);
+}
+.minimap__frame {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: 172px 156px;
+    /* background-image is supplied per-pack (fixed_mode/minimap_and_compass_frame.png). */
 }
 </style>
