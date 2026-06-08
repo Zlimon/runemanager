@@ -1,10 +1,9 @@
 <script setup>
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import debounce from 'lodash/debounce';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import InputLabel from "@/Components/InputLabel.vue";
-import Select from "@/Components/Select.vue";
 import Search from "@/Components/Search.vue";
 import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 
@@ -25,8 +24,6 @@ const props = defineProps({
 
 const formatAccountTypeName = (accountType) =>
     accountType.replace(/_/g, " ").replace(/(^\w|\s\w)(\S*)/g, (_, m1, m2) => m1.toUpperCase() + m2.toLowerCase());
-
-const formattedAccountTypeNames = computed(() => props.accountTypes.map(formatAccountTypeName));
 
 const form = ref({
     username: props.filters.username ?? '',
@@ -63,10 +60,6 @@ const removeAccountTypeSearch = (accountType) => {
 };
 
 const clearAccountTypeSearch = () => {
-    const select = document.getElementById('account_types');
-    if (select) {
-        select.value = 'All';
-    }
     form.value.account_types = [];
 };
 </script>
@@ -89,11 +82,16 @@ const clearAccountTypeSearch = () => {
                     <div class="col-span-1 max-w-md">
                         <InputLabel for="account_types"
                                     value="Filter by account type" />
-                        <Select id="account_types"
-                                :optionObject="false"
-                                :options="formattedAccountTypeNames"
-                                optionDefault="All"
-                                @change="appendAccountTypeSearch($event.target.value)" />
+                        <select id="account_types"
+                                class="select select-bordered w-full max-w-xs"
+                                @change="appendAccountTypeSearch($event.target.value); $event.target.value = 'All'">
+                            <option value="All">All</option>
+                            <option v-for="accountType in accountTypes"
+                                    :key="accountType"
+                                    :value="accountType">
+                                {{ formatAccountTypeName(accountType) }}
+                            </option>
+                        </select>
 
                         <div class="flex flex-wrap space-x-2">
                             <div v-if="form.account_types.length > 0"
@@ -152,6 +150,25 @@ const clearAccountTypeSearch = () => {
                     <div v-if="accounts.data.length === 0"
                          class="col-span-full text-center text-gray-500 dark:text-gray-400 py-12">
                         No accounts match these filters
+                    </div>
+                </div>
+
+                <div v-if="accounts.meta && accounts.meta.last_page > 1"
+                     class="mt-8 flex justify-center">
+                    <div class="join">
+                        <template v-for="(link, index) in accounts.meta.links" :key="index">
+                            <Link v-if="link.url"
+                                  :href="link.url"
+                                  :only="['accounts', 'filters']"
+                                  preserve-scroll
+                                  preserve-state
+                                  class="btn btn-sm join-item"
+                                  :class="{ 'btn-active': link.active }"
+                                  v-html="link.label" />
+                            <span v-else
+                                  class="btn btn-sm join-item btn-disabled"
+                                  v-html="link.label" />
+                        </template>
                     </div>
                 </div>
             </div>

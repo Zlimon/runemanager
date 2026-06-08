@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Search from "@/Components/Search.vue";
 
 const props = defineProps({
     source: {
@@ -35,6 +36,18 @@ const formatValue = (gp) => {
 
 const formatQuantity = (quantity) =>
     quantity > 1000 ? `${Math.floor(quantity / 1000)}K` : quantity;
+
+const search = ref('');
+const filteredHiscores = computed(() => {
+    if (!search.value) {
+        return props.hiscores;
+    }
+
+    const needle = search.value.toLowerCase();
+    return props.hiscores.filter((entry) =>
+        entry.account.username.toLowerCase().includes(needle),
+    );
+});
 </script>
 
 <template>
@@ -48,10 +61,13 @@ const formatQuantity = (quantity) =>
                     </Link>
                     <h1 class="text-2xl font-bold dark:text-white">{{ source }}</h1>
                     <span v-if="category" class="badge badge-neutral">{{ category }}</span>
+                    <div class="ml-auto w-full max-w-xs">
+                        <Search v-model="search" placeholder="Search by username" />
+                    </div>
                 </div>
 
                 <ul class="space-y-3">
-                    <li v-for="entry in hiscores" :key="entry.account.username"
+                    <li v-for="entry in filteredHiscores" :key="entry.account.username"
                         class="rounded p-4 pack-bg-card resource-pack-border"
                         :class="{ 'ring-2 ring-primary/40': entry.account.user_id === ownUserId }">
                         <div class="flex items-center justify-between gap-3">
@@ -84,6 +100,11 @@ const formatQuantity = (quantity) =>
                                 <span v-else class="text-xs">{{ item.name ?? item.id }}</span>
                             </div>
                         </div>
+                    </li>
+
+                    <li v-if="filteredHiscores.length === 0"
+                        class="rounded p-8 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                        No accounts match this search
                     </li>
                 </ul>
             </div>

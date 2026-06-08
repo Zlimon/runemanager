@@ -59,6 +59,33 @@ it('filters accounts by username substring', function () {
         );
 });
 
+it('filters accounts by username case-insensitively', function () {
+    Account::factory()->for($this->user)->create(['username' => 'ZezimA', 'account_type' => 'normal']);
+    Account::factory()->for($this->user)->create(['username' => 'Bar', 'account_type' => 'normal']);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.index', ['username' => 'zezima']))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('accounts.data', 1)
+            ->where('accounts.data.0.username', 'ZezimA'),
+        );
+});
+
+it('paginates and exposes meta for the pager', function () {
+    Account::factory()->count(20)->for($this->user)->create(['account_type' => 'normal']);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.index', ['per_page' => 16]))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('accounts.data', 16)
+            ->where('accounts.meta.last_page', 2)
+            ->where('accounts.meta.per_page', 16)
+            ->has('accounts.meta.links'),
+        );
+});
+
 it('filters accounts by account_types[]', function () {
     Account::factory()->for($this->user)->create(['username' => 'IronOne', 'account_type' => 'ironman']);
     Account::factory()->for($this->user)->create(['username' => 'NormOne', 'account_type' => 'normal']);
