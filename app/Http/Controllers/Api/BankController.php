@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Bank;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +29,8 @@ class BankController extends Controller
 
         $bank->bank = $request->input('bank');
         $bank->save();
+
+        broadcast(new AccountDataUpdated($account, 'bank'));
 
         return response()->json(['data' => $bank]);
     }

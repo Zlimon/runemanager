@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use Illuminate\Http\JsonResponse;
@@ -31,6 +32,8 @@ class InventoryController extends Controller
 
         $inventory->inventory = $request->input('inventory');
         $inventory->save();
+
+        broadcast(new AccountDataUpdated($account, 'inventory'));
 
         return response()->json(['data' => $inventory]);
     }

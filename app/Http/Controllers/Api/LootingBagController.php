@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\LootingBag;
 use Illuminate\Http\JsonResponse;
@@ -29,6 +30,8 @@ class LootingBagController extends Controller
         // Store under snake_case to match the model's $fillable and the show()/Resource.
         $bag->looting_bag = $request->input('looting_bag');
         $bag->save();
+
+        broadcast(new AccountDataUpdated($account, 'looting_bag'));
 
         return response()->json(['data' => $bag]);
     }

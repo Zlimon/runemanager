@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Loot;
 use App\Services\Feed\RecordFeedEvent;
@@ -84,6 +85,8 @@ class LootController extends Controller
         }
 
         Loot::insert($docs);
+
+        broadcast(new AccountDataUpdated($account, 'loot'));
 
         // SPEC §8 — emit a LOOT_DROP for each entry above the configured floor.
         foreach ($events as $event) {

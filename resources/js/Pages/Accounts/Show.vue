@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref } from "vue";
-import { Deferred } from "@inertiajs/vue3";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { Deferred, router } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CollectionLog from "@/Components/Game/CollectionLog.vue";
 import Loot from "@/Components/Game/Loot.vue";
@@ -66,6 +66,50 @@ const inventoryTabs = [
 ];
 
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
+
+// Live updates: the backend broadcasts a DataUpdated event on the account's
+// channel whenever a plugin push changes one of these data sets. We reload only
+// the affected Inertia prop (plus freshness) so the open profile updates itself.
+const RELOAD_PROPS = {
+    inventory: ['inventory', 'freshness'],
+    bank: ['bank', 'freshness'],
+    equipment: ['account', 'freshness'],
+    looting_bag: ['lootingBag', 'freshness'],
+    loot: ['recentLoot', 'freshness'],
+};
+
+const pendingProps = new Set();
+let reloadTimer = null;
+
+// Inventory/equipment pushes can arrive in bursts; coalesce them into one reload.
+const scheduleReload = (type) => {
+    const only = RELOAD_PROPS[type];
+    if (!only) {
+        return;
+    }
+    only.forEach((prop) => pendingProps.add(prop));
+    if (reloadTimer) {
+        return;
+    }
+    reloadTimer = window.setTimeout(() => {
+        router.reload({ only: [...pendingProps], preserveScroll: true, preserveState: true });
+        pendingProps.clear();
+        reloadTimer = null;
+    }, 600);
+};
+
+const channel = `account.${props.account.id}`;
+
+onMounted(() => {
+    window.Echo.private(channel).listen(".DataUpdated", (event) => scheduleReload(event.type));
+});
+
+onBeforeUnmount(() => {
+    if (reloadTimer) {
+        window.clearTimeout(reloadTimer);
+    }
+    window.Echo.leave(channel);
+});
 </script>
 
 <template>

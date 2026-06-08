@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\AccountDataUpdated;
 use App\Models\Account;
 use App\Models\Bank;
 use App\Models\Equipment;
@@ -10,6 +11,7 @@ use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
@@ -348,3 +350,22 @@ it('rejects loot pushes that are missing required fields', function () {
         ->assertStatus(422)
         ->assertJsonValidationErrors(['loot.0.items']);
 });
+
+it('broadcasts AccountDataUpdated so an open profile refreshes live', function (string $url, array $payload, string $method, string $type) {
+    Event::fake([AccountDataUpdated::class]);
+    Sanctum::actingAs(freshUser());
+
+    test()->json($method, $url, $payload, pluginHeaders('hash-rt', 'Zlimon'))->assertSuccessful();
+
+    $account = Account::where('account_hash', 'hash-rt')->firstOrFail();
+    Event::assertDispatched(
+        AccountDataUpdated::class,
+        fn (AccountDataUpdated $event): bool => $event->account->is($account) && $event->type === $type,
+    );
+})->with([
+    'inventory' => ['/api/plugin/inventory', ['inventory' => [[4151, 1]]], 'PUT', 'inventory'],
+    'bank' => ['/api/plugin/bank', ['bank' => [[[995, 100]]]], 'PUT', 'bank'],
+    'equipment' => ['/api/plugin/equipment', ['equipment' => [[4151, 1]]], 'PUT', 'equipment'],
+    'looting bag' => ['/api/plugin/looting-bag', ['looting_bag' => [[995, 50]]], 'PUT', 'looting_bag'],
+    'loot' => ['/api/plugin/loot', ['loot' => [['source' => 'Goblin', 'items' => [['id' => 995, 'quantity' => 5]], 'killed_at' => '2026-06-02T17:00:00Z']]], 'POST', 'loot'],
+]);

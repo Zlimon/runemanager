@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
 use Illuminate\Http\JsonResponse;
@@ -42,6 +43,8 @@ class EquipmentController extends Controller
         $equipment->ring = $itemAt(12);
         $equipment->ammo = $itemAt(13);
         $equipment->save();
+
+        broadcast(new AccountDataUpdated($account, 'equipment'));
 
         return response()->json(['data' => $equipment]);
     }
