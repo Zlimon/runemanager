@@ -112,7 +112,9 @@ const composeScene = (player, npc) => {
     const group = new THREE.Group();
 
     prepareMeshes(player);
-    const playerWidth = placeModel(player, 0, Math.PI);
+    // Solo: face the viewer (Math.PI). Fighting: turn 45° toward the opponent on
+    // the right, so the two confront each other while both faces stay visible.
+    const playerWidth = placeModel(player, 0, npc ? Math.PI * 1.25 : Math.PI);
     group.add(player);
 
     if (npc) {
@@ -120,7 +122,7 @@ const composeScene = (player, npc) => {
         const npcBox = new THREE.Box3().setFromObject(npc);
         const npcWidth = npcBox.max.x - npcBox.min.x;
         const offset = playerWidth / 2 + npcWidth / 2 + Math.max(playerWidth, npcWidth) * 0.2;
-        placeModel(npc, offset, Math.PI / 2); // turn to face the player (−X)
+        placeModel(npc, offset, Math.PI * 0.75); // turn 45° back toward the player
         group.add(npc);
     }
 
