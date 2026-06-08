@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\LootController;
 use App\Http\Controllers\Api\LootingBagController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\QuestController;
+use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\VitalsController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,8 @@ Route::middleware([
         Route::put('/position', [PositionController::class, 'update'])->name('api.plugin.position');
         // Live status-orb values (HP/prayer/run/special) for the Account Show orbs.
         Route::put('/vitals', [VitalsController::class, 'update'])->name('api.plugin.vitals');
+        // Current in-game activity (Discord-plugin style) for the account cards/header.
+        Route::put('/status', [StatusController::class, 'update'])->name('api.plugin.status');
         // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
         Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])

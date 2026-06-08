@@ -36,6 +36,7 @@ class MapController extends Controller
                 'icon' => $account->userIcon,
                 'level' => $account->level,
                 'online' => true,
+                'activity' => $account->activity,
                 'x' => $account->world_x,
                 'y' => $account->world_y,
                 'plane' => $account->world_plane,

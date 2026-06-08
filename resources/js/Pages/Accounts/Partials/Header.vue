@@ -9,6 +9,10 @@ defineProps({
         type: Object,
         required: true,
     },
+    activity: {
+        type: String,
+        default: null,
+    },
 });
 </script>
 
@@ -45,6 +49,12 @@ defineProps({
                         Last updated
                         {{ dayjs(account.updated_at).format('MMMM D, YYYY h:mm A') }}
                     </span>
+                </p>
+
+                <p v-if="account.online && activity"
+                   class="mt-1 flex items-center gap-1.5 text-xs font-medium text-success">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+                    {{ activity }}
                 </p>
             </div>
         </div>

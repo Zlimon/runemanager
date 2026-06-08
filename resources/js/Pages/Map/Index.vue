@@ -75,9 +75,18 @@ const upsert = (account) => {
             interactive: true,
             className: "map-card-tip",
         });
-        markers.set(account.username, { marker, app, lastSeen: Date.now() });
+        markers.set(account.username, { marker, app, account, lastSeen: Date.now() });
     }
     onlineCount.value = markers.size;
+};
+
+// Re-render a marker's card (the mounted AccountCard's props aren't reactive, so
+// rebuild it) — used when the player's live activity changes.
+const refreshCard = (entry) => {
+    entry.app.unmount();
+    const { el, app } = buildCard(entry.account);
+    entry.app = app;
+    entry.marker.setTooltipContent(el);
 };
 
 const removeMarker = (username, entry) => {
@@ -106,7 +115,15 @@ onMounted(() => {
     const focus = props.focus ?? props.accounts[0] ?? { x: 3221, y: 3219 };
     map.setView(toLatLng(focus), props.focus ? 4 : 2);
 
-    window.Echo.private("map").listen(".AccountMoved", (event) => upsert(event));
+    window.Echo.private("map")
+        .listen(".AccountMoved", (event) => upsert(event))
+        .listen(".StatusUpdated", (event) => {
+            const entry = markers.get(event.username);
+            if (entry && entry.account.activity !== event.activity) {
+                entry.account = { ...entry.account, activity: event.activity };
+                refreshCard(entry);
+            }
+        });
 
     sweepTimer = window.setInterval(sweepStale, 15000);
 });

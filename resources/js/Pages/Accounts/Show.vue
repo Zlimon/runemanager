@@ -72,6 +72,9 @@ const props = defineProps({
 // the values inline) rather than via a prop reload.
 const liveVitals = ref(props.vitals);
 
+// Current in-game activity — pushed live on its own broadcast.
+const liveActivity = ref(props.account.activity);
+
 const activeTab = ref('inventory');
 
 const inventoryTabs = [
@@ -118,7 +121,8 @@ const channel = `account.${props.account.id}`;
 onMounted(() => {
     window.Echo.private(channel)
         .listen(".DataUpdated", (event) => scheduleReload(event.type))
-        .listen(".VitalsUpdated", (event) => { liveVitals.value = event; });
+        .listen(".VitalsUpdated", (event) => { liveVitals.value = event; })
+        .listen(".StatusUpdated", (event) => { liveActivity.value = event.activity; });
 });
 
 onBeforeUnmount(() => {
@@ -139,7 +143,7 @@ onBeforeUnmount(() => {
 
                 <Card class="mt-4" padding="p-6 lg:p-8">
                     <div class="flex items-start justify-between gap-4">
-                        <Header :account="account" class="flex-1" />
+                        <Header :account="account" :activity="liveActivity" class="flex-1" />
                         <div class="hidden shrink-0 items-start gap-3 md:flex">
                             <StatusOrbs :vitals="liveVitals" />
                             <Minimap :username="account.username" :position="position"
