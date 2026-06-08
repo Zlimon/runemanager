@@ -68,6 +68,45 @@ it('broadcasts AccountDataUpdated(avatar) so an open profile reloads the model',
     );
 });
 
+it('stores the opponent model when fighting and exposes it on the payload', function () {
+    Sanctum::actingAs(avatarUser());
+
+    $this->post('/api/plugin/avatar', [
+        'model' => UploadedFile::fake()->createWithContent('player.obj', "v 0 0 0\n"),
+        'material' => UploadedFile::fake()->createWithContent('player.mtl', "newmtl c0\n"),
+        'npc_model' => UploadedFile::fake()->createWithContent('npc.obj', "v 1 0 0\n"),
+        'npc_material' => UploadedFile::fake()->createWithContent('npc.mtl', "newmtl n0\n"),
+    ], avatarHeaders())->assertSuccessful();
+
+    $account = Account::firstOrFail();
+    Storage::disk('public')->assertExists("avatars/{$account->id}/avatar_npc.obj");
+    Storage::disk('public')->assertExists("avatars/{$account->id}/avatar_npc.mtl");
+
+    $payload = $account->avatarPayload();
+    expect($payload['npc_obj_url'])->toContain("avatars/{$account->id}/avatar_npc.obj");
+    expect($payload['npc_mtl_url'])->toContain("avatars/{$account->id}/avatar_npc.mtl");
+});
+
+it('clears a stale opponent model when the next push has none', function () {
+    Sanctum::actingAs(avatarUser());
+
+    $this->post('/api/plugin/avatar', [
+        'model' => UploadedFile::fake()->createWithContent('player.obj', "v 0 0 0\n"),
+        'npc_model' => UploadedFile::fake()->createWithContent('npc.obj', "v 1 0 0\n"),
+    ], avatarHeaders())->assertSuccessful();
+
+    $account = Account::firstOrFail();
+    Storage::disk('public')->assertExists("avatars/{$account->id}/avatar_npc.obj");
+
+    // Stopped fighting — next push omits the NPC.
+    $this->post('/api/plugin/avatar', [
+        'model' => UploadedFile::fake()->createWithContent('player.obj', "v 0 0 0\n"),
+    ], avatarHeaders())->assertSuccessful();
+
+    Storage::disk('public')->assertMissing("avatars/{$account->id}/avatar_npc.obj");
+    expect($account->fresh()->avatarPayload()['npc_obj_url'])->toBeNull();
+});
+
 it('accepts a model with no material and clears any stale material', function () {
     $user = avatarUser();
     Sanctum::actingAs($user);

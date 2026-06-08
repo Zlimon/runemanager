@@ -162,6 +162,13 @@ class Account extends Model
             'mtl_url' => $disk->exists("{$directory}/avatar.mtl")
                 ? $disk->url("{$directory}/avatar.mtl")."?v={$version}"
                 : null,
+            // The opponent model, present only when the last snapshot was mid-combat.
+            'npc_obj_url' => $disk->exists("{$directory}/avatar_npc.obj")
+                ? $disk->url("{$directory}/avatar_npc.obj")."?v={$version}"
+                : null,
+            'npc_mtl_url' => $disk->exists("{$directory}/avatar_npc.mtl")
+                ? $disk->url("{$directory}/avatar_npc.mtl")."?v={$version}"
+                : null,
             'updated_at' => $this->avatar_uploaded_at->toIso8601String(),
         ];
     }

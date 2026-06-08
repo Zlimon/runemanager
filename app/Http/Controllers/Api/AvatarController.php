@@ -39,6 +39,19 @@ class AvatarController extends Controller
             Storage::disk('public')->delete("{$directory}/avatar.mtl");
         }
 
+        // The opponent model rides along only while fighting; clear it otherwise
+        // so the viewer drops the NPC once the player stops.
+        if ($request->hasFile('npc_model')) {
+            $request->file('npc_model')->storeAs($directory, 'avatar_npc.obj', 'public');
+            if ($request->hasFile('npc_material')) {
+                $request->file('npc_material')->storeAs($directory, 'avatar_npc.mtl', 'public');
+            } else {
+                Storage::disk('public')->delete("{$directory}/avatar_npc.mtl");
+            }
+        } else {
+            Storage::disk('public')->delete(["{$directory}/avatar_npc.obj", "{$directory}/avatar_npc.mtl"]);
+        }
+
         $account->forceFill(['avatar_uploaded_at' => now()])->save();
 
         broadcast(new AccountDataUpdated($account, 'avatar'));

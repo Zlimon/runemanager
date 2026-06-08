@@ -68,36 +68,91 @@ const disposeScene = () => {
 // Recentre the loaded model at the origin and pull the camera back far enough
 // to frame it, regardless of the model's native scale/position (game exports
 // sit in world coordinates, not around 0,0,0).
-const frameModel = (object) => {
+// Our exported OBJ carries no vertex normals (Phong renders black without them)
+// and the Y-flip inverts winding, so compute normals and render both faces.
+const prepareMeshes = (object) => {
+    object.traverse((child) => {
+        if (!child.isMesh) {
+            return;
+        }
+        child.geometry?.computeVertexNormals();
+        const materials = Array.isArray(child.material) ? child.material : [child.material];
+        materials.forEach((material) => material && (material.side = THREE.DoubleSide));
+    });
+};
+
+// Centre a model horizontally with its feet at y=0 (so models share a ground
+// plane), face it (yaw about the vertical axis) and shift it sideways. Returns
+// its footprint width for spacing. OSRS exports face away from the camera, so
+// the player's yaw is Math.PI (turn to face the viewer).
+const placeModel = (object, offsetX, yaw) => {
     const box = new THREE.Box3().setFromObject(object);
-    const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
 
-    // Recenter the geometry at the origin (rather than offsetting the object)
-    // so the facing rotation pivots around the model itself.
     object.traverse((child) => {
         if (child.isMesh && child.geometry) {
-            child.geometry.translate(-center.x, -center.y, -center.z);
+            child.geometry.translate(-center.x, -box.min.y, -center.z);
         }
     });
 
-    // OSRS exports the player facing away from the default camera — spin 180°
-    // about the vertical axis so the avatar looks back at the viewer.
-    object.rotation.y = Math.PI;
+    object.rotation.y = yaw;
+    object.position.x = offsetX;
+
+    return box.max.x - box.min.x;
+};
+
+// Position the player facing the viewer; when fighting, the opponent stands to
+// the side turned to face the player (a little combat tableau).
+const composeScene = (player, npc) => {
+    const group = new THREE.Group();
+
+    prepareMeshes(player);
+    const playerWidth = placeModel(player, 0, Math.PI);
+    group.add(player);
+
+    if (npc) {
+        prepareMeshes(npc);
+        const npcBox = new THREE.Box3().setFromObject(npc);
+        const npcWidth = npcBox.max.x - npcBox.min.x;
+        const offset = playerWidth / 2 + npcWidth / 2 + Math.max(playerWidth, npcWidth) * 0.2;
+        placeModel(npc, offset, Math.PI / 2); // turn to face the player (−X)
+        group.add(npc);
+    }
+
+    scene.add(group);
+    frameScene(group);
+};
+
+const frameScene = (group) => {
+    const box = new THREE.Box3().setFromObject(group);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
 
     const maxDimension = Math.max(size.x, size.y, size.z) || 1;
-    // Lower multiplier = camera sits closer = avatar fills more of the card.
-    const distance = (maxDimension / 2) / Math.tan((camera.fov * Math.PI) / 360) * 1.25;
+    const distance = (maxDimension / 2) / Math.tan((camera.fov * Math.PI) / 360) * 1.3;
 
-    camera.position.set(0, 0, distance);
+    camera.position.set(center.x, center.y, center.z + distance);
     camera.near = distance / 100;
     camera.far = distance * 100;
     camera.updateProjectionMatrix();
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(center);
 
-    controls.target.set(0, 0, 0);
+    controls.target.copy(center);
     controls.update();
 };
+
+const loadModel = (objUrl, mtlUrl) => new Promise((resolve, reject) => {
+    const objLoader = new OBJLoader();
+    if (mtlUrl) {
+        new MTLLoader().load(mtlUrl, (materials) => {
+            materials.preload();
+            objLoader.setMaterials(materials);
+            objLoader.load(objUrl, resolve, undefined, reject);
+        }, undefined, reject);
+    } else {
+        objLoader.load(objUrl, resolve, undefined, reject);
+    }
+});
 
 const animate = () => {
     frameId = requestAnimationFrame(animate);
@@ -127,45 +182,24 @@ const initViewer = () => {
 
     controls = new OrbitControls(camera, renderer.domElement);
 
-    const onLoad = (object) => {
-        // Our exported OBJ carries no vertex normals (Phong renders black
-        // without them) and the Y-flip inverts winding, so compute normals and
-        // render both faces.
-        object.traverse((child) => {
-            if (!child.isMesh) {
-                return;
+    Promise.all([
+        loadModel(props.avatar.obj_url, props.avatar.mtl_url),
+        props.avatar.npc_obj_url
+            ? loadModel(props.avatar.npc_obj_url, props.avatar.npc_mtl_url)
+            : Promise.resolve(null),
+    ])
+        .then(([player, npc]) => {
+            if (!scene) {
+                return; // Torn down (navigated away / re-init) while loading.
             }
-            child.geometry?.computeVertexNormals();
-            const materials = Array.isArray(child.material) ? child.material : [child.material];
-            materials.forEach((material) => material && (material.side = THREE.DoubleSide));
+            composeScene(player, npc);
+            status.value = "ready";
+            animate();
+        })
+        .catch(() => {
+            status.value = "error";
+            disposeScene();
         });
-
-        scene.add(object);
-        frameModel(object);
-        status.value = "ready";
-        animate();
-    };
-    const onError = () => {
-        status.value = "error";
-        disposeScene();
-    };
-
-    const objLoader = new OBJLoader();
-
-    if (props.avatar.mtl_url) {
-        new MTLLoader().load(
-            props.avatar.mtl_url,
-            (materials) => {
-                materials.preload();
-                objLoader.setMaterials(materials);
-                objLoader.load(props.avatar.obj_url, onLoad, undefined, onError);
-            },
-            undefined,
-            onError,
-        );
-    } else {
-        objLoader.load(props.avatar.obj_url, onLoad, undefined, onError);
-    }
 
     resizeObserver = new ResizeObserver(() => {
         if (!renderer || !el.clientWidth) {
