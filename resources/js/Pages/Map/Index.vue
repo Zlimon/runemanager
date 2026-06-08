@@ -72,8 +72,10 @@ const sweepStale = () => {
 };
 
 onMounted(() => {
+    // Default CRS (EPSG3857) — the Explv tiles + the game→latLng transform below
+    // are calibrated for it; forcing CRS.Simple throws the tile coords off and
+    // every tile 404s.
     map = L.map(mapEl.value, {
-        crs: L.CRS.Simple,
         minZoom: 4,
         maxZoom: 11,
         zoomControl: true,
