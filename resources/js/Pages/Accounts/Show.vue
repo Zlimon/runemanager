@@ -16,6 +16,7 @@ import Avatar from "@/Pages/Accounts/Partials/Avatar.vue";
 import Summary from "@/Pages/Accounts/Partials/Summary.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
 import Bank from "@/Components/Game/Bank.vue";
+import Minimap from "@/Components/Game/Minimap.vue";
 import TabbedCard from "@/Components/TabbedCard.vue";
 import Card from "@/Components/Card.vue";
 
@@ -51,6 +52,10 @@ const props = defineProps({
     recentLoot: {
         type: Array,
         default: () => [],
+    },
+    position: {
+        type: Object,
+        default: null,
     },
     freshness: {
         type: Object,
@@ -122,7 +127,11 @@ onBeforeUnmount(() => {
                 </div>
 
                 <Card class="mt-4" padding="p-6 lg:p-8">
-                    <Header :account="account" />
+                    <div class="flex items-start justify-between gap-4">
+                        <Header :account="account" class="flex-1" />
+                        <Minimap :username="account.username" :position="position"
+                                 class="hidden shrink-0 md:block" />
+                    </div>
 
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">

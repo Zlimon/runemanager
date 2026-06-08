@@ -119,8 +119,28 @@ it('show renders the Inertia component with the `account` prop and per-tab data 
             ->where('lootingBag', null)
             ->where('quests', null)
             ->where('recentLoot', [])
+            // No position shared yet → null (drives the minimap empty state).
+            ->where('position', null)
             // collectionLog is deferred — not present on the initial render
             ->missing('collectionLog'),
+        );
+});
+
+it('exposes the last known position for the minimap', function () {
+    $account = Account::factory()->for($this->user)->create([
+        'username' => 'Wanderer',
+        'world_x' => 3257,
+        'world_y' => 3227,
+        'world_plane' => 0,
+    ]);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.show', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('position.x', 3257)
+            ->where('position.y', 3227)
+            ->where('position.plane', 0),
         );
 });
 

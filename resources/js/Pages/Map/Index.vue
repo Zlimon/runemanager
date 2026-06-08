@@ -2,33 +2,14 @@
 import { createApp, onMounted, onBeforeUnmount, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import AccountCard from "@/Components/AccountCard.vue";
+import { createOsrsMap, gameToLatLng } from "@/composables/useOsrsMap";
 
 const props = defineProps({
     accounts: {
         type: Array,
         default: () => [],
-    },
-});
-
-// Live OSRS map tiles from mejrs/layers_osrs — the same data the OSRS Wiki map
-// uses, re-rendered after each game update. Pointing at master keeps us current
-// automatically (no version to bump). With L.CRS.Simple the map's coordinate
-// space *is* game coordinates, so a position is simply [y, x] — no transform.
-const TILE_URL = "https://raw.githubusercontent.com/mejrs/layers_osrs/refs/heads/master/mapsquares/-1/{z}/{plane}_{x}_{y}.png";
-
-// Custom tile layer matching the wiki/mejrs scheme: filename is plane_x_y with
-// y flipped as -(1 + coords.y).
-const OsrsTileLayer = L.TileLayer.extend({
-    getTileUrl(coords) {
-        return L.Util.template(this._url, {
-            z: coords.z,
-            plane: this.options.plane ?? 0,
-            x: coords.x,
-            y: -(1 + coords.y),
-        });
     },
 });
 
@@ -54,8 +35,7 @@ const buildCard = (account) => {
     return { el, app };
 };
 
-// CRS.Simple: game coordinates are the map coordinates, as [y, x].
-const toLatLng = (account) => L.latLng(account.y, account.x);
+const toLatLng = (account) => gameToLatLng(account.x, account.y);
 
 const COLOURS = {
     ironman: "#d1d5db",
@@ -113,21 +93,7 @@ const sweepStale = () => {
 };
 
 onMounted(() => {
-    map = L.map(mapEl.value, {
-        crs: L.CRS.Simple,
-        minZoom: -4,
-        maxZoom: 8,
-        zoomControl: true,
-    });
-
-    new OsrsTileLayer(TILE_URL, {
-        plane: 0,
-        minZoom: -4,
-        maxNativeZoom: 4,
-        maxZoom: 8,
-        noWrap: true,
-        attribution: 'Map data © <a href="https://oldschool.runescape.wiki">OSRS Wiki</a> (mejrs)',
-    }).addTo(map);
+    map = createOsrsMap(mapEl.value, { zoomControl: true });
 
     props.accounts.forEach(upsert);
 

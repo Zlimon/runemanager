@@ -70,6 +70,12 @@ class AccountController extends Controller
         return Inertia::render('Accounts/Show', [
             'account' => (new AccountResource($account))->resolve(),
 
+            // Last known in-game position for the minimap; live updates arrive
+            // over the shared map broadcast channel. Null when never shared.
+            'position' => $account->world_x !== null
+                ? ['x' => $account->world_x, 'y' => $account->world_y, 'plane' => $account->world_plane]
+                : null,
+
             'inventory' => fn () => $account->inventory
                 ? (new InventoryResource($account->inventory))->resolve()
                 : null,
