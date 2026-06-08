@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import HiscoresHeader from "@/Pages/Hiscores/Partials/HiscoresHeader.vue";
-import HiscoresTable from "@/Pages/Hiscores/Partials/HiscoresTable.vue";
+import LeaderboardTable from "@/Components/LeaderboardTable.vue";
 
 const props = defineProps({
     skillName: {
@@ -21,7 +21,7 @@ const props = defineProps({
 
 const columns = [
     { label: 'Rank', key: 'rank', format: 'number' },
-    { label: 'Level', key: 'level' },
+    { label: 'Level', key: 'level', format: 'number' },
     { label: 'XP', key: 'xp', format: 'number' },
 ];
 
@@ -44,7 +44,7 @@ const filteredHiscores = computed(() => {
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="relative overflow-x-auto sm:rounded-lg">
                     <HiscoresHeader :title="skillName" v-model:search="search" />
-                    <HiscoresTable :columns="columns" :hiscores="filteredHiscores" />
+                    <LeaderboardTable :columns="columns" :rows="filteredHiscores" />
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import HiscoresHeader from "@/Pages/Hiscores/Partials/HiscoresHeader.vue";
-import HiscoresTable from "@/Pages/Hiscores/Partials/HiscoresTable.vue";
+import LeaderboardTable from "@/Components/LeaderboardTable.vue";
 
 const props = defineProps({
     collectionName: {
@@ -43,7 +43,7 @@ const filteredHiscores = computed(() => {
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="relative overflow-x-auto sm:rounded-lg">
                     <HiscoresHeader :title="collectionName" v-model:search="search" />
-                    <HiscoresTable :columns="columns" :hiscores="filteredHiscores" />
+                    <LeaderboardTable :columns="columns" :rows="filteredHiscores" />
                 </div>
             </div>
         </div>
