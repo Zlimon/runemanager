@@ -11,6 +11,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    focus: {
+        type: Object,
+        default: null, // { x, y } to centre on (from a profile's minimap)
+    },
 });
 
 // Drop a marker if no update arrives within this window (mirrors the server's
@@ -97,9 +101,10 @@ onMounted(() => {
 
     props.accounts.forEach(upsert);
 
-    // Centre on someone if we have them, otherwise on Lumbridge.
-    const focus = props.accounts[0] ?? { x: 3221, y: 3219 };
-    map.setView(toLatLng(focus), 2);
+    // Centre on the requested player (deep-linked from a profile), else someone
+    // who's sharing, else Lumbridge.
+    const focus = props.focus ?? props.accounts[0] ?? { x: 3221, y: 3219 };
+    map.setView(toLatLng(focus), props.focus ? 4 : 2);
 
     window.Echo.private("map").listen(".AccountMoved", (event) => upsert(event));
 

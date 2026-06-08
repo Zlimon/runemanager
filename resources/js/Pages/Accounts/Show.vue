@@ -130,6 +130,7 @@ onBeforeUnmount(() => {
                     <div class="flex items-start justify-between gap-4">
                         <Header :account="account" class="flex-1" />
                         <Minimap :username="account.username" :position="position"
+                                 :href="position ? route('map.index', { focus: account.username }) : null"
                                  class="hidden shrink-0 md:block" />
                     </div>
 
