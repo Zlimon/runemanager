@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\AccountMoved;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use Illuminate\Http\JsonResponse;
@@ -35,6 +36,8 @@ class PositionController extends Controller
             'world_plane' => $validated['plane'],
             'position_updated_at' => now(),
         ])->save();
+
+        broadcast(new AccountMoved($account));
 
         return response()->json(['data' => ['position_updated_at' => $account->position_updated_at->toIso8601String()]]);
     }

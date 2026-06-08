@@ -14,6 +14,7 @@
         "laravel/boost": "^2.4",
         "laravel/framework": "^13.0",
         "laravel/jetstream": "^5.5",
+        "laravel/reverb": "^1.10",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
         "mongodb/laravel-mongodb": "^5.7",

@@ -1,8 +1,10 @@
 <?php
 
+use App\Events\AccountMoved;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 
@@ -27,7 +29,8 @@ function mapHeaders(string $hash = 'hash-map', string $username = 'Zlimon'): arr
     ];
 }
 
-it('stores the latest position on a plugin push', function () {
+it('stores the latest position on a plugin push and broadcasts it', function () {
+    Event::fake([AccountMoved::class]);
     Sanctum::actingAs(mapUser());
 
     $this->putJson('/api/plugin/position', ['x' => 3221, 'y' => 3219, 'plane' => 0], mapHeaders())
@@ -39,6 +42,31 @@ it('stores the latest position on a plugin push', function () {
     expect($account->world_plane)->toBe(0);
     expect($account->position_updated_at)->not->toBeNull();
     expect($account->isOnMap())->toBeTrue();
+
+    Event::assertDispatched(AccountMoved::class, fn (AccountMoved $event): bool => $event->account->is($account));
+});
+
+it('broadcasts the position on the private map channel with a light payload', function () {
+    Sanctum::actingAs(mapUser());
+
+    $account = Account::factory()->create([
+        'username' => 'Zezima',
+        'account_type' => 'normal',
+        'world_x' => 3200,
+        'world_y' => 3200,
+        'world_plane' => 0,
+    ]);
+    $event = new AccountMoved($account);
+
+    expect($event->broadcastOn()[0]->name)->toBe('private-map');
+    expect($event->broadcastAs())->toBe('AccountMoved');
+    expect($event->broadcastWith())->toBe([
+        'username' => 'Zezima',
+        'account_type' => 'normal',
+        'x' => 3200,
+        'y' => 3200,
+        'plane' => 0,
+    ]);
 });
 
 it('rejects an out-of-range plane', function () {
