@@ -15,6 +15,7 @@ use MongoDB\Laravel\Eloquent\Model;
  *
  * @property int $account_id
  * @property string $source
+ * @property ?string $type
  * @property array<int, array{id: int, quantity: int}> $items
  * @property int $total_value
  * @property Carbon $killed_at
@@ -30,6 +31,7 @@ class Loot extends Model
     protected $fillable = [
         'account_id',
         'source',
+        'type',
         'items',
         'total_value',
         'killed_at',

@@ -275,6 +275,7 @@ it('appends loot entries on POST /api/plugin/loot', function () {
         'loot' => [
             [
                 'source' => 'Abyssal demon',
+                'type' => 'NPC',
                 'items' => [
                     ['id' => 4151, 'quantity' => 1],
                     ['id' => 995, 'quantity' => 10000],
@@ -306,8 +307,10 @@ it('appends loot entries on POST /api/plugin/loot', function () {
         ['id' => 995, 'quantity' => 10000],
     ]);
     expect($entries[0]->total_value)->toBe(2_500_000);
+    expect($entries[0]->type)->toBe('NPC');
     expect($entries[1]->source)->toBe('Vorkath');
     expect($entries[1]->total_value)->toBe(0);
+    expect($entries[1]->type)->toBeNull();
 });
 
 it('does NOT replace prior loot — successive pushes accumulate', function () {

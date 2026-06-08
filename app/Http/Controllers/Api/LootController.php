@@ -41,6 +41,7 @@ class LootController extends Controller
         $request->validate([
             'loot' => ['required', 'array', 'min:1', 'max:100'],
             'loot.*.source' => ['required', 'string', 'max:120'],
+            'loot.*.type' => ['nullable', 'string', 'max:20'],
             'loot.*.items' => ['required', 'array', 'min:1'],
             'loot.*.items.*.id' => ['required', 'integer'],
             'loot.*.items.*.quantity' => ['required', 'integer', 'min:1'],
@@ -66,6 +67,7 @@ class LootController extends Controller
             $docs[] = [
                 'account_id' => (int) $account->id,
                 'source' => $entry['source'],
+                'type' => $entry['type'] ?? null,
                 'items' => $items,
                 'total_value' => $totalValue,
                 'killed_at' => $killedAt,

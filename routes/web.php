@@ -80,7 +80,10 @@ Route::middleware([
         Route::get('/clues/{collection}', [CollectionHiscoreController::class, 'index'])
             ->defaults('category', 'clue')
             ->name('hiscores.clues.index');
-        // SPEC §7.1 — Loot leaderboard (total value).
+        // SPEC §7 — loot directory (grouped sources) + per-source board.
         Route::get('/loot', [LootHiscoreController::class, 'index'])->name('hiscores.loot.index');
+        Route::get('/loot/{source}', [LootHiscoreController::class, 'show'])
+            ->where('source', '.*')
+            ->name('hiscores.loot.show');
     });
 });
