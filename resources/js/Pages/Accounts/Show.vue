@@ -17,6 +17,7 @@ import Summary from "@/Pages/Accounts/Partials/Summary.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
 import Bank from "@/Components/Game/Bank.vue";
 import Minimap from "@/Components/Game/Minimap.vue";
+import StatusOrbs from "@/Components/Game/StatusOrbs.vue";
 import TabbedCard from "@/Components/TabbedCard.vue";
 import Card from "@/Components/Card.vue";
 
@@ -57,11 +58,19 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    vitals: {
+        type: Object,
+        default: null,
+    },
     freshness: {
         type: Object,
         default: () => ({ stale_after_minutes: 60 }),
     },
 });
+
+// Status-orb values update often, so they arrive as their own broadcast (with
+// the values inline) rather than via a prop reload.
+const liveVitals = ref(props.vitals);
 
 const activeTab = ref('inventory');
 
@@ -107,7 +116,9 @@ const scheduleReload = (type) => {
 const channel = `account.${props.account.id}`;
 
 onMounted(() => {
-    window.Echo.private(channel).listen(".DataUpdated", (event) => scheduleReload(event.type));
+    window.Echo.private(channel)
+        .listen(".DataUpdated", (event) => scheduleReload(event.type))
+        .listen(".VitalsUpdated", (event) => { liveVitals.value = event; });
 });
 
 onBeforeUnmount(() => {
@@ -129,9 +140,11 @@ onBeforeUnmount(() => {
                 <Card class="mt-4" padding="p-6 lg:p-8">
                     <div class="flex items-start justify-between gap-4">
                         <Header :account="account" class="flex-1" />
-                        <Minimap :username="account.username" :position="position"
-                                 :href="position ? route('map.index', { focus: account.username }) : null"
-                                 class="hidden shrink-0 md:block" />
+                        <div class="hidden shrink-0 items-start gap-3 md:flex">
+                            <StatusOrbs :vitals="liveVitals" />
+                            <Minimap :username="account.username" :position="position"
+                                     :href="position ? route('map.index', { focus: account.username }) : null" />
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-6">

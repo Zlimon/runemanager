@@ -65,6 +65,29 @@ class Account extends Model
             'avatar_uploaded_at' => 'datetime',
             'last_seen_at' => 'datetime',
             'position_updated_at' => 'datetime',
+            'vitals_updated_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Live status-orb values (HP/prayer current+max, run energy, special attack),
+     * or null until the plugin has pushed them. Drives the Account Show orbs.
+     *
+     * @return array{hitpoints: int, hitpoints_max: int, prayer: int, prayer_max: int, run_energy: int, special_attack: int}|null
+     */
+    public function vitalsPayload(): ?array
+    {
+        if ($this->vitals_updated_at === null) {
+            return null;
+        }
+
+        return [
+            'hitpoints' => (int) $this->hitpoints,
+            'hitpoints_max' => (int) $this->hitpoints_max,
+            'prayer' => (int) $this->prayer,
+            'prayer_max' => (int) $this->prayer_max,
+            'run_energy' => (int) $this->run_energy,
+            'special_attack' => (int) $this->special_attack,
         ];
     }
 

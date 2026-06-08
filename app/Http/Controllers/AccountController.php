@@ -76,6 +76,10 @@ class AccountController extends Controller
                 ? ['x' => $account->world_x, 'y' => $account->world_y, 'plane' => $account->world_plane]
                 : null,
 
+            // Live status-orb values; updated over the account channel
+            // (VitalsUpdated). Null until the plugin first pushes them.
+            'vitals' => $account->vitalsPayload(),
+
             'inventory' => fn () => $account->inventory
                 ? (new InventoryResource($account->inventory))->resolve()
                 : null,
