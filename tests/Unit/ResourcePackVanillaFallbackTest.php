@@ -43,10 +43,9 @@ it('fills in only the assets a pack is missing, from vanilla, without overwritin
     File::deleteDirectory($pack);
 });
 
-it('reads the per-pack CSS referenced assets (orbs + minimap frame)', function () {
+it('reads the per-pack CSS referenced assets (e.g. the orb sprites)', function () {
     $assets = (new InstallResourcePack)->referencedAssets();
 
     expect($assets)->toContain('other/minimap_orb_hitpoints.png')
-        ->toContain('other/minimap_orb_special.png')
-        ->toContain('fixed_mode/minimap_and_compass_frame.png');
+        ->toContain('other/minimap_orb_special.png');
 });

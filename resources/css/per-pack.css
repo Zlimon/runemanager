@@ -438,11 +438,3 @@
 .status-orb--spec .status-orb__sphere {
     background-image: url('other/minimap_orb_special_icon.png'), url('other/minimap_orb_special.png');
 }
-
-/*
- * Account Show minimap: the OSRS fixed-mode minimap-and-compass frame overlaid
- * on the round map disc.
- */
-.minimap__frame {
-    background-image: url('fixed_mode/minimap_and_compass_frame.png');
-}
