@@ -37,8 +37,8 @@ const formatValue = (gp) => {
                 <section v-for="group in groups" :key="group.label" class="space-y-3">
                     <h2 class="text-lg font-semibold dark:text-white">{{ group.label }}</h2>
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                        <Link v-for="source in group.sources" :key="source.name"
-                              :href="route('hiscores.loot.show', source.name)"
+                        <Link v-for="source in group.sources" :key="`${source.type}:${source.name}`"
+                              :href="route('hiscores.loot.show', [source.type, source.name])"
                               class="flex flex-col gap-1 rounded p-4 transition hover:brightness-110 pack-bg-card resource-pack-border">
                             <span class="font-semibold text-base-content">{{ source.name }}</span>
                             <span class="text-sm text-base-content/70">{{ formatValue(source.total_value) }} gp</span>

@@ -8,6 +8,10 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    category: {
+        type: String,
+        default: null,
+    },
     hiscores: {
         type: Array,
         required: true,
@@ -43,6 +47,7 @@ const formatQuantity = (quantity) =>
                         ← Loot
                     </Link>
                     <h1 class="text-2xl font-bold dark:text-white">{{ source }}</h1>
+                    <span v-if="category" class="badge badge-neutral">{{ category }}</span>
                 </div>
 
                 <ul class="space-y-3">

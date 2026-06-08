@@ -24,28 +24,35 @@ class LootHiscoreController extends Controller
 
     private const OTHER_CATEGORY = 'Other';
 
+    private const OTHER_TOKEN = 'other';
+
     /**
      * SPEC §7 — loot directory. Lists every unique loot source grouped into
-     * category sections (by the plugin-recorded type), each carrying its
-     * combined value so the page can rank within a section. Drilling into a
-     * source hits {@see show()}.
+     * category sections by the plugin-recorded type. A source's identity is
+     * (source, type), not the name alone, so e.g. a pickpocketed "Man" and a
+     * killed "Man" are distinct entries in different sections — matching how
+     * the Loot Tracker itself records them. Drilling in hits {@see show()}.
      */
     public function index(): Response
     {
         $sources = collect($this->aggregate([
             ['$group' => [
-                '_id' => '$source',
-                'type' => ['$first' => '$type'],
+                '_id' => ['source' => '$source', 'type' => '$type'],
                 'total_value' => ['$sum' => '$total_value'],
                 'drops' => ['$sum' => 1],
             ]],
             ['$sort' => ['total_value' => -1]],
-        ]))->map(fn (array $row): array => [
-            'name' => (string) $row['_id'],
-            'total_value' => (int) $row['total_value'],
-            'drops' => (int) $row['drops'],
-            'category' => self::CATEGORIES[$row['type'] ?? ''] ?? self::OTHER_CATEGORY,
-        ]);
+        ]))->map(function (array $row): array {
+            $type = $row['_id']['type'] ?? null;
+
+            return [
+                'name' => (string) $row['_id']['source'],
+                'type' => $this->tokenFor($type),
+                'category' => $this->categoryFor($type),
+                'total_value' => (int) $row['total_value'],
+                'drops' => (int) $row['drops'],
+            ];
+        });
 
         $order = [...array_values(self::CATEGORIES), self::OTHER_CATEGORY];
 
@@ -66,14 +73,17 @@ class LootHiscoreController extends Controller
     }
 
     /**
-     * SPEC §7 — per-source board. Shows every account that has loot from this
-     * source, ranked by total value, each with the grid of items they've
-     * received (quantities summed across all of their drops).
+     * SPEC §7 — per-source board for one (source, type) pair. Shows every
+     * account with loot from it, ranked by total value, each with the grid of
+     * items they've received (quantities summed across all of their drops).
      */
-    public function show(string $source): Response
+    public function show(string $type, string $source): Response
     {
+        $recordType = $this->typeForToken($type);
+        $match = ['source' => $source, 'type' => $recordType];
+
         $totals = collect($this->aggregate([
-            ['$match' => ['source' => $source]],
+            ['$match' => $match],
             ['$group' => [
                 '_id' => '$account_id',
                 'total_value' => ['$sum' => '$total_value'],
@@ -88,7 +98,7 @@ class LootHiscoreController extends Controller
 
         abort_if($totals->isEmpty(), 404);
 
-        $itemsByAccount = $this->itemsByAccount($source);
+        $itemsByAccount = $this->itemsByAccount($match);
 
         $itemDetails = Item::lookupByOsrsIds(
             collect($itemsByAccount)
@@ -123,20 +133,22 @@ class LootHiscoreController extends Controller
         return Inertia::render('Hiscores/Loot/Show', [
             'recordType' => 'loot',
             'source' => $source,
+            'category' => $this->categoryFor($recordType),
             'hiscores' => $hiscores,
         ]);
     }
 
     /**
-     * Summed item quantities per account for a source, each account's items
-     * ordered by quantity. Keyed by account id.
+     * Summed item quantities per account for a (source, type) match, each
+     * account's items ordered by quantity. Keyed by account id.
      *
+     * @param  array<string, mixed>  $match
      * @return array<int, array<int, array{id: int, quantity: int}>>
      */
-    private function itemsByAccount(string $source): array
+    private function itemsByAccount(array $match): array
     {
         $rows = $this->aggregate([
-            ['$match' => ['source' => $source]],
+            ['$match' => $match],
             ['$unwind' => '$items'],
             ['$group' => [
                 '_id' => '$account_id',
@@ -163,6 +175,31 @@ class LootHiscoreController extends Controller
         }
 
         return $byAccount;
+    }
+
+    /**
+     * Display section for a record type (null/unknown types fall under "Other").
+     */
+    private function categoryFor(?string $type): string
+    {
+        return self::CATEGORIES[$type ?? ''] ?? self::OTHER_CATEGORY;
+    }
+
+    /**
+     * URL-safe token for a record type, used in the per-source route.
+     */
+    private function tokenFor(?string $type): string
+    {
+        return $type !== null ? strtolower($type) : self::OTHER_TOKEN;
+    }
+
+    /**
+     * Resolves a route token back to the stored record type (null for "other",
+     * which also matches legacy drops saved before types were recorded).
+     */
+    private function typeForToken(string $token): ?string
+    {
+        return strtolower($token) === self::OTHER_TOKEN ? null : strtoupper($token);
     }
 
     /**

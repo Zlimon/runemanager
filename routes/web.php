@@ -82,7 +82,7 @@ Route::middleware([
             ->name('hiscores.clues.index');
         // SPEC §7 — loot directory (grouped sources) + per-source board.
         Route::get('/loot', [LootHiscoreController::class, 'index'])->name('hiscores.loot.index');
-        Route::get('/loot/{source}', [LootHiscoreController::class, 'show'])
+        Route::get('/loot/{type}/{source}', [LootHiscoreController::class, 'show'])
             ->where('source', '.*')
             ->name('hiscores.loot.show');
     });
