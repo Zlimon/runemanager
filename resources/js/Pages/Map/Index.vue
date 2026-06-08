@@ -13,16 +13,24 @@ const props = defineProps({
     },
 });
 
-// OSRS map ↔ Leaflet transform (Explv's tiles + CRS.Simple). Constants and the
-// game(x,y) → pixel mapping are the canonical Explv/RuneScape map values.
-const MAP_HEIGHT_PX = 296704;
-const RS_TILE_PX = 32;
-const RS_OFFSET_X = 1152;
-const RS_OFFSET_Y = 8328;
-// begosrs tiles, not Explv's: the transform constants below are calibrated for
-// this re-rendered tile set (Explv's original tiles have a different origin and
-// land players in the wrong place).
-const TILES_URL = "https://raw.githubusercontent.com/begosrs/osrs-map-tiles/master/0/{z}/{x}/{y}.png";
+// Live OSRS map tiles from mejrs/layers_osrs — the same data the OSRS Wiki map
+// uses, re-rendered after each game update. Pointing at master keeps us current
+// automatically (no version to bump). With L.CRS.Simple the map's coordinate
+// space *is* game coordinates, so a position is simply [y, x] — no transform.
+const TILE_URL = "https://raw.githubusercontent.com/mejrs/layers_osrs/refs/heads/master/mapsquares/-1/{z}/{plane}_{x}_{y}.png";
+
+// Custom tile layer matching the wiki/mejrs scheme: filename is plane_x_y with
+// y flipped as -(1 + coords.y).
+const OsrsTileLayer = L.TileLayer.extend({
+    getTileUrl(coords) {
+        return L.Util.template(this._url, {
+            z: coords.z,
+            plane: this.options.plane ?? 0,
+            x: coords.x,
+            y: -(1 + coords.y),
+        });
+    },
+});
 
 // Drop a marker if no update arrives within this window (mirrors the server's
 // map.visible_within_minutes); keeps stale players from lingering on the map.
@@ -46,13 +54,8 @@ const buildCard = (account) => {
     return { el, app };
 };
 
-// Centre of the game tile -> latLng (the maintained BegOsrs toCentreLatLng:
-// x gets a quarter-tile nudge, y does not).
-const toLatLng = (account) => {
-    const px = (account.x + 0.5 - RS_OFFSET_X) * RS_TILE_PX + RS_TILE_PX / 4;
-    const py = MAP_HEIGHT_PX - (account.y + 0.5 - RS_OFFSET_Y) * RS_TILE_PX;
-    return map.unproject(L.point(px, py), map.getMaxZoom());
-};
+// CRS.Simple: game coordinates are the map coordinates, as [y, x].
+const toLatLng = (account) => L.latLng(account.y, account.x);
 
 const COLOURS = {
     ironman: "#d1d5db",
@@ -110,28 +113,27 @@ const sweepStale = () => {
 };
 
 onMounted(() => {
-    // Default CRS (EPSG3857) — the Explv tiles + the game→latLng transform below
-    // are calibrated for it; forcing CRS.Simple throws the tile coords off and
-    // every tile 404s.
     map = L.map(mapEl.value, {
-        minZoom: 4,
-        maxZoom: 11,
+        crs: L.CRS.Simple,
+        minZoom: -4,
+        maxZoom: 8,
         zoomControl: true,
     });
 
-    L.tileLayer(TILES_URL, {
-        minZoom: 4,
-        maxZoom: 11,
+    new OsrsTileLayer(TILE_URL, {
+        plane: 0,
+        minZoom: -4,
+        maxNativeZoom: 4,
+        maxZoom: 8,
         noWrap: true,
-        tms: true,
-        attribution: 'Map data © <a href="https://oldschool.runescape.wiki">OSRS Wiki</a> / Explv',
+        attribution: 'Map data © <a href="https://oldschool.runescape.wiki">OSRS Wiki</a> (mejrs)',
     }).addTo(map);
 
     props.accounts.forEach(upsert);
 
     // Centre on someone if we have them, otherwise on Lumbridge.
     const focus = props.accounts[0] ?? { x: 3221, y: 3219 };
-    map.setView(toLatLng(focus), 7);
+    map.setView(toLatLng(focus), 2);
 
     window.Echo.private("map").listen(".AccountMoved", (event) => upsert(event));
 
