@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Testing\AssertableInertia;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
@@ -79,6 +80,29 @@ it('rejects an out-of-range plane', function () {
 it('requires authentication', function () {
     $this->putJson('/api/plugin/position', ['x' => 1, 'y' => 2, 'plane' => 0], ['Accept' => 'application/json'])
         ->assertUnauthorized();
+});
+
+it('renders the map page with only currently-sharing accounts', function () {
+    config()->set('runemanager.map.visible_within_minutes', 2);
+    $user = User::factory()->withPersonalTeam()->create();
+
+    Account::factory()->for($user)->create(['username' => 'Sharing', 'account_type' => 'normal', 'world_x' => 3200, 'world_y' => 3200, 'world_plane' => 0, 'position_updated_at' => now()]);
+    Account::factory()->for($user)->create(['username' => 'Stale', 'world_x' => 1, 'world_y' => 1, 'world_plane' => 0, 'position_updated_at' => now()->subMinutes(30)]);
+
+    $this->actingAs($user)
+        ->get(route('map.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Map/Index')
+            ->has('accounts', 1)
+            ->where('accounts.0.username', 'Sharing')
+            ->where('accounts.0.x', 3200)
+            ->where('accounts.0.account_type', 'normal'),
+        );
+});
+
+it('requires authentication to view the map page', function () {
+    $this->get(route('map.index'))->assertRedirect(route('login'));
 });
 
 it('derives map presence within the window and drops stale positions', function () {

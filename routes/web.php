@@ -6,6 +6,7 @@ use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CollectionHiscoreController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\LootHiscoreController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
@@ -46,6 +47,9 @@ Route::middleware([
             )->resolve(),
         ]);
     })->name('dashboard');
+
+    // Live Map — see where accounts are in real time (positions over websockets).
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
 
     Route::prefix('/accounts')->group(function () {
         Route::get('/', [AccountController::class, 'index'])->name('accounts.index');

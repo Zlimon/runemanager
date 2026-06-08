@@ -84,6 +84,12 @@ watch(() => page.props.dark_mode, applyDarkMode);
                                 </ResponsiveNavLink>
                             </li>
                             <li>
+                                <ResponsiveNavLink :href="route('map.index')"
+                                                   :active="route().current('map.*')">
+                                    Live Map
+                                </ResponsiveNavLink>
+                            </li>
+                            <li>
                                 <ResponsiveNavLink :href="route('feed.index')"
                                                    :active="route().current('feed.*')">
                                     Live Feed
