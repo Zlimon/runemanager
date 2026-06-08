@@ -24,12 +24,16 @@ class StatusController extends Controller
 
         $validated = $request->validate([
             'activity' => ['nullable', 'string', 'max:60'],
+            'location' => ['nullable', 'string', 'max:60'],
         ]);
 
-        $account->forceFill(['activity' => $validated['activity'] ?? null])->save();
+        $account->forceFill([
+            'activity' => $validated['activity'] ?? null,
+            'location' => $validated['location'] ?? null,
+        ])->save();
 
         broadcast(new AccountStatusUpdated($account));
 
-        return response()->json(['data' => ['activity' => $account->activity]]);
+        return response()->json(['data' => ['activity' => $account->activity, 'location' => $account->location]]);
     }
 }

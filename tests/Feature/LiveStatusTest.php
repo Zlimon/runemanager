@@ -33,16 +33,17 @@ it('stores the activity and broadcasts it on the account + map channels', functi
     Event::fake([AccountStatusUpdated::class]);
     Sanctum::actingAs(statusUser());
 
-    $this->putJson('/api/plugin/status', ['activity' => 'Fighting Vorkath'], statusHeaders())->assertSuccessful();
+    $this->putJson('/api/plugin/status', ['activity' => 'Fighting Vorkath', 'location' => 'Ungael'], statusHeaders())->assertSuccessful();
 
     $account = Account::firstOrFail();
     expect($account->activity)->toBe('Fighting Vorkath');
+    expect($account->location)->toBe('Ungael');
 
     Event::assertDispatched(AccountStatusUpdated::class, function (AccountStatusUpdated $event) use ($account): bool {
         $channels = array_map(fn ($c) => $c->name, $event->broadcastOn());
 
         return $event->account->is($account)
-            && $event->broadcastWith() === ['username' => $account->username, 'activity' => 'Fighting Vorkath']
+            && $event->broadcastWith() === ['username' => $account->username, 'activity' => 'Fighting Vorkath', 'location' => 'Ungael']
             && in_array('private-account.'.$account->id, $channels, true)
             && in_array('private-map', $channels, true);
     });
@@ -67,12 +68,19 @@ it('requires authentication', function () {
     $this->putJson('/api/plugin/status', ['activity' => 'Idle'], ['Accept' => 'application/json'])->assertUnauthorized();
 });
 
-it('exposes activity through the account resource', function () {
+it('exposes activity + location on the account show page', function () {
     $user = User::factory()->withPersonalTeam()->create();
-    $account = Account::factory()->for($user)->create(['username' => 'Busy', 'activity' => 'Woodcutting']);
+    $account = Account::factory()->for($user)->create([
+        'username' => 'Busy',
+        'activity' => 'Woodcutting',
+        'location' => 'Woodcutting Guild',
+    ]);
 
     $this->actingAs($user)
         ->get(route('accounts.show', $account))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->where('account.activity', 'Woodcutting'));
+        ->assertInertia(fn ($page) => $page
+            ->where('account.activity', 'Woodcutting')
+            ->where('location', 'Woodcutting Guild'),
+        );
 });

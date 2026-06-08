@@ -80,6 +80,10 @@ class AccountController extends Controller
             // (VitalsUpdated). Null until the plugin first pushes them.
             'vitals' => $account->vitalsPayload(),
 
+            // Named area the character is in (for the minimap caption); updated
+            // live over the account channel (StatusUpdated).
+            'location' => $account->location,
+
             'inventory' => fn () => $account->inventory
                 ? (new InventoryResource($account->inventory))->resolve()
                 : null,

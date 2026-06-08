@@ -45,6 +45,7 @@ class AccountStatusUpdated implements ShouldBroadcastNow
         return [
             'username' => $this->account->username,
             'activity' => $this->account->activity,
+            'location' => $this->account->location,
         ];
     }
 }

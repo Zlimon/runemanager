@@ -58,6 +58,10 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    location: {
+        type: String,
+        default: null,
+    },
     vitals: {
         type: Object,
         default: null,
@@ -72,8 +76,9 @@ const props = defineProps({
 // the values inline) rather than via a prop reload.
 const liveVitals = ref(props.vitals);
 
-// Current in-game activity — pushed live on its own broadcast.
+// Current in-game activity + area — pushed live on the status broadcast.
 const liveActivity = ref(props.account.activity);
+const liveLocation = ref(props.location);
 
 const activeTab = ref('inventory');
 
@@ -122,7 +127,10 @@ onMounted(() => {
     window.Echo.private(channel)
         .listen(".DataUpdated", (event) => scheduleReload(event.type))
         .listen(".VitalsUpdated", (event) => { liveVitals.value = event; })
-        .listen(".StatusUpdated", (event) => { liveActivity.value = event.activity; });
+        .listen(".StatusUpdated", (event) => {
+            liveActivity.value = event.activity;
+            liveLocation.value = event.location;
+        });
 });
 
 onBeforeUnmount(() => {
@@ -146,8 +154,14 @@ onBeforeUnmount(() => {
                         <Header :account="account" :activity="liveActivity" class="flex-1" />
                         <div class="hidden shrink-0 items-start gap-3 md:flex">
                             <StatusOrbs :vitals="liveVitals" />
-                            <Minimap :username="account.username" :position="position"
-                                     :href="position ? route('map.index', { focus: account.username }) : null" />
+                            <div class="flex flex-col items-center gap-1">
+                                <Minimap :username="account.username" :position="position"
+                                         :href="position ? route('map.index', { focus: account.username }) : null" />
+                                <p v-if="account.online && liveLocation"
+                                   class="max-w-[12rem] truncate text-xs text-base-content/70" :title="liveLocation">
+                                    {{ liveLocation }}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
