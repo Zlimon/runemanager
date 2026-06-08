@@ -43,7 +43,9 @@ const iconFor = (account) =>
     L.divIcon({
         className: "",
         html: `<div class="map-pin"><span class="map-pin-dot map-pin-${escapeHtml(account.account_type)}"></span><span class="map-pin-label">${escapeHtml(account.username)}</span></div>`,
-        iconAnchor: [5, 5],
+        // Anchor the dot's centre on the position (dot is 10px, vertically centred
+        // in the ~14px row). The label hangs off to the right, not centred.
+        iconAnchor: [5, 7],
     });
 
 const upsert = (account) => {
@@ -131,7 +133,6 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 4px;
     white-space: nowrap;
-    transform: translate(-50%, -50%);
     width: max-content;
 }
 .map-pin-dot {
