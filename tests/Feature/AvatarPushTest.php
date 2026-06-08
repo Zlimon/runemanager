@@ -1,9 +1,11 @@
 <?php
 
+use App\Events\AccountDataUpdated;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
@@ -49,6 +51,21 @@ it('stores the obj + mtl pair and stamps the account', function () {
 
     expect($account->avatar_uploaded_at)->not->toBeNull();
     $response->assertJsonPath('data.avatar_uploaded_at', $account->avatar_uploaded_at->toIso8601String());
+});
+
+it('broadcasts AccountDataUpdated(avatar) so an open profile reloads the model', function () {
+    Event::fake([AccountDataUpdated::class]);
+    Sanctum::actingAs(avatarUser());
+
+    $this->post('/api/plugin/avatar', [
+        'model' => UploadedFile::fake()->createWithContent('player-808-0.obj', "o player\nv 0 0 0\n"),
+    ], avatarHeaders())->assertSuccessful();
+
+    $account = Account::firstOrFail();
+    Event::assertDispatched(
+        AccountDataUpdated::class,
+        fn (AccountDataUpdated $event): bool => $event->account->is($account) && $event->type === 'avatar',
+    );
 });
 
 it('accepts a model with no material and clears any stale material', function () {

@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
@@ -183,6 +183,22 @@ onMounted(() => {
         initViewer();
     }
 });
+
+// A live avatar push (equipment change) bumps obj_url's cache-buster — tear the
+// scene down and reload so the new model appears without a page refresh.
+watch(
+    () => props.avatar?.obj_url,
+    (url, previous) => {
+        if (url === previous) {
+            return;
+        }
+        disposeScene();
+        status.value = "idle";
+        if (props.avatar) {
+            initViewer();
+        }
+    },
+);
 
 onBeforeUnmount(disposeScene);
 </script>

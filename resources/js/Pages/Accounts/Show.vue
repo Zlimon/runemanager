@@ -76,6 +76,7 @@ const RELOAD_PROPS = {
     equipment: ['account', 'freshness'],
     looting_bag: ['lootingBag', 'freshness'],
     loot: ['recentLoot', 'freshness'],
+    avatar: ['avatar', 'freshness'],
 };
 
 const pendingProps = new Set();

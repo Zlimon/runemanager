@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAvatarRequest;
 use App\Models\Account;
@@ -39,6 +40,8 @@ class AvatarController extends Controller
         }
 
         $account->forceFill(['avatar_uploaded_at' => now()])->save();
+
+        broadcast(new AccountDataUpdated($account, 'avatar'));
 
         return response()->json([
             'data' => [
