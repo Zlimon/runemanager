@@ -35,9 +35,30 @@ it('also gates the public pages for an authenticated user during setup', functio
     }
 });
 
-it('still serves the public pages to guests during setup', function () {
-    $this->get(route('announcements.index'))->assertOk();
-    $this->get(route('calendar.index'))->assertOk();
+it('shows guests a setup-in-progress page during setup', function () {
+    $this->get(route('announcements.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('SetupInProgress'));
+
+    $this->get(route('calendar.index'))
+        ->assertInertia(fn ($page) => $page->component('SetupInProgress'));
+});
+
+it('shows authenticated non-admins a setup-in-progress page during setup', function () {
+    foreach (['owner', 'admin', 'member'] as $role) {
+        Role::findOrCreate($role, 'web');
+    }
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('member');
+
+    $this->actingAs($member)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('SetupInProgress'));
+});
+
+it('keeps the auth routes open during setup', function () {
+    $this->get(route('login'))->assertOk();
+    $this->get(route('register'))->assertOk();
 });
 
 it('lets the owner reach the setup page while unconfigured', function () {
