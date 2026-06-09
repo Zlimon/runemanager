@@ -98,6 +98,9 @@ class AccountController extends Controller
 
             'quests' => fn () => $account->quests,
 
+            // SPEC §5.2 — Achievement Diary completion ({area: {tier: bool}}).
+            'diaries' => fn () => $account->diary?->diaries ?? [],
+
             'avatar' => fn () => $account->avatarPayload(),
 
             // SPEC §5.2 Loot — append-only history. Latest 25 drops with hydrated
@@ -116,6 +119,7 @@ class AccountController extends Controller
                 'bank' => optional($account->bank)->updated_at?->toIso8601String(),
                 'looting_bag' => optional($account->lootingBag)->updated_at?->toIso8601String(),
                 'quests' => optional($account->quests)->updated_at?->toIso8601String(),
+                'diaries' => optional($account->diary)->updated_at?->toIso8601String(),
                 'equipment' => optional($account->equipment)->updated_at?->toIso8601String(),
                 'avatar' => $account->avatar_uploaded_at?->toIso8601String(),
                 'loot' => $account->latestLootKilledAt()?->toIso8601String(),

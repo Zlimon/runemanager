@@ -45,7 +45,7 @@ const items = computed(() => lists.value[activeKey.value]);
 
         <div tabindex="0"
              class="dropdown-content z-50 mt-2 w-[32rem] max-w-[90vw] rounded border border-base-300 bg-base-200 p-3 shadow-xl resource-pack-dialog">
-            <div class="mb-3 grid grid-cols-2 gap-1">
+            <div class="mb-3 grid grid-cols-3 gap-1">
                 <Link :href="route('hiscores.overall.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
                     <img src="/images/skill/overall.png" class="h-5 w-5 object-contain" alt=""
@@ -62,6 +62,17 @@ const items = computed(() => lists.value[activeKey.value]);
                         <path d="M4 12v4c0 1.66 3.58 3 8 3s8-1.34 8-3v-4c0 1.66-3.58 3-8 3s-8-1.34-8-3Z" opacity="0.7" />
                     </svg>
                     Loot
+                </Link>
+
+                <Link :href="route('hiscores.diaries.index')"
+                      class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                    <svg class="h-5 w-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6M9 11h6" />
+                    </svg>
+                    Diaries
                 </Link>
             </div>
 

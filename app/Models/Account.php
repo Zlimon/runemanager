@@ -142,6 +142,11 @@ class Account extends Model
         return $this->hasOne(AccountHiscore::class);
     }
 
+    public function diary(): HasOne
+    {
+        return $this->hasOne(AccountDiary::class);
+    }
+
     /**
      * Public URLs for the player 3D model uploaded by the RuneLite plugin,
      * or null when no avatar has been pushed yet. The MTL is optional (colour-

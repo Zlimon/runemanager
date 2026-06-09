@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import CollectionLog from "@/Components/Game/CollectionLog.vue";
 import Loot from "@/Components/Game/Loot.vue";
 import Quests from "@/Components/Game/Quests.vue";
+import Diaries from "@/Components/Game/Diaries.vue";
 import Inventory from "@/Components/Game/Inventory.vue";
 import LootingBag from "@/Components/Game/LootingBag.vue";
 import Freshness from "@/Components/Freshness.vue";
@@ -41,6 +42,10 @@ const props = defineProps({
     quests: {
         type: Object,
         default: null,
+    },
+    diaries: {
+        type: Object,
+        default: () => ({}),
     },
     avatar: {
         type: Object,
@@ -105,6 +110,7 @@ const RELOAD_PROPS = {
     looting_bag: ['lootingBag', 'freshness'],
     loot: ['recentLoot', 'freshness'],
     avatar: ['avatar', 'freshness'],
+    diaries: ['diaries', 'freshness'],
 };
 
 const pendingProps = new Set();
@@ -232,6 +238,14 @@ onBeforeUnmount(() => {
                                         <Quests :quests="quests" />
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="mt-4 flex items-baseline justify-between">
+                                <h3 class="header-chatbox-sword">Achievement Diaries</h3>
+                                <Freshness :updated-at="freshness.diaries" :stale-after-minutes="staleAfter" />
+                            </div>
+                            <div class="mt-4">
+                                <Diaries :diaries="diaries" />
                             </div>
 
                             <h3 class="mt-4 header-chatbox-sword">Collection Log</h3>

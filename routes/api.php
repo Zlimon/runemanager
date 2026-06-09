@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\ClanController;
+use App\Http\Controllers\Api\DiaryController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\GroupBankController;
 use App\Http\Controllers\Api\HeartbeatController;
@@ -39,6 +40,8 @@ Route::middleware([
         Route::put('/group-bank', [GroupBankController::class, 'update'])->name('api.plugin.group-bank');
         Route::put('/equipment', [EquipmentController::class, 'update'])->name('api.plugin.equipment');
         Route::put('/quests', [QuestController::class, 'update'])->name('api.plugin.quests');
+        // SPEC §5.2 — Achievement Diary completion snapshot.
+        Route::put('/diaries', [DiaryController::class, 'update'])->name('api.plugin.diaries');
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
         // Loot is append-only — POST, not the snapshot PUT used by the others.
         Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');
