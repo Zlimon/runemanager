@@ -36,6 +36,23 @@ class Instance
     }
 
     /**
+     * Whether the owner has completed first-time setup. Until then the mode can
+     * be set freely; afterwards, changing it triggers a destructive reset.
+     */
+    public static function isConfigured(): bool
+    {
+        return (bool) SettingHelper::getSetting('instance_configured', false);
+    }
+
+    /**
+     * CLAN/GROUP gate registration on selecting a pre-created roster account.
+     */
+    public static function requiresRosterClaim(): bool
+    {
+        return self::isClan() || self::isGroup();
+    }
+
+    /**
      * The configured clan (CLAN) or group (GROUP) name, or null in CASUAL mode.
      */
     public static function name(): ?string
