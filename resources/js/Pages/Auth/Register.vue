@@ -8,13 +8,23 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 
+const props = defineProps({
+    rosterRequired: { type: Boolean, default: false },
+    rosterAccounts: { type: Array, default: () => [] },
+});
+
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
+    account_id: '',
     terms: false,
 });
+
+// Clan/group registration is closed until the roster has at least one
+// unclaimed account for the new user to select.
+const registrationClosed = props.rosterRequired && props.rosterAccounts.length === 0;
 
 const submit = () => {
     form.post(route('register'), {
@@ -31,8 +41,33 @@ const submit = () => {
             <AuthenticationCardLogo />
         </template>
 
-        <form @submit.prevent="submit">
-            <div>
+        <div v-if="registrationClosed"
+             class="rounded p-4 text-center text-sm pack-bg-card resource-pack-border">
+            Registration is currently closed — there are no available accounts to claim.
+            Ask an admin to add you to the roster, then register here.
+            <div class="mt-3">
+                <Link :href="route('login')" class="link link-hover">Back to login</Link>
+            </div>
+        </div>
+
+        <form v-else @submit.prevent="submit">
+            <div v-if="rosterRequired">
+                <InputLabel for="account_id" value="Your account" />
+                <select
+                    id="account_id"
+                    v-model="form.account_id"
+                    class="select select-bordered mt-1 block w-full"
+                    required
+                >
+                    <option value="" disabled>Select the account you own</option>
+                    <option v-for="account in rosterAccounts" :key="account.id" :value="account.id">
+                        {{ account.username }}
+                    </option>
+                </select>
+                <InputError class="mt-2" :message="form.errors.account_id" />
+            </div>
+
+            <div :class="{ 'mt-4': rosterRequired }">
                 <InputLabel for="name" value="Name" />
                 <TextInput
                     id="name"
