@@ -12,6 +12,7 @@ use App\Http\Controllers\OverallHiscoreController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
+use App\Http\Middleware\EnsureInstanceConfigured;
 use App\Http\Resources\AnnouncementResource;
 use App\Models\Announcement;
 use Illuminate\Foundation\Application;
@@ -40,6 +41,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+    EnsureInstanceConfigured::class,
 ])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard', [
