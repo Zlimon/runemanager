@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\ClanController;
 use App\Http\Controllers\Api\EquipmentController;
+use App\Http\Controllers\Api\GroupBankController;
 use App\Http\Controllers\Api\HeartbeatController;
 use App\Http\Controllers\Api\HiscoreController;
 use App\Http\Controllers\Api\InventoryController;
@@ -34,6 +35,8 @@ Route::middleware([
     Route::middleware('plugin.account')->prefix('/plugin')->group(function () {
         Route::put('/inventory', [InventoryController::class, 'update'])->name('api.plugin.inventory');
         Route::put('/bank', [BankController::class, 'update'])->name('api.plugin.bank');
+        // SPEC §5.2 — shared Group Ironman group bank (GROUP mode); singleton, overwritten.
+        Route::put('/group-bank', [GroupBankController::class, 'update'])->name('api.plugin.group-bank');
         Route::put('/equipment', [EquipmentController::class, 'update'])->name('api.plugin.equipment');
         Route::put('/quests', [QuestController::class, 'update'])->name('api.plugin.quests');
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');

@@ -6,6 +6,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CollectionHiscoreController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\GroupBankController;
 use App\Http\Controllers\LootHiscoreController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\OverallHiscoreController;
@@ -52,6 +53,9 @@ Route::middleware([
 
     // Live Map — see where accounts are in real time (positions over websockets).
     Route::get('/map', [MapController::class, 'index'])->name('map.index');
+
+    // SPEC §5.2 — shared Group Ironman bank (GROUP mode only; controller 404s otherwise).
+    Route::get('/group-bank', [GroupBankController::class, 'index'])->name('group-bank.index');
 
     Route::prefix('/accounts')->group(function () {
         Route::get('/', [AccountController::class, 'index'])->name('accounts.index');

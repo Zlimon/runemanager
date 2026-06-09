@@ -89,6 +89,12 @@ watch(() => page.props.dark_mode, applyDarkMode);
                                     Live Map
                                 </ResponsiveNavLink>
                             </li>
+                            <li v-if="page.props.instance?.mode === 'group'">
+                                <ResponsiveNavLink :href="route('group-bank.index')"
+                                                   :active="route().current('group-bank.*')">
+                                    Group Bank
+                                </ResponsiveNavLink>
+                            </li>
                             <li>
                                 <ResponsiveNavLink :href="route('feed.index')"
                                                    :active="route().current('feed.*')">
