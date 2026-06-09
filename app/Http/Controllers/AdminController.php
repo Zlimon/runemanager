@@ -45,6 +45,7 @@ class AdminController extends Controller
                 'resource_pack_id' => (int) SettingHelper::getSetting('resource_pack_id', 0),
             ],
             'configured' => Instance::isConfigured(),
+            'accountCount' => Account::count(),
             'modes' => Instance::MODES,
             'packs' => ResourcePack::query()->orderBy('alias')->get(['id', 'alias'])
                 ->map(fn (ResourcePack $p): array => ['id' => $p->id, 'alias' => $p->alias])
@@ -67,17 +68,22 @@ class AdminController extends Controller
             'confirm' => ['nullable', 'string'],
         ]);
 
-        $modeChanged = Instance::isConfigured() && $validated['instance_mode'] !== Instance::mode();
-        // Only roster modes need a fresh account set; casual reuses what's there.
-        $destructive = $modeChanged && $validated['instance_mode'] !== Instance::MODE_CASUAL;
+        // Switching INTO a roster mode (clan/group) needs a fresh, roster-driven
+        // account set — including casual -> clan/group. Switching to casual (or
+        // staying put) keeps what's there. Confirmation is only demanded when
+        // there's actually account data to lose.
+        $switchingToRoster = $validated['instance_mode'] !== Instance::mode()
+            && $validated['instance_mode'] !== Instance::MODE_CASUAL;
+        $hasAccounts = Account::query()->exists();
 
-        if ($destructive && mb_strtolower(trim((string) ($validated['confirm'] ?? ''))) !== $validated['instance_mode']) {
+        if ($switchingToRoster && $hasAccounts
+            && mb_strtolower(trim((string) ($validated['confirm'] ?? ''))) !== $validated['instance_mode']) {
             throw ValidationException::withMessages([
                 'confirm' => 'Type the new mode name to confirm — this deletes all account data.',
             ]);
         }
 
-        if ($destructive) {
+        if ($switchingToRoster) {
             $reset->run();
         }
 
@@ -87,7 +93,7 @@ class AdminController extends Controller
         SettingHelper::setSetting('resource_pack_id', (int) ($validated['resource_pack_id'] ?? 0), 'int');
         SettingHelper::setSetting('instance_configured', true, 'bool');
 
-        return back()->with('status', $destructive
+        return back()->with('status', $switchingToRoster && $hasAccounts
             ? 'Instance reset and reconfigured.'
             : 'Instance settings updated.');
     }

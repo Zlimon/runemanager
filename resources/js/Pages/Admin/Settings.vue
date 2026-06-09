@@ -14,6 +14,7 @@ import TextInput from "@/Components/TextInput.vue";
 const props = defineProps({
     settings: { type: Object, required: true },
     configured: { type: Boolean, default: false },
+    accountCount: { type: Number, default: 0 },
     modes: { type: Array, required: true },
     packs: { type: Array, default: () => [] },
 });
@@ -36,12 +37,13 @@ const modeHint = computed(() => ({
     casual: 'Only the owner has admin access. Anyone can register.',
 }[form.instance_mode] ?? ''));
 
-// Switching into a roster mode (clan/group) after setup wipes all account data,
-// so it needs an explicit typed confirmation. Switching to casual keeps data.
+// Switching into a roster mode (clan/group) wipes all account data, so it needs
+// an explicit typed confirmation — but only when there's data to lose. Switching
+// to casual (or staying put) keeps data.
 const destructiveChange = computed(() =>
-    props.configured
-    && form.instance_mode !== props.settings.instance_mode
-    && form.instance_mode !== 'casual');
+    form.instance_mode !== props.settings.instance_mode
+    && form.instance_mode !== 'casual'
+    && props.accountCount > 0);
 
 const submit = () => {
     if (destructiveChange.value) {
@@ -147,9 +149,9 @@ const confirmReset = () => {
 
             <template #content>
                 <p class="text-sm text-base-content/80">
-                    This permanently deletes <strong>all accounts and their data</strong> (hiscores,
-                    bank, loot, inventory, clan ranks). User logins are kept but reset to plain
-                    members. This cannot be undone.
+                    This permanently deletes <strong>all {{ accountCount }} account(s) and their data</strong>
+                    (hiscores, bank, loot, inventory, clan ranks). User logins are kept but reset to
+                    plain members. This cannot be undone.
                 </p>
                 <div class="mt-4">
                     <InputLabel for="confirm" :value="`Type &quot;${form.instance_mode}&quot; to confirm`" />

@@ -19,19 +19,42 @@ function owner(): User
     return tap(User::factory()->withPersonalTeam()->create())->assignRole('owner');
 }
 
-it('treats the first save as setup without wiping anything', function () {
+it('completes first-time setup into a roster mode with no accounts and no confirmation', function () {
+    SettingHelper::setSetting('instance_configured', false, 'bool');
     $admin = owner();
-    Account::factory()->for($admin)->create(['username' => 'Existing']);
 
     $this->actingAs($admin)
         ->put(route('admin.settings.update'), [
             'instance_mode' => Instance::MODE_CLAN,
         ])
-        ->assertRedirect();
+        ->assertRedirect()
+        ->assertSessionHasNoErrors();
 
     expect(Instance::mode())->toBe(Instance::MODE_CLAN);
     expect(Instance::isConfigured())->toBeTrue();
-    expect(Account::where('username', 'Existing')->exists())->toBeTrue();
+});
+
+it('wipes account data when switching from casual to a roster mode', function () {
+    // Default mode is casual and the instance has never been configured.
+    $admin = owner();
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('member');
+    Account::factory()->for($member)->create(['username' => 'Casualacc']);
+
+    // Confirmation is required because there are accounts to delete.
+    $this->actingAs($admin)
+        ->put(route('admin.settings.update'), ['instance_mode' => Instance::MODE_CLAN])
+        ->assertSessionHasErrors('confirm');
+    expect(Account::count())->toBe(1);
+
+    $this->actingAs($admin)
+        ->put(route('admin.settings.update'), [
+            'instance_mode' => Instance::MODE_CLAN,
+            'confirm' => Instance::MODE_CLAN,
+        ])
+        ->assertRedirect();
+
+    expect(Instance::mode())->toBe(Instance::MODE_CLAN);
+    expect(Account::count())->toBe(0);
 });
 
 it('blocks a mode change without the typed confirmation', function () {
