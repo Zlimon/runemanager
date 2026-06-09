@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use App\Enums\AccountTypesEnum;
 use App\Models\Account;
-use App\Services\Accounts\GroupIronmanValidator;
 use App\Services\Accounts\RecordUsernameChange;
 use App\Support\Instance;
 use Closure;
@@ -30,10 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResolvePluginAccount
 {
-    public function __construct(
-        protected RecordUsernameChange $recorder,
-        protected GroupIronmanValidator $groupIronman,
-    ) {}
+    public function __construct(protected RecordUsernameChange $recorder) {}
 
     /**
      * @param  Closure(Request): (Response)  $next
@@ -59,6 +55,10 @@ class ResolvePluginAccount
             ], 422);
         }
 
+        // The plugin reports the in-game account type (read from the ACCOUNT_TYPE
+        // varbit). In GROUP mode the account must be a Group Ironman.
+        $reportedType = AccountTypesEnum::tryFrom((string) $request->header('X-Account-Type'));
+
         $account = Account::where('account_hash', $hash)->first();
 
         if ($account && $account->user_id !== $user->id) {
@@ -82,12 +82,10 @@ class ResolvePluginAccount
                 ], 403);
             }
 
-            // GROUP mode is a Group Ironman group: validate the account type
-            // (via TempleOSRS) before first linking/creating it. Steady-state
-            // pushes hit the hash-match path above and skip this check.
-            $claimingUnclaimed = $byUsername && $byUsername->user_id === null;
-            if (Instance::isGroup() && ($claimingUnclaimed || ! $byUsername)
-                && ! $this->groupIronman->isGroupIronman($username)) {
+            // GROUP mode is a Group Ironman group: confirm the plugin-reported
+            // type before first linking/creating. Steady-state pushes hit the
+            // hash-match path above and skip this check.
+            if (Instance::isGroup() && $reportedType !== AccountTypesEnum::GROUP_IRONMAN) {
                 return response()->json([
                     'message' => 'Only Group Ironman accounts can join this instance.',
                 ], 403);
@@ -98,24 +96,32 @@ class ResolvePluginAccount
                 // ownership, so link the (unclaimed) row and stamp the hash.
                 $byUsername->user_id = $user->id;
                 $byUsername->account_hash = $hash;
+                $byUsername->account_type = $reportedType ?? $byUsername->account_type ?? AccountTypesEnum::NORMAL;
                 $byUsername->save();
                 $account = $byUsername;
             } else {
                 $account = new Account;
                 $account->user_id = $user->id;
                 $account->account_hash = $hash;
-                $account->account_type = Instance::isGroup()
-                    ? AccountTypesEnum::GROUP_IRONMAN
-                    : AccountTypesEnum::NORMAL;
+                $account->account_type = $reportedType ?? AccountTypesEnum::NORMAL;
                 $account->username = $username;
                 $account->rank = 0;
                 $account->level = 0;
                 $account->xp = 0;
                 $account->save();
             }
-        } elseif ($account->username !== $username) {
-            $this->recorder->record($account, $username);
-            $account->refresh();
+        } else {
+            if ($account->username !== $username) {
+                $this->recorder->record($account, $username);
+                $account->refresh();
+            }
+
+            // Keep the stored account type in step with the live game (e.g. a
+            // hardcore ironman who died downgrades to a standard ironman).
+            if ($reportedType !== null && $account->account_type !== $reportedType) {
+                $account->account_type = $reportedType;
+                $account->save();
+            }
         }
 
         $request->attributes->set('account', $account);

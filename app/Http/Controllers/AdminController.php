@@ -8,7 +8,6 @@ use App\Models\Account;
 use App\Models\Announcement;
 use App\Models\ResourcePack;
 use App\Models\User;
-use App\Services\Accounts\GroupIronmanValidator;
 use App\Services\Instance\ResetInstanceData;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
@@ -117,7 +116,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function storeMember(Request $request, GroupIronmanValidator $gim): RedirectResponse
+    public function storeMember(Request $request): RedirectResponse
     {
         abort_unless(Instance::requiresRosterClaim(), 403, 'Members are only managed in clan or group mode.');
 
@@ -125,17 +124,10 @@ class AdminController extends Controller
             'username' => ['required', 'string', 'max:12', 'regex:/^[A-Za-z0-9 _-]+$/', 'unique:accounts,username'],
         ]);
 
-        $username = trim($validated['username']);
-
-        // GROUP mode is a Group Ironman group — only GIM accounts may join.
-        if (Instance::isGroup() && ! $gim->isGroupIronman($username)) {
-            throw ValidationException::withMessages([
-                'username' => "{$username} isn't a Group Ironman account (per TempleOSRS).",
-            ]);
-        }
-
+        // The account type is a placeholder until the member's first plugin
+        // login confirms it (and, in GROUP mode, that they're a Group Ironman).
         $account = new Account;
-        $account->username = $username;
+        $account->username = trim($validated['username']);
         $account->user_id = null;
         $account->account_hash = null;
         $account->account_type = Instance::isGroup()
