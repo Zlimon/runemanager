@@ -19,6 +19,7 @@ const props = defineProps({
 
 const page = usePage();
 const currentUserId = computed(() => page.props.auth?.user?.id ?? null);
+const isAdmin = computed(() => page.props.is_admin === true);
 
 const showCreate = ref(false);
 const form = useForm({
@@ -60,7 +61,7 @@ const dt = (iso) => dayjs(iso).format('ddd MMM D, YYYY h:mm A');
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="flex items-baseline justify-between">
                     <h1 class="header-chatbox-sword text-2xl font-bold dark:text-white">Calendar</h1>
-                    <PrimaryButton v-if="currentUserId" @click="openCreate">
+                    <PrimaryButton v-if="isAdmin" @click="openCreate">
                         New event
                     </PrimaryButton>
                 </div>
@@ -75,10 +76,10 @@ const dt = (iso) => dayjs(iso).format('ddd MMM D, YYYY h:mm A');
                         class="rounded p-4 pack-bg-card resource-pack-border">
                         <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center gap-2">
-                                <span class="badge badge-primary badge-lg">{{ event.event_type_label }}</span>
+                                <span class="badge badge-neutral badge-lg">{{ event.event_type_label }}</span>
                                 <h3 class="text-base font-semibold">{{ event.title }}</h3>
                             </div>
-                            <DangerButton v-if="currentUserId === event.created_by.id"
+                            <DangerButton v-if="isAdmin && currentUserId === event.created_by.id"
                                           type="button" class="btn-xs"
                                           @click="destroy(event)">
                                 Delete

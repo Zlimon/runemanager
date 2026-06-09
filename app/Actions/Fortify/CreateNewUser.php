@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
+use Spatie\Permission\Models\Role;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -37,6 +38,7 @@ class CreateNewUser implements CreatesNewUsers
                 'icon_id' => Item::randomItemId(),
             ]), function (User $user) {
                 $this->createTeam($user);
+                $this->assignDefaultRole($user);
             });
         });
     }
@@ -51,5 +53,20 @@ class CreateNewUser implements CreatesNewUsers
             'name' => explode(' ', $user->name, 2)[0]."'s Team",
             'personal_team' => true,
         ]));
+    }
+
+    /**
+     * The first registered user becomes the instance owner (SPEC §3.4);
+     * everyone after them joins as a member.
+     */
+    protected function assignDefaultRole(User $user): void
+    {
+        foreach (['owner', 'admin', 'member'] as $role) {
+            Role::findOrCreate($role, 'web');
+        }
+
+        $isFirstUser = ! Role::findByName('owner', 'web')->users()->exists();
+
+        $user->assignRole($isFirstUser ? 'owner' : 'member');
     }
 }

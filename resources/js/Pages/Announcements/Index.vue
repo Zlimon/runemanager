@@ -18,6 +18,7 @@ const props = defineProps({
 
 const page = usePage();
 const currentUserId = computed(() => page.props.auth?.user?.id ?? null);
+const isAdmin = computed(() => page.props.is_admin === true);
 
 const showCreate = ref(false);
 const form = useForm({
@@ -57,7 +58,7 @@ const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="flex items-baseline justify-between">
                     <h1 class="header-chatbox-sword text-2xl font-bold">Announcements</h1>
-                    <PrimaryButton v-if="currentUserId" @click="openCreate">
+                    <PrimaryButton v-if="isAdmin" @click="openCreate">
                         New announcement
                     </PrimaryButton>
                 </div>
@@ -72,7 +73,7 @@ const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
                         <Card padding="p-4">
                             <div class="flex items-start justify-between gap-2">
                                 <h3 class="text-base font-semibold">{{ announcement.title }}</h3>
-                                <DangerButton v-if="currentUserId === announcement.created_by.id"
+                                <DangerButton v-if="isAdmin && currentUserId === announcement.created_by.id"
                                               type="button" class="btn-xs"
                                               @click="destroy(announcement)">
                                     Delete

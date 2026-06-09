@@ -18,6 +18,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -74,7 +75,10 @@ class User extends Authenticatable
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
-    use HasTeams;
+    use HasRoles, HasTeams {
+        // Both traits ship a teams() relation; this app uses Jetstream's.
+        HasTeams::teams insteadof HasRoles;
+    }
     use Notifiable;
     use TwoFactorAuthenticatable;
 

@@ -8,7 +8,7 @@ class SettingHelper
 {
     public static function setSetting(string $key, $value, string $type = 'string'): bool
     {
-        return Setting::set($key, $value);
+        return Setting::set($key, $value, $type);
     }
 
     /**

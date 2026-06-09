@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
@@ -49,5 +50,36 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_first_user_becomes_owner_and_later_users_become_members(): void
+    {
+        if (! Features::enabled(Features::registration())) {
+            $this->markTestSkipped('Registration support is not enabled.');
+        }
+
+        $this->post('/register', [
+            'name' => 'First User',
+            'email' => 'first@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
+
+        $this->post('/logout');
+
+        $this->post('/register', [
+            'name' => 'Second User',
+            'email' => 'second@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
+
+        $first = User::where('email', 'first@example.com')->firstOrFail();
+        $second = User::where('email', 'second@example.com')->firstOrFail();
+
+        $this->assertTrue($first->hasRole('owner'));
+        $this->assertTrue($second->hasRole('member'));
     }
 }

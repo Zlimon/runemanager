@@ -24,8 +24,8 @@ it('renders the announcements index publicly with only active announcements newe
         );
 });
 
-it('lets authenticated users publish announcements', function () {
-    $user = User::factory()->withPersonalTeam()->create();
+it('lets admins publish announcements', function () {
+    $user = adminUser();
 
     $this->actingAs($user)
         ->post(route('announcements.store'), [
@@ -41,7 +41,7 @@ it('lets authenticated users publish announcements', function () {
 });
 
 it('validates the announcement payload', function () {
-    $user = User::factory()->withPersonalTeam()->create();
+    $user = adminUser();
 
     $this->actingAs($user)
         ->postJson(route('announcements.store'), ['title' => '', 'body' => '', 'expires_at' => now()->subDay()->toIso8601String()])
@@ -54,9 +54,17 @@ it('rejects guests from publishing', function () {
         ->assertRedirect(route('login'));
 });
 
-it('lets the author delete but forbids others', function () {
-    $author = User::factory()->withPersonalTeam()->create();
-    $other = User::factory()->withPersonalTeam()->create();
+it('rejects non-admins from publishing', function () {
+    $user = adminUser('member');
+
+    $this->actingAs($user)
+        ->post(route('announcements.store'), ['title' => 'x', 'body' => 'y'])
+        ->assertForbidden();
+});
+
+it('lets the author delete but forbids other admins', function () {
+    $author = adminUser();
+    $other = adminUser();
     $announcement = Announcement::factory()->for($author)->create();
 
     $this->actingAs($other)

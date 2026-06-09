@@ -107,6 +107,12 @@ watch(() => page.props.dark_mode, applyDarkMode);
                                     Announcements
                                 </ResponsiveNavLink>
                             </li>
+                            <li v-if="page.props.is_admin">
+                                <ResponsiveNavLink :href="route('admin.dashboard')"
+                                                   :active="route().current('admin.*')">
+                                    Admin
+                                </ResponsiveNavLink>
+                            </li>
                             <li>
                                 <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
                                                    :href="route('api-tokens.index')"

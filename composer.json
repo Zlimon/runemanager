@@ -19,6 +19,7 @@
         "laravel/tinker": "^3.0",
         "mongodb/laravel-mongodb": "^5.7",
         "opcodesio/log-viewer": "^3.24",
+        "spatie/laravel-permission": "^8.0",
         "symfony/dom-crawler": "^7.4",
         "tightenco/ziggy": "^2.6"
     },

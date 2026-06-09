@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CollectionHiscoreController;
@@ -57,16 +58,23 @@ Route::middleware([
         Route::get('/{account}', [AccountController::class, 'show'])->name('accounts.show');
     });
 
-    // SPEC §10.2 — creation & deletion require auth (proper role checks land
-    // alongside §3.4 + §12).
-    Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
-    Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])
-        ->name('calendar.destroy');
+    // SPEC §9/§10/§12 — admin-only management (announcements, calendar, instance
+    // config). In GROUP mode every member is an admin; see the `admin` gate.
+    Route::middleware('can:admin')->group(function () {
+        Route::prefix('/admin')->group(function () {
+            Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+            Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+            Route::put('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+        });
 
-    // SPEC §9 — admins create/delete announcements (role checks land with §3.4 + §12).
-    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
-    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
-        ->name('announcements.destroy');
+        Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
+        Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])
+            ->name('calendar.destroy');
+
+        Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+            ->name('announcements.destroy');
+    });
 
     // Per-user resource pack override (instance-global pack is set by the
     // resourcepack:switch artisan, not this endpoint).

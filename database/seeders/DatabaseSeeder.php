@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             OsrsboxStaticSeeder::class,
             UserSeeder::class,
             AccountSeeder::class,
+            RolesSeeder::class,
         ]);
 
         if (NewsPost::count() === 0) {

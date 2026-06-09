@@ -7,7 +7,9 @@ use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use App\Models\ResourcePack;
 use App\Models\Skill;
+use App\Support\Instance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Middleware;
 
@@ -54,10 +56,19 @@ class HandleInertiaRequests extends Middleware
         // and only then may they toggle it.
         $darkMode = $pack ? (bool) $pack->dark_mode : (bool) $request->user()?->dark_mode;
 
+        $user = $request->user();
+
         return array_merge(parent::share($request), [
             'app' => [
                 'name' => config('app.name'),
                 //                'url' => config('app.url'),
+            ],
+            // SPEC §12 — drives the admin-only nav entry. GROUP mode makes every
+            // authenticated member an admin; see the `admin` gate.
+            'is_admin' => $user !== null && Gate::forUser($user)->allows('admin'),
+            'instance' => [
+                'mode' => Instance::mode(),
+                'name' => Instance::name(),
             ],
             'dark_mode' => $darkMode,
             'can_toggle_dark_mode' => $request->user() !== null && $pack === null,

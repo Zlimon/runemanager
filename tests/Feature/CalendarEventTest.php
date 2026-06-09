@@ -25,8 +25,8 @@ it('renders the calendar index publicly with split upcoming + past lists', funct
         );
 });
 
-it('lets authenticated users create events', function () {
-    $user = User::factory()->withPersonalTeam()->create();
+it('lets admins create events', function () {
+    $user = adminUser();
 
     $this->actingAs($user)
         ->post(route('calendar.store'), [
@@ -56,7 +56,7 @@ it('rejects unauthenticated creates', function () {
 });
 
 it('rejects an end-before-start window', function () {
-    $user = User::factory()->withPersonalTeam()->create();
+    $user = adminUser();
 
     $this->actingAs($user)
         ->post(route('calendar.store'), [
@@ -71,7 +71,7 @@ it('rejects an end-before-start window', function () {
 });
 
 it('rejects an unknown event_type', function () {
-    $user = User::factory()->withPersonalTeam()->create();
+    $user = adminUser();
 
     $this->actingAs($user)
         ->post(route('calendar.store'), [
@@ -83,7 +83,7 @@ it('rejects an unknown event_type', function () {
 });
 
 it('lets the creator delete their own event', function () {
-    $user = User::factory()->withPersonalTeam()->create();
+    $user = adminUser();
     $event = CalendarEvent::factory()->for($user)->create();
 
     $this->actingAs($user)
@@ -94,8 +94,8 @@ it('lets the creator delete their own event', function () {
 });
 
 it('forbids non-creators from deleting other users events', function () {
-    $owner = User::factory()->withPersonalTeam()->create();
-    $intruder = User::factory()->withPersonalTeam()->create();
+    $owner = adminUser();
+    $intruder = adminUser();
     $event = CalendarEvent::factory()->for($owner)->create();
 
     $this->actingAs($intruder)

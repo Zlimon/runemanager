@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,8 +12,8 @@ use Illuminate\Support\Collection;
  * @property string $key
  * @property string $value
  * @property string $type
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Setting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Setting newQuery()
@@ -160,24 +161,17 @@ class Setting extends Model
     }
 
     /**
-     * Caste value into respective type
+     * Cast a stored value into its declared type. The `type` column is a
+     * space-padded char(20), so trim before matching; returning `mixed` keeps
+     * string settings intact (a `bool|int` return type silently coerced them).
      */
-    private static function castValue($value, $castTo): bool|int
+    private static function castValue($value, $castTo): mixed
     {
-        switch ($castTo) {
-            case 'int':
-            case 'integer':
-                return intval($value);
-                break;
-
-            case 'bool':
-            case 'boolean':
-                return boolval($value);
-                break;
-
-            default:
-                return $value;
-        }
+        return match (trim((string) $castTo)) {
+            'int', 'integer' => intval($value),
+            'bool', 'boolean' => boolval($value),
+            default => $value,
+        };
     }
 
     /**
