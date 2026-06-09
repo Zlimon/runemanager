@@ -3,18 +3,16 @@
 use App\Helpers\SettingHelper;
 use App\Models\User;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 function setupOwner(): User
 {
-    foreach (['owner', 'admin', 'member'] as $role) {
-        Role::findOrCreate($role, 'web');
-    }
+    Roles::sync();
 
-    return tap(User::factory()->withPersonalTeam()->create())->assignRole('owner');
+    return tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::OWNER);
 }
 
 beforeEach(fn () => SettingHelper::setSetting('instance_configured', false, 'bool'));
@@ -45,10 +43,8 @@ it('shows guests a setup-in-progress page during setup', function () {
 });
 
 it('shows authenticated non-admins a setup-in-progress page during setup', function () {
-    foreach (['owner', 'admin', 'member'] as $role) {
-        Role::findOrCreate($role, 'web');
-    }
-    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('member');
+    Roles::sync();
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::USER);
 
     $this->actingAs($member)
         ->get(route('dashboard'))

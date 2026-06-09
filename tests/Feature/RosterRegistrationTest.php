@@ -4,10 +4,10 @@ use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\User;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -16,9 +16,7 @@ beforeEach(function () {
         $this->markTestSkipped('Registration is not enabled.');
     }
 
-    foreach (['owner', 'admin', 'member'] as $role) {
-        Role::findOrCreate($role, 'web');
-    }
+    Roles::sync();
 });
 
 function registerPayload(array $overrides = []): array
@@ -41,15 +39,15 @@ it('requires claiming a roster account in clan mode', function () {
     $this->assertGuest();
 });
 
-it('links the claimed account and syncs the role on registration', function () {
+it('links the claimed account on registration as a plain User', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_CLAN);
     // Pre-seed the owner so the new user isn't the bootstrap owner.
-    User::factory()->withPersonalTeam()->create()->assignRole('owner');
+    User::factory()->withPersonalTeam()->create()->assignRole(Roles::OWNER);
 
     $account = Account::factory()->create([
         'username' => 'Claimee',
         'user_id' => null,
-        'clan_rank' => 126, // OWNER -> admin
+        'clan_rank' => 126,
     ]);
 
     $this->post('/register', registerPayload(['account_id' => $account->id]))
@@ -58,7 +56,8 @@ it('links the claimed account and syncs the role on registration', function () {
     $this->assertAuthenticated();
     $user = User::where('email', 'new@example.com')->firstOrFail();
     expect($account->fresh()->user_id)->toBe($user->id);
-    expect($user->hasRole('admin'))->toBeTrue();
+    // Clan-rank → role elevation is deferred; the new user is a plain User.
+    expect($user->hasRole(Roles::USER))->toBeTrue();
 });
 
 it('rejects claiming an already-claimed account', function () {

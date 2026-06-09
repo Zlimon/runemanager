@@ -2,6 +2,7 @@
 
 use App\Models\Announcement;
 use App\Models\User;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 
@@ -55,7 +56,7 @@ it('rejects guests from publishing', function () {
 });
 
 it('rejects non-admins from publishing', function () {
-    $user = adminUser('member');
+    $user = adminUser(Roles::USER);
 
     $this->actingAs($user)
         ->post(route('announcements.store'), ['title' => 'x', 'body' => 'y'])

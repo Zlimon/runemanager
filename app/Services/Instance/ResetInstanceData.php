@@ -14,7 +14,7 @@ use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
-use Spatie\Permission\Models\Role;
+use App\Support\Roles;
 
 /**
  * SPEC §5/§12 — wipe all account data when the instance mode changes. The site's
@@ -41,11 +41,11 @@ class ResetInstanceData
         UsernameHistory::query()->delete();
         Account::query()->delete();
 
-        // Strip clan/group-derived roles back to member, leaving the owner alone.
-        Role::findOrCreate('member', 'web');
+        // Strip any elevated roles back to a plain User, leaving the Owner alone.
+        Roles::sync();
         User::query()
-            ->whereDoesntHave('roles', fn ($query) => $query->where('name', 'owner'))
+            ->whereDoesntHave('roles', fn ($query) => $query->where('name', Roles::OWNER))
             ->get()
-            ->each(fn (User $user) => $user->syncRoles(['member']));
+            ->each(fn (User $user) => $user->syncRoles([Roles::USER]));
     }
 }

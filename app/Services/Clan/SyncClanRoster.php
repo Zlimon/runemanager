@@ -14,8 +14,6 @@ use App\Models\Account;
  */
 class SyncClanRoster
 {
-    public function __construct(private SyncClanRole $syncClanRole) {}
-
     /**
      * @param  array<int, array{username: string, rank?: int|null, title?: string|null}>  $members
      * @return int the number of roster members upserted
@@ -51,10 +49,7 @@ class SyncClanRoster
             $account->clan_title = $member['title'] ?? null;
             $account->save();
 
-            // Refresh the role of members who have already claimed their account.
-            if ($account->user_id !== null) {
-                $this->syncClanRole->forAccount($account);
-            }
+            // Clan-rank → website-role mapping is deferred (SPEC §5.2, later).
 
             $count++;
         }

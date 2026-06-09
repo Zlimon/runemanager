@@ -1,20 +1,19 @@
 <?php
 
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use App\Support\Roles;
 use Tests\TestCase;
 
 uses(TestCase::class)->in('Feature', 'Unit');
 
 /**
- * Create a user that passes the `admin` gate. Ensures the base roles exist
- * (RefreshDatabase wipes them) and assigns the given role.
+ * Create a user with the given base role (defaults to Owner, which holds every
+ * management permission). Ensures the roles/permissions exist first, since
+ * RefreshDatabase wipes them.
  */
-function adminUser(string $role = 'admin'): User
+function adminUser(string $role = Roles::OWNER): User
 {
-    foreach (['owner', 'admin', 'member'] as $name) {
-        Role::findOrCreate($name, 'web');
-    }
+    Roles::sync();
 
     return tap(User::factory()->withPersonalTeam()->create())->assignRole($role);
 }

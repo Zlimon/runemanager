@@ -6,8 +6,8 @@ use App\Models\Account;
 use App\Models\Item;
 use App\Models\Team;
 use App\Models\User;
-use App\Services\Clan\SyncClanRole;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -19,8 +19,6 @@ use Spatie\Permission\Models\Role;
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
-
-    public function __construct(private SyncClanRole $syncClanRole) {}
 
     /**
      * Create a newly registered user. In clan/group mode the user must claim a
@@ -78,24 +76,21 @@ class CreateNewUser implements CreatesNewUsers
     }
 
     /**
-     * The first registered user becomes the instance owner (SPEC §3.4);
-     * everyone after them joins as a member.
+     * The first registered user becomes the instance Owner (SPEC §3.4);
+     * everyone after them joins as a plain User.
      */
     protected function assignDefaultRole(User $user): void
     {
-        foreach (['owner', 'admin', 'member'] as $role) {
-            Role::findOrCreate($role, 'web');
-        }
+        Roles::sync();
 
-        $isFirstUser = ! Role::findByName('owner', 'web')->users()->exists();
+        $isFirstUser = ! Role::findByName(Roles::OWNER, 'web')->users()->exists();
 
-        $user->assignRole($isFirstUser ? 'owner' : 'member');
+        $user->assignRole($isFirstUser ? Roles::OWNER : Roles::USER);
     }
 
     /**
      * Link the selected roster account to the new user. Locked + re-checked so
-     * two simultaneous registrations can't both claim the same account; in clan
-     * mode the user's role is then synced from the account's rank.
+     * two simultaneous registrations can't both claim the same account.
      */
     protected function claimAccount(User $user, int $accountId): void
     {
@@ -107,7 +102,5 @@ class CreateNewUser implements CreatesNewUsers
 
         $account->user_id = $user->id;
         $account->save();
-
-        $this->syncClanRole->forAccount($account);
     }
 }

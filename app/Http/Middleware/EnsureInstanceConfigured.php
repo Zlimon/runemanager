@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Support\Instance;
+use App\Support\Roles;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +26,7 @@ class EnsureInstanceConfigured
 
         $user = $request->user();
 
-        if ($user !== null && Gate::forUser($user)->allows('admin')) {
+        if ($user !== null && $user->can(Roles::MANAGE_INSTANCE)) {
             return redirect()->route('admin.settings');
         }
 

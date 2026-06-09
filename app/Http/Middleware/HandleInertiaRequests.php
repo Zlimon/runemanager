@@ -8,8 +8,8 @@ use App\Models\Account;
 use App\Models\ResourcePack;
 use App\Models\Skill;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Middleware;
 
@@ -63,9 +63,9 @@ class HandleInertiaRequests extends Middleware
                 'name' => config('app.name'),
                 //                'url' => config('app.url'),
             ],
-            // SPEC §12 — drives the admin-only nav entry. GROUP mode makes every
-            // authenticated member an admin; see the `admin` gate.
-            'is_admin' => $user !== null && Gate::forUser($user)->allows('admin'),
+            // SPEC §12 — drives the admin-only nav entry. The Owner holds every
+            // management permission; clan/group elevation comes later.
+            'is_admin' => $user !== null && $user->can(Roles::MANAGE_INSTANCE),
             'instance' => [
                 'mode' => Instance::mode(),
                 'name' => Instance::name(),

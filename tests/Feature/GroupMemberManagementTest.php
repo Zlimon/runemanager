@@ -4,18 +4,16 @@ use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\User;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 function groupAdmin(): User
 {
-    foreach (['owner', 'admin', 'member'] as $name) {
-        Role::findOrCreate($name, 'web');
-    }
+    Roles::sync();
 
-    return tap(User::factory()->withPersonalTeam()->create())->assignRole('owner');
+    return tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::OWNER);
 }
 
 beforeEach(function () {

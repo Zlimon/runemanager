@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
-use App\Services\Clan\SyncClanRole;
 use App\Services\Clan\SyncClanRoster;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 /**
  * SPEC §5.2 — clan endpoints pushed by the plugin:
@@ -21,10 +20,7 @@ use Illuminate\Support\Facades\Gate;
  */
 class ClanController extends Controller
 {
-    public function __construct(
-        private SyncClanRole $syncClanRole,
-        private SyncClanRoster $syncClanRoster,
-    ) {}
+    public function __construct(private SyncClanRoster $syncClanRoster) {}
 
     public function update(Request $request): JsonResponse
     {
@@ -41,7 +37,7 @@ class ClanController extends Controller
             'clan_title' => $validated['clan_title'] ?? null,
         ])->save();
 
-        $this->syncClanRole->forAccount($account);
+        // Clan-rank → website-role mapping is deferred (SPEC §5.2, later).
 
         return response()->json(['data' => [
             'clan_rank' => $account->clan_rank,
@@ -50,13 +46,13 @@ class ClanController extends Controller
     }
 
     /**
-     * Seed/refresh the clan roster. Only an admin (the clan owner) may push it,
-     * and only while the instance is in CLAN mode.
+     * Seed/refresh the clan roster. Requires the member-management permission
+     * (the clan owner is the instance Owner), and only while in CLAN mode.
      */
     public function roster(Request $request): JsonResponse
     {
-        if (! Gate::forUser($request->user())->allows('admin')) {
-            abort(403, 'Only an admin can seed the clan roster.');
+        if (! $request->user()->can(Roles::MANAGE_MEMBERS)) {
+            abort(403, 'You do not have permission to seed the clan roster.');
         }
 
         $validated = $request->validate([

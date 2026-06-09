@@ -4,9 +4,9 @@ use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\User;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -19,11 +19,9 @@ function ownerHeaders(): array
     ];
 }
 
-function admin(string $role = 'admin'): User
+function rosterUser(string $role = Roles::OWNER): User
 {
-    foreach (['owner', 'admin', 'member'] as $name) {
-        Role::findOrCreate($name, 'web');
-    }
+    Roles::sync();
 
     return tap(User::factory()->withPersonalTeam()->create())->assignRole($role);
 }
@@ -33,7 +31,7 @@ beforeEach(function () {
 });
 
 it('pre-creates unclaimed accounts from the roster and sets the clan name', function () {
-    Sanctum::actingAs(admin('owner'));
+    Sanctum::actingAs(rosterUser(Roles::OWNER));
 
     $this->postJson('/api/plugin/clan/roster', [
         'clan_name' => 'Knights of Falador',
@@ -53,7 +51,7 @@ it('pre-creates unclaimed accounts from the roster and sets the clan name', func
 });
 
 it('refreshes rank/title on an existing roster account without re-running on every push', function () {
-    Sanctum::actingAs(admin('owner'));
+    Sanctum::actingAs(rosterUser(Roles::OWNER));
 
     $this->postJson('/api/plugin/clan/roster', [
         'clan_name' => 'Knights of Falador',
@@ -70,25 +68,25 @@ it('refreshes rank/title on an existing roster account without re-running on eve
     expect($woox->clan_rank)->toBe(100);
 });
 
-it('promotes a claimed member when the roster gives them an admin rank', function () {
-    $member = User::factory()->withPersonalTeam()->create();
-    foreach (['owner', 'admin', 'member'] as $name) {
-        Role::findOrCreate($name, 'web');
-    }
+it('refreshes the rank/title on a claimed account without changing the role', function () {
+    $member = rosterUser(Roles::USER);
     Account::factory()->for($member)->create(['username' => 'Linked', 'clan_rank' => 1]);
 
-    Sanctum::actingAs(admin('owner'));
+    Sanctum::actingAs(rosterUser(Roles::OWNER));
 
     $this->postJson('/api/plugin/clan/roster', [
         'clan_name' => 'Knights of Falador',
         'members' => [['username' => 'Linked', 'rank' => 125, 'title' => 'Deputy Owner']],
     ], ownerHeaders())->assertSuccessful();
 
-    expect($member->fresh()->hasRole('admin'))->toBeTrue();
+    $linked = Account::where('username', 'Linked')->firstOrFail();
+    expect($linked->clan_rank)->toBe(125);
+    // Clan-rank → role elevation is deferred; the member stays a plain User.
+    expect($member->fresh()->hasRole(Roles::USER))->toBeTrue();
 });
 
 it('forbids non-admins from pushing a roster', function () {
-    Sanctum::actingAs(admin('member'));
+    Sanctum::actingAs(rosterUser(Roles::USER));
 
     $this->postJson('/api/plugin/clan/roster', [
         'clan_name' => 'Knights of Falador',
@@ -100,7 +98,7 @@ it('forbids non-admins from pushing a roster', function () {
 
 it('does nothing outside clan mode', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_GROUP);
-    Sanctum::actingAs(admin('owner'));
+    Sanctum::actingAs(rosterUser(Roles::OWNER));
 
     $this->postJson('/api/plugin/clan/roster', [
         'clan_name' => 'Knights of Falador',
@@ -111,7 +109,7 @@ it('does nothing outside clan mode', function () {
 });
 
 it('validates roster member entries', function () {
-    Sanctum::actingAs(admin('owner'));
+    Sanctum::actingAs(rosterUser(Roles::OWNER));
 
     $this->postJson('/api/plugin/clan/roster', [
         'members' => [['rank' => 1]], // missing username

@@ -5,18 +5,16 @@ use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\User;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 function owner(): User
 {
-    foreach (['owner', 'admin', 'member'] as $name) {
-        Role::findOrCreate($name, 'web');
-    }
+    Roles::sync();
 
-    return tap(User::factory()->withPersonalTeam()->create())->assignRole('owner');
+    return tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::OWNER);
 }
 
 it('completes first-time setup into a roster mode with no accounts and no confirmation', function () {
@@ -37,7 +35,7 @@ it('completes first-time setup into a roster mode with no accounts and no confir
 it('wipes account data when switching from casual to a roster mode', function () {
     // Default mode is casual and the instance has never been configured.
     $admin = owner();
-    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('member');
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::USER);
     Account::factory()->for($member)->create(['username' => 'Casualacc']);
 
     // Confirmation is required because there are accounts to delete.
@@ -79,7 +77,7 @@ it('wipes account data and resets non-owner roles on a confirmed mode change', f
     SettingHelper::setSetting('instance_configured', true, 'bool');
 
     $admin = owner();
-    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('admin');
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::USER);
     $account = Account::factory()->for($member)->create(['username' => 'Wipeme']);
     AccountHiscore::forceCreate([
         'account_id' => $account->id,
@@ -97,10 +95,9 @@ it('wipes account data and resets non-owner roles on a confirmed mode change', f
     expect(Instance::mode())->toBe(Instance::MODE_GROUP);
     expect(Account::count())->toBe(0);
     expect(AccountHiscore::count())->toBe(0);
-    expect($member->fresh()->hasRole('member'))->toBeTrue();
-    expect($member->fresh()->hasRole('admin'))->toBeFalse();
+    expect($member->fresh()->hasRole(Roles::USER))->toBeTrue();
     // The owner is never demoted.
-    expect($admin->fresh()->hasRole('owner'))->toBeTrue();
+    expect($admin->fresh()->hasRole(Roles::OWNER))->toBeTrue();
 });
 
 it('does not wipe account data when switching to casual mode', function () {
@@ -108,7 +105,7 @@ it('does not wipe account data when switching to casual mode', function () {
     SettingHelper::setSetting('instance_configured', true, 'bool');
 
     $admin = owner();
-    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('admin');
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::USER);
     Account::factory()->for($member)->create(['username' => 'Keepme']);
 
     // No confirmation needed — switching to casual is non-destructive.
@@ -140,11 +137,9 @@ it('does not wipe when saving other settings without a mode change', function ()
 });
 
 it('forbids non-admins from changing settings', function () {
-    foreach (['owner', 'admin', 'member'] as $name) {
-        Role::findOrCreate($name, 'web');
-    }
+    Roles::sync();
     SettingHelper::setSetting('instance_mode', Instance::MODE_CASUAL);
-    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('member');
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::USER);
 
     $this->actingAs($member)
         ->put(route('admin.settings.update'), ['instance_mode' => Instance::MODE_CLAN])

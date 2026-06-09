@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
@@ -79,7 +80,7 @@ class RegistrationTest extends TestCase
         $first = User::where('email', 'first@example.com')->firstOrFail();
         $second = User::where('email', 'second@example.com')->firstOrFail();
 
-        $this->assertTrue($first->hasRole('owner'));
-        $this->assertTrue($second->hasRole('member'));
+        $this->assertTrue($first->hasRole(Roles::OWNER));
+        $this->assertTrue($second->hasRole(Roles::USER));
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Helpers\SettingHelper;
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 
@@ -14,7 +15,7 @@ it('forbids guests from the admin dashboard', function () {
 it('forbids members from the admin dashboard in casual mode', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_CASUAL);
 
-    $this->actingAs(adminUser('member'))
+    $this->actingAs(adminUser(Roles::USER))
         ->get(route('admin.dashboard'))
         ->assertForbidden();
 });
@@ -30,16 +31,16 @@ it('lets admins view the dashboard', function () {
         );
 });
 
-it('treats every authenticated user as admin in group mode', function () {
+it('does not elevate a plain user in group mode (clan/group elevation deferred)', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_GROUP);
 
-    $this->actingAs(adminUser('member'))
+    $this->actingAs(adminUser(Roles::USER))
         ->get(route('admin.dashboard'))
-        ->assertOk();
+        ->assertForbidden();
 });
 
-it('lets the owner reach the dashboard via the owner gate', function () {
-    $this->actingAs(adminUser('owner'))
+it('lets the owner reach the dashboard', function () {
+    $this->actingAs(adminUser(Roles::OWNER))
         ->get(route('admin.dashboard'))
         ->assertOk();
 });
@@ -76,7 +77,7 @@ it('shares the admin flag with the frontend for admins', function () {
 it('does not flag members as admin in casual mode', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_CASUAL);
 
-    $this->actingAs(adminUser('member'))
+    $this->actingAs(adminUser(Roles::USER))
         ->get(route('dashboard'))
         ->assertInertia(fn (AssertableInertia $page) => $page->where('is_admin', false));
 });

@@ -58,23 +58,31 @@ Route::middleware([
         Route::get('/{account}', [AccountController::class, 'show'])->name('accounts.show');
     });
 
-    // SPEC §9/§10/§12 — admin-only management (announcements, calendar, instance
-    // config). In GROUP mode every member is an admin; see the `admin` gate.
-    Route::middleware('can:admin')->group(function () {
-        Route::prefix('/admin')->group(function () {
+    // SPEC §9/§10/§12 — management surfaces, each behind its own permission
+    // (the Owner holds them all; clan/group elevation of other users is layered
+    // on later).
+    Route::prefix('/admin')->group(function () {
+        Route::middleware('can:manage instance')->group(function () {
             Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
             Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
             Route::put('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+        });
+
+        Route::middleware('can:manage members')->group(function () {
             Route::get('/members', [AdminController::class, 'members'])->name('admin.members');
             Route::post('/members', [AdminController::class, 'storeMember'])->name('admin.members.store');
             Route::delete('/members/{account}', [AdminController::class, 'destroyMember'])
                 ->whereNumber('account')->name('admin.members.destroy');
         });
+    });
 
+    Route::middleware('can:manage calendar')->group(function () {
         Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
         Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])
             ->name('calendar.destroy');
+    });
 
+    Route::middleware('can:manage announcements')->group(function () {
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
         Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
             ->name('announcements.destroy');
