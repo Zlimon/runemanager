@@ -93,11 +93,23 @@ const hasEvents = computed(() => events.value.length > 0);
                             </span>
                         </div>
                         <p class="mt-1 text-sm text-gray-700 dark:text-gray-300">
-                            {{ sentence(event) }}
-                            <span v-if="event.type === 'loot_drop' && event.payload.total_value"
-                                  class="ml-1 text-xs text-gray-500 dark:text-gray-400">
-                                ({{ formatValue(event.payload.total_value) }} gp)
-                            </span>
+                            <template v-if="event.type === 'loot_drop'">
+                                received
+                                <span v-for="(item, i) in event.payload.items" :key="i"
+                                      class="mx-0.5 inline-flex items-center gap-1 align-middle">
+                                    <img v-if="item.icon" :src="`data:image/jpeg;base64,${item.icon}`"
+                                         class="inline h-4 w-4 object-contain" alt="">
+                                    <span class="font-medium">{{ item.name ?? `Item ${item.id}` }}</span>
+                                    <span v-if="item.quantity > 1" class="text-gray-500 dark:text-gray-400">×{{ item.quantity.toLocaleString('en-US') }}</span>
+                                    <span v-if="i < event.payload.items.length - 1">,</span>
+                                </span>
+                                from {{ event.payload.source }}
+                                <span v-if="event.payload.total_value"
+                                      class="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                                    ({{ formatValue(event.payload.total_value) }} gp)
+                                </span>
+                            </template>
+                            <template v-else>{{ sentence(event) }}</template>
                         </p>
                     </li>
                 </ul>

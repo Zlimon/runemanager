@@ -19,7 +19,7 @@ class FeedController extends Controller
         $pageSize = (int) config('runemanager.feed.page_size', 50);
 
         return Inertia::render('Feed/Index', [
-            'events' => fn () => FeedEventResource::collection(
+            'events' => fn () => FeedEventResource::collectionWith(
                 FeedEvent::query()->with('account:id,username,account_type')->recent($pageSize)->get(),
             )->resolve(),
         ]);

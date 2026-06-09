@@ -4,6 +4,7 @@ use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\FeedEvent;
+use App\Models\Item;
 use App\Models\Quest;
 use App\Models\User;
 use App\Services\Feed\RecordFeedEvent;
@@ -193,6 +194,33 @@ it('GET /feed renders the Inertia page and includes events in reverse-chronologi
             ->has('events', 2)
             ->where('events.0.payload.quest', 'Later Quest')
             ->where('events.1.payload.quest', 'Earlier Quest'),
+        );
+});
+
+it('names loot-drop items on the feed', function () {
+    $account = makeAccountForFeed();
+
+    // Use a real item from the static collection so the name hydrates.
+    $item = (new Item)->getConnection()->getDatabase()
+        ->selectCollection((new Item)->getTable())
+        ->findOne([], ['projection' => ['id' => 1, 'name' => 1, '_id' => 0]]);
+    $itemId = (int) $item['id'];
+
+    FeedEvent::create([
+        'account_id' => $account->id,
+        'type' => FeedEvent::TYPE_LOOT_DROP,
+        'payload' => ['source' => 'Vorkath', 'items' => [['id' => $itemId, 'quantity' => 5]], 'total_value' => 1_000_000],
+        'occurred_at' => now(),
+    ]);
+
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('events.0.type', 'loot_drop')
+            ->where('events.0.payload.items.0.id', $itemId)
+            ->where('events.0.payload.items.0.quantity', 5)
+            ->where('events.0.payload.items.0.name', $item['name'])
+            ->has('events.0.payload.items.0.icon'),
         );
 });
 
