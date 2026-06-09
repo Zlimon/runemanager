@@ -100,11 +100,7 @@ it('forbids non-admins from pushing a roster', function () {
 
 it('does nothing outside clan mode', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_GROUP);
-    $admin = admin('owner');
-    // Pre-link the owner's account so the middleware resolves it by hash and
-    // doesn't run the group-mode GIM check while reaching the controller.
-    Account::factory()->for($admin)->create(['username' => 'ClanOwner', 'account_hash' => 'hash-owner']);
-    Sanctum::actingAs($admin);
+    Sanctum::actingAs(admin('owner'));
 
     $this->postJson('/api/plugin/clan/roster', [
         'clan_name' => 'Knights of Falador',

@@ -82,16 +82,16 @@ class ResolvePluginAccount
                 ], 403);
             }
 
-            // GROUP mode is a Group Ironman group: confirm the plugin-reported
-            // type before first linking/creating. Steady-state pushes hit the
-            // hash-match path above and skip this check.
-            if (Instance::isGroup() && $reportedType !== AccountTypesEnum::GROUP_IRONMAN) {
-                return response()->json([
-                    'message' => 'Only Group Ironman accounts can join this instance.',
-                ], 403);
-            }
-
             if ($byUsername) {
+                // GROUP mode is a Group Ironman group: confirm the plugin-reported
+                // type before claiming. Steady-state pushes hit the hash-match
+                // path below and skip this check.
+                if (Instance::isGroup() && $reportedType !== AccountTypesEnum::GROUP_IRONMAN) {
+                    return response()->json([
+                        'message' => 'Only Group Ironman accounts can join this instance.',
+                    ], 403);
+                }
+
                 // Claim it: logging into the game as this character proves
                 // ownership, so link the (unclaimed) row and stamp the hash.
                 $byUsername->user_id = $user->id;
@@ -99,7 +99,15 @@ class ResolvePluginAccount
                 $byUsername->account_type = $reportedType ?? $byUsername->account_type ?? AccountTypesEnum::NORMAL;
                 $byUsername->save();
                 $account = $byUsername;
+            } elseif (Instance::requiresRosterClaim()) {
+                // Clan/group instances are roster-driven: accounts are seeded by
+                // the clan roster push or added by an admin, then claimed here.
+                // A character that isn't on the roster can't auto-register.
+                return response()->json([
+                    'message' => 'This account is not on the roster. Ask an admin to add it.',
+                ], 403);
             } else {
+                // Casual mode: any logged-in character provisions its own account.
                 $account = new Account;
                 $account->user_id = $user->id;
                 $account->account_hash = $hash;

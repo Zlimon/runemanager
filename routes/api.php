@@ -50,13 +50,17 @@ Route::middleware([
         Route::put('/status', [StatusController::class, 'update'])->name('api.plugin.status');
         // SPEC §5.2 — in-game clan name + rank; mirrors onto website roles in CLAN mode.
         Route::put('/clan', [ClanController::class, 'update'])->name('api.plugin.clan');
-        // SPEC §5.2 — owner-pushed clan roster; pre-creates the unclaimed accounts.
-        Route::post('/clan/roster', [ClanController::class, 'roster'])->name('api.plugin.clan.roster');
         // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
         Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])
             ->name('api.plugin.announcements.acknowledge');
     });
+
+    // SPEC §5.2 — the owner's clan roster push. Outside plugin.account: it
+    // bootstraps accounts (incl. the owner's own) from nothing, so it must not
+    // require the owner's account to already be resolved. Admin-gated in the
+    // controller.
+    Route::post('/plugin/clan/roster', [ClanController::class, 'roster'])->name('api.plugin.clan.roster');
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it
     // sits outside the plugin.account middleware. Plugin pushes a pack name;

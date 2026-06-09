@@ -19,13 +19,25 @@ function clanHeaders(string $hash = 'hash-clan', string $username = 'Zlimon'): a
     ];
 }
 
-function clanMember(): User
+/**
+ * A clan member with their primary account already claimed (the roster + claim
+ * flow having run), acting as them. Clan mode no longer auto-creates on login.
+ */
+function actingClanMember(?string $role = null): User
 {
-    foreach (['owner', 'admin', 'member'] as $role) {
-        Role::findOrCreate($role, 'web');
+    foreach (['owner', 'admin', 'member'] as $r) {
+        Role::findOrCreate($r, 'web');
     }
 
-    return User::factory()->withPersonalTeam()->create();
+    $user = User::factory()->withPersonalTeam()->create();
+    if ($role) {
+        $user->assignRole($role);
+    }
+
+    Account::factory()->for($user)->create(['username' => 'Zlimon', 'account_hash' => 'hash-clan']);
+    Sanctum::actingAs($user);
+
+    return $user;
 }
 
 beforeEach(function () {
@@ -33,21 +45,20 @@ beforeEach(function () {
 });
 
 it('stores the clan rank and title on the account', function () {
-    Sanctum::actingAs(clanMember());
+    actingClanMember();
 
     $this->putJson('/api/plugin/clan', [
         'clan_rank' => 100,
         'clan_title' => 'General',
     ], clanHeaders())->assertSuccessful();
 
-    $account = Account::firstOrFail();
+    $account = Account::where('username', 'Zlimon')->firstOrFail();
     expect($account->clan_rank)->toBe(100);
     expect($account->clan_title)->toBe('General');
 });
 
 it('promotes a member at administrator rank or above to admin', function () {
-    $user = clanMember();
-    Sanctum::actingAs($user);
+    $user = actingClanMember();
 
     $this->putJson('/api/plugin/clan', [
         'clan_rank' => 126, // OWNER
@@ -58,8 +69,7 @@ it('promotes a member at administrator rank or above to admin', function () {
 });
 
 it('keeps a low-rank clan member as a plain member', function () {
-    $user = clanMember();
-    Sanctum::actingAs($user);
+    $user = actingClanMember();
 
     $this->putJson('/api/plugin/clan', [
         'clan_rank' => 50, // custom rank below ADMINISTRATOR
@@ -72,9 +82,7 @@ it('keeps a low-rank clan member as a plain member', function () {
 });
 
 it('demotes a former clan-admin back to member when their rank drops', function () {
-    $user = clanMember();
-    $user->assignRole('admin');
-    Sanctum::actingAs($user);
+    $user = actingClanMember('admin');
 
     $this->putJson('/api/plugin/clan', [
         'clan_rank' => 1,
@@ -87,9 +95,7 @@ it('demotes a former clan-admin back to member when their rank drops', function 
 });
 
 it('never demotes the instance owner', function () {
-    $user = clanMember();
-    $user->assignRole('owner');
-    Sanctum::actingAs($user);
+    $user = actingClanMember('owner');
 
     $this->putJson('/api/plugin/clan', [
         'clan_rank' => 1,
@@ -101,8 +107,7 @@ it('never demotes the instance owner', function () {
 
 it('does not sync roles outside clan mode', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_CASUAL);
-    $user = clanMember();
-    Sanctum::actingAs($user);
+    $user = actingClanMember();
 
     $this->putJson('/api/plugin/clan', [
         'clan_rank' => 126,
@@ -113,12 +118,11 @@ it('does not sync roles outside clan mode', function () {
 });
 
 it('takes the highest rank across the users accounts', function () {
-    $user = clanMember();
+    $user = actingClanMember();
     Account::factory()->for($user)->create([
         'username' => 'AltAccount',
         'clan_rank' => 126, // OWNER on the alt
     ]);
-    Sanctum::actingAs($user);
 
     // The main account pushes a low rank, but the alt is clan owner.
     $this->putJson('/api/plugin/clan', [
@@ -135,7 +139,7 @@ it('requires authentication', function () {
 });
 
 it('validates the clan rank range', function () {
-    Sanctum::actingAs(clanMember());
+    actingClanMember();
 
     $this->putJson('/api/plugin/clan', ['clan_rank' => 9999], clanHeaders())
         ->assertJsonValidationErrorFor('clan_rank');

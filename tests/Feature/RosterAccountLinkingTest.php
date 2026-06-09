@@ -1,7 +1,9 @@
 <?php
 
+use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\User;
+use App\Support\Instance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
@@ -49,7 +51,7 @@ it('refuses to claim an account already owned by another user', function () {
         ->assertForbidden();
 });
 
-it('still auto-creates an account for an unrostered character', function () {
+it('auto-creates an account for an unrostered character in casual mode', function () {
     $user = User::factory()->withPersonalTeam()->create();
     Sanctum::actingAs($user);
 
@@ -59,4 +61,14 @@ it('still auto-creates an account for an unrostered character', function () {
     $account = Account::where('username', 'Freshie')->firstOrFail();
     expect($account->user_id)->toBe($user->id);
     expect($account->account_hash)->toBe('hash-new');
+});
+
+it('does not auto-create an unrostered character in clan mode', function () {
+    SettingHelper::setSetting('instance_mode', Instance::MODE_CLAN);
+    Sanctum::actingAs(User::factory()->withPersonalTeam()->create());
+
+    $this->putJson('/api/plugin/heartbeat', [], linkHeaders('hash-x', 'Unrostered'))
+        ->assertForbidden();
+
+    expect(Account::where('username', 'Unrostered')->exists())->toBeFalse();
 });
