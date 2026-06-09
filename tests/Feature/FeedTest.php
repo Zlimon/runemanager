@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\FeedEvent;
@@ -13,6 +14,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia;
 use Laravel\Sanctum\Sanctum;
 
@@ -90,6 +92,19 @@ it('skips the "overall" pseudo-skill', function () {
     ))->toBe(0);
 
     expect(FeedEvent::count())->toBe(0);
+});
+
+it('broadcasts FeedEventCreated on the public feed channel when an event is recorded', function () {
+    Event::fake([FeedEventCreated::class]);
+
+    $account = makeAccountForFeed();
+    (new RecordFeedEvent)->recordQuestCompletions($account, [], [['Cooks Assistant', 901389]]);
+
+    Event::assertDispatched(FeedEventCreated::class, function ($event) use ($account): bool {
+        return $event->feedEvent->account_id === $account->id
+            && $event->broadcastOn()[0]->name === 'feed'
+            && $event->broadcastWith()['type'] === FeedEvent::TYPE_QUEST_COMPLETE;
+    });
 });
 
 it('records a LOOT_DROP only when total_value clears the configured floor', function () {
@@ -177,8 +192,7 @@ it('GET /feed renders the Inertia page and includes events in reverse-chronologi
             ->component('Feed/Index')
             ->has('events', 2)
             ->where('events.0.payload.quest', 'Later Quest')
-            ->where('events.1.payload.quest', 'Earlier Quest')
-            ->has('pollIntervalMs'),
+            ->where('events.1.payload.quest', 'Earlier Quest'),
         );
 });
 

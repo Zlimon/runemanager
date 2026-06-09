@@ -2,6 +2,7 @@
 
 namespace App\Services\Feed;
 
+use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\FeedEvent;
 use Illuminate\Support\Carbon;
@@ -57,7 +58,7 @@ class RecordFeedEvent
             // shouldn't emit four events.
             $milestone = end($crossed);
 
-            FeedEvent::create([
+            $this->emit([
                 'account_id' => $account->id,
                 'type' => FeedEvent::TYPE_LEVEL_UP,
                 'payload' => [
@@ -127,7 +128,7 @@ class RecordFeedEvent
             $isFinished = $status === 901389;
 
             if ($isFinished && ! $wasFinished) {
-                FeedEvent::create([
+                $this->emit([
                     'account_id' => $account->id,
                     'type' => FeedEvent::TYPE_QUEST_COMPLETE,
                     'payload' => ['quest' => $name],
@@ -138,5 +139,19 @@ class RecordFeedEvent
         }
 
         return $emitted;
+    }
+
+    /**
+     * Persist a feed event and broadcast it to connected browsers (SPEC §8.3).
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    private function emit(array $attributes): FeedEvent
+    {
+        $event = FeedEvent::create($attributes);
+
+        broadcast(new FeedEventCreated($event));
+
+        return $event;
     }
 }
