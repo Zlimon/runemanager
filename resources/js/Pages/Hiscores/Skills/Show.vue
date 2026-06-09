@@ -19,10 +19,11 @@ const props = defineProps({
     },
 });
 
+const overall = props.skillSlug === 'overall';
 const columns = [
     { label: 'Rank', key: 'rank', format: 'number' },
-    { label: 'Level', key: 'level', format: 'number' },
-    { label: 'XP', key: 'xp', format: 'number' },
+    { label: overall ? 'Total level' : 'Level', key: 'level', format: 'number' },
+    { label: overall ? 'Total XP' : 'XP', key: 'xp', format: 'number' },
 ];
 
 const search = ref('');

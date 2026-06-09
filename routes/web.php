@@ -7,6 +7,7 @@ use App\Http\Controllers\CollectionHiscoreController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\LootHiscoreController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\OverallHiscoreController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
@@ -77,6 +78,8 @@ Route::middleware([
         ->name('user.dark-mode.update');
 
     Route::prefix('/hiscores')->group(function () {
+        // SPEC §7.1 — Overall (total level + total XP).
+        Route::get('/overall', [OverallHiscoreController::class, 'index'])->name('hiscores.overall.index');
         Route::get('/skills/{skill}', [SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
         Route::get('/bosses/{collection}', [CollectionHiscoreController::class, 'index'])
             ->defaults('category', 'boss')
