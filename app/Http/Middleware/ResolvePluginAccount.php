@@ -64,19 +64,23 @@ class ResolvePluginAccount
 
         if (! $account) {
             // No hash match — fall through to a username lookup so the plugin can
-            // adopt an existing row whose hash is a placeholder (seeded data, or
-            // a previously-failed first push). The username column is globally
-            // unique, so either we find one row or none.
+            // adopt an existing row. This covers a pre-created roster account
+            // (user_id null, SPEC §5.2) that this login now claims, plus a
+            // placeholder-hash row already owned by this user. Usernames are
+            // globally unique, so we find at most one row.
             $byUsername = Account::where('username', $username)->first();
 
-            if ($byUsername && $byUsername->user_id !== $user->id) {
-                // Someone else owns this in-game name — don't let the caller hijack it.
+            if ($byUsername && $byUsername->user_id !== null && $byUsername->user_id !== $user->id) {
+                // Owned by someone else — don't let the caller hijack it.
                 return response()->json([
                     'message' => 'This account is linked to a different user.',
                 ], 403);
             }
 
             if ($byUsername) {
+                // Claim it: logging into the game as this character proves
+                // ownership, so link the (unclaimed) row and stamp the hash.
+                $byUsername->user_id = $user->id;
                 $byUsername->account_hash = $hash;
                 $byUsername->save();
                 $account = $byUsername;

@@ -46,7 +46,7 @@ defineProps({
                     </span>
                     <template v-if="account.clan_title">
                         ·
-                        <span :title="account.clan_name">{{ account.clan_title }}</span>
+                        <span>{{ account.clan_title }}</span>
                     </template>
                     ·
                     <span>

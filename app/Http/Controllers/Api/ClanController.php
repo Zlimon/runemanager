@@ -25,13 +25,11 @@ class ClanController extends Controller
         $account = $request->attributes->get('account');
 
         $validated = $request->validate([
-            'clan_name' => ['nullable', 'string', 'max:60'],
             'clan_rank' => ['nullable', 'integer', 'between:-128,127'],
             'clan_title' => ['nullable', 'string', 'max:60'],
         ]);
 
         $account->forceFill([
-            'clan_name' => $validated['clan_name'] ?? null,
             'clan_rank' => $validated['clan_rank'] ?? null,
             'clan_title' => $validated['clan_title'] ?? null,
         ])->save();
@@ -39,7 +37,6 @@ class ClanController extends Controller
         $this->syncClanRole->forAccount($account);
 
         return response()->json(['data' => [
-            'clan_name' => $account->clan_name,
             'clan_rank' => $account->clan_rank,
             'clan_title' => $account->clan_title,
         ]]);
