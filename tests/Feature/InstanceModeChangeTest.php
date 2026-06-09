@@ -80,6 +80,25 @@ it('wipes account data and resets non-owner roles on a confirmed mode change', f
     expect($admin->fresh()->hasRole('owner'))->toBeTrue();
 });
 
+it('does not wipe account data when switching to casual mode', function () {
+    SettingHelper::setSetting('instance_mode', Instance::MODE_CLAN);
+    SettingHelper::setSetting('instance_configured', true, 'bool');
+
+    $admin = owner();
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole('admin');
+    Account::factory()->for($member)->create(['username' => 'Keepme']);
+
+    // No confirmation needed — switching to casual is non-destructive.
+    $this->actingAs($admin)
+        ->put(route('admin.settings.update'), [
+            'instance_mode' => Instance::MODE_CASUAL,
+        ])
+        ->assertRedirect();
+
+    expect(Instance::mode())->toBe(Instance::MODE_CASUAL);
+    expect(Account::where('username', 'Keepme')->exists())->toBeTrue();
+});
+
 it('does not wipe when saving other settings without a mode change', function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_CLAN);
     SettingHelper::setSetting('instance_configured', true, 'bool');

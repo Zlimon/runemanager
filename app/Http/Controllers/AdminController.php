@@ -53,9 +53,9 @@ class AdminController extends Controller
     }
 
     /**
-     * Save instance settings. Changing the mode after first-time setup wipes all
-     * account data (SPEC §5/§12), so it requires a typed confirmation matching
-     * the new mode name.
+     * Save instance settings. Switching into a roster mode (clan/group) after
+     * first-time setup wipes all account data (SPEC §5/§12) and so requires a
+     * typed confirmation. Switching to casual keeps existing accounts.
      */
     public function updateSettings(Request $request, ResetInstanceData $reset): RedirectResponse
     {
@@ -68,14 +68,16 @@ class AdminController extends Controller
         ]);
 
         $modeChanged = Instance::isConfigured() && $validated['instance_mode'] !== Instance::mode();
+        // Only roster modes need a fresh account set; casual reuses what's there.
+        $destructive = $modeChanged && $validated['instance_mode'] !== Instance::MODE_CASUAL;
 
-        if ($modeChanged && mb_strtolower(trim((string) ($validated['confirm'] ?? ''))) !== $validated['instance_mode']) {
+        if ($destructive && mb_strtolower(trim((string) ($validated['confirm'] ?? ''))) !== $validated['instance_mode']) {
             throw ValidationException::withMessages([
                 'confirm' => 'Type the new mode name to confirm — this deletes all account data.',
             ]);
         }
 
-        if ($modeChanged) {
+        if ($destructive) {
             $reset->run();
         }
 
@@ -85,7 +87,7 @@ class AdminController extends Controller
         SettingHelper::setSetting('resource_pack_id', (int) ($validated['resource_pack_id'] ?? 0), 'int');
         SettingHelper::setSetting('instance_configured', true, 'bool');
 
-        return back()->with('status', $modeChanged
+        return back()->with('status', $destructive
             ? 'Instance reset and reconfigured.'
             : 'Instance settings updated.');
     }

@@ -36,12 +36,15 @@ const modeHint = computed(() => ({
     casual: 'Only the owner has admin access. Anyone can register.',
 }[form.instance_mode] ?? ''));
 
-// Changing the mode after first-time setup wipes all account data, so it needs
-// an explicit typed confirmation.
-const modeChanged = computed(() => props.configured && form.instance_mode !== props.settings.instance_mode);
+// Switching into a roster mode (clan/group) after setup wipes all account data,
+// so it needs an explicit typed confirmation. Switching to casual keeps data.
+const destructiveChange = computed(() =>
+    props.configured
+    && form.instance_mode !== props.settings.instance_mode
+    && form.instance_mode !== 'casual');
 
 const submit = () => {
-    if (modeChanged.value) {
+    if (destructiveChange.value) {
         form.confirm = '';
         form.clearErrors();
         showConfirm.value = true;
@@ -86,7 +89,7 @@ const confirmReset = () => {
                                 </option>
                             </select>
                             <p class="mt-1 text-xs text-base-content/60">{{ modeHint }}</p>
-                            <p v-if="modeChanged" class="mt-1 text-xs font-medium text-error">
+                            <p v-if="destructiveChange" class="mt-1 text-xs font-medium text-error">
                                 Switching mode permanently deletes all accounts and their data.
                             </p>
                             <InputError v-if="form.errors.instance_mode" :messages="form.errors.instance_mode" />
