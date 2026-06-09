@@ -22,11 +22,16 @@ const modeLabel = (mode) => mode.charAt(0).toUpperCase() + mode.slice(1);
     <AppLayout title="Admin">
         <div class="py-12">
             <div class="mx-auto max-w-5xl space-y-8 sm:px-6 lg:px-8">
-                <div class="flex items-baseline justify-between">
+                <div class="flex items-baseline justify-between gap-2">
                     <h1 class="header-chatbox-sword text-2xl font-bold">Admin</h1>
-                    <Link :href="route('admin.settings')" class="btn btn-neutral btn-sm">
-                        Instance settings
-                    </Link>
+                    <div class="flex gap-2">
+                        <Link v-if="mode !== 'casual'" :href="route('admin.members')" class="btn btn-neutral btn-sm">
+                            Members
+                        </Link>
+                        <Link :href="route('admin.settings')" class="btn btn-neutral btn-sm">
+                            Instance settings
+                        </Link>
+                    </div>
                 </div>
 
                 <Card>

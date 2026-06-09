@@ -65,6 +65,10 @@ Route::middleware([
             Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
             Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
             Route::put('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+            Route::get('/members', [AdminController::class, 'members'])->name('admin.members');
+            Route::post('/members', [AdminController::class, 'storeMember'])->name('admin.members.store');
+            Route::delete('/members/{account}', [AdminController::class, 'destroyMember'])
+                ->whereNumber('account')->name('admin.members.destroy');
         });
 
         Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
