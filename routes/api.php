@@ -50,6 +50,8 @@ Route::middleware([
         Route::put('/status', [StatusController::class, 'update'])->name('api.plugin.status');
         // SPEC §5.2 — in-game clan name + rank; mirrors onto website roles in CLAN mode.
         Route::put('/clan', [ClanController::class, 'update'])->name('api.plugin.clan');
+        // SPEC §5.2 — owner-pushed clan roster; pre-creates the unclaimed accounts.
+        Route::post('/clan/roster', [ClanController::class, 'roster'])->name('api.plugin.clan.roster');
         // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
         Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])
