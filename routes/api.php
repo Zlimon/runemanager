@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\ClanController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\HeartbeatController;
+use App\Http\Controllers\Api\HiscoreController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\LootController;
 use App\Http\Controllers\Api\LootingBagController;
@@ -48,6 +49,9 @@ Route::middleware([
         Route::put('/vitals', [VitalsController::class, 'update'])->name('api.plugin.vitals');
         // Current in-game activity (Discord-plugin style) for the account cards/header.
         Route::put('/status', [StatusController::class, 'update'])->name('api.plugin.status');
+        // SPEC §7 — ask the server to refresh stats (skills/bosses/clues) from
+        // the official OSRS hiscores. Part of the login full-account snapshot.
+        Route::put('/hiscores', [HiscoreController::class, 'sync'])->name('api.plugin.hiscores');
         // SPEC §5.2 — in-game clan name + rank; mirrors onto website roles in CLAN mode.
         Route::put('/clan', [ClanController::class, 'update'])->name('api.plugin.clan');
         // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
