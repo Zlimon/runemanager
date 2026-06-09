@@ -13,7 +13,8 @@ defineProps({
     <ul v-if="inventory"
         class="m-2 grid grid-cols-4 gap-2 p-4">
         <li v-for="(slotItem, slot) in inventory.items" :key="slot">
-            <ItemSlot :item="slotItem" />
+            <ItemSlot :icon="slotItem.item?.icon" :name="slotItem.item?.name" :quantity="slotItem.quantity"
+                      :examine="slotItem.item?.examine" :highalch="slotItem.item?.highalch" :lowalch="slotItem.item?.lowalch" />
         </li>
     </ul>
     <div v-else class="flex h-96 items-center justify-center">

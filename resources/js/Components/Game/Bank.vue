@@ -55,7 +55,8 @@ const activeTabItems = computed(() => {
 
             <ul v-if="activeTabItems" class="grid grid-cols-8 gap-2 p-4">
                 <li v-for="(slotItem, slot) in activeTabItems" :key="slot">
-                    <ItemSlot :item="slotItem" />
+                    <ItemSlot :icon="slotItem.item?.icon" :name="slotItem.item?.name" :quantity="slotItem.quantity"
+                              :examine="slotItem.item?.examine" :highalch="slotItem.item?.highalch" :lowalch="slotItem.item?.lowalch" />
                 </li>
             </ul>
         </TabbedCard>
