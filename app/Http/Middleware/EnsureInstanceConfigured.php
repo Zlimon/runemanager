@@ -19,7 +19,7 @@ class EnsureInstanceConfigured
     {
         if (! Instance::isConfigured()
             && $request->user() !== null
-            && ! $request->routeIs('admin.settings', 'admin.settings.update', 'logout')) {
+            && ! $request->routeIs('admin.settings', 'admin.settings.update', 'logout', 'user.*')) {
             return redirect()->route('admin.settings');
         }
 

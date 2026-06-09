@@ -25,6 +25,21 @@ it('redirects an authenticated user to setup until the instance is configured', 
         ->assertRedirect(route('admin.settings'));
 });
 
+it('also gates the public pages for an authenticated user during setup', function () {
+    $owner = setupOwner();
+
+    foreach (['feed.index', 'calendar.index', 'announcements.index'] as $route) {
+        $this->actingAs($owner)
+            ->get(route($route))
+            ->assertRedirect(route('admin.settings'));
+    }
+});
+
+it('still serves the public pages to guests during setup', function () {
+    $this->get(route('announcements.index'))->assertOk();
+    $this->get(route('calendar.index'))->assertOk();
+});
+
 it('lets the owner reach the setup page while unconfigured', function () {
     $this->actingAs(setupOwner())
         ->get(route('admin.settings'))
