@@ -32,40 +32,39 @@ function makeAccountForLog(string $username = 'Zlimon'): Account
     ]);
 }
 
-it('round-trips a collection log document with nested slots', function () {
+it('round-trips a collection log document (TempleOSRS shape)', function () {
     $account = makeAccountForLog();
 
     CollectionLog::create([
         'account_id' => $account->id,
-        'slots' => [
-            [
-                'tab' => 'Bosses',
-                'source' => 'Abyssal Sire',
-                'item_id' => 13262,
-                'name' => 'Abyssal orphan',
-                'first_obtained_at' => '2026-06-01T12:00:00Z',
-                'last_obtained_at' => '2026-06-01T12:00:00Z',
-                'quantity' => 1,
+        'obtained' => 2,
+        'total' => 1701,
+        'categories_finished' => 1,
+        'categories_available' => 122,
+        'items' => [
+            'abyssal_sire' => [
+                ['id' => 13262, 'count' => 1, 'date' => '2026-06-01 12:00:00'],
+                ['id' => 13265, 'count' => 2, 'date' => '2026-06-01 12:00:00'],
             ],
         ],
+        'fetched_at' => now(),
     ]);
 
     $fetched = CollectionLog::where('account_id', $account->id)->first();
 
     expect($fetched)->not->toBeNull();
-    expect($fetched->slots)->toHaveCount(1);
-    expect($fetched->slots[0]['source'])->toBe('Abyssal Sire');
-    expect($fetched->slots[0]['item_id'])->toBe(13262);
-    expect($fetched->slots[0]['name'])->toBe('Abyssal orphan');
-    expect($fetched->slots[0]['quantity'])->toBe(1);
+    expect($fetched->obtained)->toBe(2);
+    expect($fetched->total)->toBe(1701);
+    expect($fetched->items['abyssal_sire'])->toHaveCount(2);
+    expect($fetched->items['abyssal_sire'][0]['id'])->toBe(13262);
 });
 
 it('enforces one document per account via the unique index', function () {
     $account = makeAccountForLog();
 
-    CollectionLog::create(['account_id' => $account->id, 'slots' => []]);
+    CollectionLog::create(['account_id' => $account->id, 'items' => []]);
 
-    expect(fn () => CollectionLog::create(['account_id' => $account->id, 'slots' => []]))
+    expect(fn () => CollectionLog::create(['account_id' => $account->id, 'items' => []]))
         ->toThrow(BulkWriteException::class);
 });
 
@@ -80,12 +79,12 @@ it('Account::collectionLog accessor returns the doc when it exists', function ()
 
     CollectionLog::create([
         'account_id' => $account->id,
-        'slots' => [
-            ['tab' => 'Bosses', 'source' => 'Vorkath', 'item_id' => 22971, 'name' => 'Vorki', 'quantity' => 1],
-        ],
+        'obtained' => 1,
+        'total' => 1701,
+        'items' => ['vorkath' => [['id' => 21992, 'count' => 1]]],
     ]);
 
     expect($account->collectionLog)
         ->toBeInstanceOf(CollectionLog::class)
-        ->and($account->collectionLog->slots[0]['name'])->toBe('Vorki');
+        ->and($account->collectionLog->items['vorkath'][0]['id'])->toBe(21992);
 });

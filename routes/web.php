@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CollectionHiscoreController;
+use App\Http\Controllers\CollectionLogHiscoreController;
 use App\Http\Controllers\DiaryHiscoreController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GroupBankController;
@@ -107,6 +108,8 @@ Route::middleware([
         Route::get('/overall', [OverallHiscoreController::class, 'index'])->name('hiscores.overall.index');
         // SPEC §7 — Achievement Diaries (total tiers completed).
         Route::get('/diaries', [DiaryHiscoreController::class, 'index'])->name('hiscores.diaries.index');
+        // SPEC §7 — Collection Log (total slots unlocked, via TempleOSRS).
+        Route::get('/collection-log', [CollectionLogHiscoreController::class, 'index'])->name('hiscores.collection-log.index');
         Route::get('/skills/{skill}', [SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
         Route::get('/bosses/{collection}', [CollectionHiscoreController::class, 'index'])
             ->defaults('category', 'boss')

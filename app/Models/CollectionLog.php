@@ -13,12 +13,22 @@ class CollectionLog extends Model
 
     protected $fillable = [
         'account_id',
-        'slots',
+        'obtained',
+        'total',
+        'categories_finished',
+        'categories_available',
+        'items',
+        'fetched_at',
     ];
 
     protected $casts = [
         'account_id' => 'int',
-        'slots' => 'array',
+        'obtained' => 'int',
+        'total' => 'int',
+        'categories_finished' => 'int',
+        'categories_available' => 'int',
+        'items' => 'array',
+        'fetched_at' => 'datetime',
     ];
 
     public function account(): BelongsTo

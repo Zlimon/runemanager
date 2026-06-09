@@ -13,8 +13,8 @@ Schedule::command('hiscores:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
-Schedule::command('name-changes:detect')
-    ->hourly()
+Schedule::command('collection-log:sync')
+    ->daily()
     ->withoutOverlapping()
     ->runInBackground();
 

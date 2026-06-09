@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Clients\CollectionLogClient;
 use App\Enums\AccountTypesEnum;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\BankResource;
@@ -10,14 +9,12 @@ use App\Http\Resources\InventoryResource;
 use App\Http\Resources\LootingBagResource;
 use App\Http\Resources\LootResource;
 use App\Models\Account;
-use App\Models\Collection;
 use App\Models\Item;
 use App\Rules\AccountUsernameRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Throwable;
 
 class AccountController extends Controller
 {
@@ -129,115 +126,86 @@ class AccountController extends Controller
     }
 
     /**
-     * @return array{tabs: array<string, mixed>, activeTab: ?string, activeCollection: ?array<string, mixed>}|null
+     * SPEC §5.2 — build the collection log view from the stored TempleOSRS data.
+     * TempleOSRS gives overall progress plus the obtained items per category; we
+     * list the categories and lazy-load one category's items at a time (selected
+     * via ?ccollection) to keep the payload small.
+     *
+     * @return array<string, mixed>|null
      */
     private function buildCollectionLog(Account $account, Request $request): ?array
     {
-        try {
-            $client = new CollectionLogClient;
-            $response = $client->request('GET', "/collectionlog/user/{$account->username}");
-            $payload = json_decode($response->getBody()->getContents(), true);
-        } catch (Throwable $e) {
-            report($e);
-
+        $log = $account->collectionLog;
+        if ($log === null) {
             return null;
         }
 
-        $allowedTabs = ['Bosses', 'Raids', 'Clues'];
-        $tabs = [];
+        $items = $log->items ?? [];
 
-        foreach ($payload['collectionLog']['tabs'] ?? [] as $tabName => $tab) {
-            if (! in_array($tabName, $allowedTabs, true)) {
-                continue;
-            }
-
-            foreach ($tab as $collectionName => $collection) {
-                $slug = Str::slug($collectionName);
-                $obtained = count(array_filter(
-                    $collection['items'] ?? [],
-                    fn ($item) => ($item['obtained'] ?? false) === true,
-                ));
-
-                $tabs[$tabName][$slug] = [
-                    'name' => $collectionName,
-                    'slug' => $slug,
-                    'obtained' => $obtained,
-                    'total' => count($collection['items'] ?? []),
-                ];
-            }
+        $categories = [];
+        foreach ($items as $slug => $entries) {
+            $categories[$slug] = [
+                'slug' => $slug,
+                'name' => $this->prettyCategoryName($slug),
+                'obtained' => count($entries),
+            ];
         }
+        uasort($categories, fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
 
-        $requestedTab = $request->query('ctab');
-        $requestedCollection = $request->query('ccollection');
+        $requested = $request->query('ccollection');
+        $activeSlug = ($requested && isset($categories[$requested]))
+            ? $requested
+            : (array_key_first($categories) ?: null);
 
-        $activeTab = ($requestedTab && isset($tabs[$requestedTab]))
-            ? $requestedTab
-            : (array_key_first($tabs) ?: null);
-
-        $activeCollection = null;
-        if ($activeTab !== null) {
-            $availableSlugs = array_keys($tabs[$activeTab] ?? []);
-            $slug = ($requestedCollection && in_array($requestedCollection, $availableSlugs, true))
-                ? $requestedCollection
-                : ($availableSlugs[0] ?? null);
-
-            if ($slug !== null) {
-                $activeCollection = $this->loadCollectionItems($account, $activeTab, $slug, $tabs[$activeTab][$slug]);
-            }
-        }
+        $activeCollection = $activeSlug !== null
+            ? $this->loadCollectionItems($categories[$activeSlug], $items[$activeSlug] ?? [])
+            : null;
 
         return [
-            'tabs' => $tabs,
-            'activeTab' => $activeTab,
+            'categories' => array_values($categories),
+            'activeSlug' => $activeSlug,
             'activeCollection' => $activeCollection,
+            'obtained' => (int) $log->obtained,
+            'total' => (int) $log->total,
+            'fetchedAt' => $log->fetched_at?->toIso8601String(),
         ];
     }
 
     /**
+     * Hydrate one category's obtained items with their icon/name details.
+     *
      * @param  array<string, mixed>  $summary
-     * @return array<string, mixed>|null
+     * @param  array<int, array<string, mixed>>  $entries
+     * @return array<string, mixed>
      */
-    private function loadCollectionItems(Account $account, string $tab, string $slug, array $summary): ?array
+    private function loadCollectionItems(array $summary, array $entries): array
     {
-        $collection = Collection::whereSlug($slug)->first();
-        if (! $collection) {
-            return null;
-        }
-
-        try {
-            $client = new CollectionLogClient;
-            $response = $client->request('GET', "/items/user/{$account->username}?pageName={$collection->name}");
-            $payload = json_decode($response->getBody()->getContents(), true);
-        } catch (Throwable $e) {
-            report($e);
-
-            return null;
-        }
-
         $items = Item::select('_id', 'name', 'examine', 'icon')
-            ->whereIn('_id', array_column($payload['items'] ?? [], 'id'))
+            ->whereIn('_id', array_column($entries, 'id'))
             ->get()
             ->keyBy('_id');
 
         $slots = [];
-        foreach (($payload['items'] ?? []) as $item) {
-            $dbItem = $items[$item['id']] ?? null;
+        foreach ($entries as $entry) {
+            $dbItem = $items[$entry['id']] ?? null;
             $slots[] = [
-                'id' => $item['id'],
-                'quantity' => $item['quantity'] ?? 0,
-                'obtained' => $item['obtained'] ?? false,
+                'id' => $entry['id'],
+                'quantity' => $entry['count'] ?? 0,
+                'date' => $entry['date'] ?? null,
                 'item' => $dbItem ? $dbItem->toArray() : null,
             ];
         }
 
         return [
-            'name' => $collection->name,
-            'slug' => $collection->slug,
-            'tab' => $tab,
-            'obtained' => $payload['obtainedCount'] ?? $summary['obtained'],
-            'total' => $payload['itemCount'] ?? $summary['total'],
-            'killCount' => $payload['killCount'] ?? [],
+            'slug' => $summary['slug'],
+            'name' => $summary['name'],
+            'obtained' => $summary['obtained'],
             'items' => $slots,
         ];
+    }
+
+    private function prettyCategoryName(string $slug): string
+    {
+        return ucwords(str_replace('_', ' ', $slug));
     }
 }
