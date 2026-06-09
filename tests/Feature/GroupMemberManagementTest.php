@@ -3,11 +3,19 @@
 use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\User;
+use App\Services\Accounts\GroupIronmanValidator;
 use App\Support\Instance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
+
+function fakeGimValidator(bool $result = true): void
+{
+    test()->mock(GroupIronmanValidator::class, function ($mock) use ($result) {
+        $mock->shouldReceive('isGroupIronman')->andReturn($result);
+    });
+}
 
 function groupAdmin(): User
 {
@@ -20,9 +28,10 @@ function groupAdmin(): User
 
 beforeEach(function () {
     SettingHelper::setSetting('instance_mode', Instance::MODE_GROUP);
+    fakeGimValidator(true);
 });
 
-it('lets the admin add a member as an unclaimed account', function () {
+it('lets the admin add a Group Ironman member as an unclaimed account', function () {
     $this->actingAs(groupAdmin())
         ->post(route('admin.members.store'), ['username' => 'Woox'])
         ->assertRedirect();
@@ -30,6 +39,17 @@ it('lets the admin add a member as an unclaimed account', function () {
     $account = Account::where('username', 'Woox')->firstOrFail();
     expect($account->user_id)->toBeNull();
     expect($account->account_hash)->toBeNull();
+    expect($account->account_type->value)->toBe('group_ironman');
+});
+
+it('rejects a member that is not a Group Ironman account', function () {
+    fakeGimValidator(false);
+
+    $this->actingAs(groupAdmin())
+        ->post(route('admin.members.store'), ['username' => 'Maindude'])
+        ->assertSessionHasErrors('username');
+
+    expect(Account::where('username', 'Maindude')->exists())->toBeFalse();
 });
 
 it('rejects a duplicate username', function () {

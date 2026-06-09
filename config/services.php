@@ -44,4 +44,10 @@ return [
         'user_agent' => env('WOM_USER_AGENT', 'RuneManager/1.0'),
     ],
 
+    // TempleOSRS player_info — used to validate that a username is a Group
+    // Ironman account (SPEC §5.2, GROUP mode).
+    'templeosrs' => [
+        'url' => env('TEMPLEOSRS_API_URL', 'https://templeosrs.com/api'),
+    ],
+
 ];

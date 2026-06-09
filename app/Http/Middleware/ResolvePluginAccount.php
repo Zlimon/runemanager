@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use App\Enums\AccountTypesEnum;
 use App\Models\Account;
+use App\Services\Accounts\GroupIronmanValidator;
 use App\Services\Accounts\RecordUsernameChange;
+use App\Support\Instance;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +30,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResolvePluginAccount
 {
-    public function __construct(protected RecordUsernameChange $recorder) {}
+    public function __construct(
+        protected RecordUsernameChange $recorder,
+        protected GroupIronmanValidator $groupIronman,
+    ) {}
 
     /**
      * @param  Closure(Request): (Response)  $next
@@ -77,6 +82,17 @@ class ResolvePluginAccount
                 ], 403);
             }
 
+            // GROUP mode is a Group Ironman group: validate the account type
+            // (via TempleOSRS) before first linking/creating it. Steady-state
+            // pushes hit the hash-match path above and skip this check.
+            $claimingUnclaimed = $byUsername && $byUsername->user_id === null;
+            if (Instance::isGroup() && ($claimingUnclaimed || ! $byUsername)
+                && ! $this->groupIronman->isGroupIronman($username)) {
+                return response()->json([
+                    'message' => 'Only Group Ironman accounts can join this instance.',
+                ], 403);
+            }
+
             if ($byUsername) {
                 // Claim it: logging into the game as this character proves
                 // ownership, so link the (unclaimed) row and stamp the hash.
@@ -88,7 +104,9 @@ class ResolvePluginAccount
                 $account = new Account;
                 $account->user_id = $user->id;
                 $account->account_hash = $hash;
-                $account->account_type = AccountTypesEnum::NORMAL;
+                $account->account_type = Instance::isGroup()
+                    ? AccountTypesEnum::GROUP_IRONMAN
+                    : AccountTypesEnum::NORMAL;
                 $account->username = $username;
                 $account->rank = 0;
                 $account->level = 0;
