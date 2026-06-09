@@ -44,6 +44,10 @@ defineProps({
                     <span class="capitalize">
                         {{ account.account_type }}
                     </span>
+                    <template v-if="account.clan_title">
+                        ·
+                        <span :title="account.clan_name">{{ account.clan_title }}</span>
+                    </template>
                     ·
                     <span>
                         Last updated

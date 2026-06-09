@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
+use App\Http\Controllers\Api\ClanController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\HeartbeatController;
 use App\Http\Controllers\Api\InventoryController;
@@ -47,6 +48,8 @@ Route::middleware([
         Route::put('/vitals', [VitalsController::class, 'update'])->name('api.plugin.vitals');
         // Current in-game activity (Discord-plugin style) for the account cards/header.
         Route::put('/status', [StatusController::class, 'update'])->name('api.plugin.status');
+        // SPEC §5.2 — in-game clan name + rank; mirrors onto website roles in CLAN mode.
+        Route::put('/clan', [ClanController::class, 'update'])->name('api.plugin.clan');
         // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
         Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])

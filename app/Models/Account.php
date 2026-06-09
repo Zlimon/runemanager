@@ -19,6 +19,9 @@ use Illuminate\Support\Str;
  * @property int $id
  * @property int $user_id
  * @property AccountTypesEnum $account_type
+ * @property string|null $clan_name
+ * @property int|null $clan_rank
+ * @property string|null $clan_title
  * @property string $username
  * @property int $rank
  * @property int $level
