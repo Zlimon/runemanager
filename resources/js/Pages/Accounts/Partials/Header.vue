@@ -37,7 +37,7 @@ defineProps({
                     </PrimaryButton>
                 </div>
 
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-xs text-base-content/60">
                     <span class="capitalize">
                         {{ account.account_type }}
                     </span>

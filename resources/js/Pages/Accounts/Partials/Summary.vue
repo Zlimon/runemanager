@@ -23,14 +23,14 @@ const page = usePage();
         <div class="grid grid-cols-2 gap-6">
             <div class="col-span-1">
                 <InputLabel :value="`${page.props.app.name} rank`" class="text-sm"/>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-base-content">
                     {{ account.rank.toLocaleString('en-US') }}
                 </p>
             </div>
 
             <div class="col-span-1">
                 <InputLabel :value="`Joined ${page.props.app.name}`" class="text-sm"/>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-base-content">
                     {{ dayjs(account.created_at).format('MMM D, YYYY') }}
                 </p>
             </div>
@@ -47,28 +47,28 @@ const page = usePage();
         <div class="grid grid-cols-2 gap-6">
             <div class="col-span-1">
                 <InputLabel class="text-sm" value="Total level"/>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-base-content">
                     {{ account.level }}
                 </p>
             </div>
 
             <div class="col-span-1">
                 <InputLabel class="text-sm" value="Total XP"/>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-base-content">
                     {{ account.xp.toLocaleString('en-US') }}
                 </p>
             </div>
 
             <div class="col-span-1">
                 <InputLabel class="text-sm" value="Rank"/>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-base-content">
                     {{ account.rank.toLocaleString('en-US') }}
                 </p>
             </div>
 
             <div class="col-span-1">
                 <InputLabel class="text-sm" value="Account created"/>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-base-content">
                     {{ dayjs(account.created_at).format('MMM D, YYYY') }}
                 </p>
             </div>

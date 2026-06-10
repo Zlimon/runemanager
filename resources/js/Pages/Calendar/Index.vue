@@ -68,7 +68,7 @@ const dt = (iso) => dayjs(iso).format('ddd MMM D, YYYY h:mm A');
 
                 <h2 class="mt-6 mb-2 text-lg font-semibold dark:text-white">Upcoming</h2>
                 <div v-if="upcoming.length === 0"
-                     class="bg-base-100 border border-base-300 rounded p-6 text-center text-gray-500 dark:text-gray-400">
+                     class="rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
                     No upcoming events scheduled.
                 </div>
                 <ul v-else class="space-y-2">

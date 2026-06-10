@@ -28,7 +28,7 @@ defineProps({
 
             <div v-if="account.level" class="flex items-center space-x-1">
                 <img class="h-6 w-6 object-contain" src="/images/skill/total.webp" alt="">
-                <p class="font-normal text-gray-700 dark:text-gray-400">{{ account.level }}</p>
+                <p class="font-normal text-base-content/70">{{ account.level }}</p>
             </div>
 
             <p v-if="account.online && account.activity"
