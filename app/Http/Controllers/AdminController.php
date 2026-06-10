@@ -10,6 +10,7 @@ use App\Models\Announcement;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\Instance\ResetInstanceData;
+use App\Services\ResourcePacks\InstallResourcePack;
 use App\Services\ResourcePacks\ResourcePackHub;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
@@ -38,8 +39,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function settings(): Response
+    public function settings(InstallResourcePack $installer): Response
     {
+        $installer->ensureVanilla();
+
         return Inertia::render('Admin/Settings', [
             'settings' => [
                 'instance_mode' => Instance::mode(),
@@ -58,9 +61,7 @@ class AdminController extends Controller
             'configured' => Instance::isConfigured(),
             'accountCount' => Account::count(),
             'modes' => Instance::MODES,
-            'packs' => ResourcePack::query()->orderBy('alias')->get()
-                ->map(fn (ResourcePack $p): array => $p->toPickerArray())
-                ->all(),
+            'packs' => ResourcePack::pickerList(),
         ]);
     }
 

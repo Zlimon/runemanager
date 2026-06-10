@@ -27,12 +27,12 @@ class UserResourcePackController extends Controller
      * SPEC §6.2 — the user's appearance page: browse installed packs (with
      * icon.png thumbnails) and pick a personal override.
      */
-    public function index(Request $request): Response
+    public function index(Request $request, InstallResourcePack $installer): Response
     {
+        $installer->ensureVanilla();
+
         return Inertia::render('Themes/Index', [
-            'packs' => ResourcePack::query()->orderBy('alias')->get()
-                ->map(fn (ResourcePack $pack): array => $pack->toPickerArray())
-                ->all(),
+            'packs' => ResourcePack::pickerList(),
             'selectedId' => $request->user()->resource_pack_id,
             'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
         ]);

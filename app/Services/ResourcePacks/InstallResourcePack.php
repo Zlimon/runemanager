@@ -129,6 +129,41 @@ class InstallResourcePack
     }
 
     /**
+     * SPEC §6 — ensure the bundled "Default Vanilla" pack has a DB row so it's
+     * always selectable alongside "Default" (no pack). The assets ship with the
+     * app, so this builds the row from disk (palette only) with no download.
+     * Idempotent and cheap after the first call.
+     */
+    public function ensureVanilla(): ?ResourcePack
+    {
+        $existing = ResourcePack::where('name', self::VANILLA_PACK)->first();
+        if ($existing) {
+            return $existing;
+        }
+
+        $dir = public_path('resource-packs/'.self::VANILLA_PACK);
+        if (! File::isDirectory($dir)) {
+            return null;
+        }
+
+        $colors = $this->extractPaletteColors($dir);
+
+        $pack = new ResourcePack;
+        $pack->name = self::VANILLA_PACK;
+        $pack->alias = 'Default Vanilla';
+        $pack->version = 'bundled';
+        $pack->author = 'RuneManager';
+        $pack->url = '';
+        $pack->tags = '';
+        $pack->dark_mode = false;
+        $pack->background_color = $colors['background_color'];
+        $pack->accent_color = $colors['accent_color'];
+        $pack->save();
+
+        return $pack;
+    }
+
+    /**
      * Fetch the {@code compatibleVersion} from the pack's upstream {@code pack.properties}.
      * Returns null if upstream is unreachable or the properties file is missing — callers
      * should treat that as "no information; don't change anything".

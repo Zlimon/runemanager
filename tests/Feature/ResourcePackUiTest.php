@@ -3,6 +3,7 @@
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Services\ResourcePacks\InstallResourcePack;
 use App\Services\ResourcePacks\ResourcePackHub;
 use App\Support\Roles;
 use GuzzleHttp\Client;
@@ -29,6 +30,32 @@ function uiPack(string $name): ResourcePack
     ]);
 }
 
+it('ensures the bundled Default Vanilla pack exists (idempotent)', function () {
+    $installer = app(InstallResourcePack::class);
+
+    $pack = $installer->ensureVanilla();
+
+    expect($pack)->not->toBeNull();
+    expect($pack->name)->toBe('sample-vanilla');
+    expect($pack->alias)->toBe('Default Vanilla');
+
+    $installer->ensureVanilla();
+    expect(ResourcePack::where('name', 'sample-vanilla')->count())->toBe(1);
+});
+
+it('lists Default Vanilla first on the appearance page', function () {
+    uiPack('pack-zebra');
+    $user = User::factory()->withPersonalTeam()->create();
+
+    $this->actingAs($user)
+        ->get(route('themes.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('packs.0.name', 'sample-vanilla')
+            ->where('packs.0.alias', 'Default Vanilla'),
+        );
+});
+
 it('renders the user appearance page with installed packs', function () {
     $pack = uiPack('pack-rs3');
     $user = User::factory()->withPersonalTeam()->create(['resource_pack_id' => $pack->id]);
@@ -39,9 +66,11 @@ it('renders the user appearance page with installed packs', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Themes/Index')
             ->where('selectedId', $pack->id)
-            ->has('packs', 1)
-            ->where('packs.0.name', 'pack-rs3')
-            ->has('packs.0.icon_url'),
+            // Default Vanilla is auto-ensured and pinned first; pack-rs3 follows.
+            ->has('packs', 2)
+            ->where('packs.0.name', 'sample-vanilla')
+            ->where('packs.1.name', 'pack-rs3')
+            ->has('packs.1.icon_url'),
         );
 });
 

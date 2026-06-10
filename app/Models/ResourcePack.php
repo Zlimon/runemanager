@@ -38,6 +38,23 @@ class ResourcePack extends Model
 {
     use HasFactory;
 
+    /** The bundled vanilla template pack, always offered as "Default Vanilla". */
+    public const VANILLA = 'sample-vanilla';
+
+    /**
+     * Installed packs for the picker, vanilla pinned first then alphabetical.
+     *
+     * @return list<array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool}>
+     */
+    public static function pickerList(): array
+    {
+        return self::query()->get()
+            ->sortBy(fn (self $pack): string => $pack->name === self::VANILLA ? '' : mb_strtolower($pack->alias))
+            ->map(fn (self $pack): array => $pack->toPickerArray())
+            ->values()
+            ->all();
+    }
+
     /**
      * Public URL to the pack's icon.png thumbnail (shipped in every pack), or
      * null when the file isn't on disk.
