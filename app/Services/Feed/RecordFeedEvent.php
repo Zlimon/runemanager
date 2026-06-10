@@ -5,6 +5,7 @@ namespace App\Services\Feed;
 use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\FeedEvent;
+use App\Support\Instance;
 use Illuminate\Support\Carbon;
 
 /**
@@ -27,7 +28,7 @@ class RecordFeedEvent
     public function recordLevelUps(Account $account, array $previous, array $current): int
     {
         /** @var int[] $thresholds */
-        $thresholds = config('runemanager.feed.level_up_thresholds', []);
+        $thresholds = Instance::feedLevelUpThresholds();
         sort($thresholds);
 
         $emitted = 0;
@@ -87,7 +88,7 @@ class RecordFeedEvent
         int $totalValue,
         Carbon $occurredAt,
     ): bool {
-        $floor = (int) config('runemanager.feed.loot_min_value', 0);
+        $floor = Instance::feedLootMinValue();
         if ($totalValue < $floor) {
             return false;
         }

@@ -12,6 +12,7 @@ use App\Services\Instance\ResetInstanceData;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -42,7 +43,15 @@ class AdminController extends Controller
                 'instance_mode' => Instance::mode(),
                 'clan_name' => (string) SettingHelper::getSetting('clan_name', ''),
                 'group_name' => (string) SettingHelper::getSetting('group_name', ''),
+                'instance_description' => (string) SettingHelper::getSetting('instance_description', ''),
                 'resource_pack_id' => (int) SettingHelper::getSetting('resource_pack_id', 0),
+                'hiscore_refresh_minutes' => Instance::hiscoreRefreshMinutes(),
+                'feed_level_up_thresholds' => implode(', ', Instance::feedLevelUpThresholds()),
+                'feed_loot_min_value' => Instance::feedLootMinValue(),
+            ],
+            'branding' => [
+                'logo_url' => Instance::logoUrl(),
+                'banner_url' => Instance::bannerUrl(),
             ],
             'configured' => Instance::isConfigured(),
             'accountCount' => Account::count(),
@@ -64,6 +73,7 @@ class AdminController extends Controller
             'instance_mode' => ['required', Rule::in(Instance::MODES)],
             'clan_name' => ['nullable', 'string', 'max:60'],
             'group_name' => ['nullable', 'string', 'max:60'],
+            'instance_description' => ['nullable', 'string', 'max:2000'],
             'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
             'confirm' => ['nullable', 'string'],
         ]);
@@ -90,12 +100,64 @@ class AdminController extends Controller
         SettingHelper::setSetting('instance_mode', $validated['instance_mode']);
         SettingHelper::setSetting('clan_name', $validated['clan_name'] ?? '');
         SettingHelper::setSetting('group_name', $validated['group_name'] ?? '');
+        SettingHelper::setSetting('instance_description', $validated['instance_description'] ?? '');
         SettingHelper::setSetting('resource_pack_id', (int) ($validated['resource_pack_id'] ?? 0), 'int');
         SettingHelper::setSetting('instance_configured', true, 'bool');
 
         return back()->with('status', $switchingToRoster && $hasAccounts
             ? 'Instance reset and reconfigured.'
             : 'Instance settings updated.');
+    }
+
+    /**
+     * SPEC §12.4 — operational config: hiscores refresh cadence and live-feed
+     * milestone thresholds. The thresholds string is stored raw and sanitised on
+     * read (see Instance::feedLevelUpThresholds).
+     */
+    public function updateConfig(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'hiscore_refresh_minutes' => ['required', 'integer', Rule::in([30, 60, 180, 360, 720, 1440])],
+            'feed_level_up_thresholds' => ['nullable', 'string', 'max:200', 'regex:/^[0-9,\s]*$/'],
+            'feed_loot_min_value' => ['required', 'integer', 'min:0', 'max:2147483647'],
+        ]);
+
+        SettingHelper::setSetting('hiscore_refresh_minutes', (int) $validated['hiscore_refresh_minutes'], 'int');
+        SettingHelper::setSetting('feed_level_up_thresholds', $validated['feed_level_up_thresholds'] ?? '');
+        SettingHelper::setSetting('feed_loot_min_value', (int) $validated['feed_loot_min_value'], 'int');
+
+        return back()->with('status', 'Feed & sync settings updated.');
+    }
+
+    /**
+     * SPEC §12.4 — instance branding (logo + banner) image uploads, stored on
+     * the public disk. POST (multipart); a `remove_*` flag clears an asset.
+     */
+    public function updateBranding(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'logo' => ['nullable', 'image', 'max:1024'],
+            'banner' => ['nullable', 'image', 'max:2048'],
+            'remove_logo' => ['nullable', 'boolean'],
+            'remove_banner' => ['nullable', 'boolean'],
+        ]);
+
+        $this->storeBrandingAsset($request, 'logo', 'logo_path', $request->boolean('remove_logo'));
+        $this->storeBrandingAsset($request, 'banner', 'banner_path', $request->boolean('remove_banner'));
+
+        return back()->with('status', 'Branding updated.');
+    }
+
+    private function storeBrandingAsset(Request $request, string $field, string $key, bool $remove): void
+    {
+        if (($remove || $request->hasFile($field)) && ($old = SettingHelper::getSetting($key))) {
+            Storage::disk('public')->delete($old);
+            SettingHelper::setSetting($key, '');
+        }
+
+        if ($request->hasFile($field)) {
+            SettingHelper::setSetting($key, $request->file($field)->store('branding', 'public'));
+        }
     }
 
     /**

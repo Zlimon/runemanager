@@ -72,6 +72,8 @@ Route::middleware([
             Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
             Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
             Route::put('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+            Route::put('/config', [AdminController::class, 'updateConfig'])->name('admin.config.update');
+            Route::post('/branding', [AdminController::class, 'updateBranding'])->name('admin.branding.update');
         });
 
         Route::middleware('can:manage members')->group(function () {

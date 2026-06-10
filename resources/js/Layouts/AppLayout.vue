@@ -49,7 +49,10 @@ watch(() => page.props.dark_mode, applyDarkMode);
             <nav class="bg-beige-600 dark:bg-gray-900">
                 <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
                     <Link :href="route('dashboard')" class="flex items-center space-x-3 rtl:space-x-reverse">
-                        <span class="self-center whitespace-nowrap text-2xl text-6xl font-bold dark:text-white md:text-7xl"
+                        <img v-if="page.props.instance?.logo_url" :src="page.props.instance.logo_url"
+                             :alt="page.props.app.name" class="h-12 w-auto object-contain md:h-16">
+                        <span v-else
+                              class="self-center whitespace-nowrap text-2xl text-6xl font-bold dark:text-white md:text-7xl"
                               style="font-family: 'runescape-smooth', sans-serif">
                             {{ page.props.app.name }}
                         </span>

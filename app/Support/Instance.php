@@ -3,10 +3,12 @@
 namespace App\Support;
 
 use App\Helpers\SettingHelper;
+use Illuminate\Support\Facades\Storage;
 
 /**
- * Instance-level configuration (SPEC §2 Modes). The mode and clan/group name
- * are stored as settings and editable from the admin panel.
+ * Instance-level configuration (SPEC §2 Modes, §12.4). Mode, names, branding,
+ * sync cadence and feed thresholds are stored as settings and editable from the
+ * admin panel; readers here fall back to config defaults.
  */
 class Instance
 {
@@ -66,5 +68,99 @@ class Instance
         }
 
         return null;
+    }
+
+    /**
+     * Admin-set instance description (SPEC §12.4), or null when unset.
+     */
+    public static function description(): ?string
+    {
+        return SettingHelper::getSetting('instance_description') ?: null;
+    }
+
+    /**
+     * Public URL for an uploaded branding asset (logo/banner), or null. The
+     * stored value is a path on the public disk.
+     */
+    public static function logoUrl(): ?string
+    {
+        return self::assetUrl('logo_path');
+    }
+
+    public static function bannerUrl(): ?string
+    {
+        return self::assetUrl('banner_path');
+    }
+
+    private static function assetUrl(string $key): ?string
+    {
+        $path = SettingHelper::getSetting($key);
+
+        return $path ? Storage::disk('public')->url($path) : null;
+    }
+
+    /**
+     * How often the hiscores sweep runs (minutes); the scheduler maps this to a
+     * cron cadence. SPEC §12.4.
+     */
+    public static function hiscoreRefreshMinutes(): int
+    {
+        $minutes = (int) SettingHelper::getSetting('hiscore_refresh_minutes', 0);
+
+        return $minutes > 0 ? $minutes : 60;
+    }
+
+    /** The hiscores refresh cadence as a cron expression. */
+    public static function hiscoreRefreshCron(): string
+    {
+        $minutes = self::hiscoreRefreshMinutes();
+
+        if ($minutes < 60) {
+            return '*/'.max(1, $minutes).' * * * *';
+        }
+
+        $hours = intdiv($minutes, 60);
+
+        return match (true) {
+            $hours >= 24 => '0 0 * * *',
+            $hours === 1 => '0 * * * *',
+            default => '0 */'.$hours.' * * *',
+        };
+    }
+
+    /**
+     * Notable level-up thresholds for the live feed (SPEC §8.2/§12.4). Falls
+     * back to the config defaults when unset.
+     *
+     * @return list<int>
+     */
+    public static function feedLevelUpThresholds(): array
+    {
+        $raw = SettingHelper::getSetting('feed_level_up_thresholds');
+
+        if (! $raw) {
+            return config('runemanager.feed.level_up_thresholds', []);
+        }
+
+        $values = array_values(array_unique(array_filter(array_map(
+            fn ($v) => (int) trim((string) $v),
+            explode(',', (string) $raw),
+        ), fn (int $v) => $v >= 2 && $v <= 99)));
+
+        sort($values);
+
+        return $values ?: config('runemanager.feed.level_up_thresholds', []);
+    }
+
+    /**
+     * Minimum loot GP value for a feed LOOT_DROP (SPEC §8.2/§12.4).
+     */
+    public static function feedLootMinValue(): int
+    {
+        $value = SettingHelper::getSetting('feed_loot_min_value');
+
+        return $value !== null && $value !== ''
+            ? (int) $value
+            : (int) config('runemanager.feed.loot_min_value', 0);
     }
 }

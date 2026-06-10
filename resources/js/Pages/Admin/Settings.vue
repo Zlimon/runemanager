@@ -13,6 +13,7 @@ import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
     settings: { type: Object, required: true },
+    branding: { type: Object, default: () => ({}) },
     configured: { type: Boolean, default: false },
     accountCount: { type: Number, default: 0 },
     modes: { type: Array, required: true },
@@ -23,11 +24,44 @@ const form = useForm({
     instance_mode: props.settings.instance_mode,
     clan_name: props.settings.clan_name ?? '',
     group_name: props.settings.group_name ?? '',
+    instance_description: props.settings.instance_description ?? '',
     resource_pack_id: props.settings.resource_pack_id || '',
     confirm: '',
 });
 
+const configForm = useForm({
+    hiscore_refresh_minutes: props.settings.hiscore_refresh_minutes,
+    feed_level_up_thresholds: props.settings.feed_level_up_thresholds ?? '',
+    feed_loot_min_value: props.settings.feed_loot_min_value,
+});
+
+const brandingForm = useForm({
+    logo: null,
+    banner: null,
+    remove_logo: false,
+    remove_banner: false,
+});
+
+const refreshOptions = [
+    { value: 30, label: 'Every 30 minutes' },
+    { value: 60, label: 'Hourly' },
+    { value: 180, label: 'Every 3 hours' },
+    { value: 360, label: 'Every 6 hours' },
+    { value: 720, label: 'Every 12 hours' },
+    { value: 1440, label: 'Daily' },
+];
+
 const showConfirm = ref(false);
+
+const submitConfig = () => configForm.put(route('admin.config.update'), { preserveScroll: true });
+
+const submitBranding = () => {
+    brandingForm.post(route('admin.branding.update'), {
+        preserveScroll: true,
+        forceFormData: true,
+        onSuccess: () => brandingForm.reset('logo', 'banner', 'remove_logo', 'remove_banner'),
+    });
+};
 
 const modeLabel = (mode) => mode.charAt(0).toUpperCase() + mode.slice(1);
 
@@ -121,6 +155,16 @@ const confirmReset = () => {
                         </div>
 
                         <div>
+                            <InputLabel for="instance_description" value="Description" />
+                            <textarea id="instance_description"
+                                      v-model="form.instance_description"
+                                      class="textarea textarea-bordered mt-1 block w-full"
+                                      rows="3"
+                                      placeholder="A short description of your clan/group, shown on the homepage." />
+                            <InputError v-if="form.errors.instance_description" :messages="form.errors.instance_description" />
+                        </div>
+
+                        <div>
                             <InputLabel for="resource_pack_id" value="Default resource pack" />
                             <select id="resource_pack_id"
                                     v-model="form.resource_pack_id"
@@ -137,6 +181,95 @@ const confirmReset = () => {
                             <PrimaryButton :class="{ 'opacity-25': form.processing }"
                                            :disabled="form.processing">
                                 {{ configured ? 'Save' : 'Complete setup' }}
+                            </PrimaryButton>
+                        </div>
+                    </form>
+                </Card>
+
+                <!-- Feed & sync config (SPEC §12.4) -->
+                <Card v-if="configured" class="mt-6">
+                    <h2 class="header-chatbox-sword text-lg font-bold">Feed &amp; sync</h2>
+                    <form class="mt-4 space-y-6" @submit.prevent="submitConfig">
+                        <div>
+                            <InputLabel for="hiscore_refresh_minutes" value="Hiscores refresh" />
+                            <select id="hiscore_refresh_minutes"
+                                    v-model.number="configForm.hiscore_refresh_minutes"
+                                    class="select select-bordered mt-1 block w-full">
+                                <option v-for="opt in refreshOptions" :key="opt.value" :value="opt.value">
+                                    {{ opt.label }}
+                                </option>
+                            </select>
+                            <p class="mt-1 text-xs text-base-content/60">How often stats are pulled from the OSRS hiscores.</p>
+                            <InputError v-if="configForm.errors.hiscore_refresh_minutes" :messages="configForm.errors.hiscore_refresh_minutes" />
+                        </div>
+
+                        <div>
+                            <InputLabel for="feed_level_up_thresholds" value="Level-up milestones" />
+                            <TextInput id="feed_level_up_thresholds"
+                                       v-model="configForm.feed_level_up_thresholds"
+                                       type="text"
+                                       class="mt-1 block w-full"
+                                       placeholder="50, 60, 70, 80, 90, 99"
+                                       :error="configForm.errors.feed_level_up_thresholds !== undefined" />
+                            <p class="mt-1 text-xs text-base-content/60">
+                                Comma-separated levels (2–99). The feed posts a level-up only when a skill crosses one.
+                            </p>
+                            <InputError v-if="configForm.errors.feed_level_up_thresholds" :messages="configForm.errors.feed_level_up_thresholds" />
+                        </div>
+
+                        <div>
+                            <InputLabel for="feed_loot_min_value" value="Minimum loot value (gp)" />
+                            <TextInput id="feed_loot_min_value"
+                                       v-model.number="configForm.feed_loot_min_value"
+                                       type="number"
+                                       min="0"
+                                       class="mt-1 block w-full"
+                                       :error="configForm.errors.feed_loot_min_value !== undefined" />
+                            <p class="mt-1 text-xs text-base-content/60">Drops below this GE value don't reach the live feed.</p>
+                            <InputError v-if="configForm.errors.feed_loot_min_value" :messages="configForm.errors.feed_loot_min_value" />
+                        </div>
+
+                        <div class="flex justify-end">
+                            <PrimaryButton :class="{ 'opacity-25': configForm.processing }" :disabled="configForm.processing">
+                                Save
+                            </PrimaryButton>
+                        </div>
+                    </form>
+                </Card>
+
+                <!-- Branding (SPEC §12.4) -->
+                <Card v-if="configured" class="mt-6">
+                    <h2 class="header-chatbox-sword text-lg font-bold">Branding</h2>
+                    <form class="mt-4 space-y-6" @submit.prevent="submitBranding">
+                        <div>
+                            <InputLabel value="Logo" />
+                            <img v-if="branding.logo_url" :src="branding.logo_url" alt="Current logo"
+                                 class="mt-1 h-12 object-contain">
+                            <input type="file" accept="image/*"
+                                   class="file-input file-input-bordered mt-1 block w-full"
+                                   @input="brandingForm.logo = $event.target.files[0]">
+                            <label v-if="branding.logo_url" class="mt-1 flex items-center gap-2 text-xs text-base-content/70">
+                                <input type="checkbox" v-model="brandingForm.remove_logo" class="checkbox checkbox-xs"> Remove current logo
+                            </label>
+                            <InputError v-if="brandingForm.errors.logo" :messages="brandingForm.errors.logo" />
+                        </div>
+
+                        <div>
+                            <InputLabel value="Banner" />
+                            <img v-if="branding.banner_url" :src="branding.banner_url" alt="Current banner"
+                                 class="mt-1 h-24 w-full rounded object-cover">
+                            <input type="file" accept="image/*"
+                                   class="file-input file-input-bordered mt-1 block w-full"
+                                   @input="brandingForm.banner = $event.target.files[0]">
+                            <label v-if="branding.banner_url" class="mt-1 flex items-center gap-2 text-xs text-base-content/70">
+                                <input type="checkbox" v-model="brandingForm.remove_banner" class="checkbox checkbox-xs"> Remove current banner
+                            </label>
+                            <InputError v-if="brandingForm.errors.banner" :messages="brandingForm.errors.banner" />
+                        </div>
+
+                        <div class="flex justify-end">
+                            <PrimaryButton :class="{ 'opacity-25': brandingForm.processing }" :disabled="brandingForm.processing">
+                                Save branding
                             </PrimaryButton>
                         </div>
                     </form>

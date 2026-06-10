@@ -69,6 +69,9 @@ class HandleInertiaRequests extends Middleware
             'instance' => [
                 'mode' => Instance::mode(),
                 'name' => Instance::name(),
+                'description' => Instance::description(),
+                'logo_url' => Instance::logoUrl(),
+                'banner_url' => Instance::bannerUrl(),
             ],
             'dark_mode' => $darkMode,
             'can_toggle_dark_mode' => $request->user() !== null && $pack === null,
