@@ -24,9 +24,12 @@ const modeLabel = (mode) => mode.charAt(0).toUpperCase() + mode.slice(1);
             <div class="mx-auto max-w-5xl space-y-8 sm:px-6 lg:px-8">
                 <div class="flex items-baseline justify-between gap-2">
                     <h1 class="header-chatbox-sword text-2xl font-bold">Admin</h1>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <Link v-if="mode !== 'casual'" :href="route('admin.members')" class="btn btn-neutral btn-sm">
                             Members
+                        </Link>
+                        <Link :href="route('admin.packs')" class="btn btn-neutral btn-sm">
+                            Resource packs
                         </Link>
                         <Link :href="route('admin.settings')" class="btn btn-neutral btn-sm">
                             Instance settings

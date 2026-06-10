@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,8 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $url
  * @property string $tags
  * @property int $dark_mode
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newQuery()
@@ -36,4 +37,31 @@ use Illuminate\Database\Eloquent\Model;
 class ResourcePack extends Model
 {
     use HasFactory;
+
+    /**
+     * Public URL to the pack's icon.png thumbnail (shipped in every pack), or
+     * null when the file isn't on disk.
+     */
+    public function getIconUrlAttribute(): ?string
+    {
+        $relative = "resource-packs/{$this->name}/icon.png";
+
+        return is_file(public_path($relative)) ? '/'.$relative : null;
+    }
+
+    /**
+     * Shape used by the resource-pack picker UI (owner-global + user-personal).
+     *
+     * @return array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool}
+     */
+    public function toPickerArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'alias' => $this->alias,
+            'icon_url' => $this->icon_url,
+            'dark_mode' => (bool) $this->dark_mode,
+        ];
+    }
 }

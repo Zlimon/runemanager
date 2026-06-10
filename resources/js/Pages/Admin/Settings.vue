@@ -10,6 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
 
 const props = defineProps({
     settings: { type: Object, required: true },
@@ -165,15 +166,11 @@ const confirmReset = () => {
                         </div>
 
                         <div>
-                            <InputLabel for="resource_pack_id" value="Default resource pack" />
-                            <select id="resource_pack_id"
-                                    v-model="form.resource_pack_id"
-                                    class="select select-bordered mt-1 block w-full">
-                                <option value="">None</option>
-                                <option v-for="pack in packs" :key="pack.id" :value="pack.id">
-                                    {{ pack.alias }}
-                                </option>
-                            </select>
+                            <InputLabel value="Default resource pack" />
+                            <p class="mt-1 text-xs text-base-content/60">
+                                The instance-wide theme, applied to anyone without their own pick.
+                            </p>
+                            <ResourcePackPicker v-model="form.resource_pack_id" :packs="packs" class="mt-2" />
                             <InputError v-if="form.errors.resource_pack_id" :messages="form.errors.resource_pack_id" />
                         </div>
 

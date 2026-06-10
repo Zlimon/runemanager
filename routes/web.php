@@ -74,6 +74,8 @@ Route::middleware([
             Route::put('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
             Route::put('/config', [AdminController::class, 'updateConfig'])->name('admin.config.update');
             Route::post('/branding', [AdminController::class, 'updateBranding'])->name('admin.branding.update');
+            Route::get('/packs', [AdminController::class, 'packs'])->name('admin.packs');
+            Route::post('/packs/install', [AdminController::class, 'installPack'])->name('admin.packs.install');
         });
 
         Route::middleware('can:manage members')->group(function () {
@@ -96,8 +98,9 @@ Route::middleware([
             ->name('announcements.destroy');
     });
 
-    // Per-user resource pack override (instance-global pack is set by the
-    // resourcepack:switch artisan, not this endpoint).
+    // SPEC §6.2 — per-user appearance: browse packs + set a personal override
+    // (instance-global default is set by the owner in admin settings).
+    Route::get('/themes', [UserResourcePackController::class, 'index'])->name('themes.index');
     Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
         ->name('user.resource-pack.update');
 

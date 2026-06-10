@@ -123,6 +123,12 @@ watch(() => page.props.dark_mode, applyDarkMode);
                                 </ResponsiveNavLink>
                             </li>
                             <li>
+                                <ResponsiveNavLink :href="route('themes.index')"
+                                                   :active="route().current('themes.*')">
+                                    Appearance
+                                </ResponsiveNavLink>
+                            </li>
+                            <li>
                                 <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
                                                    :href="route('api-tokens.index')"
                                                    :active="route().current('api-tokens.index')">

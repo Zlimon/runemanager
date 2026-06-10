@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SettingHelper;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\ResourcePacks\InstallResourcePack;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Manage the authenticated user's per-user resource pack override.
@@ -20,9 +24,26 @@ use Illuminate\Support\Str;
 class UserResourcePackController extends Controller
 {
     /**
-     * Website / API: set the override by id.
+     * SPEC §6.2 — the user's appearance page: browse installed packs (with
+     * icon.png thumbnails) and pick a personal override.
      */
-    public function update(Request $request): JsonResponse
+    public function index(Request $request): Response
+    {
+        return Inertia::render('Themes/Index', [
+            'packs' => ResourcePack::query()->orderBy('alias')->get()
+                ->map(fn (ResourcePack $pack): array => $pack->toPickerArray())
+                ->all(),
+            'selectedId' => $request->user()->resource_pack_id,
+            'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
+        ]);
+    }
+
+    /**
+     * Website / API: set the override by id. Inertia requests get a redirect
+     * back (the picker full-reloads to swap the server-rendered pack CSS); API
+     * callers get JSON.
+     */
+    public function update(Request $request): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
             'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
@@ -31,6 +52,10 @@ class UserResourcePackController extends Controller
         $user = $request->user();
         $user->resource_pack_id = $validated['resource_pack_id'] ?? null;
         $user->save();
+
+        if ($request->header('X-Inertia')) {
+            return back();
+        }
 
         return response()->json([
             'resource_pack_id' => $user->resource_pack_id,

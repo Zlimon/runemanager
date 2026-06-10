@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Enums\AccountTypesEnum;
 use App\Helpers\SettingHelper;
+use App\Jobs\FetchResourcePackJob;
 use App\Models\Account;
 use App\Models\Announcement;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\Instance\ResetInstanceData;
+use App\Services\ResourcePacks\ResourcePackHub;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -56,8 +58,8 @@ class AdminController extends Controller
             'configured' => Instance::isConfigured(),
             'accountCount' => Account::count(),
             'modes' => Instance::MODES,
-            'packs' => ResourcePack::query()->orderBy('alias')->get(['id', 'alias'])
-                ->map(fn (ResourcePack $p): array => ['id' => $p->id, 'alias' => $p->alias])
+            'packs' => ResourcePack::query()->orderBy('alias')->get()
+                ->map(fn (ResourcePack $p): array => $p->toPickerArray())
                 ->all(),
         ]);
     }
@@ -158,6 +160,28 @@ class AdminController extends Controller
         if ($request->hasFile($field)) {
             SettingHelper::setSetting($key, $request->file($field)->store('branding', 'public'));
         }
+    }
+
+    /**
+     * SPEC §6 — browse the resource-pack hub and install packs.
+     */
+    public function packs(ResourcePackHub $hub): Response
+    {
+        return Inertia::render('Admin/Packs', [
+            'packs' => $hub->available(),
+            'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
+        ]);
+    }
+
+    public function installPack(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
+        ]);
+
+        FetchResourcePackJob::dispatch($validated['name']);
+
+        return back()->with('status', "Installing {$validated['name']} — it'll appear shortly.");
     }
 
     /**
