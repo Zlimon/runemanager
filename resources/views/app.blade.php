@@ -1,5 +1,23 @@
+@php
+    // Resolve the effective resource pack + dark mode for the current viewer so
+    // the <html> theme is correct on first paint for EVERY page — including the
+    // auth pages, which don't mount AppLayout (the client-side toggler). Mirrors
+    // App\Http\Middleware\HandleInertiaRequests::share().
+    $user = auth()->user();
+    if ($user) {
+        $pack = $user->effectiveResourcePack();
+    } else {
+        $globalId = \App\Helpers\SettingHelper::getSetting('resource_pack_id');
+        $pack = $globalId ? \App\Models\ResourcePack::find($globalId) : null;
+    }
+    // A logged-in user's own preference always wins; a pack's flag only seeds the
+    // default for logged-out visitors.
+    $darkMode = $user ? (bool) $user->dark_mode : (bool) ($pack?->dark_mode);
+@endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      class="{{ $darkMode ? 'dark' : '' }}"
+      data-theme="{{ $darkMode ? 'runemanager-dark' : 'runemanager' }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,17 +33,6 @@
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/app.css', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
 
-        @php
-            // Resolve the effective resource pack for the current viewer.
-            // Authenticated user override → instance default → none.
-            $pack = null;
-            if ($user = auth()->user()) {
-                $pack = $user->effectiveResourcePack();
-            } else {
-                $globalId = \App\Helpers\SettingHelper::getSetting('resource_pack_id');
-                $pack = $globalId ? \App\Models\ResourcePack::find($globalId) : null;
-            }
-        @endphp
         @if ($pack && file_exists(public_path("resource-packs/{$pack->name}/resource-pack.css")))
             {{-- Cache-bust on the CSS file's mtime so template tweaks (which don't
                  touch the pack's updated_at) are picked up without a hard refresh. --}}
