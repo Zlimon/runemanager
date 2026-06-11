@@ -127,8 +127,10 @@ it('website install: stub-creates the row, selects it and queues a fetch when no
     expect(ResourcePack::count())->toBe(0);
 
     $this->actingAs($user)
-        ->post(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
-        ->assertRedirect();
+        ->postJson(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
+        ->assertSuccessful()
+        ->assertJsonPath('installed', false)
+        ->assertJsonPath('queued', true);
 
     $pack = ResourcePack::firstWhere('name', 'pack-sakurascape');
     expect($pack)->not->toBeNull();
@@ -148,8 +150,10 @@ it('website install: selects without re-queuing when the pack is already install
     $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     $this->actingAs($user)
-        ->post(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
-        ->assertRedirect();
+        ->postJson(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
+        ->assertSuccessful()
+        ->assertJsonPath('installed', true)
+        ->assertJsonPath('queued', false);
 
     expect($user->fresh()->resource_pack_id)->toBe($pack->id);
     Queue::assertNothingPushed();
@@ -157,17 +161,38 @@ it('website install: selects without re-queuing when the pack is already install
 
 it('website install: rejects names without the pack- prefix', function () {
     $this->actingAs(freshPackUser())
-        ->post(route('user.resource-pack.install'), ['name' => 'sakurascape'])
-        ->assertSessionHasErrors('name');
+        ->postJson(route('user.resource-pack.install'), ['name' => 'sakurascape'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('name');
 
     Queue::assertNothingPushed();
 });
 
 it('website install: rejects guests', function () {
-    $this->post(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
-        ->assertRedirect(route('login'));
+    $this->postJson(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
+        ->assertUnauthorized();
 
     Queue::assertNothingPushed();
+});
+
+it('install status: reports not-installed for a pending stub even with assets on disk', function () {
+    makePack('pack-sakurascape', ['version' => 'pending']);
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+
+    $this->actingAs(freshPackUser())
+        ->getJson(route('user.resource-pack.status', ['name' => 'pack-sakurascape']))
+        ->assertSuccessful()
+        ->assertJsonPath('installed', false);
+});
+
+it('install status: reports installed once the row is populated and assets exist', function () {
+    makePack('pack-sakurascape', ['version' => '1.0.0']);
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+
+    $this->actingAs(freshPackUser())
+        ->getJson(route('user.resource-pack.status', ['name' => 'pack-sakurascape']))
+        ->assertSuccessful()
+        ->assertJsonPath('installed', true);
 });
 
 it('plugin push: 200 + no job queued when pack is already installed', function () {

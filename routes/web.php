@@ -109,6 +109,8 @@ Route::middleware([
         ->name('user.resource-pack.update');
     Route::post('/user/resource-pack/install', [UserResourcePackController::class, 'install'])
         ->name('user.resource-pack.install');
+    Route::get('/user/resource-pack/status', [UserResourcePackController::class, 'status'])
+        ->name('user.resource-pack.status');
 
     Route::prefix('/hiscores')->group(function () {
         // SPEC §7.1 — Overall (total level + total XP).

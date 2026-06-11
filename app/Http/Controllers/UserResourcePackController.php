@@ -68,10 +68,11 @@ class UserResourcePackController extends Controller
 
     /**
      * Website: install a pack from the community hub and apply it as the user's
-     * personal theme. Same pipeline as the plugin push, but keyed on a hub
-     * branch name (`pack-*`) and answering with an Inertia redirect.
+     * personal theme. Same pipeline as the plugin push, keyed on a hub branch
+     * name (`pack-*`). Answers with JSON so the Appearance page can show a
+     * spinner and poll {@see status()} until the download lands.
      */
-    public function install(Request $request, InstallResourcePack $installer): RedirectResponse
+    public function install(Request $request, InstallResourcePack $installer): JsonResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
@@ -79,9 +80,32 @@ class UserResourcePackController extends Controller
 
         $installed = $this->installAndSelect($validated['name'], $request->user(), $installer);
 
-        return back()->with('status', $installed
-            ? 'Theme applied.'
-            : "Installing {$validated['name']} — it'll appear shortly.");
+        return response()->json([
+            'name' => $validated['name'],
+            'installed' => $installed,
+            'queued' => ! $installed,
+        ]);
+    }
+
+    /**
+     * Website: report whether a pack has finished installing (assets on disk +
+     * a fully-populated row). Polled by the Appearance page after an install so
+     * it can reload — and apply the new theme — the moment the job lands.
+     */
+    public function status(Request $request, InstallResourcePack $installer): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
+        ]);
+
+        $name = $validated['name'];
+        $pack = ResourcePack::where('name', $name)->first();
+
+        return response()->json([
+            'installed' => $pack !== null
+                && $installer->isInstalled($name)
+                && $pack->version !== 'pending',
+        ]);
     }
 
     /**

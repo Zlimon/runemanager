@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Card from "@/Components/Card.vue";
@@ -37,7 +37,6 @@ const choose = (id) => {
 // Browse the community hub. Only packs that aren't installed yet are offered
 // here — installed ones live in the picker above.
 const search = ref('');
-const installing = ref(null);
 
 const installable = computed(() => {
     const needle = search.value.toLowerCase();
@@ -48,16 +47,73 @@ const installable = computed(() => {
             || p.name.toLowerCase().includes(needle));
 });
 
-// Installing applies the pack as the user's personal theme and queues the
-// download; reload so the new theme + updated lists take effect.
-const install = (pack) => {
-    installing.value = pack.name;
-    router.post(route('user.resource-pack.install'), { name: pack.name }, {
-        preserveScroll: true,
-        onSuccess: () => window.location.reload(),
-        onError: () => { installing.value = null; },
-    });
+// Installing a pack queues an async download. Rather than reload straight away
+// (which would flash to the default theme while the job is still running), keep
+// the user here under a spinner and poll until the assets land, then reload so
+// the server-rendered theme picks them up.
+const installingPack = ref(null);
+const installTimedOut = ref(false);
+const POLL_INTERVAL = 2000;
+const POLL_TIMEOUT = 90_000;
+
+let pollTimer = null;
+let pollDeadline = 0;
+
+const stopPolling = () => {
+    if (pollTimer) {
+        clearTimeout(pollTimer);
+        pollTimer = null;
+    }
 };
+
+const pollStatus = (name) => {
+    pollTimer = setTimeout(() => {
+        window.axios.get(route('user.resource-pack.status'), { params: { name } })
+            .then(({ data }) => {
+                if (data.installed) {
+                    window.location.reload();
+                } else if (Date.now() > pollDeadline) {
+                    installTimedOut.value = true;
+                } else {
+                    pollStatus(name);
+                }
+            })
+            .catch(() => {
+                if (Date.now() > pollDeadline) {
+                    installTimedOut.value = true;
+                } else {
+                    pollStatus(name);
+                }
+            });
+    }, POLL_INTERVAL);
+};
+
+const install = (pack) => {
+    if (installingPack.value) {
+        return;
+    }
+    installingPack.value = pack;
+    installTimedOut.value = false;
+
+    window.axios.post(route('user.resource-pack.install'), { name: pack.name })
+        .then(({ data }) => {
+            if (data.installed) {
+                window.location.reload();
+                return;
+            }
+            pollDeadline = Date.now() + POLL_TIMEOUT;
+            pollStatus(pack.name);
+        })
+        .catch(() => { installTimedOut.value = true; });
+};
+
+const dismissInstall = () => {
+    stopPolling();
+    installingPack.value = null;
+    installTimedOut.value = false;
+};
+
+onBeforeUnmount(stopPolling);
 </script>
 
 <template>
@@ -109,14 +165,39 @@ const install = (pack) => {
                                  loading="lazy" onerror="this.style.visibility='hidden'">
                             <span class="max-w-full truncate text-sm font-medium" :title="pack.alias">{{ pack.alias }}</span>
                             <PrimaryButton type="button" class="btn-xs"
-                                           :class="{ 'opacity-25': installing === pack.name }"
-                                           :disabled="installing === pack.name"
+                                           :class="{ 'opacity-25': installingPack }"
+                                           :disabled="!!installingPack"
                                            @click="install(pack)">
-                                {{ installing === pack.name ? 'Installing…' : 'Install' }}
+                                {{ installingPack?.name === pack.name ? 'Installing…' : 'Install' }}
                             </PrimaryButton>
                         </div>
                     </div>
                 </Card>
+            </div>
+        </div>
+
+        <!-- Install overlay: spinner while the queued download runs, with a
+             graceful fallback if it's taking unusually long. -->
+        <div v-if="installingPack"
+             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+            <div class="w-full max-w-sm rounded-lg p-8 text-center shadow-xl pack-bg-card resource-pack-border">
+                <template v-if="!installTimedOut">
+                    <span class="loading loading-spinner loading-lg text-primary"></span>
+                    <h3 class="mt-4 text-lg font-semibold">Installing {{ installingPack.alias }}…</h3>
+                    <p class="mt-1 text-sm text-base-content/70">
+                        Downloading the pack and applying your theme. This usually takes a few seconds.
+                    </p>
+                </template>
+                <template v-else>
+                    <h3 class="text-lg font-semibold">Still working on it</h3>
+                    <p class="mt-1 text-sm text-base-content/70">
+                        {{ installingPack.alias }} is taking longer than usual to download. Your theme will
+                        apply automatically the next time it's ready — no need to install again.
+                    </p>
+                    <PrimaryButton type="button" class="mt-4" @click="dismissInstall">
+                        Got it
+                    </PrimaryButton>
+                </template>
             </div>
         </div>
     </AppLayout>
