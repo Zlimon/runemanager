@@ -193,8 +193,8 @@
  * runemanager / runemanager-dark themes remain the no-pack fallback.
  */
 
-/* Buttons — 9-slice metal frame from button/, dialog fill in the centre; the
- * _selected sprites + brighter fill on hover/focus/active. */
+/* Buttons — 9-slice metal frame from button/, dialog fill in the centre;
+ * brightened for feedback on hover/focus/active. */
 .btn {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -220,17 +220,23 @@
 .btn:focus-visible,
 .btn:active,
 .btn.btn-active {
-    background: url('button/corner_top_left_selected.png') no-repeat,
-                url('button/corner_top_right_selected.png') no-repeat,
-                url('button/corner_bottom_left_selected.png') no-repeat,
-                url('button/corner_bottom_right_selected.png') no-repeat,
-                url('button/edge_top_selected.png') repeat-x,
-                url('button/edge_left_selected.png') repeat-y,
-                url('button/edge_right_selected.png') repeat-y,
-                url('button/edge_bottom_selected.png') repeat-x,
-                url('dialog/background_brighter.png');
+    /* Keep the pack's own button face + frame and just brighten for feedback.
+     * Swapping to the _selected sprites + background_brighter.png shifted the
+     * hue on many packs (a brown button flashing pink or red), which read as a
+     * different button rather than a hover state. background-color is forced
+     * transparent so DaisyUI's own hover colour can't bleed through. */
+    background: url('button/corner_top_left.png') no-repeat,
+                url('button/corner_top_right.png') no-repeat,
+                url('button/corner_bottom_left.png') no-repeat,
+                url('button/corner_bottom_right.png') no-repeat,
+                url('button/edge_top.png') repeat-x,
+                url('button/edge_left.png') repeat-y,
+                url('button/edge_right.png') repeat-y,
+                url('button/edge_bottom.png') repeat-x,
+                url('dialog/background.png');
     background-position: top left, top right, bottom left, bottom right,
                          top, left, right, bottom, center;
+    filter: brightness(1.12);
 }
 
 /* Checkboxes — swap DaisyUI's drawn box for the in-game checkbox sprites. */
