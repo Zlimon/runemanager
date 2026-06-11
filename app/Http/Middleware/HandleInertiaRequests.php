@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Helpers\SettingHelper;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use App\Models\ResourcePack;
@@ -47,11 +46,9 @@ class HandleInertiaRequests extends Middleware
         // we forward `dark_mode` to drive Tailwind's `dark:` variants and `pack`
         // (name + updated_at timestamp) so Vue components can resolve pack-shipped
         // assets like /resource-packs/{name}/skill/{slug}.png with cache busting.
-        $packId = $request->user()?->effectiveResourcePackId()
-            ?? SettingHelper::getSetting('resource_pack_id');
-        $pack = $packId ? ResourcePack::find($packId) : null;
-
+        // A pack is always in effect — Default Vanilla is the floor.
         $user = $request->user();
+        $pack = ResourcePack::effectiveFor($user);
 
         // Dark mode resolves through Instance: the viewer's own toggle wins, then
         // a guest's cookie choice, then the owner's instance default, then the

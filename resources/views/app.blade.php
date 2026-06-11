@@ -4,12 +4,7 @@
     // auth pages, which don't mount AppLayout (the client-side toggler). Mirrors
     // App\Http\Middleware\HandleInertiaRequests::share().
     $user = auth()->user();
-    if ($user) {
-        $pack = $user->effectiveResourcePack();
-    } else {
-        $globalId = \App\Helpers\SettingHelper::getSetting('resource_pack_id');
-        $pack = $globalId ? \App\Models\ResourcePack::find($globalId) : null;
-    }
+    $pack = \App\Models\ResourcePack::effectiveFor($user);
     // Same precedence as the Inertia share: user toggle > guest cookie >
     // instance default > pack flag (see App\Support\Instance::resolveDarkMode).
     $darkMode = \App\Support\Instance::resolveDarkMode($user, $pack);
