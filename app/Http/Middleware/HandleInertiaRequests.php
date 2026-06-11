@@ -53,13 +53,11 @@ class HandleInertiaRequests extends Middleware
 
         $user = $request->user();
 
-        // Dark mode is always the user's own choice (a pack's dark_mode flag is
-        // unreliable, so it only seeds the default for logged-out visitors). A
-        // logged-in user can always toggle, even with a pack active — it flips
-        // the DaisyUI base theme while the pack's textures stay on top.
-        $darkMode = $user !== null
-            ? (bool) $user->dark_mode
-            : (bool) $pack?->dark_mode;
+        // Dark mode resolves through Instance: the viewer's own toggle wins, then
+        // a guest's cookie choice, then the owner's instance default, then the
+        // pack's (unreliable) flag. Anyone may toggle — it flips the DaisyUI base
+        // theme while the pack's textures stay on top.
+        $darkMode = Instance::resolveDarkMode($user, $pack);
 
         return array_merge(parent::share($request), [
             'app' => [
@@ -77,7 +75,7 @@ class HandleInertiaRequests extends Middleware
                 'banner_url' => Instance::bannerUrl(),
             ],
             'dark_mode' => $darkMode,
-            'can_toggle_dark_mode' => $user !== null,
+            'can_toggle_dark_mode' => true,
             'pack' => $pack ? [
                 'name' => $pack->name,
                 'version' => $pack->updated_at?->timestamp,

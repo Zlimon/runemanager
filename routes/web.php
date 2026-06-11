@@ -39,6 +39,10 @@ Route::get('/calendar', [CalendarEventController::class, 'index'])->name('calend
 // SPEC §9 — announcements are viewable in all modes; mutation is auth-gated below.
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
+// Light/dark preference — public so the on-page toggle works on the auth screens
+// too (guests persist to a cookie; logged-in users to their account).
+Route::put('/dark-mode', [UserDarkModeController::class, 'update'])->name('dark-mode.update');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -103,10 +107,6 @@ Route::middleware([
     Route::get('/themes', [UserResourcePackController::class, 'index'])->name('themes.index');
     Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
         ->name('user.resource-pack.update');
-
-    // Per-user light/dark preference (ignored while a pack is in effect).
-    Route::put('/user/dark-mode', [UserDarkModeController::class, 'update'])
-        ->name('user.dark-mode.update');
 
     Route::prefix('/hiscores')->group(function () {
         // SPEC §7.1 — Overall (total level + total XP).

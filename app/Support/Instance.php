@@ -3,6 +3,8 @@
 namespace App\Support;
 
 use App\Helpers\SettingHelper;
+use App\Models\ResourcePack;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -19,6 +21,9 @@ class Instance
     public const MODE_CASUAL = 'casual';
 
     public const MODES = [self::MODE_CLAN, self::MODE_GROUP, self::MODE_CASUAL];
+
+    /** Cookie holding a logged-out visitor's light/dark choice ('1' | '0'). */
+    public const DARK_MODE_COOKIE = 'dark_mode';
 
     public static function mode(): string
     {
@@ -162,5 +167,39 @@ class Instance
         return $value !== null && $value !== ''
             ? (int) $value
             : (int) config('runemanager.feed.loot_min_value', 0);
+    }
+
+    /**
+     * The owner's instance-wide default appearance, overriding a resource pack's
+     * own (often unreliable) dark_mode flag. Null means "follow the pack".
+     */
+    public static function defaultDarkMode(): ?bool
+    {
+        return match ((string) SettingHelper::getSetting('default_dark_mode', '')) {
+            'dark' => true,
+            'light' => false,
+            default => null,
+        };
+    }
+
+    /**
+     * Resolve the effective dark-mode flag for a viewer, in precedence order:
+     * the user's own explicit toggle, then a logged-out visitor's cookie choice,
+     * then the owner's instance default, and finally the resource pack's flag.
+     */
+    public static function resolveDarkMode(?User $user, ?ResourcePack $pack): bool
+    {
+        if ($user !== null && $user->dark_mode !== null) {
+            return (bool) $user->dark_mode;
+        }
+
+        if ($user === null) {
+            $cookie = request()->cookie(self::DARK_MODE_COOKIE);
+            if ($cookie === '1' || $cookie === '0') {
+                return $cookie === '1';
+            }
+        }
+
+        return self::defaultDarkMode() ?? (bool) $pack?->dark_mode;
     }
 }

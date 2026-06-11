@@ -1,9 +1,10 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import Banner from '@/Components/Banner.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import HiscoresMenu from '@/Components/HiscoresMenu.vue';
+import DarkModeToggle from '@/Components/DarkModeToggle.vue';
 
 defineProps({
     title: String,
@@ -16,27 +17,6 @@ const mobileMenuOpen = ref(false);
 const logout = () => {
     router.post(route('logout'));
 };
-
-// Persist the user's light/dark preference. Only reachable when no pack is in
-// effect (the toggle is hidden otherwise — a pack controls dark mode itself).
-const toggleDarkMode = () => {
-    router.put(route('user.dark-mode.update'), { dark_mode: !page.props.dark_mode }, {
-        preserveScroll: true,
-    });
-};
-
-// The resource pack CSS itself is included by the Blade root via a server-rendered
-// <link> tag (see resources/views/app.blade.php). Vue flips Tailwind's `dark` class
-// (so `dark:` variants compile) and sets DaisyUI's `data-theme` so the matching base
-// theme — runemanager / runemanager-dark — drives the semantic colour tokens.
-const applyDarkMode = () => {
-    const dark = page.props.dark_mode === true;
-    document.documentElement.classList.toggle('dark', dark);
-    document.documentElement.dataset.theme = dark ? 'runemanager-dark' : 'runemanager';
-};
-
-onMounted(applyDarkMode);
-watch(() => page.props.dark_mode, applyDarkMode);
 </script>
 
 <template>
@@ -142,23 +122,8 @@ watch(() => page.props.dark_mode, applyDarkMode);
                                     </ResponsiveNavLink>
                                 </form>
                             </li>
-                            <li v-if="page.props.can_toggle_dark_mode" class="flex items-center">
-                                <button type="button"
-                                        class="btn btn-ghost btn-circle btn-sm"
-                                        :aria-label="page.props.dark_mode ? 'Switch to light mode' : 'Switch to dark mode'"
-                                        @click="toggleDarkMode">
-                                    <svg v-if="!page.props.dark_mode" class="h-5 w-5" fill="none" stroke="currentColor"
-                                         stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
-                                    </svg>
-                                    <svg v-else class="h-5 w-5" fill="none" stroke="currentColor"
-                                         stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="12" cy="12" r="4"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                                    </svg>
-                                </button>
+                            <li class="flex items-center">
+                                <DarkModeToggle />
                             </li>
                         </ul>
                     </div>

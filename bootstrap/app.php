@@ -25,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
             EnsureInstanceConfigured::class,
         ]);
         $middleware->statefulApi();
+        // Read as plaintext server-side (Blade root + Inertia share) to theme the
+        // first paint before any JS runs; it holds no sensitive data.
+        $middleware->encryptCookies(except: ['dark_mode']);
         $middleware->alias([
             'plugin.account' => ResolvePluginAccount::class,
         ]);

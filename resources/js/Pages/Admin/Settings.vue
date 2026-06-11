@@ -27,6 +27,7 @@ const form = useForm({
     group_name: props.settings.group_name ?? '',
     instance_description: props.settings.instance_description ?? '',
     resource_pack_id: props.settings.resource_pack_id || '',
+    default_dark_mode: props.settings.default_dark_mode ?? '',
     confirm: '',
 });
 
@@ -172,6 +173,23 @@ const confirmReset = () => {
                             </p>
                             <ResourcePackPicker v-model="form.resource_pack_id" :packs="packs" class="mt-2" />
                             <InputError v-if="form.errors.resource_pack_id" :messages="form.errors.resource_pack_id" />
+                        </div>
+
+                        <div>
+                            <InputLabel for="default_dark_mode" value="Default appearance" />
+                            <select id="default_dark_mode"
+                                    v-model="form.default_dark_mode"
+                                    class="select select-bordered mt-1 block w-full">
+                                <option value="">Follow resource pack</option>
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                            <p class="mt-1 text-xs text-base-content/60">
+                                Overrides the pack's own light/dark flag for anyone who hasn't
+                                picked their own — handy when a pack ships an unreliable flag.
+                                Members can still toggle for themselves.
+                            </p>
+                            <InputError v-if="form.errors.default_dark_mode" :messages="form.errors.default_dark_mode" />
                         </div>
 
                         <div class="flex justify-end">

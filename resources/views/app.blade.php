@@ -10,9 +10,9 @@
         $globalId = \App\Helpers\SettingHelper::getSetting('resource_pack_id');
         $pack = $globalId ? \App\Models\ResourcePack::find($globalId) : null;
     }
-    // A logged-in user's own preference always wins; a pack's flag only seeds the
-    // default for logged-out visitors.
-    $darkMode = $user ? (bool) $user->dark_mode : (bool) ($pack?->dark_mode);
+    // Same precedence as the Inertia share: user toggle > guest cookie >
+    // instance default > pack flag (see App\Support\Instance::resolveDarkMode).
+    $darkMode = \App\Support\Instance::resolveDarkMode($user, $pack);
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
