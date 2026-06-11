@@ -7,6 +7,7 @@ use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\ResourcePacks\InstallResourcePack;
+use App\Services\ResourcePacks\ResourcePackHub;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,15 +25,17 @@ use Inertia\Response;
 class UserResourcePackController extends Controller
 {
     /**
-     * SPEC §6.2 — the user's appearance page: browse installed packs (with
-     * icon.png thumbnails) and pick a personal override.
+     * SPEC §6.2 — the user's appearance page: pick a personal override from the
+     * installed packs, and browse the community hub to install new ones (so
+     * members no longer depend on the RuneLite plugin to add a pack).
      */
-    public function index(Request $request, InstallResourcePack $installer): Response
+    public function index(Request $request, InstallResourcePack $installer, ResourcePackHub $hub): Response
     {
         $installer->ensureVanilla();
 
         return Inertia::render('Themes/Index', [
             'packs' => ResourcePack::pickerList(),
+            'hubPacks' => $hub->available(),
             'selectedId' => $request->user()->resource_pack_id,
             'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
         ]);
@@ -64,6 +67,24 @@ class UserResourcePackController extends Controller
     }
 
     /**
+     * Website: install a pack from the community hub and apply it as the user's
+     * personal theme. Same pipeline as the plugin push, but keyed on a hub
+     * branch name (`pack-*`) and answering with an Inertia redirect.
+     */
+    public function install(Request $request, InstallResourcePack $installer): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
+        ]);
+
+        $installed = $this->installAndSelect($validated['name'], $request->user(), $installer);
+
+        return back()->with('status', $installed
+            ? 'Theme applied.'
+            : "Installing {$validated['name']} — it'll appear shortly.");
+    }
+
+    /**
      * Plugin push: set the override by pack name. The plugin reads the active
      * pack name from the RuneLite community Resource Packs plugin and pushes it
      * here so the website mirrors what's active in-game.
@@ -81,11 +102,30 @@ class UserResourcePackController extends Controller
             'name' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9_-]+$/'],
         ]);
 
-        $name = $validated['name'];
+        $user = $request->user();
+        $installed = $this->installAndSelect($validated['name'], $user, $installer);
 
-        // Find or stub-create a ResourcePack row so we have an id to point at.
+        return response()->json([
+            'resource_pack_id' => $user->resource_pack_id,
+            'effective_resource_pack_id' => $user->effectiveResourcePackId(),
+            'installed' => $installed,
+            'queued' => ! $installed,
+        ], $installed ? 200 : 202);
+    }
+
+    /**
+     * Ensure a ResourcePack row exists for $name, point the user's personal
+     * override at it, and queue a fetch when the assets aren't installed yet.
+     * Shared by the website install and the plugin push.
+     *
+     * Returns whether the pack is already fully installed — i.e. assets on disk
+     * AND a populated DB row. A stub row (version=pending, null colours) — newly
+     * created here or carried over from a migrate:fresh while the CSS survived on
+     * disk — still needs the pipeline to fetch metadata and extract the palette.
+     */
+    private function installAndSelect(string $name, User $user, InstallResourcePack $installer): bool
+    {
         $pack = ResourcePack::where('name', $name)->first();
-        $isStub = false;
 
         if (! $pack) {
             $pack = new ResourcePack;
@@ -97,32 +137,19 @@ class UserResourcePackController extends Controller
             $pack->tags = '';
             $pack->dark_mode = false;
             $pack->save();
-            $isStub = true;
         }
 
-        // Record the user's preference even if the pack isn't yet installed —
-        // the Blade root will fall through to the default until assets arrive.
-        $user = $request->user();
+        // Record the preference even before assets arrive — the Blade root falls
+        // through to the default until they do.
         $user->resource_pack_id = $pack->id;
         $user->save();
 
-        // "Installed" means BOTH assets on disk AND a fully populated DB row.
-        // A stub row (just created above, or carried over from a previous
-        // migrate:fresh while public/resource-packs/ survived) carries
-        // version=pending and null colour columns — the install pipeline needs
-        // to run to fetch metadata + extract the palette even if the CSS file
-        // happens to already be sitting on disk.
         $installed = $installer->isInstalled($name) && $pack->version !== 'pending';
 
         if (! $installed) {
             FetchResourcePackJob::dispatch($name);
         }
 
-        return response()->json([
-            'resource_pack_id' => $user->resource_pack_id,
-            'effective_resource_pack_id' => $user->effectiveResourcePackId(),
-            'installed' => $installed,
-            'queued' => ! $installed,
-        ], $installed ? 200 : 202);
+        return $installed;
     }
 }

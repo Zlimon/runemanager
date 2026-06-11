@@ -119,6 +119,57 @@ it('does not touch the global setting when a user updates their override', funct
     expect(SettingHelper::getSetting('resource_pack_id'))->toEqual($globalPack->id);
 });
 
+it('website install: stub-creates the row, selects it and queues a fetch when not installed', function () {
+    $user = freshPackUser();
+
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+
+    expect(ResourcePack::count())->toBe(0);
+
+    $this->actingAs($user)
+        ->post(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
+        ->assertRedirect();
+
+    $pack = ResourcePack::firstWhere('name', 'pack-sakurascape');
+    expect($pack)->not->toBeNull();
+    expect($user->fresh()->resource_pack_id)->toBe($pack->id);
+
+    Queue::assertPushed(FetchResourcePackJob::class, fn ($job) => $job->packName === 'pack-sakurascape');
+});
+
+it('website install: selects without re-queuing when the pack is already installed', function () {
+    $user = freshPackUser();
+    $pack = makePack('pack-sakurascape', [
+        'version' => '1.0.0',
+        'background_color' => '#483f33',
+        'accent_color' => '#88827a',
+    ]);
+
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+
+    $this->actingAs($user)
+        ->post(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
+        ->assertRedirect();
+
+    expect($user->fresh()->resource_pack_id)->toBe($pack->id);
+    Queue::assertNothingPushed();
+});
+
+it('website install: rejects names without the pack- prefix', function () {
+    $this->actingAs(freshPackUser())
+        ->post(route('user.resource-pack.install'), ['name' => 'sakurascape'])
+        ->assertSessionHasErrors('name');
+
+    Queue::assertNothingPushed();
+});
+
+it('website install: rejects guests', function () {
+    $this->post(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
+        ->assertRedirect(route('login'));
+
+    Queue::assertNothingPushed();
+});
+
 it('plugin push: 200 + no job queued when pack is already installed', function () {
     $user = freshPackUser();
     $pack = makePack('sample-vanilla');

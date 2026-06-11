@@ -107,6 +107,8 @@ Route::middleware([
     Route::get('/themes', [UserResourcePackController::class, 'index'])->name('themes.index');
     Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
         ->name('user.resource-pack.update');
+    Route::post('/user/resource-pack/install', [UserResourcePackController::class, 'install'])
+        ->name('user.resource-pack.install');
 
     Route::prefix('/hiscores')->group(function () {
         // SPEC §7.1 — Overall (total level + total XP).
