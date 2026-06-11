@@ -49,3 +49,22 @@ it('reads the per-pack CSS referenced assets (e.g. the orb sprites)', function (
     expect($assets)->toContain('other/minimap_orb_hitpoints.png')
         ->toContain('other/minimap_orb_special.png');
 });
+
+it('borrows frontend-addressed equipment + skill sprites a pack omits', function () {
+    // An otherwise-empty pack borrows everything from the bundled vanilla — the
+    // equipment slots and skill icons the frontend loads directly by pack name.
+    $pack = tempPackDir('imgpack');
+
+    $copied = (new InstallResourcePack)->completeFromVanilla($pack);
+
+    expect($copied)->toBeGreaterThan(0);
+    expect(File::exists($pack.'/equipment/slot_ammunition.png'))->toBeTrue();
+    expect(File::exists($pack.'/skill/attack.png'))->toBeTrue();
+
+    File::deleteDirectory($pack);
+});
+
+it('does not fill the vanilla pack from itself', function () {
+    expect((new InstallResourcePack)->completeFromVanilla(public_path('resource-packs/sample-vanilla')))
+        ->toBe(0);
+});

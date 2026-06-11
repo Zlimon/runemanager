@@ -57,6 +57,18 @@ class InstallResourcePack
     ];
 
     /**
+     * Pack-image directories the frontend addresses by pack name directly (not
+     * via the per-pack CSS), so {@see referencedAssets()} never sees them. Every
+     * file vanilla ships under these is borrowed when the pack omits it — e.g. a
+     * pack missing equipment/slot_ammunition.png falls back to vanilla's instead
+     * of rendering a broken image. Extend this when a new pack-sourced image
+     * category is added to the frontend.
+     *
+     * @var list<string>
+     */
+    private const VANILLA_IMAGE_DIRS = ['equipment', 'skill'];
+
+    /**
      * @return ResourcePack the upserted row
      *
      * @throws RuntimeException on download / extract failure
@@ -75,7 +87,7 @@ class InstallResourcePack
             $this->download($name, $zipPath);
             $this->extract($zipPath, $extractTarget);
             $this->copyTemplateCss($extractTarget);
-            $this->completeFromVanilla($name, $extractTarget);
+            $this->completeFromVanilla($extractTarget);
             $this->normalizeBorderSprites($extractTarget);
         } finally {
             @unlink($zipPath);
@@ -87,23 +99,51 @@ class InstallResourcePack
     }
 
     /**
-     * Fill in any per-pack.css-referenced sprite this pack doesn't ship by copying
-     * the vanilla default's version. Packs only override the sprites they change,
-     * so without this a pack that omits (say) the orb sprites would render those
-     * elements blank instead of falling back to the standard look.
+     * Fill in any sprite this pack doesn't ship by copying the vanilla default's
+     * version — both the per-pack.css referenced sprites and the frontend-
+     * addressed image dirs ({@see VANILLA_IMAGE_DIRS}). Packs only override what
+     * they change, so without this a pack that omits (say) the orb sprites or an
+     * equipment slot would render those elements blank/broken instead of falling
+     * back to the standard look. No-op for the vanilla pack itself. Returns the
+     * number of files copied (also used to backfill already-installed packs).
      */
-    private function completeFromVanilla(string $name, string $extractTarget): void
+    public function completeFromVanilla(string $packDir): int
     {
-        if ($name === self::VANILLA_PACK) {
-            return;
+        if (basename($packDir) === self::VANILLA_PACK) {
+            return 0;
         }
 
         $vanilla = public_path('resource-packs/'.self::VANILLA_PACK);
-        if (! File::isDirectory($vanilla)) {
-            return; // Default not installed yet — nothing to borrow from.
+        if (! File::isDirectory($vanilla) || realpath($vanilla) === realpath($packDir)) {
+            return 0; // Default not installed yet — nothing to borrow from.
         }
 
-        self::fillMissingAssets($extractTarget, $vanilla, $this->referencedAssets());
+        $assets = array_merge($this->referencedAssets(), self::vanillaImageDirAssets($vanilla));
+
+        return self::fillMissingAssets($packDir, $vanilla, $assets);
+    }
+
+    /**
+     * Relative paths of every file vanilla ships under the frontend-addressed
+     * image dirs, so a pack can borrow the ones it doesn't ship.
+     *
+     * @return list<string>
+     */
+    private static function vanillaImageDirAssets(string $vanillaDir): array
+    {
+        $assets = [];
+
+        foreach (self::VANILLA_IMAGE_DIRS as $dir) {
+            $path = $vanillaDir.'/'.$dir;
+            if (! File::isDirectory($path)) {
+                continue;
+            }
+            foreach (File::files($path) as $file) {
+                $assets[] = $dir.'/'.$file->getFilename();
+            }
+        }
+
+        return $assets;
     }
 
     /**
