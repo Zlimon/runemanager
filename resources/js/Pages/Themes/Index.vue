@@ -6,6 +6,7 @@ import Card from "@/Components/Card.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
+import Loader from "@/Components/Loader.vue";
 
 const props = defineProps({
     packs: { type: Array, default: () => [] },
@@ -176,18 +177,17 @@ onBeforeUnmount(stopPolling);
             </div>
         </div>
 
-        <!-- Install overlay: spinner while the queued download runs, with a
-             graceful fallback if it's taking unusually long. -->
+        <!-- Centered install modal: circular loading rat while the queued
+             download runs, with a graceful fallback if it takes unusually long. -->
         <div v-if="installingPack"
              class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
             <div class="w-full max-w-sm rounded-lg p-8 text-center shadow-xl pack-bg-card resource-pack-border">
-                <template v-if="!installTimedOut">
-                    <span class="loading loading-spinner loading-lg text-primary"></span>
-                    <h3 class="mt-4 text-lg font-semibold">Installing {{ installingPack.alias }}…</h3>
-                    <p class="mt-1 text-sm text-base-content/70">
+                <Loader v-if="!installTimedOut" bare :loading="true">
+                    <h3 class="text-lg font-semibold">Installing {{ installingPack.alias }}…</h3>
+                    <p class="text-sm text-base-content/70">
                         Downloading the pack and applying your theme. This usually takes a few seconds.
                     </p>
-                </template>
+                </Loader>
                 <template v-else>
                     <h3 class="text-lg font-semibold">Still working on it</h3>
                     <p class="mt-1 text-sm text-base-content/70">
