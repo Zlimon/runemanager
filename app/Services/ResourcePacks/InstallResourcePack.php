@@ -36,6 +36,27 @@ class InstallResourcePack
     public const VANILLA_PACK = 'sample-vanilla';
 
     /**
+     * Canonical pixel size for each textured border edge sprite. Packs ship these
+     * at one of two thicknesses (e.g. 36px vs 21px) — the thinner ones are the
+     * thick sprite cropped on the inner side, which shifts where the border line
+     * sits relative to the sprite's right/bottom edge and breaks the fixed CSS
+     * offsets in per-pack.css. Padding every sprite back to the canonical size
+     * (content anchored top-left, transparent fill) restores a uniform geometry.
+     *
+     * @var array<string, array{int, int}>
+     */
+    private const BORDER_SPRITE_SIZES = [
+        'dialog/iron_rivets_edge_top.png' => [36, 36],
+        'dialog/iron_rivets_vertical.png' => [36, 36],
+        'dialog/iron_rivets_edge_right.png' => [36, 36],
+        'dialog/iron_rivets_bottom.png' => [36, 36],
+        'dialog/bottom_line_mode_side_panel_edge_top.png' => [32, 32],
+        'dialog/bottom_line_mode_side_panel_edge_left.png' => [32, 32],
+        'dialog/bottom_line_mode_side_panel_edge_right.png' => [32, 32],
+        'dialog/bottom_line_mode_side_panel_edge_bottom.png' => [32, 32],
+    ];
+
+    /**
      * @return ResourcePack the upserted row
      *
      * @throws RuntimeException on download / extract failure
@@ -55,6 +76,7 @@ class InstallResourcePack
             $this->extract($zipPath, $extractTarget);
             $this->copyTemplateCss($extractTarget);
             $this->completeFromVanilla($name, $extractTarget);
+            $this->normalizeBorderSprites($extractTarget);
         } finally {
             @unlink($zipPath);
         }
@@ -82,6 +104,55 @@ class InstallResourcePack
         }
 
         self::fillMissingAssets($extractTarget, $vanilla, $this->referencedAssets());
+    }
+
+    /**
+     * Pad every border edge sprite this pack ships up to its canonical size so the
+     * fixed CSS border offsets land the border line on the panel edge regardless
+     * of the thickness the pack originally shipped. Idempotent — sprites already
+     * at (or above) the canonical size are left untouched.
+     */
+    public function normalizeBorderSprites(string $packDir): void
+    {
+        foreach (self::BORDER_SPRITE_SIZES as $relative => [$width, $height]) {
+            $path = $packDir.'/'.$relative;
+            if (File::exists($path)) {
+                self::padPngTopLeft($path, $width, $height);
+            }
+        }
+    }
+
+    /**
+     * Grow a PNG to at least {@code $targetW}×{@code $targetH}, keeping the existing
+     * pixels anchored at the top-left and filling the new right/bottom area with
+     * transparency. No-op when the image already meets both dimensions.
+     */
+    private static function padPngTopLeft(string $path, int $targetW, int $targetH): void
+    {
+        $size = getimagesize($path);
+        if ($size === false) {
+            return;
+        }
+
+        [$srcW, $srcH] = $size;
+        if ($srcW >= $targetW && $srcH >= $targetH) {
+            return;
+        }
+
+        $src = @imagecreatefrompng($path);
+        if ($src === false) {
+            return;
+        }
+
+        $dst = imagecreatetruecolor(max($srcW, $targetW), max($srcH, $targetH));
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        imagefilledrectangle($dst, 0, 0, imagesx($dst) - 1, imagesy($dst) - 1, imagecolorallocatealpha($dst, 0, 0, 0, 127));
+        imagecopy($dst, $src, 0, 0, 0, 0, $srcW, $srcH);
+        imagepng($dst, $path);
+
+        imagedestroy($src);
+        imagedestroy($dst);
     }
 
     /**

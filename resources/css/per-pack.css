@@ -36,8 +36,13 @@
                 url('dialog/iron_rivets_edge_right.png') repeat-y,
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
+    /* The border line sits ~15px in from each sprite's top-left, with transparent
+       margin around it, so each edge is nudged outward to land that line on the
+       panel edge. Install normalises every edge sprite to a fixed size (see
+       InstallResourcePack::normalizeBorderSprites), so these offsets hold whether
+       a pack originally shipped 36px or 21px edges. */
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right top 10px,
+                         top -15px left, left -15px top 10px, right -15px top 10px,
                          bottom -15px left, center;
 }
 
@@ -61,6 +66,9 @@
                       url('dialog/bottom_line_mode_side_panel_edge_bottom.png');
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat,
                        repeat-x, repeat-y, repeat-y, repeat-x;
+    /* Side-panel border line sits ~13px in from each sprite's top-left; nudge
+       each edge outward to land it on the panel edge. Sprites are normalised to a
+       fixed size at install so these offsets hold across packs. */
     background-position: top left, top right, bottom left, bottom right,
                          top -13px left, left -13px top 10px, right -12px top 10px,
                          bottom -12px left;
@@ -79,8 +87,9 @@
                 url('dialog/iron_rivets_edge_right.png') repeat-y,
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
+    /* As .resource-pack-dialog but without the top (the tabs above close it). */
     background-position: bottom left, bottom right,
-                         left -15px top, right top,
+                         left -15px top, right -15px top,
                          bottom -15px left, center;
 }
 
@@ -94,8 +103,9 @@
                 url('dialog/iron_rivets_edge_right.png') repeat-y,
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
+    /* Same iron-rivet frame + offsets as .resource-pack-dialog. */
     background-position: top left, top right, bottom left, bottom right,
-                         top -15px left, left -15px top 10px, right top 10px,
+                         top -15px left, left -15px top 10px, right -15px top 10px,
                          bottom -15px left, center;
 }
 
