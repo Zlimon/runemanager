@@ -10,9 +10,11 @@ use App\Models\Announcement;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\Instance\ResetInstanceData;
+use App\Services\ResourcePacks\DeleteResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Services\ResourcePacks\ResourcePackHub;
 use App\Support\Instance;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -171,21 +173,71 @@ class AdminController extends Controller
      */
     public function packs(ResourcePackHub $hub): Response
     {
+        $defaultId = ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null;
+
+        $installed = ResourcePack::query()
+            ->with('installedBy:id,name')
+            ->withCount('users')
+            ->orderBy('alias')
+            ->get()
+            ->map(fn (ResourcePack $pack): array => [
+                'id' => $pack->id,
+                'name' => $pack->name,
+                'alias' => $pack->alias,
+                'icon_url' => $pack->icon_url,
+                'installed_by' => $pack->installedBy?->name,
+                'users_count' => $pack->users_count,
+                'is_default' => $pack->id === $defaultId,
+                'is_vanilla' => $pack->isVanilla(),
+            ])
+            ->all();
+
         return Inertia::render('Admin/Packs', [
-            'packs' => $hub->available(),
-            'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
+            'installed' => $installed,
+            'hubPacks' => $hub->available(),
+            'defaultId' => $defaultId,
         ]);
     }
 
-    public function installPack(Request $request): RedirectResponse
+    /**
+     * Queue a hub install. Answers with JSON for the page's install modal (which
+     * polls {@see UserResourcePackController::status()} until the assets land),
+     * and falls back to a redirect for plain requests.
+     */
+    public function installPack(Request $request, InstallResourcePack $installer): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
         ]);
 
-        FetchResourcePackJob::dispatch($validated['name']);
+        $name = $validated['name'];
+        $installed = $installer->isInstalled($name)
+            && ResourcePack::where('name', $name)->where('version', '!=', 'pending')->exists();
 
-        return back()->with('status', "Installing {$validated['name']} — it'll appear shortly.");
+        if (! $installed) {
+            FetchResourcePackJob::dispatch($name);
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['name' => $name, 'installed' => $installed, 'queued' => ! $installed]);
+        }
+
+        return back()->with('status', "Installing {$name} — it'll appear shortly.");
+    }
+
+    /**
+     * SPEC §6 — the owner can remove any installed pack (the bundled Default
+     * Vanilla aside). Anyone using it falls back to the default; if it was the
+     * instance default, that's cleared too (see {@see DeleteResourcePack}).
+     */
+    public function destroyPack(ResourcePack $pack, DeleteResourcePack $deleter): RedirectResponse
+    {
+        abort_if($pack->isVanilla(), 403, 'The bundled default pack cannot be deleted.');
+
+        $alias = $pack->alias;
+        $deleter->run($pack);
+
+        return back()->with('status', "Deleted {$alias}.");
     }
 
     /**

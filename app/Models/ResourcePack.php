@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Helpers\SettingHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -40,6 +43,38 @@ class ResourcePack extends Model
 
     /** The bundled vanilla template pack, always offered as "Default Vanilla". */
     public const VANILLA = 'sample-vanilla';
+
+    /** The member who installed this pack from the hub (null = instance-managed). */
+    public function installedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'installed_by_user_id');
+    }
+
+    /** Members who have explicitly selected this pack as their personal theme. */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'resource_pack_id');
+    }
+
+    /** The bundled pack ships with the app and can never be deleted. */
+    public function isVanilla(): bool
+    {
+        return $this->name === self::VANILLA;
+    }
+
+    /**
+     * The pack to actually render for a viewer: their personal pick, then the
+     * instance-global default, and finally the bundled Default Vanilla — so a
+     * pack is always in effect and there's no separate "no resource pack"
+     * rendering path. Null only if even the vanilla row is absent.
+     */
+    public static function effectiveFor(?User $user): ?self
+    {
+        $id = $user?->effectiveResourcePackId() ?? SettingHelper::getSetting('resource_pack_id');
+        $pack = $id ? self::find($id) : null;
+
+        return $pack ?? self::where('name', self::VANILLA)->first();
+    }
 
     /**
      * Installed packs for the picker, vanilla pinned first then alphabetical.
@@ -79,6 +114,7 @@ class ResourcePack extends Model
             'alias' => $this->alias,
             'icon_url' => $this->icon_url,
             'dark_mode' => (bool) $this->dark_mode,
+            'installed_by_user_id' => $this->installed_by_user_id,
         ];
     }
 }

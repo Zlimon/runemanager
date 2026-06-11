@@ -6,12 +6,15 @@ use App\Helpers\SettingHelper;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Services\ResourcePacks\DeleteResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Services\ResourcePacks\ResourcePackHub;
+use App\Support\Roles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,11 +36,16 @@ class UserResourcePackController extends Controller
     {
         $installer->ensureVanilla();
 
+        $user = $request->user();
+
         return Inertia::render('Themes/Index', [
             'packs' => ResourcePack::pickerList(),
             'hubPacks' => $hub->available(),
-            'selectedId' => $request->user()->resource_pack_id,
+            'selectedId' => $user->resource_pack_id,
             'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
+            'installLimit' => $this->installLimit(),
+            'installedCount' => $this->userInstallCount($user),
+            'canInstall' => $this->canInstallMore($user),
         ]);
     }
 
@@ -78,13 +86,43 @@ class UserResourcePackController extends Controller
             'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
         ]);
 
-        $installed = $this->installAndSelect($validated['name'], $request->user(), $installer);
+        $user = $request->user();
+
+        // Only a brand-new pack counts against the member's quota — re-adding one
+        // already in the shared pool just points them at it.
+        if (! ResourcePack::where('name', $validated['name'])->exists() && ! $this->canInstallMore($user)) {
+            throw ValidationException::withMessages([
+                'name' => "You've reached your limit of {$this->installLimit()} installed packs. Delete one to add another.",
+            ]);
+        }
+
+        $installed = $this->installAndSelect($validated['name'], $user, $installer);
 
         return response()->json([
             'name' => $validated['name'],
             'installed' => $installed,
             'queued' => ! $installed,
         ]);
+    }
+
+    /**
+     * Delete a pack the member installed. They can only remove their own installs,
+     * never the bundled default or the current instance-wide default (an admin
+     * must change that first). Anyone using it falls back to the default.
+     */
+    public function destroy(Request $request, ResourcePack $pack, DeleteResourcePack $deleter): RedirectResponse
+    {
+        abort_unless(
+            $pack->installed_by_user_id === $request->user()->id,
+            403,
+            'You can only delete packs you installed.',
+        );
+        abort_if($pack->isVanilla(), 403, 'The default pack cannot be deleted.');
+        abort_if($deleter->isInstanceDefault($pack), 422, 'This pack is the instance default — an admin must change it first.');
+
+        $deleter->run($pack);
+
+        return back();
     }
 
     /**
@@ -160,6 +198,7 @@ class UserResourcePackController extends Controller
             $pack->url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
             $pack->tags = '';
             $pack->dark_mode = false;
+            $pack->installed_by_user_id = $user->id;
             $pack->save();
         }
 
@@ -175,5 +214,22 @@ class UserResourcePackController extends Controller
         }
 
         return $installed;
+    }
+
+    private function installLimit(): int
+    {
+        return (int) config('runemanager.resource_packs.user_install_limit', 5);
+    }
+
+    private function userInstallCount(User $user): int
+    {
+        return ResourcePack::where('installed_by_user_id', $user->id)->count();
+    }
+
+    /** The owner manages packs instance-wide, so the per-member quota doesn't apply. */
+    private function canInstallMore(User $user): bool
+    {
+        return $user->can(Roles::MANAGE_INSTANCE)
+            || $this->userInstallCount($user) < $this->installLimit();
     }
 }

@@ -80,6 +80,8 @@ Route::middleware([
             Route::post('/branding', [AdminController::class, 'updateBranding'])->name('admin.branding.update');
             Route::get('/packs', [AdminController::class, 'packs'])->name('admin.packs');
             Route::post('/packs/install', [AdminController::class, 'installPack'])->name('admin.packs.install');
+            Route::delete('/packs/{pack}', [AdminController::class, 'destroyPack'])
+                ->whereNumber('pack')->name('admin.packs.destroy');
         });
 
         Route::middleware('can:manage members')->group(function () {
@@ -111,6 +113,8 @@ Route::middleware([
         ->name('user.resource-pack.install');
     Route::get('/user/resource-pack/status', [UserResourcePackController::class, 'status'])
         ->name('user.resource-pack.status');
+    Route::delete('/user/resource-pack/{pack}', [UserResourcePackController::class, 'destroy'])
+        ->whereNumber('pack')->name('user.resource-pack.destroy');
 
     Route::prefix('/hiscores')->group(function () {
         // SPEC §7.1 — Overall (total level + total XP).

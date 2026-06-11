@@ -105,6 +105,32 @@ it('effectiveResourcePackId() returns null when neither is set', function () {
     expect($user->fresh()->effectiveResourcePackId())->toBeNull();
 });
 
+it('effectiveFor() floors to Default Vanilla when nothing is selected', function () {
+    $vanilla = makePack('sample-vanilla');
+
+    expect(ResourcePack::effectiveFor(null)?->id)->toBe($vanilla->id);
+});
+
+it('effectiveFor() prefers the user pack, then the global default, over vanilla', function () {
+    makePack('sample-vanilla');
+    $global = makePack('global-pack');
+    $userPack = makePack('user-pack');
+    SettingHelper::setSetting('resource_pack_id', $global->id, 'int');
+
+    $guest = freshPackUser('guest@test.local');
+    $picky = freshPackUser('picky@test.local');
+    $picky->forceFill(['resource_pack_id' => $userPack->id])->save();
+
+    // Guest with no personal pick rides the global default.
+    expect(ResourcePack::effectiveFor($guest->fresh())?->id)->toBe($global->id);
+    // A personal pick wins.
+    expect(ResourcePack::effectiveFor($picky->fresh())?->id)->toBe($userPack->id);
+});
+
+it('effectiveFor() returns null only when even vanilla is absent', function () {
+    expect(ResourcePack::effectiveFor(null))->toBeNull();
+});
+
 it('does not touch the global setting when a user updates their override', function () {
     $user = freshPackUser();
     $userPack = makePack('user-pack');
@@ -173,6 +199,108 @@ it('website install: rejects guests', function () {
         ->assertUnauthorized();
 
     Queue::assertNothingPushed();
+});
+
+it('website install: attributes a newly installed pack to the member', function () {
+    $user = freshPackUser();
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+
+    $this->actingAs($user)
+        ->postJson(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
+        ->assertSuccessful();
+
+    expect(ResourcePack::firstWhere('name', 'pack-sakurascape')->installed_by_user_id)->toBe($user->id);
+});
+
+it('website install: blocks a member who is at their install limit', function () {
+    config(['runemanager.resource_packs.user_install_limit' => 2]);
+    $user = freshPackUser();
+    makePack('pack-a', ['installed_by_user_id' => $user->id]);
+    makePack('pack-b', ['installed_by_user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->postJson(route('user.resource-pack.install'), ['name' => 'pack-c'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('name');
+
+    Queue::assertNothingPushed();
+    expect(ResourcePack::where('name', 'pack-c')->exists())->toBeFalse();
+});
+
+it('website install: re-adding a pack already in the pool ignores the limit', function () {
+    config(['runemanager.resource_packs.user_install_limit' => 1]);
+    $user = freshPackUser();
+    makePack('pack-a', ['installed_by_user_id' => $user->id]);
+    // Installed by someone else, already in the shared pool.
+    $shared = makePack('pack-shared', ['version' => '1.0.0', 'background_color' => '#111111']);
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+
+    $this->actingAs($user)
+        ->postJson(route('user.resource-pack.install'), ['name' => 'pack-shared'])
+        ->assertSuccessful();
+
+    expect($user->fresh()->resource_pack_id)->toBe($shared->id);
+});
+
+it('website install: the owner is exempt from the install limit', function () {
+    config(['runemanager.resource_packs.user_install_limit' => 1]);
+    $owner = adminUser();
+    makePack('pack-a', ['installed_by_user_id' => $owner->id]);
+    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+
+    $this->actingAs($owner)
+        ->postJson(route('user.resource-pack.install'), ['name' => 'pack-b'])
+        ->assertSuccessful();
+
+    expect(ResourcePack::where('name', 'pack-b')->exists())->toBeTrue();
+});
+
+it('delete: a member can delete a pack they installed and users on it fall back', function () {
+    $user = freshPackUser();
+    $other = freshPackUser('other@test.local');
+    $pack = makePack('pack-mine', ['installed_by_user_id' => $user->id]);
+    $user->forceFill(['resource_pack_id' => $pack->id])->save();
+    $other->forceFill(['resource_pack_id' => $pack->id])->save();
+
+    $this->actingAs($user)
+        ->delete(route('user.resource-pack.destroy', $pack->id))
+        ->assertRedirect();
+
+    expect(ResourcePack::find($pack->id))->toBeNull();
+    expect($user->fresh()->resource_pack_id)->toBeNull();
+    expect($other->fresh()->resource_pack_id)->toBeNull();
+});
+
+it('delete: a member cannot delete a pack they did not install', function () {
+    $user = freshPackUser();
+    $pack = makePack('pack-theirs', ['installed_by_user_id' => freshPackUser('owner@test.local')->id]);
+
+    $this->actingAs($user)
+        ->delete(route('user.resource-pack.destroy', $pack->id))
+        ->assertForbidden();
+
+    expect(ResourcePack::find($pack->id))->not->toBeNull();
+});
+
+it('delete: nobody can delete the bundled vanilla pack', function () {
+    $user = freshPackUser();
+    $pack = makePack('sample-vanilla', ['installed_by_user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->delete(route('user.resource-pack.destroy', $pack->id))
+        ->assertForbidden();
+});
+
+it('delete: a member cannot delete the current instance default', function () {
+    $user = freshPackUser();
+    $pack = makePack('pack-default', ['installed_by_user_id' => $user->id]);
+    SettingHelper::setSetting('resource_pack_id', $pack->id, 'int');
+
+    $this->actingAs($user)
+        ->delete(route('user.resource-pack.destroy', $pack->id))
+        ->assertStatus(422);
+
+    expect(ResourcePack::find($pack->id))->not->toBeNull();
 });
 
 it('install status: reports not-installed for a pending stub even with assets on disk', function () {

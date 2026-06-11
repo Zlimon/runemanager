@@ -27,19 +27,21 @@ class ResourcePackHub
     }
 
     /**
-     * Available hub packs with a freshly-computed "installed" flag.
+     * Available hub packs with a freshly-computed "installed" flag and, when
+     * installed, the DB id so the admin can delete it.
      *
-     * @return list<array{name: string, alias: string, icon_url: string, installed: bool}>
+     * @return list<array{name: string, alias: string, icon_url: string, installed: bool, id: int|null}>
      */
     public function available(): array
     {
-        $installed = ResourcePack::query()->pluck('name')->flip();
+        $installed = ResourcePack::query()->pluck('id', 'name');
 
         return array_map(fn (string $name): array => [
             'name' => $name,
             'alias' => Str::title(str_replace(['pack-', '-'], ' ', $name)),
             'icon_url' => 'https://raw.githubusercontent.com/'.self::REPO.'/'.$name.'/icon.png',
             'installed' => $installed->has($name),
+            'id' => $installed->get($name),
         ], $this->branches());
     }
 

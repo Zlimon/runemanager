@@ -53,6 +53,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Resource Packs (SPEC §6)
+    |--------------------------------------------------------------------------
+    |
+    | How many community-hub packs a single member may install. The owner/admin
+    | is exempt (instance-managed packs don't count against anyone) and the
+    | bundled Default Vanilla is never counted. Deleting a pack frees a slot.
+    |
+    */
+
+    'resource_packs' => [
+        'user_install_limit' => (int) env('RESOURCE_PACK_USER_INSTALL_LIMIT', 5),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Live Feed (SPEC §8)
     |--------------------------------------------------------------------------
     |

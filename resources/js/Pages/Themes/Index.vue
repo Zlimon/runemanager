@@ -1,19 +1,39 @@
 <script setup>
-import { computed, onBeforeUnmount, ref } from "vue";
-import { router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+import { router, usePage } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Card from "@/Components/Card.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
-import Loader from "@/Components/Loader.vue";
+import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
 
 const props = defineProps({
     packs: { type: Array, default: () => [] },
     hubPacks: { type: Array, default: () => [] },
     selectedId: { type: [Number, null], default: null },
     defaultId: { type: [Number, null], default: null },
+    installLimit: { type: Number, default: 0 },
+    installedCount: { type: Number, default: 0 },
+    canInstall: { type: Boolean, default: true },
 });
+
+const currentUserId = computed(() => usePage().props.auth?.user?.id ?? null);
+
+// Packs this member installed — the only ones they may delete.
+const myPacks = computed(() =>
+    props.packs.filter((p) => p.installed_by_user_id && p.installed_by_user_id === currentUserId.value));
+
+const removePack = (pack) => {
+    if (!confirm(`Delete "${pack.alias}"? Anyone using it falls back to the default theme.`)) {
+        return;
+    }
+    router.delete(route('user.resource-pack.destroy', pack.id), {
+        preserveScroll: true,
+        onSuccess: () => window.location.reload(),
+    });
+};
 
 const saving = ref(false);
 const selected = ref(props.selectedId ?? '');
@@ -48,73 +68,15 @@ const installable = computed(() => {
             || p.name.toLowerCase().includes(needle));
 });
 
-// Installing a pack queues an async download. Rather than reload straight away
-// (which would flash to the default theme while the job is still running), keep
-// the user here under a spinner and poll until the assets land, then reload so
-// the server-rendered theme picks them up.
-const installingPack = ref(null);
-const installTimedOut = ref(false);
-const POLL_INTERVAL = 2000;
-const POLL_TIMEOUT = 90_000;
-
-let pollTimer = null;
-let pollDeadline = 0;
-
-const stopPolling = () => {
-    if (pollTimer) {
-        clearTimeout(pollTimer);
-        pollTimer = null;
-    }
-};
-
-const pollStatus = (name) => {
-    pollTimer = setTimeout(() => {
-        window.axios.get(route('user.resource-pack.status'), { params: { name } })
-            .then(({ data }) => {
-                if (data.installed) {
-                    window.location.reload();
-                } else if (Date.now() > pollDeadline) {
-                    installTimedOut.value = true;
-                } else {
-                    pollStatus(name);
-                }
-            })
-            .catch(() => {
-                if (Date.now() > pollDeadline) {
-                    installTimedOut.value = true;
-                } else {
-                    pollStatus(name);
-                }
-            });
-    }, POLL_INTERVAL);
-};
+// Installing is handled by ResourcePackInstallModal (POST + poll-to-ready + the
+// loading rat). We just hand it the pack once the quota check passes.
+const installer = ref(null);
 
 const install = (pack) => {
-    if (installingPack.value) {
-        return;
+    if (props.canInstall) {
+        installer.value?.start(pack);
     }
-    installingPack.value = pack;
-    installTimedOut.value = false;
-
-    window.axios.post(route('user.resource-pack.install'), { name: pack.name })
-        .then(({ data }) => {
-            if (data.installed) {
-                window.location.reload();
-                return;
-            }
-            pollDeadline = Date.now() + POLL_TIMEOUT;
-            pollStatus(pack.name);
-        })
-        .catch(() => { installTimedOut.value = true; });
 };
-
-const dismissInstall = () => {
-    stopPolling();
-    installingPack.value = null;
-    installTimedOut.value = false;
-};
-
-onBeforeUnmount(stopPolling);
 </script>
 
 <template>
@@ -139,6 +101,29 @@ onBeforeUnmount(stopPolling);
                     </p>
                 </Card>
 
+                <Card v-if="myPacks.length">
+                    <div class="flex items-baseline justify-between gap-3">
+                        <h2 class="header-chatbox-sword text-lg font-bold">Your packs</h2>
+                        <span class="text-xs text-base-content/60">{{ installedCount }} of {{ installLimit }} installed</span>
+                    </div>
+                    <p class="mt-1 text-sm text-base-content/60">
+                        Packs you installed from the hub. Deleting one frees a slot.
+                    </p>
+                    <ul class="mt-4 divide-y divide-base-300">
+                        <li v-for="pack in myPacks" :key="pack.id"
+                            class="flex items-center justify-between gap-3 py-2">
+                            <div class="flex items-center gap-3">
+                                <img v-if="pack.icon_url" :src="pack.icon_url" :alt="pack.alias"
+                                     class="h-10 w-10 rounded object-cover [image-rendering:pixelated]">
+                                <span class="text-sm font-medium">{{ pack.alias }}</span>
+                            </div>
+                            <DangerButton type="button" class="btn-xs" @click="removePack(pack)">
+                                Delete
+                            </DangerButton>
+                        </li>
+                    </ul>
+                </Card>
+
                 <Card>
                     <div class="flex items-baseline justify-between gap-3">
                         <h2 class="header-chatbox-sword text-lg font-bold">Browse packs</h2>
@@ -146,6 +131,9 @@ onBeforeUnmount(stopPolling);
                     </div>
                     <p class="mt-1 text-sm text-base-content/60">
                         Install a community pack from the RuneLite hub to add it to your themes.
+                    </p>
+                    <p v-if="!canInstall" class="mt-1 text-xs font-medium text-error">
+                        You've reached your limit of {{ installLimit }} installed packs — delete one above to add another.
                     </p>
 
                     <div v-if="!hubPacks.length"
@@ -166,10 +154,10 @@ onBeforeUnmount(stopPolling);
                                  loading="lazy" onerror="this.style.visibility='hidden'">
                             <span class="max-w-full truncate text-sm font-medium" :title="pack.alias">{{ pack.alias }}</span>
                             <PrimaryButton type="button" class="btn-xs"
-                                           :class="{ 'opacity-25': installingPack }"
-                                           :disabled="!!installingPack"
+                                           :class="{ 'opacity-25': !canInstall }"
+                                           :disabled="!canInstall"
                                            @click="install(pack)">
-                                {{ installingPack?.name === pack.name ? 'Installing…' : 'Install' }}
+                                Install
                             </PrimaryButton>
                         </div>
                     </div>
@@ -177,28 +165,8 @@ onBeforeUnmount(stopPolling);
             </div>
         </div>
 
-        <!-- Centered install modal: circular loading rat while the queued
-             download runs, with a graceful fallback if it takes unusually long. -->
-        <div v-if="installingPack"
-             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-            <div class="w-full max-w-sm rounded-lg p-8 text-center shadow-xl pack-bg-card resource-pack-border">
-                <Loader v-if="!installTimedOut" bare :loading="true">
-                    <h3 class="text-lg font-semibold">Installing {{ installingPack.alias }}…</h3>
-                    <p class="text-sm text-base-content/70">
-                        Downloading the pack and applying your theme. This usually takes a few seconds.
-                    </p>
-                </Loader>
-                <template v-else>
-                    <h3 class="text-lg font-semibold">Still working on it</h3>
-                    <p class="mt-1 text-sm text-base-content/70">
-                        {{ installingPack.alias }} is taking longer than usual to download. Your theme will
-                        apply automatically the next time it's ready — no need to install again.
-                    </p>
-                    <PrimaryButton type="button" class="mt-4" @click="dismissInstall">
-                        Got it
-                    </PrimaryButton>
-                </template>
-            </div>
-        </div>
+        <ResourcePackInstallModal ref="installer"
+                                  :install-url="route('user.resource-pack.install')"
+                                  :status-url="route('user.resource-pack.status')" />
     </AppLayout>
 </template>
