@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import ItemTooltip from "@/Components/Game/ItemTooltip.vue";
 
 /*
  * A single OSRS item cell: icon with a quantity badge and a hover tooltip — the
@@ -43,19 +44,7 @@ const formatQuantity = (q) => {
                  class="object-contain" loading="lazy" :alt="name ?? ''">
             <span v-else class="text-center text-[10px] leading-tight">{{ name }}</span>
 
-            <div v-if="hovered && name"
-                 class="box-tooltip bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap">
-                <p class="font-semibold">{{ name }}</p>
-                <p v-if="examine" class="opacity-80">{{ examine }}</p>
-                <p v-if="quantity > 0 && highalch">
-                    HA: {{ (highalch * quantity).toLocaleString("en-US") }} gp
-                    <span v-if="quantity > 1">({{ highalch.toLocaleString("en-US") }} ea)</span>
-                </p>
-                <p v-if="quantity > 0 && lowalch">
-                    LA: {{ (lowalch * quantity).toLocaleString("en-US") }} gp
-                    <span v-if="quantity > 1">({{ lowalch.toLocaleString("en-US") }} ea)</span>
-                </p>
-            </div>
+            <ItemTooltip v-if="hovered && name" :name="name" :examine="examine" />
         </template>
     </div>
 </template>

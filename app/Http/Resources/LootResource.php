@@ -54,6 +54,7 @@ class LootResource extends JsonResource
                 'quantity' => (int) $slot['quantity'],
                 'name' => $details['name'] ?? null,
                 'icon' => $details['icon'] ?? null,
+                'examine' => $details['examine'] ?? null,
             ];
         }, $this->items ?? []);
 

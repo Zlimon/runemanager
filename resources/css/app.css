@@ -163,7 +163,11 @@ h6 {
 }
 
 .box-tooltip {
-    @apply z-10 absolute rounded px-3 py-2 bg-neutral text-neutral-content text-sm;
+    /* Mirror the Card surface (pack-bg-card + pack-accent-border) so item/skill
+       tooltips pick up the active resource pack's colours instead of a flat box. */
+    @apply z-10 absolute rounded border px-3 py-2 text-sm text-base-content shadow-lg;
+    background-color: var(--pack-bg-card);
+    border-color: var(--pack-accent, theme(colors.base-300));
 }
 
 .tab {

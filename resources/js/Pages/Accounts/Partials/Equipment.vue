@@ -1,6 +1,7 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { usePage } from "@inertiajs/vue3";
+import ItemTooltip from "@/Components/Game/ItemTooltip.vue";
 
 const props = defineProps({
     account: {
@@ -56,6 +57,8 @@ const slotTileBg = computed(() => {
 const equippedItem = (key) => props.account?.equipment?.[`${key}_item`] ?? null;
 
 const emptySrc = (key) => packAsset(emptyAsset[key]);
+
+const hoveredKey = ref(null);
 </script>
 
 <template>
@@ -65,14 +68,18 @@ const emptySrc = (key) => packAsset(emptyAsset[key]);
                  class="flex justify-center gap-1">
                 <div v-for="key in row" :key="key"
                      class="relative flex h-9 w-9 items-center justify-center"
-                     :style="slotTileBg">
+                     :style="slotTileBg"
+                     @mouseenter="hoveredKey = key" @mouseleave="hoveredKey = null">
                     <img v-if="equippedItem(key)"
                          :src="`data:image/jpeg;base64,${equippedItem(key).icon}`"
-                         :title="equippedItem(key).name"
                          class="h-7 w-7 object-contain">
                     <img v-else-if="emptySrc(key)"
                          :src="emptySrc(key)"
                          class="h-7 w-7 object-contain opacity-60">
+
+                    <ItemTooltip v-if="hoveredKey === key && equippedItem(key)"
+                                 :name="equippedItem(key).name"
+                                 :examine="equippedItem(key).examine" />
                 </div>
             </div>
         </div>
