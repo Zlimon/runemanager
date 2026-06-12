@@ -1,10 +1,19 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
+
+// Prefer the instance's uploaded branding logo (SPEC §12.4); fall back to the
+// default mark when none is set.
+const page = usePage();
+const logoUrl = computed(() => page.props.instance?.logo_url ?? null);
+const appName = computed(() => page.props.app?.name ?? '');
 </script>
 
 <template>
     <Link :href="'/'">
+        <img v-if="logoUrl" :src="logoUrl" :alt="appName" class="h-16 w-auto object-contain">
         <svg
+            v-else
             class="w-16 h-16"
             viewBox="0 0 48 48"
             fill="none"
