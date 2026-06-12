@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import dayjs from "dayjs";
+import LootItems from "@/Components/Game/LootItems.vue";
 
 const props = defineProps({
     entries: {
@@ -8,19 +9,6 @@ const props = defineProps({
         default: () => [],
     },
 });
-
-const formatValue = (gp) => {
-    if (!gp) {
-        return '';
-    }
-    if (gp >= 1_000_000) {
-        return `${(gp / 1_000_000).toFixed(1)}M`;
-    }
-    if (gp >= 1_000) {
-        return `${(gp / 1_000).toFixed(1)}K`;
-    }
-    return gp.toLocaleString('en-US');
-};
 
 const hasEntries = computed(() => props.entries.length > 0);
 </script>
@@ -39,26 +27,7 @@ const hasEntries = computed(() => props.entries.length > 0);
                     </span>
                 </div>
 
-                <div class="mt-1 flex flex-wrap gap-2">
-                    <div v-for="item in entry.items" :key="item.id"
-                         class="flex h-12 w-12 items-center justify-center rounded hover:bg-white/10"
-                         :title="`${item.name ?? 'Item ' + item.id} × ${item.quantity}`">
-                        <span v-if="item.quantity > 1"
-                              class="absolute p-1 text-xs font-bold">
-                            {{ item.quantity > 1000 ? `${Math.floor(item.quantity / 1000)}K` : item.quantity }}
-                        </span>
-                        <img v-if="item.icon"
-                             :src="`data:image/jpeg;base64,${item.icon}`"
-                             class="object-contain"
-                             loading="lazy">
-                        <span v-else class="text-xs">{{ item.name ?? item.id }}</span>
-                    </div>
-                </div>
-
-                <p v-if="entry.total_value > 0"
-                   class="mt-1 text-xs text-gray-700 dark:text-gray-200">
-                    {{ formatValue(entry.total_value) }} gp
-                </p>
+                <LootItems :items="entry.items" :total-value="entry.total_value" class="mt-1" />
             </li>
         </ul>
     </div>

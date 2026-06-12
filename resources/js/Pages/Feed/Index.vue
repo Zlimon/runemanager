@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { Link } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import LootItems from "@/Components/Game/LootItems.vue";
 
 const props = defineProps({
     events: {
@@ -26,19 +27,6 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => window.Echo.leave("feed"));
-
-const formatValue = (gp) => {
-    if (!gp) {
-        return '';
-    }
-    if (gp >= 1_000_000) {
-        return `${(gp / 1_000_000).toFixed(1)}M`;
-    }
-    if (gp >= 1_000) {
-        return `${(gp / 1_000).toFixed(1)}K`;
-    }
-    return gp.toLocaleString('en-US');
-};
 
 const formatSkill = (slug) => slug.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -92,25 +80,13 @@ const hasEvents = computed(() => events.value.length > 0);
                                 {{ dayjs(event.occurred_at).fromNow() }}
                             </span>
                         </div>
-                        <p class="mt-1 text-sm text-base-content/80">
-                            <template v-if="event.type === 'loot_drop'">
-                                received
-                                <span v-for="(item, i) in event.payload.items" :key="i"
-                                      class="mx-0.5 inline-flex items-center gap-1 align-middle">
-                                    <img v-if="item.icon" :src="`data:image/jpeg;base64,${item.icon}`"
-                                         class="inline h-4 w-4 object-contain" alt="">
-                                    <span class="font-medium">{{ item.name ?? `Item ${item.id}` }}</span>
-                                    <span v-if="item.quantity > 1" class="text-base-content/60">×{{ item.quantity.toLocaleString('en-US') }}</span>
-                                    <span v-if="i < event.payload.items.length - 1">,</span>
-                                </span>
-                                from {{ event.payload.source }}
-                                <span v-if="event.payload.total_value"
-                                      class="ml-1 text-xs text-base-content/60">
-                                    ({{ formatValue(event.payload.total_value) }} gp)
-                                </span>
-                            </template>
-                            <template v-else>{{ sentence(event) }}</template>
-                        </p>
+                        <div class="mt-1 text-sm text-base-content/80">
+                            <p>{{ sentence(event) }}</p>
+                            <LootItems v-if="event.type === 'loot_drop'"
+                                       :items="event.payload.items"
+                                       :total-value="event.payload.total_value"
+                                       class="mt-1.5" />
+                        </div>
                     </li>
                 </ul>
 
