@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\CollectionLog;
+use App\Models\Item;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use MongoDB\Driver\Exception\BulkWriteException;
@@ -87,4 +88,43 @@ it('Account::collectionLog accessor returns the doc when it exists', function ()
     expect($account->collectionLog)
         ->toBeInstanceOf(CollectionLog::class)
         ->and($account->collectionLog->items['vorkath'][0]['id'])->toBe(21992);
+});
+
+it('hydrates collection log item details on the account page (looks up by id, not _id)', function () {
+    $account = makeAccountForLog('LogViewer');
+
+    // A real item from the static collection so the lookup hydrates its name.
+    // Items store the OSRS id in the string `id` field; matching on Mongo's `_id`
+    // (as the page used to) resolves nothing — this guards that regression.
+    $item = (new Item)->getConnection()->getDatabase()
+        ->selectCollection((new Item)->getTable())
+        ->findOne([], ['projection' => ['id' => 1, 'name' => 1, '_id' => 0]]);
+    $itemId = (int) $item['id'];
+
+    CollectionLog::create([
+        'account_id' => $account->id,
+        'obtained' => 1,
+        'total' => 1701,
+        'items' => ['abyssal_sire' => [['id' => $itemId, 'count' => 1, 'date' => '2026-06-01 12:00:00']]],
+        'fetched_at' => now(),
+    ]);
+
+    // Match the asset version so the Inertia middleware doesn't 409 the partial.
+    $version = file_exists($m = public_path('build/manifest.json')) ? hash_file('xxh128', $m) : '';
+
+    $response = $this->actingAs($account->user)
+        ->withHeaders([
+            'X-Inertia' => 'true',
+            'X-Inertia-Version' => $version,
+            'X-Inertia-Partial-Data' => 'collectionLog',
+            'X-Inertia-Partial-Component' => 'Accounts/Show',
+        ])
+        ->get(route('accounts.show', $account))
+        ->assertOk();
+
+    $active = $response->json('props.collectionLog.activeCollection');
+
+    expect($active['items'])->toHaveCount(1)
+        ->and($active['items'][0]['item'])->not->toBeNull()
+        ->and($active['items'][0]['item']['name'])->toBe($item['name']);
 });

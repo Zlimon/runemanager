@@ -43,7 +43,9 @@ const switchTo = (slug) => {
             </span>
         </div>
 
-        <div class="flex bg-base-200 border border-base-300 rounded resource-pack-dialog">
+        <!-- Padding insets the columns so the pack's textured frame wraps the
+             whole panel instead of being covered by the scroll columns. -->
+        <div class="flex rounded bg-base-200 p-4 resource-pack-dialog">
             <!-- Left: category list -->
             <div class="h-[454px] w-1/3 overflow-y-scroll">
                 <ul class="menu">
@@ -67,28 +69,29 @@ const switchTo = (slug) => {
 
                     <ul v-if="activeCollection.items.length" class="m-2 grid grid-cols-6 gap-2">
                         <li v-for="(slotItem, slot) in activeCollection.items" :key="slot">
-                            <div class="h-14 w-14 rounded hover:bg-white/10"
+                            <div class="relative flex h-14 w-14 items-center justify-center rounded hover:bg-white/10"
                                  @mouseleave="activeItem = null"
                                  @mouseover="slotItem.item ? activeItem = slot : null">
-                                <div v-if="slotItem.item">
-                                    <span v-if="slotItem.quantity > 1" class="absolute p-1 text-xs font-bold">
+                                <template v-if="slotItem.item">
+                                    <span v-if="slotItem.quantity > 1"
+                                          class="absolute left-0 top-0 z-10 px-0.5 text-xs font-bold text-yellow-300"
+                                          style="text-shadow: 0 0 2px #000, 0 0 2px #000">
                                         {{ slotItem.quantity }}
                                     </span>
-                                    <div class="flex h-14 items-center justify-center">
-                                        <img v-if="slotItem.item.icon"
-                                             :src="`data:image/jpeg;base64,${slotItem.item.icon}`"
-                                             class="object-contain" loading="lazy">
-                                        <span v-else class="text-xs">{{ slotItem.item.name }}</span>
-                                    </div>
-                                </div>
-                            </div>
+                                    <img v-if="slotItem.item.icon"
+                                         :src="`data:image/jpeg;base64,${slotItem.item.icon}`"
+                                         class="object-contain" loading="lazy">
+                                    <span v-else class="text-center text-[10px] leading-tight">{{ slotItem.item.name }}</span>
 
-                            <div v-if="activeItem === slot && slotItem.item" class="box-tooltip">
-                                <p>{{ slotItem.item.name }}</p>
-                                <p>{{ slotItem.item.examine }}</p>
-                                <p v-if="slotItem.date" class="text-base-content/60">
-                                    {{ dayjs(slotItem.date).format('MMM D, YYYY') }}
-                                </p>
+                                    <div v-if="activeItem === slot"
+                                         class="box-tooltip bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap">
+                                        <p class="font-semibold">{{ slotItem.item.name }}</p>
+                                        <p v-if="slotItem.item.examine" class="opacity-80">{{ slotItem.item.examine }}</p>
+                                        <p v-if="slotItem.date" class="opacity-60">
+                                            {{ dayjs(slotItem.date).format('MMM D, YYYY') }}
+                                        </p>
+                                    </div>
+                                </template>
                             </div>
                         </li>
                     </ul>

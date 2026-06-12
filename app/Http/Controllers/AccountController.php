@@ -180,19 +180,17 @@ class AccountController extends Controller
      */
     private function loadCollectionItems(array $summary, array $entries): array
     {
-        $items = Item::select('_id', 'name', 'examine', 'icon')
-            ->whereIn('_id', array_column($entries, 'id'))
-            ->get()
-            ->keyBy('_id');
+        // Items store the OSRS id in the `id` field (Mongo `_id` is an ObjectId),
+        // so reuse the shared lookup the inventory/bank/loot panels use.
+        $items = Item::lookupByOsrsIds(array_column($entries, 'id'));
 
         $slots = [];
         foreach ($entries as $entry) {
-            $dbItem = $items[$entry['id']] ?? null;
             $slots[] = [
                 'id' => $entry['id'],
                 'quantity' => $entry['count'] ?? 0,
                 'date' => $entry['date'] ?? null,
-                'item' => $dbItem ? $dbItem->toArray() : null,
+                'item' => $items[(int) $entry['id']] ?? null,
             ];
         }
 
