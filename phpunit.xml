@@ -24,6 +24,10 @@
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_DATABASE" value="testing"/>
+        <!-- Isolate the writable Mongo DB so tests never touch real dev data
+             (CollectionLog/Inventory/Loot/etc. live on the `mongodb` connection).
+             mongodb-static (osrsbox items) is left shared — it's read-only here. -->
+        <env name="MONGODB_DATABASE" value="runemanager_testing"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
