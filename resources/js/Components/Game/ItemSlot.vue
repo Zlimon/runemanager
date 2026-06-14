@@ -15,6 +15,11 @@ defineProps({
     examine: { type: String, default: null },
     highalch: { type: Number, default: null },
     lowalch: { type: Number, default: null },
+    // Optional muted tooltip line, e.g. the collection-log obtained date.
+    subtext: { type: String, default: null },
+    // Render the item greyed out (e.g. a missing collection-log slot) — still
+    // shows the icon + tooltip so you can see what's not yet obtained.
+    dimmed: { type: Boolean, default: false },
 });
 
 const hovered = ref(false);
@@ -34,17 +39,19 @@ const formatQuantity = (q) => {
     <div class="relative flex h-12 w-12 items-center justify-center rounded hover:bg-white/10"
          @mouseenter="hovered = true" @mouseleave="hovered = false">
         <template v-if="icon || name">
-            <span v-if="quantity > 1"
+            <span v-if="quantity > 1 && !dimmed"
                   class="map-quantity absolute left-0 top-0 z-10 px-0.5 text-xs font-bold text-yellow-300">
                 {{ formatQuantity(quantity) }}
             </span>
 
             <img v-if="icon"
                  :src="`data:image/jpeg;base64,${icon}`"
-                 class="object-contain" loading="lazy" :alt="name ?? ''">
-            <span v-else class="text-center text-[10px] leading-tight">{{ name }}</span>
+                 class="object-contain" :class="{ 'opacity-25 grayscale': dimmed }"
+                 loading="lazy" :alt="name ?? ''">
+            <span v-else class="text-center text-[10px] leading-tight"
+                  :class="{ 'opacity-40': dimmed }">{{ name }}</span>
 
-            <ItemTooltip v-if="hovered && name" :name="name" :examine="examine" />
+            <ItemTooltip v-if="hovered && name" :name="name" :examine="examine" :subtext="subtext" />
         </template>
     </div>
 </template>
