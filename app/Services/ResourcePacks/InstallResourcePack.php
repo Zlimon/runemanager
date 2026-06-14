@@ -89,6 +89,7 @@ class InstallResourcePack
             $this->copyTemplateCss($extractTarget);
             $this->completeFromVanilla($extractTarget);
             $this->normalizeBorderSprites($extractTarget);
+            $this->generateHorizontalScrollbar($extractTarget);
         } finally {
             @unlink($zipPath);
         }
@@ -193,6 +194,63 @@ class InstallResourcePack
 
         imagedestroy($src);
         imagedestroy($dst);
+    }
+
+    /**
+     * The horizontal scrollbar sprites are just the vertical ones rotated 90°, but
+     * packs rarely ship them — so they'd fall back to vanilla and clash with the
+     * pack's own (vertical) scrollbar. Derive them from whatever vertical sprite
+     * is in effect (the pack's own, or vanilla after completeFromVanilla) so the
+     * two axes always match. Maps vertical source => horizontal target.
+     *
+     * @var array<string, string>
+     */
+    private const HORIZONTAL_SCROLLBAR = [
+        'scrollbar/thumb_middle_dark.png' => 'scrollbar/horizontal_thumb_middle_dark.png',
+        'scrollbar/thumb_middle.png' => 'scrollbar/horizontal_thumb_middle.png',
+        'scrollbar/thumb_top.png' => 'scrollbar/horizontal_thumb_right.png',
+        'scrollbar/thumb_bottom.png' => 'scrollbar/horizontal_thumb_left.png',
+    ];
+
+    /**
+     * Regenerate the horizontal scrollbar sprites by rotating the pack's vertical
+     * ones 90° clockwise, so the horizontal bar always matches the vertical one.
+     * No-op for the bundled vanilla pack (it ships correct horizontal sprites).
+     */
+    public function generateHorizontalScrollbar(string $packDir): void
+    {
+        if (basename($packDir) === self::VANILLA_PACK) {
+            return;
+        }
+
+        foreach (self::HORIZONTAL_SCROLLBAR as $vertical => $horizontal) {
+            $source = $packDir.'/'.$vertical;
+            if (File::exists($source)) {
+                self::rotatePngClockwise($source, $packDir.'/'.$horizontal);
+            }
+        }
+    }
+
+    /**
+     * Write a 90°-clockwise rotation of a PNG to $dest, preserving transparency.
+     */
+    private static function rotatePngClockwise(string $source, string $dest): void
+    {
+        $img = @imagecreatefrompng($source);
+        if ($img === false) {
+            return;
+        }
+
+        imagealphablending($img, false);
+        imagesavealpha($img, true);
+        // imagerotate turns anticlockwise, so -90 gives clockwise.
+        $rotated = imagerotate($img, -90, imagecolorallocatealpha($img, 0, 0, 0, 127));
+        imagealphablending($rotated, false);
+        imagesavealpha($rotated, true);
+        imagepng($rotated, $dest);
+
+        imagedestroy($img);
+        imagedestroy($rotated);
     }
 
     /**

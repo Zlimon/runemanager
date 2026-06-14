@@ -398,6 +398,13 @@
     background-size: 16px auto;
 }
 
+/* The vertical track tiles a 16px-wide column; the horizontal track needs the
+   sideways dark texture tiled along its length instead. */
+::-webkit-scrollbar-track:horizontal {
+    background: url('scrollbar/horizontal_thumb_middle_dark.png');
+    background-size: auto 16px;
+}
+
 ::-webkit-scrollbar-thumb {
     background: url('scrollbar/thumb_top.png') top center no-repeat,
                 url('scrollbar/thumb_bottom.png') bottom center no-repeat,

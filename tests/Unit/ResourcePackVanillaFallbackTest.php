@@ -68,3 +68,20 @@ it('does not fill the vanilla pack from itself', function () {
     expect((new InstallResourcePack)->completeFromVanilla(public_path('resource-packs/sample-vanilla')))
         ->toBe(0);
 });
+
+it('derives horizontal scrollbar sprites by rotating the vertical ones', function () {
+    $pack = tempPackDir('scroll');
+    File::ensureDirectoryExists($pack.'/scrollbar');
+
+    // A 16x5 vertical track sprite (as packs ship).
+    $img = imagecreatetruecolor(16, 5);
+    imagepng($img, $pack.'/scrollbar/thumb_middle_dark.png');
+    imagedestroy($img);
+
+    (new InstallResourcePack)->generateHorizontalScrollbar($pack);
+
+    [$width, $height] = getimagesize($pack.'/scrollbar/horizontal_thumb_middle_dark.png');
+    expect($width)->toBe(5)->and($height)->toBe(16);
+
+    File::deleteDirectory($pack);
+});
