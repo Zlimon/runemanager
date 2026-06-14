@@ -11,6 +11,7 @@ use App\Http\Resources\LootResource;
 use App\Models\Account;
 use App\Models\Item;
 use App\Rules\AccountUsernameRule;
+use App\Services\CollectionLog\CollectionLogStructure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -106,7 +107,7 @@ class AccountController extends Controller
 
             // External API — defer so the page paints first, then the client
             // pulls this in via a follow-up partial reload.
-            'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request)),
+            'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request, app(CollectionLogStructure::class))),
 
             // Per SPEC §5.3 — one timestamp per data type, plus the staleness
             // threshold the UI uses to flag old data.
@@ -127,27 +128,39 @@ class AccountController extends Controller
 
     /**
      * SPEC §5.2 — build the collection log view from the stored TempleOSRS data.
-     * TempleOSRS gives overall progress plus the obtained items per category; we
-     * list the categories and lazy-load one category's items at a time (selected
-     * via ?ccollection) to keep the payload small.
+     * The player sync only returns *obtained* items per category, so we overlay
+     * it on the full TempleOSRS structure (every category's complete item list,
+     * grouped) to show missing items and real per-category totals — mirroring the
+     * TempleOSRS UI. One category's items are loaded at a time (via ?ccollection)
+     * to keep the payload small.
      *
      * @return array<string, mixed>|null
      */
-    private function buildCollectionLog(Account $account, Request $request): ?array
+    private function buildCollectionLog(Account $account, Request $request, CollectionLogStructure $structure): ?array
     {
         $log = $account->collectionLog;
         if ($log === null) {
             return null;
         }
 
-        $items = $log->items ?? [];
+        $obtainedItems = $log->items ?? [];
+        $flat = $structure->flatten();
+        // Fall back to the obtained-only set if the structure can't be fetched, so
+        // the panel still works offline (no missing items / real totals then).
+        $catIds = $flat['ids'] ?: array_map(
+            fn (array $entries): array => array_map(fn (array $e): int => (int) $e['id'], $entries),
+            $obtainedItems,
+        );
 
         $categories = [];
-        foreach ($items as $slug => $entries) {
+        foreach ($catIds as $slug => $ids) {
+            $obtainedCount = count(array_intersect($ids, array_column($obtainedItems[$slug] ?? [], 'id')));
             $categories[$slug] = [
                 'slug' => $slug,
                 'name' => $this->prettyCategoryName($slug),
-                'obtained' => count($entries),
+                'group' => $flat['group'][$slug] ?? 'other',
+                'obtained' => $obtainedCount,
+                'total' => count($ids),
             ];
         }
         uasort($categories, fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
@@ -158,7 +171,7 @@ class AccountController extends Controller
             : (array_key_first($categories) ?: null);
 
         $activeCollection = $activeSlug !== null
-            ? $this->loadCollectionItems($categories[$activeSlug], $items[$activeSlug] ?? [])
+            ? $this->loadCollectionItems($categories[$activeSlug], $catIds[$activeSlug], $obtainedItems[$activeSlug] ?? [])
             : null;
 
         return [
@@ -172,32 +185,39 @@ class AccountController extends Controller
     }
 
     /**
-     * Hydrate one category's obtained items with their icon/name details.
+     * Hydrate one category's full ordered item list with icon/name/examine, marking
+     * which the player has obtained (with quantity + date) and which are missing.
      *
      * @param  array<string, mixed>  $summary
-     * @param  array<int, array<string, mixed>>  $entries
+     * @param  list<int>  $orderedIds  the category's complete item list, in display order
+     * @param  array<int, array<string, mixed>>  $obtained  the player's obtained entries
      * @return array<string, mixed>
      */
-    private function loadCollectionItems(array $summary, array $entries): array
+    private function loadCollectionItems(array $summary, array $orderedIds, array $obtained): array
     {
         // Items store the OSRS id in the `id` field (Mongo `_id` is an ObjectId),
         // so reuse the shared lookup the inventory/bank/loot panels use.
-        $items = Item::lookupByOsrsIds(array_column($entries, 'id'));
+        $details = Item::lookupByOsrsIds($orderedIds);
+        $obtainedById = collect($obtained)->keyBy(fn (array $e): int => (int) $e['id']);
 
-        $slots = [];
-        foreach ($entries as $entry) {
-            $slots[] = [
-                'id' => $entry['id'],
-                'quantity' => $entry['count'] ?? 0,
+        $slots = array_map(function (int $id) use ($details, $obtainedById): array {
+            $entry = $obtainedById->get($id);
+
+            return [
+                'id' => $id,
+                'item' => $details[$id] ?? null,
+                'quantity' => (int) ($entry['count'] ?? 0),
                 'date' => $entry['date'] ?? null,
-                'item' => $items[(int) $entry['id']] ?? null,
+                'obtained' => $entry !== null,
             ];
-        }
+        }, $orderedIds);
 
         return [
             'slug' => $summary['slug'],
             'name' => $summary['name'],
+            'group' => $summary['group'],
             'obtained' => $summary['obtained'],
+            'total' => $summary['total'],
             'items' => $slots,
         ];
     }

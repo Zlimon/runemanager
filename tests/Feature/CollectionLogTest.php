@@ -5,6 +5,7 @@ use App\Models\CollectionLog;
 use App\Models\Item;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use MongoDB\Driver\Exception\BulkWriteException;
 
 uses(RefreshDatabase::class);
@@ -90,16 +91,23 @@ it('Account::collectionLog accessor returns the doc when it exists', function ()
         ->and($account->collectionLog->items['vorkath'][0]['id'])->toBe(21992);
 });
 
-it('hydrates collection log item details on the account page (looks up by id, not _id)', function () {
+it('overlays obtained items on the full category structure (obtained + missing)', function () {
     $account = makeAccountForLog('LogViewer');
 
     // A real item from the static collection so the lookup hydrates its name.
     // Items store the OSRS id in the string `id` field; matching on Mongo's `_id`
-    // (as the page used to) resolves nothing — this guards that regression.
+    // (as the page once did) resolves nothing — this also guards that regression.
     $item = (new Item)->getConnection()->getDatabase()
         ->selectCollection((new Item)->getTable())
         ->findOne([], ['projection' => ['id' => 1, 'name' => 1, '_id' => 0]]);
     $itemId = (int) $item['id'];
+    $missingId = 999999; // not obtained, not in the static collection
+
+    // Seed the (normally fetched + week-cached) TempleOSRS structure: the category
+    // has two items; the player has only one. Missing one should still render.
+    Cache::put('templeosrs:collection-log-structure', [
+        'bosses' => ['abyssal_sire' => [$itemId, $missingId]],
+    ]);
 
     CollectionLog::create([
         'account_id' => $account->id,
@@ -124,7 +132,15 @@ it('hydrates collection log item details on the account page (looks up by id, no
 
     $active = $response->json('props.collectionLog.activeCollection');
 
-    expect($active['items'])->toHaveCount(1)
-        ->and($active['items'][0]['item'])->not->toBeNull()
-        ->and($active['items'][0]['item']['name'])->toBe($item['name']);
+    expect($active['group'])->toBe('bosses')
+        ->and($active['total'])->toBe(2)
+        ->and($active['obtained'])->toBe(1)
+        ->and($active['items'])->toHaveCount(2);
+
+    $obtained = collect($active['items'])->firstWhere('id', $itemId);
+    expect($obtained['obtained'])->toBeTrue()
+        ->and($obtained['item']['name'])->toBe($item['name']);
+
+    $missing = collect($active['items'])->firstWhere('id', $missingId);
+    expect($missing['obtained'])->toBeFalse();
 });

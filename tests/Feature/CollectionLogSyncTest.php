@@ -5,6 +5,7 @@ use App\Jobs\SyncAccountHiscoresJob;
 use App\Models\Account;
 use App\Models\CollectionLog;
 use App\Models\User;
+use App\Services\CollectionLog\CollectionLogStructure;
 use App\Services\CollectionLog\CollectionLogSync;
 use App\Services\TempleOsrs\TempleOsrsClient;
 use GuzzleHttp\Client;
@@ -12,6 +13,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia;
 use Laravel\Sanctum\Sanctum;
@@ -111,4 +113,35 @@ it('ranks the collection-log leaderboard by slots unlocked', function () {
             ->where('hiscores.0.obtained', 1200)
             ->where('hiscores.1.account.username', 'Starter'),
         );
+});
+
+it('fetches + flattens the collection log structure into ids and groups', function () {
+    Cache::flush();
+
+    $client = new TempleOsrsClient(new Client(['handler' => HandlerStack::create(new MockHandler([
+        new Response(200, [], json_encode([
+            'bosses' => ['abyssal_sire' => [13262, 4151]],
+            'clues' => ['beginner_treasure_trails' => [23182, 23185]],
+        ])),
+    ]))]));
+
+    $flat = (new CollectionLogStructure($client))->flatten();
+
+    expect($flat['ids']['abyssal_sire'])->toBe([13262, 4151])
+        ->and($flat['group']['abyssal_sire'])->toBe('bosses')
+        ->and($flat['group']['beginner_treasure_trails'])->toBe('clues');
+});
+
+it('caches the structure so it is fetched once', function () {
+    Cache::flush();
+
+    // Only one response queued — a second fetch would throw, proving the cache.
+    $client = new TempleOsrsClient(new Client(['handler' => HandlerStack::create(new MockHandler([
+        new Response(200, [], json_encode(['bosses' => ['abyssal_sire' => [13262]]])),
+    ]))]));
+
+    $structure = new CollectionLogStructure($client);
+
+    expect($structure->groups())->toHaveKey('bosses');
+    expect($structure->groups())->toHaveKey('bosses'); // served from cache
 });
