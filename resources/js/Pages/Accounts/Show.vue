@@ -92,6 +92,12 @@ const inventoryTabs = [
     { key: 'looting-bag', label: 'Looting bag' },
 ];
 
+const activeJournalTab = ref('quests');
+const journalTabs = [
+    { key: 'quests', label: 'Quests' },
+    { key: 'diaries', label: 'Diaries' },
+];
+
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
 
 // When the avatar includes an opponent, give it the whole column and tuck the
@@ -230,22 +236,22 @@ onBeforeUnmount(() => {
                                 </div>
 
                                 <div class="col-span-1">
-                                    <div class="flex items-baseline justify-between">
-                                        <h3 class="header-chatbox-sword">Quests</h3>
-                                        <Freshness :updated-at="freshness.quests" :stale-after-minutes="staleAfter" />
-                                    </div>
-                                    <div class="mt-4 bg-base-200 border border-base-300 rounded resource-pack-dialog p-2">
-                                        <Quests :quests="quests" />
-                                    </div>
+                                    <h3 class="header-chatbox-sword">Journal</h3>
+                                    <TabbedCard :tabs="journalTabs" v-model="activeJournalTab" class="mt-4">
+                                        <template #quests>
+                                            <div class="flex justify-end">
+                                                <Freshness :updated-at="freshness.quests" :stale-after-minutes="staleAfter" />
+                                            </div>
+                                            <Quests :quests="quests" />
+                                        </template>
+                                        <template #diaries>
+                                            <div class="flex justify-end">
+                                                <Freshness :updated-at="freshness.diaries" :stale-after-minutes="staleAfter" />
+                                            </div>
+                                            <Diaries :diaries="diaries" />
+                                        </template>
+                                    </TabbedCard>
                                 </div>
-                            </div>
-
-                            <div class="mt-4 flex items-baseline justify-between">
-                                <h3 class="header-chatbox-sword">Achievement Diaries</h3>
-                                <Freshness :updated-at="freshness.diaries" :stale-after-minutes="staleAfter" />
-                            </div>
-                            <div class="mt-4">
-                                <Diaries :diaries="diaries" />
                             </div>
 
                             <h3 class="mt-4 header-chatbox-sword">Collection Log</h3>

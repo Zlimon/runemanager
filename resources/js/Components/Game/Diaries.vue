@@ -33,7 +33,7 @@ const hasData = computed(() => completed.value > 0 || Object.keys(props.diaries 
         <div class="mb-2 flex justify-end">
             <span class="text-xs text-base-content/60">{{ completed }} / 48 completed</span>
         </div>
-        <div class="overflow-x-auto bg-base-200 border border-base-300 rounded resource-pack-dialog">
+        <div class="overflow-x-auto">
             <table class="table table-sm">
                 <thead>
                     <tr>
