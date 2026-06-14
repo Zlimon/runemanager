@@ -103,7 +103,7 @@ const install = (pack) => {
 
                 <Card v-if="myPacks.length">
                     <div class="flex items-baseline justify-between gap-3">
-                        <h2 class="header-chatbox-sword text-lg font-bold">Your packs</h2>
+                        <h2 class="text-lg font-bold">Your packs</h2>
                         <span class="text-xs text-base-content/60">{{ installedCount }} of {{ installLimit }} installed</span>
                     </div>
                     <p class="mt-1 text-sm text-base-content/60">
@@ -126,7 +126,7 @@ const install = (pack) => {
 
                 <Card>
                     <div class="flex items-baseline justify-between gap-3">
-                        <h2 class="header-chatbox-sword text-lg font-bold">Browse packs</h2>
+                        <h2 class="text-lg font-bold">Browse packs</h2>
                         <TextInput v-model="search" type="search" placeholder="Search packs…" class="w-44" />
                     </div>
                     <p class="mt-1 text-sm text-base-content/60">

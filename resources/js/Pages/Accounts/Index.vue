@@ -68,7 +68,7 @@ const clearAccountTypeSearch = () => {
     <AppLayout title="Accounts">
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <h3 class="text-left header-chatbox-sword">Search for accounts</h3>
+                <h3 class="text-left">Search for accounts</h3>
 
                 <div class="mt-2 grid grid-cols-2 gap-12">
                     <div class="col-span-1 max-w-md">

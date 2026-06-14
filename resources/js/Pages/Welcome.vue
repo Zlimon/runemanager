@@ -36,7 +36,7 @@ import {Head, Link} from '@inertiajs/vue3';
                 <div class="col-span-1"
                      style="background: url('/images/scenery_1.png'); background-size: cover; background-position: center; height: 15rem;"/>
                 <div class="col-span-1">
-                    <h2 class="text-4xl text-center header-chatbox-sword">
+                    <h2 class="text-4xl text-center">
                         About
                     </h2>
                     <div class="m-4 text-start">
@@ -47,7 +47,7 @@ import {Head, Link} from '@inertiajs/vue3';
                 </div>
 
                 <div class="col-span-1">
-                    <h2 class="text-4xl text-center header-chatbox-sword">
+                    <h2 class="text-4xl text-center">
                         Requirements
                     </h2>
                     <div class="m-4 text-end">

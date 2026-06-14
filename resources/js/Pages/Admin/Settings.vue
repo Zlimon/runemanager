@@ -203,7 +203,7 @@ const confirmReset = () => {
 
                 <!-- Feed & sync config (SPEC §12.4) -->
                 <Card v-if="configured" class="mt-6">
-                    <h2 class="header-chatbox-sword text-lg font-bold">Feed &amp; sync</h2>
+                    <h2 class="text-lg font-bold">Feed &amp; sync</h2>
                     <form class="mt-4 space-y-6" @submit.prevent="submitConfig">
                         <div>
                             <InputLabel for="hiscore_refresh_minutes" value="Hiscores refresh" />
@@ -254,7 +254,7 @@ const confirmReset = () => {
 
                 <!-- Branding (SPEC §12.4) -->
                 <Card v-if="configured" class="mt-6">
-                    <h2 class="header-chatbox-sword text-lg font-bold">Branding</h2>
+                    <h2 class="text-lg font-bold">Branding</h2>
                     <form class="mt-4 space-y-6" @submit.prevent="submitBranding">
                         <div>
                             <InputLabel value="Logo" />

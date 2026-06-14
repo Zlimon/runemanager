@@ -43,7 +43,7 @@ const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
         <div v-if="announcements.length" class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="flex items-baseline justify-between">
-                    <h2 class="header-chatbox-sword text-xl font-bold">Announcements</h2>
+                    <h2 class="text-xl font-bold">Announcements</h2>
                     <Link :href="route('announcements.index')" class="link link-hover text-sm text-base-content/70">
                         View all
                     </Link>

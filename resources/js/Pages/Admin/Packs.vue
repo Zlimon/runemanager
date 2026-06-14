@@ -61,7 +61,7 @@ const install = (pack) => installer.value?.start(pack);
                 <!-- Installed packs management -->
                 <Card>
                     <div class="flex flex-wrap items-baseline justify-between gap-3">
-                        <h2 class="header-chatbox-sword text-lg font-bold">
+                        <h2 class="text-lg font-bold">
                             Installed <span class="text-base-content/50">({{ installed.length }})</span>
                         </h2>
                         <div class="flex items-center gap-2">
@@ -117,7 +117,7 @@ const install = (pack) => installer.value?.start(pack);
                 <!-- Browse the community hub -->
                 <Card>
                     <div class="flex items-baseline justify-between gap-3">
-                        <h2 class="header-chatbox-sword text-lg font-bold">Browse the hub</h2>
+                        <h2 class="text-lg font-bold">Browse the hub</h2>
                         <TextInput v-model="browseSearch" type="search" placeholder="Search packs…" class="w-48" />
                     </div>
                     <p class="mt-1 text-sm text-base-content/60">

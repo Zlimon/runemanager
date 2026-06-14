@@ -14,16 +14,35 @@
     background-size: contain !important;
 }
 
-.header-chatbox-sword:after {
-    display: block;
-    max-width: 10rem;
-    height: 1rem;
-    margin: auto;
+/*
+ * Page-title (h1) decoration: the heading text is centred with a sword on each
+ * side. flex:1 lets it centre across the full width when alone, or across the
+ * remaining space when it shares a row with an action button. Only h1s carry the
+ * .header-chatbox-sword class — other headings are left plain.
+ */
+.header-chatbox-sword {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-align: center;
+}
+.header-chatbox-sword::before,
+.header-chatbox-sword::after {
     content: '';
-    background: url('chatbox/sword_pointed_left.png') no-repeat,
-                url('options/round_check_box.png') no-repeat,
-                url('chatbox/sword_pointed_right.png') no-repeat;
-    background-position: left, center, right;
+    flex: 0 0 auto;
+    width: 4rem;
+    height: 1.25rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+.header-chatbox-sword::before {
+    background-image: url('chatbox/sword_pointed_left.png');
+}
+.header-chatbox-sword::after {
+    background-image: url('chatbox/sword_pointed_right.png');
 }
 
 .resource-pack-dialog {

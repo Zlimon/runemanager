@@ -231,12 +231,12 @@ onBeforeUnmount(() => {
                         <div class="col-span-2">
                             <div class="mx-auto mt-6 grid grid-cols-3 gap-2">
                                 <div class="col-span-2">
-                                    <h3 class="header-chatbox-sword">Skills</h3>
+                                    <h3>Skills</h3>
                                     <Skills :account="account" />
                                 </div>
 
                                 <div class="col-span-1">
-                                    <h3 class="header-chatbox-sword">Journal</h3>
+                                    <h3>Journal</h3>
                                     <TabbedCard :tabs="journalTabs" v-model="activeJournalTab" class="mt-4">
                                         <template #quests>
                                             <div class="flex justify-end">
@@ -254,7 +254,7 @@ onBeforeUnmount(() => {
                                 </div>
                             </div>
 
-                            <h3 class="mt-4 header-chatbox-sword">Collection Log</h3>
+                            <h3 class="mt-4">Collection Log</h3>
                             <div class="mt-4">
                                 <Deferred data="collectionLog">
                                     <template #fallback>
@@ -268,7 +268,7 @@ onBeforeUnmount(() => {
                             </div>
 
                             <div class="mt-4 flex items-baseline justify-between">
-                                <h3 class="header-chatbox-sword">Bank</h3>
+                                <h3>Bank</h3>
                                 <Freshness :updated-at="freshness.bank" :stale-after-minutes="staleAfter" />
                             </div>
                             <div class="mt-4">
@@ -276,7 +276,7 @@ onBeforeUnmount(() => {
                             </div>
 
                             <div class="mt-4 flex items-baseline justify-between">
-                                <h3 class="header-chatbox-sword">Recent Loot</h3>
+                                <h3>Recent Loot</h3>
                                 <Freshness :updated-at="freshness.loot" :stale-after-minutes="staleAfter" />
                             </div>
                             <div class="mt-4">
