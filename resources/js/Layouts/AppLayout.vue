@@ -4,6 +4,8 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import Banner from '@/Components/Banner.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import HiscoresMenu from '@/Components/HiscoresMenu.vue';
+import NavDropdown from '@/Components/NavDropdown.vue';
+import NavDropdownLink from '@/Components/NavDropdownLink.vue';
 import DarkModeToggle from '@/Components/DarkModeToggle.vue';
 
 defineProps({
@@ -61,40 +63,33 @@ const logout = () => {
                                 <HiscoresMenu :active="route().current('hiscores.*')" />
                             </li>
                             <li>
-                                <ResponsiveNavLink :href="route('accounts.index')"
-                                                   :active="route().current('accounts.*')">
-                                    Accounts
-                                </ResponsiveNavLink>
+                                <NavDropdown label="Accounts"
+                                             :active="route().current('accounts.*') || route().current('map.*') || route().current('group-bank.*')">
+                                    <NavDropdownLink :href="route('accounts.index')" :active="route().current('accounts.*')">
+                                        All Accounts
+                                    </NavDropdownLink>
+                                    <NavDropdownLink :href="route('map.index')" :active="route().current('map.*')">
+                                        Live Map
+                                    </NavDropdownLink>
+                                    <NavDropdownLink v-if="page.props.instance?.mode === 'group'"
+                                                     :href="route('group-bank.index')" :active="route().current('group-bank.*')">
+                                        Group Bank
+                                    </NavDropdownLink>
+                                </NavDropdown>
                             </li>
                             <li>
-                                <ResponsiveNavLink :href="route('map.index')"
-                                                   :active="route().current('map.*')">
-                                    Live Map
-                                </ResponsiveNavLink>
-                            </li>
-                            <li v-if="page.props.instance?.mode === 'group'">
-                                <ResponsiveNavLink :href="route('group-bank.index')"
-                                                   :active="route().current('group-bank.*')">
-                                    Group Bank
-                                </ResponsiveNavLink>
-                            </li>
-                            <li>
-                                <ResponsiveNavLink :href="route('feed.index')"
-                                                   :active="route().current('feed.*')">
-                                    Live Feed
-                                </ResponsiveNavLink>
-                            </li>
-                            <li>
-                                <ResponsiveNavLink :href="route('calendar.index')"
-                                                   :active="route().current('calendar.*')">
-                                    Calendar
-                                </ResponsiveNavLink>
-                            </li>
-                            <li>
-                                <ResponsiveNavLink :href="route('announcements.index')"
-                                                   :active="route().current('announcements.*')">
-                                    Announcements
-                                </ResponsiveNavLink>
+                                <NavDropdown label="Community"
+                                             :active="route().current('feed.*') || route().current('calendar.*') || route().current('announcements.*')">
+                                    <NavDropdownLink :href="route('feed.index')" :active="route().current('feed.*')">
+                                        Live Feed
+                                    </NavDropdownLink>
+                                    <NavDropdownLink :href="route('calendar.index')" :active="route().current('calendar.*')">
+                                        Calendar
+                                    </NavDropdownLink>
+                                    <NavDropdownLink :href="route('announcements.index')" :active="route().current('announcements.*')">
+                                        Announcements
+                                    </NavDropdownLink>
+                                </NavDropdown>
                             </li>
                             <li v-if="page.props.is_admin">
                                 <ResponsiveNavLink :href="route('admin.dashboard')"
@@ -103,24 +98,20 @@ const logout = () => {
                                 </ResponsiveNavLink>
                             </li>
                             <li>
-                                <ResponsiveNavLink :href="route('themes.index')"
-                                                   :active="route().current('themes.*')">
-                                    Appearance
-                                </ResponsiveNavLink>
-                            </li>
-                            <li>
-                                <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures"
-                                                   :href="route('api-tokens.index')"
-                                                   :active="route().current('api-tokens.index')">
-                                    API Tokens
-                                </ResponsiveNavLink>
-                            </li>
-                            <li>
-                                <form method="POST" @submit.prevent="logout">
-                                    <ResponsiveNavLink as="button">
+                                <NavDropdown :label="page.props.auth?.user?.name ?? 'Account'"
+                                             :active="route().current('themes.*') || route().current('api-tokens.*')">
+                                    <NavDropdownLink :href="route('themes.index')" :active="route().current('themes.*')">
+                                        Appearance
+                                    </NavDropdownLink>
+                                    <NavDropdownLink v-if="$page.props.jetstream.hasApiFeatures"
+                                                     :href="route('api-tokens.index')" :active="route().current('api-tokens.index')">
+                                        API Tokens
+                                    </NavDropdownLink>
+                                    <button type="button" @click="logout"
+                                            class="block w-full rounded px-3 py-2 text-left text-base-content hover:bg-base-300">
                                         Log out
-                                    </ResponsiveNavLink>
-                                </form>
+                                    </button>
+                                </NavDropdown>
                             </li>
                             <li class="flex items-center">
                                 <DarkModeToggle />
