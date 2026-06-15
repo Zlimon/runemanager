@@ -56,6 +56,23 @@ class Account extends Model
     }
 
     /**
+     * Case-insensitive username substring search, shared by the account index
+     * filter and the header typeahead. Uses LOWER(...) LIKE so it's portable
+     * across Postgres (case-sensitive LIKE) and SQLite, and a no-op for a blank
+     * term so callers can pass the raw query straight through.
+     */
+    public function scopeSearchUsername(Builder $query, ?string $term): Builder
+    {
+        $term = trim((string) $term);
+
+        if ($term === '') {
+            return $query;
+        }
+
+        return $query->whereRaw('LOWER(username) LIKE ?', ['%'.Str::lower($term).'%']);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

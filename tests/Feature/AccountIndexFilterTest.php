@@ -245,3 +245,20 @@ it('returns matching accounts when accountSearchResults is requested via partial
     expect($results)->toBeArray()->toHaveCount(1)
         ->and($results[0]['username'])->toBe('Needle One');
 });
+
+it('matches accountSearchResults case-insensitively (shared username search)', function () {
+    Account::factory()->for($this->user)->create(['username' => 'IKEA Ocelot']);
+
+    $response = $this->actingAs($this->user)
+        ->withHeaders([
+            'X-Inertia' => 'true',
+            'X-Inertia-Version' => currentInertiaVersion(),
+            'X-Inertia-Partial-Data' => 'accountSearchResults',
+            'X-Inertia-Partial-Component' => 'Accounts/Index',
+        ])
+        ->get(route('accounts.index', ['account_search' => 'ikea']))
+        ->assertOk();
+
+    expect($response->json('props.accountSearchResults'))->toHaveCount(1)
+        ->and($response->json('props.accountSearchResults.0.username'))->toBe('IKEA Ocelot');
+});

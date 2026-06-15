@@ -30,13 +30,7 @@ class AccountController extends Controller
             'per_page' => ['nullable', 'integer', 'min:4', 'max:64'],
         ]);
 
-        $query = Account::query();
-
-        if (! empty($validated['username'] ?? null)) {
-            // Case-insensitive substring match, portable across Postgres/SQLite
-            // (Postgres LIKE is case-sensitive; ILIKE isn't available on SQLite).
-            $query->whereRaw('LOWER(username) LIKE ?', ['%'.Str::lower($validated['username']).'%']);
-        }
+        $query = Account::query()->searchUsername($validated['username'] ?? null);
 
         if (! empty($validated['account_types'] ?? [])) {
             $normalized = array_map(

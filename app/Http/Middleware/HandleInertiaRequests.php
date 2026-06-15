@@ -104,9 +104,10 @@ class HandleInertiaRequests extends Middleware
                     return [];
                 }
 
+                // Same case-insensitive username search as the account index.
                 return AccountResource::collection(
                     Account::query()
-                        ->where('username', 'LIKE', '%'.$query.'%')
+                        ->searchUsername($query)
                         ->orderBy('username')
                         ->limit(10)
                         ->get(),
