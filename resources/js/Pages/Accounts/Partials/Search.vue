@@ -49,14 +49,14 @@ watch(query, (value) => {
                     placeholder="Search accounts" />
         </div>
 
-        <div class="relative z-50 flex justify-end">
+        <div class="relative z-[1100] flex justify-end">
             <div v-if="showDropdown && query && results.length > 0"
-                 class="w-[calc(100%+4rem)] absolute overflow-y-auto bg-beige-600 border-2 border-beige-700 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+                 class="absolute w-[calc(100%+4rem)] overflow-hidden rounded shadow-xl pack-bg-card resource-pack-border">
                 <div v-for="account in results" :key="account.username">
                     <Link :href="route('accounts.show', account)"
-                          class="flex flex-row items-center border-b p-2 border-beige-700 space-x-2 hover:bg-beige-200 dark:hover:bg-gray-700">
+                          class="flex flex-row items-center space-x-2 border-b border-base-300 p-2 hover:bg-base-300/40">
                         <img :src="`data:image/jpeg;base64,${account.icon}`"
-                             class="h-16 w-16 rounded-full p-2 ring-2 ring-beige-600 dark:ring-gray-500">
+                             class="h-16 w-16 rounded-full p-2 ring-2 ring-base-300">
                         <div class="flex flex-col justify-between">
                             <div class="flex items-center space-x-1">
                                 <img v-if="account.account_type === 'ironman'"
@@ -65,13 +65,13 @@ watch(query, (value) => {
                                 <img v-else-if="account.account_type !== 'normal'"
                                      :src="`/images/${account.account_type}_ironman.png`"
                                      class="h-6 w-6 object-contain">
-                                <p class="text-xl">{{ account.username }}</p>
+                                <p class="text-xl text-base-content">{{ account.username }}</p>
                             </div>
 
                             <div class="flex items-center space-x-1">
                                 <img class="h-6 w-6 object-contain"
                                      src="/images/skill/total.webp">
-                                <p class="font-normal text-gray-700 text-md dark:text-gray-400">
+                                <p class="text-md font-normal text-base-content/60">
                                     {{ account.level }}
                                 </p>
                             </div>
