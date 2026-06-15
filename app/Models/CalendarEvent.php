@@ -30,6 +30,7 @@ class CalendarEvent extends Model
         'title',
         'description',
         'event_type',
+        'color',
         'starts_at',
         'ends_at',
     ];

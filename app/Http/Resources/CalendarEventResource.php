@@ -18,6 +18,7 @@ class CalendarEventResource extends JsonResource
             'description' => $this->description,
             'event_type' => $this->event_type->value,
             'event_type_label' => $this->event_type->label(),
+            'color' => $this->color,
             'starts_at' => $this->starts_at?->toIso8601String(),
             'ends_at' => $this->ends_at?->toIso8601String(),
             'created_by' => [
