@@ -315,9 +315,12 @@
                          bottom -15px left, center;
     border: 0 !important;
 }
-.menu,
-.dropdown-content,
-.alert {
+/* Plain textured panel for menus/dropdowns/alerts. Excludes elements that opt
+   into the full framed dialog (.resource-pack-dialog) — otherwise this flat
+   background, defined later, would override their frame and drop the border. */
+.menu:not(.resource-pack-dialog),
+.dropdown-content:not(.resource-pack-dialog),
+.alert:not(.resource-pack-dialog) {
     background: url('dialog/background.png');
     border: 0 !important;
 }
