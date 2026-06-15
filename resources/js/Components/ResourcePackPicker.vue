@@ -1,4 +1,6 @@
 <script setup>
+import Badge from "@/Components/Badge.vue";
+
 /*
  * A thumbnail gallery for choosing a resource pack (icon.png), used for both the
  * owner's global default and a user's personal override. v-model is the selected
@@ -46,7 +48,7 @@ const select = (id) => emit('update:modelValue', id);
             </div>
             <span class="flex items-center gap-1 text-sm font-medium">
                 <span class="max-w-[8rem] truncate" :title="pack.alias">{{ pack.alias }}</span>
-                <span v-if="pack.id === defaultId" class="badge badge-neutral badge-xs">Default</span>
+                <Badge v-if="pack.id === defaultId" size="xs">Default</Badge>
             </span>
         </button>
     </div>

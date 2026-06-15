@@ -258,6 +258,25 @@
     filter: brightness(1.12);
 }
 
+/* Badges — reuse the metal button face (cream text reads on every pack's button
+ * fill) so small labels like event types match the rest of the UI. */
+.resource-pack-badge {
+    background: url('button/corner_top_left.png') no-repeat,
+                url('button/corner_top_right.png') no-repeat,
+                url('button/corner_bottom_left.png') no-repeat,
+                url('button/corner_bottom_right.png') no-repeat,
+                url('button/edge_top.png') repeat-x,
+                url('button/edge_left.png') repeat-y,
+                url('button/edge_right.png') repeat-y,
+                url('button/edge_bottom.png') repeat-x,
+                url('dialog/background.png');
+    background-position: top left, top right, bottom left, bottom right,
+                         top, left, right, bottom, center;
+    border: 0 !important;
+    color: #f0e6d2 !important;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.85);
+}
+
 /* Checkboxes — swap DaisyUI's drawn box for the in-game checkbox sprites. */
 .checkbox {
     -webkit-appearance: none;

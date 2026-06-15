@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import { Calendar as VCalendar } from "v-calendar";
 import "v-calendar/dist/style.css";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import Badge from "@/Components/Badge.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -179,7 +180,7 @@ const destroy = (event) => {
                         class="flex cursor-pointer items-center justify-between gap-2 rounded p-3 pack-bg-card resource-pack-border"
                         @click="selected = event">
                         <div class="flex items-center gap-2">
-                            <span class="badge badge-neutral">{{ event.event_type_label }}</span>
+                            <Badge>{{ event.event_type_label }}</Badge>
                             <span class="font-semibold">{{ event.title }}</span>
                         </div>
                         <span class="text-xs text-base-content/60">{{ dt(event.starts_at) }}</span>
@@ -192,7 +193,7 @@ const destroy = (event) => {
         <DialogModal :show="selected !== null" @close="selected = null">
             <template #title>
                 <div class="flex items-center gap-2">
-                    <span class="badge badge-neutral">{{ selected?.event_type_label }}</span>
+                    <Badge>{{ selected?.event_type_label }}</Badge>
                     {{ selected?.title }}
                 </div>
             </template>

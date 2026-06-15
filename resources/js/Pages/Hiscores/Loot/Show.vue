@@ -4,6 +4,7 @@ import { Link, usePage } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Search from "@/Components/Search.vue";
 import ItemSlot from "@/Components/Game/ItemSlot.vue";
+import Badge from "@/Components/Badge.vue";
 
 const props = defineProps({
     source: {
@@ -58,7 +59,7 @@ const filteredHiscores = computed(() => {
                         ← Loot
                     </Link>
                     <h1 class="text-2xl font-bold dark:text-white">{{ source }}</h1>
-                    <span v-if="category" class="badge badge-neutral">{{ category }}</span>
+                    <Badge v-if="category">{{ category }}</Badge>
                     <div class="ml-auto w-full max-w-xs">
                         <Search v-model="search" placeholder="Search by username" />
                     </div>

@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import Badge from "@/Components/Badge.vue";
 import Card from "@/Components/Card.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
@@ -92,7 +93,7 @@ const install = (pack) => installer.value?.start(pack);
                                                  class="h-8 w-8 rounded object-cover [image-rendering:pixelated]"
                                                  loading="lazy">
                                             <span class="font-medium">{{ pack.alias }}</span>
-                                            <span v-if="pack.is_default" class="badge badge-neutral badge-sm">Default</span>
+                                            <Badge v-if="pack.is_default" size="sm">Default</Badge>
                                         </div>
                                     </td>
                                     <td class="text-base-content/70">{{ pack.installed_by ?? 'Admin' }}</td>
