@@ -6,6 +6,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CollectionHiscoreController;
 use App\Http\Controllers\CollectionLogHiscoreController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiaryHiscoreController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GroupBankController;
@@ -15,8 +16,6 @@ use App\Http\Controllers\OverallHiscoreController;
 use App\Http\Controllers\SkillHiscoreController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
-use App\Http\Resources\AnnouncementResource;
-use App\Models\Announcement;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -48,14 +47,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard', [
-            // SPEC §9.2 — surface the latest active announcements on the homepage.
-            'announcements' => AnnouncementResource::collection(
-                Announcement::with('user:id,name')->active()->limit(5)->get(),
-            )->resolve(),
-        ]);
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Live Map — see where accounts are in real time (positions over websockets).
     Route::get('/map', [MapController::class, 'index'])->name('map.index');
