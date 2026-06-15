@@ -210,6 +210,9 @@ class InstallResourcePack
         'scrollbar/thumb_middle.png' => 'scrollbar/horizontal_thumb_middle.png',
         'scrollbar/thumb_top.png' => 'scrollbar/horizontal_thumb_right.png',
         'scrollbar/thumb_bottom.png' => 'scrollbar/horizontal_thumb_left.png',
+        // Arrow buttons: rotating clockwise, up points right and down points left.
+        'scrollbar/arrow_up.png' => 'scrollbar/arrow_right.png',
+        'scrollbar/arrow_down.png' => 'scrollbar/arrow_left.png',
     ];
 
     /**
