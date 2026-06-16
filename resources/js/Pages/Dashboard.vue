@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -27,7 +27,11 @@ const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
 const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
 
 // Show only milestone level-ups in the feed (every level is stored).
-const visibleFeed = computed(() => visibleFeedEvents(props.feed, page.props.feed_level_milestones ?? []));
+const feedEvents = ref([...props.feed]);
+const visibleFeed = computed(() => visibleFeedEvents(feedEvents.value, page.props.feed_level_milestones ?? []));
+const removeEvent = (id) => {
+    feedEvents.value = feedEvents.value.filter((e) => e.id !== id);
+};
 </script>
 
 <template>
@@ -101,7 +105,7 @@ const visibleFeed = computed(() => visibleFeedEvents(props.feed, page.props.feed
 
                         <ul v-if="visibleFeed.length" class="mt-4 space-y-2">
                             <li v-for="event in visibleFeed" :key="event.id">
-                                <FeedEventItem :event="event" />
+                                <FeedEventItem :event="event" @deleted="removeEvent" />
                             </li>
                         </ul>
                         <div v-else class="mt-4 rounded p-8 text-center text-base-content/60 pack-bg-card resource-pack-border">

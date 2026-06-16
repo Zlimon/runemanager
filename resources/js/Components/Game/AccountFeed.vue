@@ -21,6 +21,10 @@ const liveEvents = ref([...props.events]);
 const milestones = computed(() => usePage().props.feed_level_milestones ?? []);
 const visible = computed(() => visibleFeedEvents(liveEvents.value, milestones.value));
 
+const removeEvent = (id) => {
+    liveEvents.value = liveEvents.value.filter((e) => e.id !== id);
+};
+
 onMounted(() => {
     window.Echo.channel("feed").listen(".FeedEventCreated", (event) => {
         if (event.account?.username !== props.account.username) {
@@ -48,7 +52,7 @@ onBeforeUnmount(() => window.Echo.leave("feed"));
 
         <ul v-if="visible.length" class="mt-2 space-y-2">
             <li v-for="event in visible" :key="event.id">
-                <FeedEventItem :event="event" />
+                <FeedEventItem :event="event" @deleted="removeEvent" />
             </li>
         </ul>
         <div v-else class="mt-2 rounded p-6 text-center text-sm text-base-content/60 pack-bg-card resource-pack-border">

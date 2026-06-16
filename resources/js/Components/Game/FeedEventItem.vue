@@ -1,5 +1,6 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { computed } from "vue";
+import { Link, router, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import LootItems from "@/Components/Game/LootItems.vue";
 import ImageLightbox from "@/Components/ImageLightbox.vue";
@@ -9,12 +10,31 @@ import ImageLightbox from "@/Components/ImageLightbox.vue";
  * timestamp, the event sentence and, for loot drops, the dropped items.
  * Shared by the Live Feed page and the homepage activity widget.
  */
-defineProps({
+const props = defineProps({
     event: {
         type: Object,
         required: true,
     },
 });
+
+const emit = defineEmits(['deleted']);
+
+const page = usePage();
+
+// Instance admins, or the owner of the account the entry belongs to, may delete.
+const canDelete = computed(() => page.props.is_admin
+    || (page.props.auth?.user?.id != null && page.props.auth.user.id === props.event.account?.user_id));
+
+const remove = () => {
+    if (!confirm('Delete this feed entry?')) {
+        return;
+    }
+    router.delete(route('feed.destroy', props.event.id), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => emit('deleted', props.event.id),
+    });
+};
 
 const formatSkill = (slug) => slug.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -60,10 +80,20 @@ const sentence = (event) => {
                      alt="">
                 {{ event.account.username }}
             </Link>
-            <span class="text-xs text-base-content/60"
-                  :title="dayjs(event.occurred_at).format('MMM D, YYYY h:mm A')">
-                {{ dayjs(event.occurred_at).fromNow() }}
-            </span>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-base-content/60"
+                      :title="dayjs(event.occurred_at).format('MMM D, YYYY h:mm A')">
+                    {{ dayjs(event.occurred_at).fromNow() }}
+                </span>
+                <button v-if="canDelete" type="button" @click="remove" aria-label="Delete entry"
+                        class="text-base-content/40 hover:text-error" title="Delete entry">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M6 7h12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-7 0v12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V7" />
+                    </svg>
+                </button>
+            </div>
         </div>
         <div class="mt-1 text-sm text-base-content/80">
             <p>{{ sentence(event) }}</p>

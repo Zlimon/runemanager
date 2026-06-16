@@ -182,6 +182,40 @@ it('exposes only this account\'s events on the account show page', function () {
         );
 });
 
+it('lets the account owner delete their feed entry', function () {
+    $account = makeAccountForFeed('Owner');
+    $event = FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now()]);
+
+    $this->actingAs($account->user)
+        ->delete(route('feed.destroy', $event))
+        ->assertRedirect();
+
+    expect(FeedEvent::find($event->id))->toBeNull();
+});
+
+it('lets an admin delete any feed entry', function () {
+    $account = makeAccountForFeed('Someone');
+    $event = FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now()]);
+
+    $this->actingAs(adminUser())
+        ->delete(route('feed.destroy', $event))
+        ->assertRedirect();
+
+    expect(FeedEvent::find($event->id))->toBeNull();
+});
+
+it('forbids a non-owner non-admin from deleting a feed entry', function () {
+    $account = makeAccountForFeed('Victim');
+    $stranger = User::factory()->withPersonalTeam()->create();
+    $event = FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now()]);
+
+    $this->actingAs($stranger)
+        ->delete(route('feed.destroy', $event))
+        ->assertForbidden();
+
+    expect(FeedEvent::find($event->id))->not->toBeNull();
+});
+
 it('/feed is publicly accessible (no auth required)', function () {
     // No actingAs / Sanctum here on purpose — SPEC §8.2: "publicly visible".
     $this->get(route('feed.index'))->assertOk();

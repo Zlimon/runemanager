@@ -4,8 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\FeedEventResource;
 use App\Models\FeedEvent;
+use App\Support\Roles;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class FeedController extends Controller
 {
@@ -20,8 +25,29 @@ class FeedController extends Controller
 
         return Inertia::render('Feed/Index', [
             'events' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,username,account_type')->recent($pageSize)->get(),
+                FeedEvent::query()->with('account:id,user_id,username,account_type')->recent($pageSize)->get(),
             )->resolve(),
         ]);
+    }
+
+    /**
+     * Delete a feed entry. Allowed for an instance admin or the owner of the
+     * account the entry belongs to. Removes its screenshot too.
+     */
+    public function destroy(Request $request, FeedEvent $feedEvent): RedirectResponse
+    {
+        $user = $request->user();
+        $canDelete = $user !== null
+            && ($user->can(Roles::MANAGE_INSTANCE) || $user->id === $feedEvent->account?->user_id);
+
+        abort_unless($canDelete, HttpResponse::HTTP_FORBIDDEN);
+
+        if ($feedEvent->screenshot_path) {
+            Storage::disk('public')->delete($feedEvent->screenshot_path);
+        }
+
+        $feedEvent->delete();
+
+        return back();
     }
 }

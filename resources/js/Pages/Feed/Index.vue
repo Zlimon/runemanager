@@ -33,6 +33,10 @@ onMounted(() => {
 onBeforeUnmount(() => window.Echo.leave("feed"));
 
 const hasEvents = computed(() => visibleEvents.value.length > 0);
+
+const removeEvent = (id) => {
+    events.value = events.value.filter((e) => e.id !== id);
+};
 </script>
 
 <template>
@@ -49,7 +53,7 @@ const hasEvents = computed(() => visibleEvents.value.length > 0);
 
                 <ul v-if="hasEvents" class="mt-4 space-y-2">
                     <li v-for="event in visibleEvents" :key="event.id">
-                        <FeedEventItem :event="event" />
+                        <FeedEventItem :event="event" @deleted="removeEvent" />
                     </li>
                 </ul>
 

@@ -81,6 +81,11 @@ Route::middleware([
         });
     });
 
+    // SPEC §8 — admins (manage instance) or the account's owner can delete feed
+    // entries; the controller enforces ownership.
+    Route::delete('/feed/{feedEvent}', [FeedController::class, 'destroy'])
+        ->whereNumber('feedEvent')->name('feed.destroy');
+
     Route::middleware('can:manage calendar')->group(function () {
         Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
         Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])

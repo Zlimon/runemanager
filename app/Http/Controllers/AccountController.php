@@ -109,7 +109,7 @@ class AccountController extends Controller
 
             // SPEC §8 — this account's slice of the live feed.
             'feed' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,username,account_type')
+                FeedEvent::query()->with('account:id,user_id,username,account_type')
                     ->where('account_id', $account->id)->recent(20)->get(),
             )->resolve(),
 

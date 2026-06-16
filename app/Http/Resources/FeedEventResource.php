@@ -60,6 +60,7 @@ class FeedEventResource extends JsonResource
                 : null,
             'occurred_at' => $this->occurred_at?->toIso8601String(),
             'account' => [
+                'user_id' => $this->account?->user_id,
                 'username' => $this->account?->username,
                 'account_type' => $this->account?->account_type?->value
                     ?? $this->account?->account_type,
