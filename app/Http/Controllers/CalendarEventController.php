@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\CalendarEventType;
 use App\Http\Requests\StoreCalendarEventRequest;
 use App\Http\Resources\CalendarEventResource;
+use App\Jobs\DeliverWebhook;
 use App\Models\CalendarEvent;
+use App\Services\Webhooks\WebhookPayload;
+use App\Support\Instance;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Http\RedirectResponse;
@@ -59,7 +62,12 @@ class CalendarEventController extends Controller
 
     public function store(StoreCalendarEventRequest $request): RedirectResponse
     {
-        $request->user()->calendarEvents()->create($request->validated());
+        $event = $request->user()->calendarEvents()->create($request->validated());
+
+        // Forward to the instance's configured webhook (e.g. Discord).
+        if ($url = Instance::webhookUrl()) {
+            DeliverWebhook::dispatch($url, WebhookPayload::forCalendarEvent($event), 'calendar');
+        }
 
         return redirect()->route('calendar.index');
     }

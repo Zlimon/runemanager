@@ -84,6 +84,16 @@ class Instance
     }
 
     /**
+     * The instance's single outbound webhook URL (Discord etc.) that notable
+     * events — new announcements, calendar events, and anything we add later —
+     * are forwarded to, or null when unset.
+     */
+    public static function webhookUrl(): ?string
+    {
+        return SettingHelper::getSetting('webhook_url') ?: null;
+    }
+
+    /**
      * Public URL for an uploaded branding asset (logo/banner), or null. The
      * stored value is a path on the public disk.
      */

@@ -55,6 +55,7 @@ class AdminController extends Controller
                 'resource_pack_id' => (int) SettingHelper::getSetting('resource_pack_id', 0),
                 'default_dark_mode' => (string) SettingHelper::getSetting('default_dark_mode', ''),
                 'public_anonymize_accounts' => Instance::publicAnonymizeAccounts(),
+                'webhook_url' => (string) SettingHelper::getSetting('webhook_url', ''),
                 'hiscore_refresh_minutes' => Instance::hiscoreRefreshMinutes(),
                 'feed_level_up_thresholds' => implode(', ', Instance::feedLevelUpThresholds()),
                 'feed_loot_min_value' => Instance::feedLootMinValue(),
@@ -85,6 +86,7 @@ class AdminController extends Controller
             'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
             'default_dark_mode' => ['nullable', 'string', Rule::in(['', 'light', 'dark'])],
             'public_anonymize_accounts' => ['boolean'],
+            'webhook_url' => ['nullable', 'url', 'max:2000'],
             'confirm' => ['nullable', 'string'],
         ]);
 
@@ -127,6 +129,7 @@ class AdminController extends Controller
         SettingHelper::setSetting('resource_pack_id', (int) ($validated['resource_pack_id'] ?? 0), 'int');
         SettingHelper::setSetting('default_dark_mode', $validated['default_dark_mode'] ?? '');
         SettingHelper::setSetting('public_anonymize_accounts', $validated['public_anonymize_accounts'] ?? false, 'bool');
+        SettingHelper::setSetting('webhook_url', $validated['webhook_url'] ?? '');
         SettingHelper::setSetting('instance_configured', true, 'bool');
 
         return back()->with('status', $switchingToRoster && $hasAccounts

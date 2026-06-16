@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAnnouncementRequest;
 use App\Http\Resources\AnnouncementResource;
+use App\Jobs\DeliverWebhook;
 use App\Models\Announcement;
+use App\Services\Webhooks\WebhookPayload;
+use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,7 +30,12 @@ class AnnouncementController extends Controller
 
     public function store(StoreAnnouncementRequest $request): RedirectResponse
     {
-        $request->user()->announcements()->create($request->validated());
+        $announcement = $request->user()->announcements()->create($request->validated());
+
+        // Forward to the instance's configured webhook (e.g. Discord).
+        if ($url = Instance::webhookUrl()) {
+            DeliverWebhook::dispatch($url, WebhookPayload::forAnnouncement($announcement), 'announcement');
+        }
 
         return redirect()->route('announcements.index');
     }

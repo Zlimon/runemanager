@@ -29,6 +29,7 @@ const form = useForm({
     resource_pack_id: props.settings.resource_pack_id || '',
     default_dark_mode: props.settings.default_dark_mode ?? '',
     public_anonymize_accounts: props.settings.public_anonymize_accounts ?? false,
+    webhook_url: props.settings.webhook_url ?? '',
     confirm: '',
 });
 
@@ -205,6 +206,21 @@ const confirmReset = () => {
                                 who's who.
                             </p>
                             <InputError v-if="form.errors.public_anonymize_accounts" :messages="form.errors.public_anonymize_accounts" />
+                        </div>
+
+                        <div>
+                            <InputLabel for="webhook_url" value="Webhook URL" />
+                            <TextInput id="webhook_url"
+                                       v-model="form.webhook_url"
+                                       type="url"
+                                       class="mt-1 block w-full"
+                                       placeholder="https://discord.com/api/webhooks/..."
+                                       :error="form.errors.webhook_url !== undefined" />
+                            <p class="mt-1 text-xs text-base-content/60">
+                                Notable events (new announcements and calendar events) are posted to this
+                                webhook — e.g. a Discord channel. Leave blank to disable.
+                            </p>
+                            <InputError v-if="form.errors.webhook_url" :messages="form.errors.webhook_url" />
                         </div>
 
                         <div class="flex justify-end">
