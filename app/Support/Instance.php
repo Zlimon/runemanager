@@ -170,6 +170,16 @@ class Instance
     }
 
     /**
+     * Whether usernames are hidden on the public landing page (SPEC §12.4) —
+     * the showcase of top accounts then masks names so the leaderboard can be
+     * shown to logged-out visitors without exposing who's who.
+     */
+    public static function publicAnonymizeAccounts(): bool
+    {
+        return (bool) SettingHelper::getSetting('public_anonymize_accounts', false);
+    }
+
+    /**
      * The owner's instance-wide default appearance, overriding a resource pack's
      * own (often unreliable) dark_mode flag. Null means "follow the pack".
      */

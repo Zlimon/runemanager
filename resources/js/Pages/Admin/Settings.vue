@@ -28,6 +28,7 @@ const form = useForm({
     instance_description: props.settings.instance_description ?? '',
     resource_pack_id: props.settings.resource_pack_id || '',
     default_dark_mode: props.settings.default_dark_mode ?? '',
+    public_anonymize_accounts: props.settings.public_anonymize_accounts ?? false,
     confirm: '',
 });
 
@@ -190,6 +191,20 @@ const confirmReset = () => {
                                 Members can still toggle for themselves.
                             </p>
                             <InputError v-if="form.errors.default_dark_mode" :messages="form.errors.default_dark_mode" />
+                        </div>
+
+                        <div>
+                            <InputLabel value="Public landing page" />
+                            <label class="mt-2 flex items-center gap-2 text-sm">
+                                <input type="checkbox" v-model="form.public_anonymize_accounts" class="checkbox checkbox-sm">
+                                Hide account names
+                            </label>
+                            <p class="mt-1 text-xs text-base-content/60">
+                                Masks usernames in the top-accounts showcase on the logged-out
+                                homepage, so the leaderboard can be shown publicly without revealing
+                                who's who.
+                            </p>
+                            <InputError v-if="form.errors.public_anonymize_accounts" :messages="form.errors.public_anonymize_accounts" />
                         </div>
 
                         <div class="flex justify-end">

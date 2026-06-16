@@ -53,6 +53,7 @@ class AdminController extends Controller
                 'instance_description' => (string) SettingHelper::getSetting('instance_description', ''),
                 'resource_pack_id' => (int) SettingHelper::getSetting('resource_pack_id', 0),
                 'default_dark_mode' => (string) SettingHelper::getSetting('default_dark_mode', ''),
+                'public_anonymize_accounts' => Instance::publicAnonymizeAccounts(),
                 'hiscore_refresh_minutes' => Instance::hiscoreRefreshMinutes(),
                 'feed_level_up_thresholds' => implode(', ', Instance::feedLevelUpThresholds()),
                 'feed_loot_min_value' => Instance::feedLootMinValue(),
@@ -82,6 +83,7 @@ class AdminController extends Controller
             'instance_description' => ['nullable', 'string', 'max:2000'],
             'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
             'default_dark_mode' => ['nullable', 'string', Rule::in(['', 'light', 'dark'])],
+            'public_anonymize_accounts' => ['boolean'],
             'confirm' => ['nullable', 'string'],
         ]);
 
@@ -110,6 +112,7 @@ class AdminController extends Controller
         SettingHelper::setSetting('instance_description', $validated['instance_description'] ?? '');
         SettingHelper::setSetting('resource_pack_id', (int) ($validated['resource_pack_id'] ?? 0), 'int');
         SettingHelper::setSetting('default_dark_mode', $validated['default_dark_mode'] ?? '');
+        SettingHelper::setSetting('public_anonymize_accounts', $validated['public_anonymize_accounts'] ?? false, 'bool');
         SettingHelper::setSetting('instance_configured', true, 'bool');
 
         return back()->with('status', $switchingToRoster && $hasAccounts
