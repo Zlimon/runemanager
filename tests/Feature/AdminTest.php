@@ -4,14 +4,35 @@ use App\Helpers\SettingHelper;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Services\Hiscores\GroupIronmanValidator;
 use App\Services\ResourcePacks\ResourcePackHub;
 use App\Support\Instance;
 use App\Support\Roles;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
+
+/**
+ * Bind a GIM validator backed by a faked OSRS group page: true = a normal page,
+ * false = the "Unable to find group" notice, null = the site being unreachable.
+ */
+function fakeGimValidator(?bool $result): void
+{
+    $response = match ($result) {
+        true => new Response(200, [], '<title>Old School Group Ironman - Hiscores - ikeabanden</title>'),
+        false => new Response(200, [], 'Unable to find group with name <strong>nope</strong>.'),
+        null => new Response(503, [], 'down'),
+    };
+
+    $http = new Client(['handler' => HandlerStack::create(new MockHandler([$response]))]);
+    app()->instance(GroupIronmanValidator::class, new GroupIronmanValidator($http));
+}
 
 function adminPack(string $name = 'pack-deletable'): ResourcePack
 {
@@ -84,6 +105,47 @@ it('validates the instance mode', function () {
         ])
         ->assertStatus(422)
         ->assertJsonValidationErrors('instance_mode');
+});
+
+it('rejects a GIM group name the OSRS hiscores does not know (SPEC §2.2)', function () {
+    fakeGimValidator(false);
+
+    $this->actingAs(adminUser())
+        ->putJson(route('admin.settings.update'), [
+            'instance_mode' => Instance::MODE_GROUP,
+            'group_name' => 'definitely not a real group',
+        ])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('group_name');
+
+    expect(Instance::mode())->not->toBe(Instance::MODE_GROUP);
+});
+
+it('accepts a GIM group name found on the OSRS hiscores', function () {
+    fakeGimValidator(true);
+
+    $this->actingAs(adminUser())
+        ->put(route('admin.settings.update'), [
+            'instance_mode' => Instance::MODE_GROUP,
+            'group_name' => 'ikeabanden',
+        ])
+        ->assertRedirect();
+
+    expect(Instance::mode())->toBe(Instance::MODE_GROUP)
+        ->and(Instance::name())->toBe('ikeabanden');
+});
+
+it('saves the group when validation can not reach the hiscores (validated where possible)', function () {
+    fakeGimValidator(null);
+
+    $this->actingAs(adminUser())
+        ->put(route('admin.settings.update'), [
+            'instance_mode' => Instance::MODE_GROUP,
+            'group_name' => 'ikeabanden',
+        ])
+        ->assertRedirect();
+
+    expect(Instance::name())->toBe('ikeabanden');
 });
 
 it('shares the admin flag with the frontend for admins', function () {

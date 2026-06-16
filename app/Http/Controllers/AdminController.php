@@ -9,6 +9,7 @@ use App\Models\Account;
 use App\Models\Announcement;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Services\Hiscores\GroupIronmanValidator;
 use App\Services\Instance\ResetInstanceData;
 use App\Services\ResourcePacks\DeleteResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
@@ -74,7 +75,7 @@ class AdminController extends Controller
      * first-time setup wipes all account data (SPEC §5/§12) and so requires a
      * typed confirmation. Switching to casual keeps existing accounts.
      */
-    public function updateSettings(Request $request, ResetInstanceData $reset): RedirectResponse
+    public function updateSettings(Request $request, ResetInstanceData $reset, GroupIronmanValidator $gimValidator): RedirectResponse
     {
         $validated = $request->validate([
             'instance_mode' => ['required', Rule::in(Instance::MODES)],
@@ -86,6 +87,19 @@ class AdminController extends Controller
             'public_anonymize_accounts' => ['boolean'],
             'confirm' => ['nullable', 'string'],
         ]);
+
+        // SPEC §2.2 — validate the GIM group name against the official OSRS group
+        // page when it's set/changed. A transient lookup failure returns null and
+        // is allowed through ("validated where possible"); only a definitive
+        // "not found" blocks the save, before any destructive reset runs.
+        $groupName = trim((string) ($validated['group_name'] ?? ''));
+        if ($validated['instance_mode'] === Instance::MODE_GROUP && $groupName !== ''
+            && $groupName !== trim((string) SettingHelper::getSetting('group_name', ''))
+            && $gimValidator->exists($groupName) === false) {
+            throw ValidationException::withMessages([
+                'group_name' => "No Group Ironman group named \"{$groupName}\" was found on the OSRS hiscores.",
+            ]);
+        }
 
         // Switching INTO a roster mode (clan/group) needs a fresh, roster-driven
         // account set — including casual -> clan/group. Switching to casual (or
