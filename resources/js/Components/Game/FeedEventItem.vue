@@ -32,6 +32,12 @@ const sentence = (event) => {
                 : `completed the combat task: ${payload.task}`;
         case 'collection_log':
             return `added ${payload.item} to their collection log`;
+        case 'pet':
+            return 'received a pet';
+        case 'death':
+            return 'died';
+        case 'reward':
+            return payload.source ? `opened ${payload.source} rewards` : 'received rewards';
         default:
             return type;
     }
@@ -64,6 +70,11 @@ const sentence = (event) => {
                        :items="event.payload.items"
                        :total-value="event.payload.total_value"
                        class="mt-1.5" />
+            <a v-if="event.screenshot_url" :href="event.screenshot_url" target="_blank" rel="noopener"
+               class="mt-2 block w-fit overflow-hidden rounded border pack-accent-border">
+                <img :src="event.screenshot_url" alt="Event screenshot" loading="lazy"
+                     class="max-h-48 w-auto object-cover transition hover:opacity-90">
+            </a>
         </div>
     </div>
 </template>

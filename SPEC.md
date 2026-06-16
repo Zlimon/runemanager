@@ -272,12 +272,21 @@ A real-time stream of notable in-game events from all members of the instance.
 - **Quest completion**.
 - **Combat achievement unlock** — task name (+ tier when available).
 - **Collection log slot** — the item added (the plugin parses the in-game "new item" notice; the full log is still pulled from TempleOSRS).
+- **Pet** — a pet drop.
+- **Death** — the player died.
+- **Reward** — a reward screen opened (clue / CoX / ToB / ToA / Barrows).
+
+> The pet/death/reward/collection-log/combat-achievement events are detected
+> client-side by the plugin (mirroring the official Screenshot plugin's
+> triggers), so the set of feed events and the set of screenshot-able moments
+> line up.
 
 ### 8.2 Behaviour
 
 - Events are generated server-side when pushed data is processed and a qualifying change is detected.
 - Reverse-chronological; entries link to the relevant player/section.
 - Admin-configurable thresholds: level-up milestones and minimum loot value.
+- Optional **screenshots**: with an opt-in plugin toggle, a full-frame screenshot is captured for loot drops, combat achievements, and collection-log slots and attached to the matching feed event. (RuneLite has no API to exclude other plugins' in-world overlays, so the shot is the full client frame.)
 - Publicly visible.
 
 ### 8.3 Real-time Updates

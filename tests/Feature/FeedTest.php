@@ -290,3 +290,27 @@ it('rejects a collection-log unlock without an item', function () {
         'X-Account-Username' => 'Collector',
     ])->assertStatus(422)->assertJsonValidationErrors('item');
 });
+
+it('records pet, death and reward events from the generic feed endpoint', function () {
+    $account = makeAccountForFeed('Notable');
+    Sanctum::actingAs($account->user);
+    $headers = ['Accept' => 'application/json', 'X-Account-Hash' => 'n-hash', 'X-Account-Username' => 'Notable'];
+
+    $this->postJson('/api/plugin/feed', ['type' => 'pet'], $headers)->assertSuccessful();
+    $this->postJson('/api/plugin/feed', ['type' => 'death'], $headers)->assertSuccessful();
+    $this->postJson('/api/plugin/feed', ['type' => 'reward', 'source' => 'Barrows'], $headers)->assertSuccessful();
+
+    expect(FeedEvent::ofType('pet')->count())->toBe(1)
+        ->and(FeedEvent::ofType('death')->count())->toBe(1);
+    $reward = FeedEvent::ofType('reward')->firstOrFail();
+    expect($reward->payload['source'])->toBe('Barrows');
+});
+
+it('rejects a generic feed event with an unsupported type', function () {
+    $account = makeAccountForFeed('Notable');
+    Sanctum::actingAs($account->user);
+
+    $this->postJson('/api/plugin/feed', ['type' => 'loot_drop'], [
+        'Accept' => 'application/json', 'X-Account-Hash' => 'n-hash', 'X-Account-Username' => 'Notable',
+    ])->assertStatus(422)->assertJsonValidationErrors('type');
+});

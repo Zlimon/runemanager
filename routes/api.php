@@ -9,12 +9,14 @@ use App\Http\Controllers\Api\CollectionLogController;
 use App\Http\Controllers\Api\CombatAchievementController;
 use App\Http\Controllers\Api\DiaryController;
 use App\Http\Controllers\Api\EquipmentController;
+use App\Http\Controllers\Api\FeedScreenshotController;
 use App\Http\Controllers\Api\GroupBankController;
 use App\Http\Controllers\Api\HeartbeatController;
 use App\Http\Controllers\Api\HiscoreController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\LootController;
 use App\Http\Controllers\Api\LootingBagController;
+use App\Http\Controllers\Api\PluginFeedController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\QuestController;
 use App\Http\Controllers\Api\StatusController;
@@ -54,6 +56,11 @@ Route::middleware([
         // pulled from TempleOSRS, not pushed).
         Route::post('/collection-log/unlock', [CollectionLogController::class, 'unlock'])
             ->name('api.plugin.collection-log.unlock');
+        // SPEC §8.1 — simple plugin-detected notable events (pet/death/reward).
+        Route::post('/feed', [PluginFeedController::class, 'store'])->name('api.plugin.feed');
+        // SPEC §8 — a clean screenshot attached to the matching feed event.
+        Route::post('/feed/screenshot', [FeedScreenshotController::class, 'store'])
+            ->name('api.plugin.feed.screenshot');
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
         // Loot is append-only — POST, not the snapshot PUT used by the others.
         Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');

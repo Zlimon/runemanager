@@ -82,4 +82,22 @@ class FeedEventFactory extends Factory
             'payload' => ['item' => $this->faker->randomElement(['Twisted bow', 'Tumeken\'s shadow', 'Pet snakeling', 'Dragon warhammer'])],
         ]);
     }
+
+    public function pet(): static
+    {
+        return $this->state(fn () => ['type' => FeedEvent::TYPE_PET, 'payload' => []]);
+    }
+
+    public function death(): static
+    {
+        return $this->state(fn () => ['type' => FeedEvent::TYPE_DEATH, 'payload' => []]);
+    }
+
+    public function reward(): static
+    {
+        return $this->state(fn () => [
+            'type' => FeedEvent::TYPE_REWARD,
+            'payload' => ['source' => $this->faker->randomElement(['Barrows', 'Chambers of Xeric', 'Clue scroll'])],
+        ]);
+    }
 }

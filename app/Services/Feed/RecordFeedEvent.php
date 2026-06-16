@@ -143,6 +143,23 @@ class RecordFeedEvent
     }
 
     /**
+     * Record a simple plugin-detected event (pet / death / reward) — the plugin
+     * spots these in-game (mirroring the official Screenshot plugin) and pushes
+     * the type + a small payload.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    public function record(Account $account, string $type, array $payload = []): FeedEvent
+    {
+        return $this->emit([
+            'account_id' => $account->id,
+            'type' => $type,
+            'payload' => $payload,
+            'occurred_at' => now(),
+        ]);
+    }
+
+    /**
      * Record a COMBAT_ACHIEVEMENT unlock (SPEC §8.1). Unlike level-ups/quests
      * these aren't derived from a snapshot diff — the plugin parses the in-game
      * completion message and pushes the task name + tier directly.

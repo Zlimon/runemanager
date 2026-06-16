@@ -37,10 +37,17 @@ class FeedEvent extends Model
 
     public const TYPE_COLLECTION_LOG = 'collection_log';
 
+    public const TYPE_PET = 'pet';
+
+    public const TYPE_DEATH = 'death';
+
+    public const TYPE_REWARD = 'reward';
+
     protected $fillable = [
         'account_id',
         'type',
         'payload',
+        'screenshot_path',
         'occurred_at',
     ];
 

@@ -7,6 +7,7 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Plain wire shape for SPEC §8 feed events. Account is included slim — the
@@ -54,6 +55,9 @@ class FeedEventResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type,
             'payload' => $this->resolvePayload(),
+            'screenshot_url' => $this->screenshot_path
+                ? Storage::disk('public')->url($this->screenshot_path)
+                : null,
             'occurred_at' => $this->occurred_at?->toIso8601String(),
             'account' => [
                 'username' => $this->account?->username,
