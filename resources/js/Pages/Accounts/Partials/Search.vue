@@ -70,7 +70,7 @@ watch(query, (value) => {
 
                             <div class="flex items-center space-x-1">
                                 <img class="h-6 w-6 object-contain"
-                                     src="/images/skill/total.webp">
+                                     src="/images/skill/overall.png">
                                 <p class="text-md font-normal text-base-content/60">
                                     {{ account.level }}
                                 </p>
