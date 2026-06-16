@@ -267,7 +267,7 @@ A real-time stream of notable in-game events from all members of the instance.
 
 ### 8.1 Event Types (implemented)
 
-- **Level-up / skill milestone** — at configurable thresholds.
+- **Level-up** — every level is stored; the feed UI shows only the admin's milestone levels (the thresholds are a display filter, not a storage filter).
 - **Loot drop** — for drops clearing a configurable minimum value.
 - **Quest completion**.
 - **Combat achievement unlock** — task name (+ tier when available).
@@ -276,10 +276,10 @@ A real-time stream of notable in-game events from all members of the instance.
 - **Death** — the player died.
 - **Reward** — a reward screen opened (clue / CoX / ToB / ToA / Barrows).
 
-> The pet/death/reward/collection-log/combat-achievement events are detected
-> client-side by the plugin (mirroring the official Screenshot plugin's
-> triggers), so the set of feed events and the set of screenshot-able moments
-> line up.
+> All of these are detected client-side by the plugin (mirroring the official
+> Screenshot plugin's triggers), so the set of feed events and the set of
+> screenshot-able moments line up. Level-ups are pushed for every level; the
+> hiscores sweep no longer derives them (it just keeps stats fresh).
 
 ### 8.2 Behaviour
 

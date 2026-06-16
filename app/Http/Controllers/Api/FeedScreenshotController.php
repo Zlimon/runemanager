@@ -29,6 +29,7 @@ class FeedScreenshotController extends Controller
         FeedEvent::TYPE_PET,
         FeedEvent::TYPE_DEATH,
         FeedEvent::TYPE_REWARD,
+        FeedEvent::TYPE_LEVEL_UP,
     ];
 
     public function store(Request $request): JsonResponse

@@ -73,6 +73,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'dark_mode' => $darkMode,
             'can_toggle_dark_mode' => true,
+            // Level-up feed events are stored for every level; the UI shows only
+            // these milestone levels (SPEC §8.2).
+            'feed_level_milestones' => Instance::feedLevelUpThresholds(),
             'pack' => $pack ? [
                 'name' => $pack->name,
                 'version' => $pack->updated_at?->timestamp,

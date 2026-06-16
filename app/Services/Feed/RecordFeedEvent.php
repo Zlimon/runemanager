@@ -19,63 +19,6 @@ use Illuminate\Support\Carbon;
 class RecordFeedEvent
 {
     /**
-     * Compare two skill snapshots and record a LEVEL_UP for each notable
-     * threshold crossed. Returns the number of events created.
-     *
-     * @param  array<string, array<string, int>>  $previous  entries['skills'] before sync
-     * @param  array<string, array<string, int>>  $current  entries['skills'] after sync
-     */
-    public function recordLevelUps(Account $account, array $previous, array $current): int
-    {
-        /** @var int[] $thresholds */
-        $thresholds = Instance::feedLevelUpThresholds();
-        sort($thresholds);
-
-        $emitted = 0;
-        $now = now();
-
-        foreach ($current as $slug => $entry) {
-            if ($slug === 'overall') {
-                continue;
-            }
-
-            $newLevel = (int) ($entry['level'] ?? 1);
-            $oldLevel = (int) ($previous[$slug]['level'] ?? 1);
-
-            if ($newLevel <= $oldLevel) {
-                continue;
-            }
-
-            $crossed = array_values(array_filter(
-                $thresholds,
-                fn (int $t) => $t > $oldLevel && $t <= $newLevel,
-            ));
-
-            if ($crossed === []) {
-                continue;
-            }
-
-            // Use the highest threshold crossed in one tick — going 88 → 99
-            // shouldn't emit four events.
-            $milestone = end($crossed);
-
-            $this->emit([
-                'account_id' => $account->id,
-                'type' => FeedEvent::TYPE_LEVEL_UP,
-                'payload' => [
-                    'skill' => $slug,
-                    'level' => $newLevel,
-                    'milestone' => $milestone,
-                ],
-                'occurred_at' => $now,
-            ]);
-            $emitted++;
-        }
-
-        return $emitted;
-    }
-
-    /**
      * Record a LOOT_DROP event when an inbound loot entry clears the configured
      * value floor. Returns true if an event was recorded.
      *

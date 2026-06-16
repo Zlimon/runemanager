@@ -24,6 +24,7 @@ class PluginFeedController extends Controller
         FeedEvent::TYPE_PET,
         FeedEvent::TYPE_DEATH,
         FeedEvent::TYPE_REWARD,
+        FeedEvent::TYPE_LEVEL_UP,
     ];
 
     public function store(Request $request, RecordFeedEvent $feed): JsonResponse
@@ -34,11 +35,19 @@ class PluginFeedController extends Controller
         $validated = $request->validate([
             'type' => ['required', 'string', Rule::in(self::TYPES)],
             'source' => ['nullable', 'string', 'max:255'],
+            // Level-ups carry the skill + level (every level is stored; the feed
+            // UI filters to milestones).
+            'skill' => ['required_if:type,level_up', 'string', 'max:40'],
+            'level' => ['required_if:type,level_up', 'integer', 'min:1', 'max:126'],
         ]);
 
-        $payload = isset($validated['source']) && $validated['source'] !== ''
-            ? ['source' => $validated['source']]
-            : [];
+        $payload = match ($validated['type']) {
+            FeedEvent::TYPE_LEVEL_UP => ['skill' => $validated['skill'], 'level' => (int) $validated['level']],
+            FeedEvent::TYPE_REWARD => isset($validated['source']) && $validated['source'] !== ''
+                ? ['source' => $validated['source']]
+                : [],
+            default => [],
+        };
 
         $feed->record($account, $validated['type'], $payload);
 

@@ -86,7 +86,7 @@ it('rejects a non-image upload and an unknown type', function () {
     $this->postJson(route('api.plugin.feed.screenshot', ['type' => 'loot_drop']), [], screenshotHeaders())
         ->assertStatus(422)->assertJsonValidationErrors('image');
 
-    $this->post(route('api.plugin.feed.screenshot', ['type' => 'level_up']), [
+    $this->post(route('api.plugin.feed.screenshot', ['type' => 'quest_complete']), [
         'image' => UploadedFile::fake()->image('shot.png'),
     ], screenshotHeaders())->assertStatus(422)->assertJsonValidationErrors('type');
 });

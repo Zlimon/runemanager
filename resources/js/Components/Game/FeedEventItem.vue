@@ -21,7 +21,7 @@ const sentence = (event) => {
     const { type, payload } = event;
     switch (type) {
         case 'level_up':
-            return `reached ${payload.milestone} ${formatSkill(payload.skill)} (now level ${payload.level})`;
+            return `reached level ${payload.level} ${formatSkill(payload.skill)}`;
         case 'loot_drop':
             return `received a drop from ${payload.source}`;
         case 'quest_complete':

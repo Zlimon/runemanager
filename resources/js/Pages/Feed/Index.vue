@@ -1,7 +1,9 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import FeedEventItem from "@/Components/Game/FeedEventItem.vue";
+import { visibleFeedEvents } from "@/feed";
 
 const props = defineProps({
     events: {
@@ -15,6 +17,10 @@ const props = defineProps({
 const events = ref([...props.events]);
 const MAX_EVENTS = 100;
 
+// Every level-up is stored; the feed only shows the configured milestone levels.
+const milestones = computed(() => usePage().props.feed_level_milestones ?? []);
+const visibleEvents = computed(() => visibleFeedEvents(events.value, milestones.value));
+
 onMounted(() => {
     window.Echo.channel("feed").listen(".FeedEventCreated", (event) => {
         if (events.value.some((e) => e.id === event.id)) {
@@ -26,7 +32,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => window.Echo.leave("feed"));
 
-const hasEvents = computed(() => events.value.length > 0);
+const hasEvents = computed(() => visibleEvents.value.length > 0);
 </script>
 
 <template>
@@ -42,7 +48,7 @@ const hasEvents = computed(() => events.value.length > 0);
                 </div>
 
                 <ul v-if="hasEvents" class="mt-4 space-y-2">
-                    <li v-for="event in events" :key="event.id">
+                    <li v-for="event in visibleEvents" :key="event.id">
                         <FeedEventItem :event="event" />
                     </li>
                 </ul>

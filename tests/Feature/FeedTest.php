@@ -2,18 +2,11 @@
 
 use App\Events\FeedEventCreated;
 use App\Models\Account;
-use App\Models\AccountHiscore;
 use App\Models\FeedEvent;
 use App\Models\Item;
 use App\Models\Quest;
 use App\Models\User;
 use App\Services\Feed\RecordFeedEvent;
-use App\Services\Hiscores\HiscoresSync;
-use App\Services\Hiscores\OsrsHiscoresClient;
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia;
@@ -45,54 +38,30 @@ function makeAccountForFeed(string $username = 'Zlimon'): Account
     ]);
 }
 
-it('records a LEVEL_UP only when a configured threshold is crossed', function () {
-    config()->set('runemanager.feed.level_up_thresholds', [50, 99]);
+it('records a level-up pushed by the plugin (every level; UI filters milestones)', function () {
+    $account = makeAccountForFeed('Leveller');
+    Sanctum::actingAs($account->user);
 
-    $account = makeAccountForFeed();
-    $recorder = new RecordFeedEvent;
+    $this->postJson('/api/plugin/feed', ['type' => 'level_up', 'skill' => 'attack', 'level' => 73], [
+        'Accept' => 'application/json',
+        'X-Account-Hash' => 'lvl-hash',
+        'X-Account-Username' => 'Leveller',
+    ])->assertSuccessful();
 
-    // 48 → 49: no threshold crossed, no event.
-    expect($recorder->recordLevelUps(
-        $account,
-        previous: ['attack' => ['level' => 48]],
-        current: ['attack' => ['level' => 49]],
-    ))->toBe(0);
-
-    // 48 → 50: crosses 50, one event.
-    expect($recorder->recordLevelUps(
-        $account,
-        previous: ['attack' => ['level' => 48]],
-        current: ['attack' => ['level' => 50]],
-    ))->toBe(1);
-
-    // 50 → 99: crosses both 50 and 99, but we collapse to the highest milestone.
-    expect($recorder->recordLevelUps(
-        $account,
-        previous: ['defence' => ['level' => 50]],
-        current: ['defence' => ['level' => 99]],
-    ))->toBe(1);
-
-    $events = FeedEvent::ofType(FeedEvent::TYPE_LEVEL_UP)->orderBy('id')->get();
-    expect($events)->toHaveCount(2);
-    expect($events[0]->payload['skill'])->toBe('attack');
-    expect($events[0]->payload['milestone'])->toBe(50);
-    expect($events[1]->payload['skill'])->toBe('defence');
-    expect($events[1]->payload['milestone'])->toBe(99);
+    $event = FeedEvent::ofType(FeedEvent::TYPE_LEVEL_UP)->firstOrFail();
+    expect($event->payload['skill'])->toBe('attack')
+        ->and($event->payload['level'])->toBe(73);
 });
 
-it('skips the "overall" pseudo-skill', function () {
-    config()->set('runemanager.feed.level_up_thresholds', [50]);
+it('requires skill and level for a level-up push', function () {
+    $account = makeAccountForFeed('Leveller');
+    Sanctum::actingAs($account->user);
 
-    $account = makeAccountForFeed();
-    $recorder = new RecordFeedEvent;
-
-    expect($recorder->recordLevelUps(
-        $account,
-        previous: ['overall' => ['level' => 40]],
-        current: ['overall' => ['level' => 60]],
-    ))->toBe(0);
-
-    expect(FeedEvent::count())->toBe(0);
+    $this->postJson('/api/plugin/feed', ['type' => 'level_up'], [
+        'Accept' => 'application/json',
+        'X-Account-Hash' => 'lvl-hash',
+        'X-Account-Username' => 'Leveller',
+    ])->assertStatus(422)->assertJsonValidationErrors(['skill', 'level']);
 });
 
 it('broadcasts FeedEventCreated on the public feed channel when an event is recorded', function () {
@@ -141,34 +110,6 @@ it('records a QUEST_COMPLETE on the first push that flips a quest to finished', 
     ))->toBe(0);
 
     expect(FeedEvent::ofType(FeedEvent::TYPE_QUEST_COMPLETE)->count())->toBe(1);
-});
-
-it('HiscoresSync emits LEVEL_UP events through the recorder on a crossing sync', function () {
-    config()->set('runemanager.feed.level_up_thresholds', [70]);
-
-    $account = makeAccountForFeed();
-    AccountHiscore::create([
-        'account_id' => $account->id,
-        'entries' => ['skills' => ['attack' => ['rank' => 1, 'level' => 69, 'xp' => 0]], 'activities' => []],
-        'fetched_at' => now()->subHour(),
-    ]);
-
-    $mockedClient = new HttpClient([
-        'handler' => HandlerStack::create(new MockHandler([
-            new Response(200, ['Content-Type' => 'application/json'], json_encode([
-                'skills' => [
-                    ['id' => 0, 'name' => 'Overall', 'rank' => 1, 'level' => 100, 'xp' => 100],
-                    ['id' => 1, 'name' => 'Attack', 'rank' => 1, 'level' => 70, 'xp' => 1000],
-                ],
-                'activities' => [],
-            ])),
-        ])),
-    ]);
-
-    $sync = new HiscoresSync(new OsrsHiscoresClient($mockedClient), new RecordFeedEvent);
-    $sync->syncForAccount($account);
-
-    expect(FeedEvent::ofType(FeedEvent::TYPE_LEVEL_UP)->count())->toBe(1);
 });
 
 it('GET /feed renders the Inertia page and includes events in reverse-chronological order', function () {

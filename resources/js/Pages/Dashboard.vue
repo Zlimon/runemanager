@@ -5,8 +5,9 @@ import dayjs from 'dayjs';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Card from '@/Components/Card.vue';
 import FeedEventItem from '@/Components/Game/FeedEventItem.vue';
+import { visibleFeedEvents } from '@/feed';
 
-defineProps({
+const props = defineProps({
     stats: { type: Object, default: () => ({ accounts: 0, members: 0, online: 0 }) },
     announcements: { type: Array, default: () => [] },
     upcoming: { type: Array, default: () => [] },
@@ -24,6 +25,9 @@ const bannerStyle = computed(() => page.props.instance?.banner_url
 
 const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
 const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
+
+// Show only milestone level-ups in the feed (every level is stored).
+const visibleFeed = computed(() => visibleFeedEvents(props.feed, page.props.feed_level_milestones ?? []));
 </script>
 
 <template>
@@ -95,8 +99,8 @@ const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
                             </Link>
                         </div>
 
-                        <ul v-if="feed.length" class="mt-4 space-y-2">
-                            <li v-for="event in feed" :key="event.id">
+                        <ul v-if="visibleFeed.length" class="mt-4 space-y-2">
+                            <li v-for="event in visibleFeed" :key="event.id">
                                 <FeedEventItem :event="event" />
                             </li>
                         </ul>

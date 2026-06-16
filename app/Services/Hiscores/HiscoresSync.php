@@ -31,19 +31,13 @@ class HiscoresSync
 
         $entries = $this->normalise($payload);
 
-        // Capture the pre-sync skill snapshot so the feed recorder can diff
-        // for level-up milestones. First sync -> empty array, so the recorder
-        // sees "no previous levels" and stays quiet (a level can't cross a
-        // threshold without a strictly-greater-than comparison against prior).
-        $existing = AccountHiscore::where('account_id', $account->id)->first();
-        $previousSkills = $existing?->entries['skills'] ?? [];
-
+        // Level-up feed events are pushed by the plugin in real time (every
+        // level; the UI filters to milestones), so the sweep no longer derives
+        // them — it just keeps stats fresh.
         $hiscore = AccountHiscore::updateOrCreate(
             ['account_id' => $account->id],
             ['entries' => $entries, 'fetched_at' => now()],
         );
-
-        $this->feed->recordLevelUps($account, $previousSkills, $entries['skills']);
 
         // Denormalise the "overall" entry onto the parent Account so the Summary
         // and Index cards have something to show without joining account_hiscores.
