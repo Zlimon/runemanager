@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             AccountSeeder::class,
             RolesSeeder::class,
+            DemoContentSeeder::class,
         ]);
 
         if (NewsPost::count() === 0) {
