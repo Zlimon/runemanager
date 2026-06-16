@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\AccountTypesEnum;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\BankResource;
+use App\Http\Resources\FeedEventResource;
 use App\Http\Resources\InventoryResource;
 use App\Http\Resources\LootingBagResource;
 use App\Http\Resources\LootResource;
 use App\Models\Account;
+use App\Models\FeedEvent;
 use App\Models\Item;
 use App\Rules\AccountUsernameRule;
 use App\Services\CollectionLog\CollectionLogStructure;
@@ -104,6 +106,12 @@ class AccountController extends Controller
             // SPEC §5.2 Loot — append-only history. Latest 25 drops with hydrated
             // item details for the recent-loot panel.
             'recentLoot' => fn () => LootResource::collectionWith($account->recentLoot(25))->resolve(),
+
+            // SPEC §8 — this account's slice of the live feed.
+            'feed' => fn () => FeedEventResource::collectionWith(
+                FeedEvent::query()->with('account:id,username,account_type')
+                    ->where('account_id', $account->id)->recent(20)->get(),
+            )->resolve(),
 
             // External API — defer so the page paints first, then the client
             // pulls this in via a follow-up partial reload.

@@ -165,6 +165,23 @@ it('names loot-drop items on the feed', function () {
         );
 });
 
+it('exposes only this account\'s events on the account show page', function () {
+    $account = makeAccountForFeed('Mine');
+    $other = makeAccountForFeed('Theirs');
+
+    FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now()]);
+    FeedEvent::create(['account_id' => $other->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now()]);
+
+    $this->actingAs($account->user)
+        ->get(route('accounts.show', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('feed', 1)
+            ->where('feed.0.type', 'pet')
+            ->where('feed.0.account.username', 'Mine'),
+        );
+});
+
 it('/feed is publicly accessible (no auth required)', function () {
     // No actingAs / Sanctum here on purpose — SPEC §8.2: "publicly visible".
     $this->get(route('feed.index'))->assertOk();

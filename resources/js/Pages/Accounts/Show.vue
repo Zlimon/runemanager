@@ -9,6 +9,7 @@ import Diaries from "@/Components/Game/Diaries.vue";
 import CombatAchievements from "@/Components/Game/CombatAchievements.vue";
 import Inventory from "@/Components/Game/Inventory.vue";
 import LootingBag from "@/Components/Game/LootingBag.vue";
+import AccountFeed from "@/Components/Game/AccountFeed.vue";
 import Freshness from "@/Components/Freshness.vue";
 import Loader from "@/Components/Loader.vue";
 import Search from "@/Pages/Accounts/Partials/Search.vue";
@@ -61,6 +62,10 @@ const props = defineProps({
         default: null,
     },
     recentLoot: {
+        type: Array,
+        default: () => [],
+    },
+    feed: {
         type: Array,
         default: () => [],
     },
@@ -233,6 +238,11 @@ onBeforeUnmount(() => {
                                     <LootingBag :looting-bag="lootingBag" />
                                 </template>
                             </TabbedCard>
+
+                            <!-- This account's live feed -->
+                            <div class="mt-4">
+                                <AccountFeed :account="account" :events="feed" />
+                            </div>
                         </div>
 
                         <div class="col-span-2">
