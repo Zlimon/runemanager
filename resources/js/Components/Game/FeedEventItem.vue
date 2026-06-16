@@ -30,6 +30,8 @@ const sentence = (event) => {
             return payload.tier
                 ? `completed the ${formatSkill(payload.tier)} combat task: ${payload.task}`
                 : `completed the combat task: ${payload.task}`;
+        case 'collection_log':
+            return `added ${payload.item} to their collection log`;
         default:
             return type;
     }

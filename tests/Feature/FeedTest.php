@@ -264,3 +264,29 @@ it('LootController emits a feed event on a qualifying push', function () {
 
     expect(FeedEvent::ofType(FeedEvent::TYPE_LOOT_DROP)->count())->toBe(1);
 });
+
+it('records a COLLECTION_LOG event on a slot-unlock push', function () {
+    $account = makeAccountForFeed('Collector');
+    Sanctum::actingAs($account->user);
+
+    $this->postJson('/api/plugin/collection-log/unlock', ['item' => 'Twisted bow'], [
+        'Accept' => 'application/json',
+        'X-Account-Hash' => 'cl-hash',
+        'X-Account-Username' => 'Collector',
+    ])->assertSuccessful();
+
+    $event = FeedEvent::ofType(FeedEvent::TYPE_COLLECTION_LOG)->firstOrFail();
+    expect($event->payload['item'])->toBe('Twisted bow')
+        ->and($event->account_id)->toBe($account->id);
+});
+
+it('rejects a collection-log unlock without an item', function () {
+    $account = makeAccountForFeed('Collector');
+    Sanctum::actingAs($account->user);
+
+    $this->postJson('/api/plugin/collection-log/unlock', [], [
+        'Accept' => 'application/json',
+        'X-Account-Hash' => 'cl-hash',
+        'X-Account-Username' => 'Collector',
+    ])->assertStatus(422)->assertJsonValidationErrors('item');
+});

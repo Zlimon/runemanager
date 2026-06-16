@@ -271,8 +271,7 @@ A real-time stream of notable in-game events from all members of the instance.
 - **Loot drop** — for drops clearing a configurable minimum value.
 - **Quest completion**.
 - **Combat achievement unlock** — task name (+ tier when available).
-
-> **(not yet implemented)**: collection-log-slot feed events.
+- **Collection log slot** — the item added (the plugin parses the in-game "new item" notice; the full log is still pulled from TempleOSRS).
 
 ### 8.2 Behaviour
 

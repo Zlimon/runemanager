@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\ClanController;
+use App\Http\Controllers\Api\CollectionLogController;
 use App\Http\Controllers\Api\CombatAchievementController;
 use App\Http\Controllers\Api\DiaryController;
 use App\Http\Controllers\Api\EquipmentController;
@@ -49,6 +50,10 @@ Route::middleware([
             ->name('api.plugin.combat-achievements');
         Route::post('/combat-achievements/unlock', [CombatAchievementController::class, 'unlock'])
             ->name('api.plugin.combat-achievements.unlock');
+        // SPEC §8.1 — collection-log slot unlock → live feed (the full log is
+        // pulled from TempleOSRS, not pushed).
+        Route::post('/collection-log/unlock', [CollectionLogController::class, 'unlock'])
+            ->name('api.plugin.collection-log.unlock');
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
         // Loot is append-only — POST, not the snapshot PUT used by the others.
         Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');

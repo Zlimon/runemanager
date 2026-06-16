@@ -74,4 +74,12 @@ class FeedEventFactory extends Factory
             ],
         ]);
     }
+
+    public function collectionLog(): static
+    {
+        return $this->state(fn () => [
+            'type' => FeedEvent::TYPE_COLLECTION_LOG,
+            'payload' => ['item' => $this->faker->randomElement(['Twisted bow', 'Tumeken\'s shadow', 'Pet snakeling', 'Dragon warhammer'])],
+        ]);
+    }
 }

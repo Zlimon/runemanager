@@ -93,7 +93,7 @@ class RecordFeedEvent
             return false;
         }
 
-        FeedEvent::create([
+        $this->emit([
             'account_id' => $account->id,
             'type' => FeedEvent::TYPE_LOOT_DROP,
             'payload' => [
@@ -153,6 +153,20 @@ class RecordFeedEvent
             'account_id' => $account->id,
             'type' => FeedEvent::TYPE_COMBAT_ACHIEVEMENT,
             'payload' => ['task' => $task, 'tier' => $tier],
+            'occurred_at' => now(),
+        ]);
+    }
+
+    /**
+     * Record a COLLECTION_LOG slot unlock (SPEC §8.1). Like combat achievements,
+     * the plugin parses the in-game "new item" notice and pushes the item name.
+     */
+    public function recordCollectionLogSlot(Account $account, string $item): FeedEvent
+    {
+        return $this->emit([
+            'account_id' => $account->id,
+            'type' => FeedEvent::TYPE_COLLECTION_LOG,
+            'payload' => ['item' => $item],
             'occurred_at' => now(),
         ]);
     }
