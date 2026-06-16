@@ -1,7 +1,12 @@
 # RuneManager — Product Specification
 
-> Version 1.1 — Draft  
-> Last updated: 2026-06-01
+> Version 2.0  
+> Last updated: 2026-06-16
+
+This document describes the RuneManager product **as implemented**. Where the
+build deliberately diverges from an earlier design intent, an
+`> Implementation note` calls it out. Items not yet built are marked
+**(not yet implemented)**.
 
 ---
 
@@ -17,7 +22,7 @@
 8. [Live Feed](#8-live-feed)
 9. [Announcements](#9-announcements)
 10. [Calendar](#10-calendar)
-11. [Webhook System](#11-webhook-system)
+11. [Outbound Webhooks](#11-outbound-webhooks)
 12. [Administrative Backend](#12-administrative-backend)
 13. [Technology Stack](#13-technology-stack)
 14. [Business Model](#14-business-model)
@@ -28,7 +33,9 @@
 
 RuneManager is a SaaS CMS that bridges Old School RuneScape (OSRS) with a managed website. It allows players — whether in a large clan, a Group Ironman team, or playing solo/casually — to display, share, and compete on in-game data through a public-facing website backed by live game data.
 
-Data flows between the game and the website via the **RuneManager RuneLite plugin**. The plugin is the sole initiator of all communication: it pushes in-game data to the website backend, and it polls the backend to pull down notifications such as announcements and alerts. The website never initiates a connection to the game client. The plugin also handles authentication, theming synchronisation, and in-game display of website content.
+Data flows between the game and the website via the **RuneManager RuneLite plugin**. The plugin is the sole initiator of all communication: it pushes in-game data to the website backend, and it polls the backend to pull down notifications such as announcements. The website never initiates a connection to the game client. The plugin also handles authentication, theme synchronisation, and in-game display of website content.
+
+Beyond stat tracking, the site surfaces a **public landing page** (recruitment-facing digest), a **live feed**, **leaderboards**, a **live map**, per-account profiles (inventory, bank, equipment, quests, diaries, collection log, combat achievements, loot, a 3D avatar, and live status orbs), **announcements**, and a **calendar**.
 
 Each customer receives a managed instance of RuneManager. Instance management and billing are handled by a separate administrative system (out of scope for this spec).
 
@@ -36,33 +43,31 @@ Each customer receives a managed instance of RuneManager. Instance management an
 
 ## 2. Modes
 
-Every RuneManager instance operates in exactly one mode, chosen at setup. The mode determines which features are available and what identity the instance is built around.
+Every RuneManager instance operates in exactly one mode, chosen at setup. The mode determines which features are available and what identity the instance is built around. Switching mode after setup wipes all account data and requires a typed confirmation.
 
 ### 2.1 CLAN
 
 Intended for clan leaders who want a website representing their OSRS clan.
 
-- Requires a valid **clan name** at setup.
-- Supports the full feature set: leaderboards, live feed, announcements, calendar, webhooks, data sync for all members.
-- Members join by registering on the website and linking their OSRS account.
-- Clan leaders are assigned an admin role with elevated permissions.
+- Requires a **clan name** (auto-filled from the owner's clan once the plugin syncs the roster).
+- Supports the full feature set: leaderboards, live feed, announcements, calendar, data sync for all members.
+- The roster is seeded by the owner's plugin push; members **claim** a pre-created roster account when they register.
+- Clan rank and title are pushed by the plugin and displayed on accounts.
 
 ### 2.2 GROUP
 
 Intended for Group Ironman (GIM) groups who want to share in-game data.
 
-- Requires a valid **Group Ironman group name** at setup.
-- Group name should be validated against the official OSRS hiscores GIM endpoint where possible.
-- Supports group-specific features: shared group bank view, combined group hiscores, and GIM-specific leaderboard categories.
-- All GROUP features are a subset of CLAN, minus clan-management-specific functionality.
+- Requires a **Group Ironman group name**, which is **validated against the official OSRS GIM hiscores page** at save time. A definitively unknown group is rejected; a transient lookup failure is allowed through so an outage doesn't block setup.
+- Supports group-specific features: a shared **group bank** view and GIM-flavoured accounts.
+- Members are added to the roster by hand by the admin and claimed on registration.
 
 ### 2.3 CASUAL
 
-Intended for small friend groups or solo players who want the tracking and display features without the overhead of a full clan or GIM setup.
+Intended for small friend groups or solo players who want tracking/display without a clan or GIM setup.
 
 - No clan or group name required.
-- Supports the same core features as CLAN and GROUP, minus the functionality that is specific to those modes (group bank, GIM validation, clan management).
-- Suitable for personal stat tracking, loot logging, sharing a public profile, and organising events with a small group of friends.
+- Open registration; supports the same core features minus the roster-claim flow and group-only features.
 
 ### Feature Matrix
 
@@ -74,14 +79,20 @@ Intended for small friend groups or solo players who want the tracking and displ
 | Loot log                 | ✓    | ✓     | ✓      |
 | Quest list               | ✓    | ✓     | ✓      |
 | Collection log           | ✓    | ✓     | ✓      |
-| Achievements             | ✓    | ✓     | ✓      |
+| Achievement diaries      | ✓    | ✓     | ✓      |
+| Combat achievements      | ✓    | ✓     | ✓      |
 | Leaderboards             | ✓    | ✓     | ✓      |
 | Live feed                | ✓    | ✓     | ✓      |
+| Live map                 | ✓    | ✓     | ✓      |
 | Announcements            | ✓    | ✓     | ✓      |
 | Calendar                 | ✓    | ✓     | ✓      |
-| Webhooks                 | ✓    | ✓     | ✓      |
-| Clan management          | ✓    | –     | –      |
 | GIM group validation     | –    | ✓     | –      |
+| Roster claim on register | ✓    | ✓     | –      |
+
+> Implementation note: the original spec described per-mode automatic role
+> elevation (clan ranks / group membership granting website admin). Today only
+> the **Owner** holds management permissions; rank/membership-based elevation is
+> **(not yet implemented)** — see §3.4.
 
 ---
 
@@ -89,28 +100,30 @@ Intended for small friend groups or solo players who want the tracking and displ
 
 ### 3.1 Registration
 
-- Users register on the RuneManager website with an email address and password.
+- Users register with an email address and password (Laravel Jetstream/Fortify).
 - Email verification is required before the account is active.
-- OAuth providers (e.g. Discord) may be supported as an alternative registration path.
+- In CLAN/GROUP modes, registration is gated on **claiming a pre-created roster account**.
+- OAuth providers (e.g. Discord) — **(not yet implemented)**.
 
 ### 3.2 OSRS Account Linking
 
-- After registration, the user installs the **RuneManager RuneLite plugin** and logs in using their RuneManager credentials from within the plugin.
-- The plugin authenticates with the RuneManager backend and associates the player's in-game OSRS username with their website account.
-- A single website account may link multiple OSRS usernames (e.g. main + ironman).
-- The primary linked account is used for hiscores, leaderboards, and public profile display.
+- After registration, the user installs the **RuneManager RuneLite plugin** and logs in with their RuneManager credentials from the plugin config panel.
+- The plugin authenticates with the backend and associates the player's OSRS account (by a stable account hash + username) with the website account.
+- A single website account may link multiple OSRS usernames.
 
 ### 3.3 Username Changes
 
-- OSRS usernames can change. The system must track username history.
-- When a data submission arrives with a username not matching the stored one, the backend checks whether it corresponds to an existing linked account (via account ID or other stable identifier from the plugin) and updates the stored username accordingly.
-- Full username history is retained per account for audit and display purposes.
+- OSRS usernames can change; the system tracks username history (`username_histories`).
+- Every plugin request carries the current in-game username; when it differs from the stored one (matched by account hash), the backend updates it and records the change.
 
 ### 3.4 Roles
 
-- **Member**: standard registered user with a linked OSRS account.
-- **Admin / Clan Leader**: elevated permissions for managing the instance (announcements, calendar events, webhook configuration, member management in CLAN mode).
-- **Instance Owner**: top-level role, typically the person who set up the instance.
+- **User**: standard registered member (default; no management permissions).
+- **Owner**: top-level role, holds every management permission (`manage instance`, `manage members`, `manage announcements`, `manage calendar`).
+- Role/permission handling uses Spatie Laravel-Permission.
+
+> Implementation note: clan-leader / group-member elevation to admin is
+> **(not yet implemented)**; the Owner is currently the only admin.
 
 ---
 
@@ -120,281 +133,254 @@ The RuneManager RuneLite plugin is the primary bridge between the game client an
 
 ### 4.1 Responsibilities
 
-- Authenticate the player against the RuneManager backend using their website credentials.
-- Push in-game data to the backend on the appropriate triggers (see Section 5).
-- Poll the backend at a regular interval to retrieve pending notifications: announcements, alerts (e.g. notable loot drops from other members), and any other server-side messages.
-- Display retrieved notifications in-game as chat messages or plugin panel entries.
-- Detect the active Resource Pack and report it to the backend for theme synchronisation (see Section 6).
+- Authenticate the player against the backend using their website credentials, exchanging them once for an API token stored locally.
+- Push in-game data to the backend on the appropriate triggers (see §5), gated by per-data **"Data sync" toggles** in the plugin config.
+- Poll the backend for unacknowledged **announcements** and display them in-game, then acknowledge them.
+- Detect the active RuneLite **resource pack** and report it for theme sync (§6).
+- Maintain presence (a periodic heartbeat) and, opt-in, share live **location** for the map.
 
 ### 4.2 Communication Model
 
-The plugin is the **sole initiator** of all network communication. The website backend never opens a connection to the plugin or game client. This means:
+The plugin is the **sole initiator** of all network communication.
 
-- **Outbound (plugin → backend)**: data submissions (push events), authentication requests, resource pack reports.
-- **Inbound (plugin polls backend)**: announcements, alerts, and other queued notifications. The plugin polls at a configurable interval (e.g. every 30 seconds). The backend queues notifications until they are acknowledged by the plugin.
+- **Outbound (plugin → backend)**: data submissions, authentication, resource-pack reports, presence/heartbeat.
+- **Inbound (plugin polls backend)**: announcements (pulled then acknowledged). The backend never opens a connection to the plugin.
 
 ### 4.3 Authentication Flow
 
-1. User enters their RuneManager credentials in the plugin config panel.
-2. Plugin exchanges credentials for a session token with the RuneManager API.
-3. Token is stored locally in the plugin and attached to all subsequent API requests.
-4. Token refresh is handled automatically; the user is only prompted to re-authenticate if the token is invalidated.
+1. User enters RuneManager credentials in the plugin config.
+2. Plugin exchanges them for a session token via the API.
+3. Token is stored locally and attached (with the OSRS account hash + username) to all subsequent requests.
+4. A rejected token (HTTP 401) is cleared so the plugin re-authenticates.
 
 ### 4.4 Data Submission
 
-- All data is submitted over HTTPS to the RuneManager REST API.
-- Each request includes the player's session token and the OSRS username of the currently logged-in character.
-- The backend validates the token and associates the data with the correct website account.
+- All data is submitted over HTTPS to the REST API.
+- Each request includes the session token and the headers `X-Account-Hash`, `X-Account-Username`, `X-Account-Type`; middleware resolves these to the correct account.
 
 ---
 
 ## 5. Data Sync
 
-Data synchronisation is the core of RuneManager. Different data types use different sync strategies depending on how they change in-game.
-
 ### 5.1 Sync Strategies
 
-**Push (plugin-initiated, event-driven)** — The plugin detects a specific in-game event and immediately submits the relevant data to the RuneManager backend. This is the primary sync mechanism for all in-game data.
+**Push (plugin-initiated, event-driven)** — the primary mechanism for in-game data.
 
-**Backend pull from official hiscores (server-initiated, periodic)** — For hiscore data only, the RuneManager backend periodically fetches from the **official OSRS hiscores API** (not from the game client). This is a server-to-server operation and requires no plugin involvement beyond the initial account link.
+**Backend pull from official hiscores (server-initiated, periodic)** — for hiscore data only, the backend fetches from the official OSRS hiscores API on a configurable cadence.
 
-> The website never initiates a connection to the game client or plugin. All game-to-website data flow originates from the plugin.
+**Backend pull from TempleOSRS** — the collection log is fetched from TempleOSRS rather than pushed slot-by-slot.
+
+> The website never initiates a connection to the game client or plugin. All
+> game-to-website data flow originates from the plugin.
 
 ### 5.2 Data Types
 
-#### Hiscores
-- **Strategy**: Backend pull from official OSRS hiscores API (not from the plugin)
-- The backend fetches skill levels, experience, and boss/activity kill counts from the official OSRS hiscores API.
-- Refresh frequency is configurable per instance (e.g. every 30 minutes, every hour).
-- When the official hiscores adds a new skill, boss, or activity entry, the backend must support dynamically ingesting the new field without requiring a code deployment. This is achieved by storing hiscore entries as a flexible key-value structure rather than a rigid schema.
+| Data | Strategy | Store | Notes |
+|------|----------|-------|-------|
+| Hiscores (skills, bosses, activities, clues) | Backend pull (OSRS API) | PostgreSQL (jsonb) | Dynamic key-value schema; new skills/bosses ingested without migration. |
+| Inventory | Push | MongoDB | Full snapshot. |
+| Bank | Push | MongoDB | Full snapshot. |
+| Group bank (GROUP only) | Push | MongoDB | Single shared document, overwritten on each member's bank access. |
+| Looting bag | Push | MongoDB | Snapshot when opened. |
+| Equipment | Push | PostgreSQL | Worn-slot snapshot. |
+| Loot | Push (append-only) | MongoDB | One document per drop; `total_value` is the plugin-computed GE total. |
+| Quests | Push | MongoDB | Snapshot of quest states. |
+| Achievement diaries | Push | PostgreSQL | 12 areas × 4 tiers, read from completion varbits. |
+| Combat achievements | Push | PostgreSQL | Total points + completed-task count per tier (read from varbits); individual task unlocks are pushed to the feed. |
+| Collection log | Backend pull (TempleOSRS) | MongoDB | Full log overlaid on the TempleOSRS category structure. |
+| Position (live map) | Push (opt-in) | PostgreSQL | Latest WorldPoint while sharing is enabled. |
+| Vitals (status orbs) | Push | PostgreSQL | HP/prayer/run energy/special attack. |
+| Activity & presence | Push / heartbeat | PostgreSQL | Current in-game activity + `last_seen_at`-derived online status. |
+| Avatar (3D model) | Push | public disk | Default-pose player model (OBJ/MTL), captured on login + equipment change. |
+| Clan rank & title | Push (CLAN) | PostgreSQL | Mirrors the in-game clan. |
 
-#### Inventory
-- **Strategy**: Push
-- The plugin submits the full inventory state (item IDs and quantities) whenever the inventory is opened or its contents change.
-- Stored in MongoDB as a snapshot per player with a timestamp.
-
-#### Bank
-- **Strategy**: Push
-- The plugin submits the full bank contents (all tabs, item IDs and quantities) whenever the bank is opened or changes.
-- Stored in MongoDB as a snapshot per player with a timestamp.
-- **Group Bank (GROUP mode only)**: In OSRS, Group Ironman members share a single in-game group bank. Whenever any group member opens the bank, the plugin submits the full current state of the group bank to the backend. The website displays this as a live shared bank view. Because any member's bank access triggers a submission, the group bank on the website stays dynamically up to date as members interact with it in-game. The group bank is stored as a single document in MongoDB, keyed to the group, and overwritten on each submission.
-
-#### Loot
-- **Strategy**: Push
-- The plugin submits a loot entry on each drop event (NPC kill, chest open, etc.), including source name, item IDs, quantities, and a timestamp.
-- Loot entries are appended (not replaced) to form a full loot history per player.
-- Stored in MongoDB.
-
-#### Quest List
-- **Strategy**: Push
-- The plugin submits the full quest state (quest name, completion status) on quest completion.
-- Stored as a structured list in PostgreSQL.
-
-#### Collection Log
-- **Strategy**: Push
-- The plugin submits individual collection log slot unlocks as they occur (item name, source category, timestamp).
-- Full collection log state is stored per player, with each slot tracked individually.
-- Stored in MongoDB.
-
-#### Achievements & Combat Achievements
-- **Strategy**: Push
-- The plugin submits achievement unlocks as they occur (achievement name, tier for combat achievements, timestamp).
-- Stored in PostgreSQL as an append-only log per player.
+> Implementation notes:
+> - Quests are stored in **MongoDB** (the original spec called for PostgreSQL).
+> - The collection log is **pulled from TempleOSRS** rather than pushed per-slot.
+> - Combat achievements store **points + per-tier counts**, not all ~600 task rows.
+> - There is no generic "achievements" type separate from Achievement Diaries
+>   and Combat Achievements.
 
 ### 5.3 Data Freshness Indicators
 
-- The UI displays a "last updated" timestamp for each data type on player profiles.
-- Stale data (beyond a configurable threshold) is visually flagged.
+- Profiles show a "last updated" timestamp per data type.
+- Data older than a configurable threshold is visually flagged as stale.
 
 ---
 
 ## 6. Theming & Resource Packs
 
-RuneManager uses DaisyUI for its component library, enabling full theme customisation.
+RuneManager uses DaisyUI for its component library, with a custom `runemanager` theme (light + dark) as the base. In-game **resource packs** are layered on top to texture the entire UI.
 
 ### 6.1 Resource Pack Sync
 
-- The RuneManager plugin detects which Resource Pack (via the RuneLite Resource Packs plugin) the player currently has active.
-- When the player loads the website, their active resource pack theme is automatically applied if a corresponding RuneManager theme exists.
-- Theme mappings between resource pack identifiers and DaisyUI themes are maintained by the instance admin.
+- The plugin detects the active RuneLite Resource Pack (via the community Resource Packs plugin, opt-in) and pushes its identifier.
+- The website renders the matching pack's in-game sprites across DaisyUI components (buttons, panels, inputs, scrollbars, borders, badges, tooltips, etc.).
+- A pack is always in effect — a bundled **Default Vanilla** pack is the render floor, so missing sprites fall back cleanly.
 
-### 6.2 Manual Theme Selection
+### 6.2 Manual Selection (per user)
 
-- Users can override the auto-detected theme and manually select any available theme from their profile settings.
-- The manual selection persists across sessions until changed.
+- Users can override the auto-detected pack from **Settings → Appearance** and pick any installed pack; the choice persists.
+- Each user may install a limited number of packs from the hub (the Owner is exempt); a user may delete packs they installed.
+- Light/dark is independent of the pack and can be toggled by anyone.
 
 ### 6.3 Theme Management (Admin)
 
-- Instance admins can define and upload custom DaisyUI-compatible themes.
-- Admins can map resource pack identifiers to specific themes.
-- A default theme is set for unauthenticated visitors and users without a manual selection.
+- Admins install packs from a resource-pack **hub** and set the instance-wide **default** pack (applied to guests and users without an override).
+- Admins set the **default appearance** (light/dark, or "follow the pack").
+
+> Implementation note: theming is delivered through resource packs rather than
+> admin-uploaded custom DaisyUI themes (the original §6.3). Pack sprites are
+> normalised at install time for cross-pack consistency.
 
 ---
 
 ## 7. Leaderboards
 
-Leaderboards allow members to compete against each other on a variety of metrics.
+Leaderboards let members compete on a variety of metrics.
 
-### 7.1 Categories
+### 7.1 Categories (implemented)
 
-- **Skills**: Total level, total XP, individual skill XP/level rankings.
-- **Bosses & Activities**: Kill counts / score for each hiscore boss and activity entry.
-- **Loot**: Total loot value (calculated from GE prices), loot by source. GE price data source to be determined; candidate: [ge-tracker/osrs-api](https://github.com/ge-tracker/osrs-api).
-- **Collection Log**: Total slots unlocked.
-- **Combat Achievements**: Total points, breakdown by tier (Easy / Medium / Hard / Elite / Master / Grandmaster).
-- **Achievements**: Total count.
+- **Overall** — total level + total XP.
+- **Skills** — per-skill level/XP rankings.
+- **Bosses & Activities** — kill count / score per hiscore entry.
+- **Clues** — counts per clue tier.
+- **Loot** — total loot value (plugin-computed GE) and loot by source.
+- **Collection Log** — total slots unlocked (via TempleOSRS).
+- **Combat Achievements** — total points, with completed-task counts per tier.
+- **Achievement Diaries** — total tiers completed, with a per-tier breakdown.
 
 ### 7.2 Scope
 
-- Leaderboards are scoped to the instance (i.e. rankings are among members of the clan/group, not global).
-- In CLAN mode, leaderboards show all clan members.
-- In GROUP mode, leaderboards show group members only.
+- Leaderboards are scoped to the instance (rankings among the instance's accounts).
 
 ### 7.3 Display
 
-- Leaderboards are paginated and sortable.
-- Each entry links to the player's public profile.
-- The viewer's own rank is highlighted if they are a member.
+- Paginated and sortable; each entry links to the player's profile.
+- The viewer's own accounts are highlighted.
 
 ---
 
 ## 8. Live Feed
 
-The live feed displays a real-time stream of notable in-game events from all members of the instance.
+A real-time stream of notable in-game events from all members of the instance.
 
-### 8.1 Event Types
+### 8.1 Event Types (implemented)
 
-The following event types appear in the live feed:
+- **Level-up / skill milestone** — at configurable thresholds.
+- **Loot drop** — for drops clearing a configurable minimum value.
+- **Quest completion**.
+- **Combat achievement unlock** — task name (+ tier when available).
 
-- **Level up / Skill milestone**: e.g. "PlayerX reached 99 Slayer" or "PlayerX reached level 70 Agility".
-- **Boss kill / Loot drop**: e.g. "PlayerX received Twisted Bow from Chambers of Xeric".
-- **Quest completion**: e.g. "PlayerX completed Dragon Slayer II".
-- **Combat achievement unlock**: e.g. "PlayerX unlocked 'Ghommal's Hilt 6' (Grandmaster)".
-- **Collection log slot**: e.g. "PlayerX added Tumeken's Shadow to their collection log".
+> **(not yet implemented)**: collection-log-slot feed events.
 
 ### 8.2 Behaviour
 
 - Events are generated server-side when pushed data is processed and a qualifying change is detected.
-- The feed is displayed in reverse chronological order.
-- Feed entries link to the relevant player profile or data section.
-- Configurable milestone thresholds (e.g. only announce level-ups at 99, or at every 10 levels) should be available to instance admins.
-- The feed is publicly visible on the instance website.
+- Reverse-chronological; entries link to the relevant player/section.
+- Admin-configurable thresholds: level-up milestones and minimum loot value.
+- Publicly visible.
 
 ### 8.3 Real-time Updates
 
-- The live feed uses WebSockets or Server-Sent Events (SSE) to push new entries to connected browsers without requiring a page refresh.
+- New entries are pushed to connected browsers over WebSockets (Laravel Reverb + Laravel Echo) with no polling. The feed also seeds the public homepage.
 
 ---
 
 ## 9. Announcements
 
-Announcements allow instance admins to broadcast messages to all members, both on the website and in-game via the plugin.
+Admins broadcast messages to members, both on the website and in-game.
 
 ### 9.1 Creating Announcements
 
-- Admins create announcements via the website dashboard.
-- Each announcement has a title, body (rich text), and optional expiry date.
+- Admins create announcements (title, body, optional expiry) from the website.
 
 ### 9.2 Delivery
 
-- **Website**: Announcements are displayed prominently on the instance homepage and in a dedicated announcements section.
-- **In-game**: The plugin polls the RuneManager API at its configured interval and retrieves any unacknowledged announcements. New announcements are displayed as in-game chat messages or a plugin panel notification. Once displayed, the plugin marks them as acknowledged so they are not shown again.
+- **Website**: shown on the homepage and a dedicated announcements page (active/non-expired, newest first).
+- **In-game**: the plugin polls the API, displays new announcements, and acknowledges them so they aren't repeated.
+- New announcements are also forwarded to the instance webhook if configured (§11).
 
 ### 9.3 Availability
 
-- Available in all modes (CLAN, GROUP, and CASUAL).
+- Available in all modes.
 
 ---
 
 ## 10. Calendar
 
-The calendar provides a shared schedule of in-game events for instance members.
+A shared schedule of in-game events.
 
 ### 10.1 Events
 
-Each calendar event includes:
-
-- Title
-- Description
-- Start date/time and optional end date/time
-- Event type (e.g. PvM mass, Clan wars, Skilling event, Custom)
-- Created by (admin or member)
+Title, description, start (and optional end) date/time, event type (PvM mass, Clan wars, Skilling event, Custom), a custom colour, and the creator.
 
 ### 10.2 Permissions
 
-- **Viewing**: Anyone (including unauthenticated visitors) can view the calendar.
-- **Creating events**: Instance admins and clan leaders can create events. Regular members may be granted event creation rights at the admin's discretion.
+- **Viewing**: anyone, including unauthenticated visitors.
+- **Creating**: gated behind the `manage calendar` permission. Events can't be scheduled before today.
 
 ### 10.3 Display
 
-- Calendar is displayed in a monthly/weekly view on the website.
-- Upcoming events are surfaced in the website sidebar or homepage widget.
+- Monthly grid (V-Calendar); multi-day events span every day they cover.
+- Upcoming events are surfaced on the homepage.
+- New events are forwarded to the instance webhook if configured (§11).
 
 ### 10.4 Availability
 
-- Available in all modes (CLAN, GROUP, and CASUAL).
+- Available in all modes.
 
 ---
 
-## 11. Webhook System
+## 11. Outbound Webhooks
 
-Webhooks allow instance members and admins to subscribe to events and receive notifications in external services, primarily Discord.
+A single, admin-configured instance webhook forwards **website-originated** events to an external service (primarily a Discord channel).
 
 ### 11.1 Configuration
 
-- Any registered member can configure their own webhooks from their profile settings.
-- Each webhook consists of:
-  - A target URL (e.g. a Discord channel webhook URL).
-  - A display name for identification.
-  - Enabled/disabled toggle.
+- The Owner sets one **webhook URL** under **Settings → Integrations**. Blank disables it.
 
-### 11.2 Event Triggers
+### 11.2 Triggers
 
-- A webhook fires on any live feed event (see Section 8.1) that belongs to the configuring user's account.
-- Instance admins can additionally configure instance-wide webhooks that fire on any member's events.
-- All event types are supported; there is no per-webhook event type filtering (any event triggers the webhook).
+- New **announcements** and new **calendar events** are POSTed as Discord-compatible embeds.
 
-### 11.3 Payload
+### 11.3 Delivery
 
-- Webhook payloads are delivered as HTTP POST requests with a JSON body.
-- The payload includes: event type, player name, description, timestamp, and a URL to the relevant page on the RuneManager instance.
-- Discord-compatible embeds are supported in the payload format.
+- Sent via a queued job with retries and exponential backoff; failures are logged.
 
-### 11.4 Reliability
-
-- Failed webhook deliveries are retried with exponential backoff (up to 3 attempts).
-- Delivery status (success/failure) is logged and visible to the webhook owner.
+> Implementation note: this replaces the original §11 design (per-user webhooks
+> firing on every personal feed event). Per-player **in-game** event forwarding
+> is intentionally delegated to dedicated RuneLite plugins such as
+> [Dink](https://github.com/pajlads/DinkPlugin) — which other plugins integrate
+> with by posting a RuneLite `PluginMessage` — rather than reimplemented here.
+> RuneManager only owns instance-wide, website-originated notifications.
 
 ---
 
 ## 12. Administrative Backend
 
+Settings are organised as a sidebar **settings hub** shared by users and admins. Admin sections: **General**, **Branding**, **Feed & sync**, **Integrations**.
+
 ### 12.1 Username Change Tracking
 
-- The system maintains a `username_history` record per linked OSRS account.
-- Each entry records the old username, the new username, and the date the change was detected.
-- The current username is always the most recent entry.
-- The plugin submits the current in-game username with every request, allowing the backend to detect changes automatically.
+- A `username_history` record per linked account (old/new username, detection date); the current username is the latest entry.
 
 ### 12.2 Dynamic Hiscore Schema
 
-- Hiscore data is not stored against a fixed list of skill/boss columns.
-- The backend stores hiscore entries as a flexible map of `{ key: { rank, level_or_score, xp } }`.
-- When the official OSRS hiscores introduces a new entry (e.g. a new skill or boss), the backend begins storing it automatically on the next pull without any schema migration or deployment.
-- The UI renders hiscore entries dynamically from whatever keys are present in the stored data.
+- Hiscore entries are stored as a flexible `{ key: { rank, level_or_score, xp } }` map; new official hiscore entries are ingested automatically with no migration, and the UI renders whatever keys are present.
 
-### 12.3 Member Management (CLAN mode)
+### 12.3 Member Management
 
-- Admins can view all registered members, their linked accounts, and their join date.
-- Admins can remove members from the instance.
-- Admins can promote members to admin role.
+- Admins view members and their linked accounts.
+- In CLAN/GROUP modes, admins manage the roster (add/remove accounts).
+- Promoting a member to admin — **(not yet implemented)**.
 
 ### 12.4 Instance Configuration
 
-- Admins can update the instance name, description, and branding (logo, banner).
-- Admins can set the default theme.
-- Admins can configure hiscore refresh frequency.
-- Admins can configure live feed milestone thresholds.
+- **General**: mode, clan/group name, description, default resource pack, default appearance (light/dark), and a public-landing toggle to anonymise account names.
+- **Branding**: logo + banner uploads.
+- **Feed & sync**: hiscores refresh cadence, level-up milestone thresholds, minimum loot value.
+- **Integrations**: the outbound webhook URL (§11).
 
 ---
 
@@ -402,13 +388,16 @@ Webhooks allow instance members and admins to subscribe to events and receive no
 
 | Layer              | Technology                                      |
 |--------------------|-------------------------------------------------|
-| Primary database   | PostgreSQL — relational data (users, roles, quests, achievements, username history, webhooks, calendar events, announcements) |
-| Document store     | MongoDB — high-volume snapshot data (bank, inventory, loot log, collection log) |
-| Frontend component | DaisyUI — theming and UI components             |
-| Plugin platform    | RuneLite (Java plugin)                          |
-| Real-time          | WebSockets or Server-Sent Events (SSE) for live feed |
-| External API       | Official OSRS Hiscores API (backend pull for hiscores) |
-| GE Prices (TBD)    | Candidate: [ge-tracker/osrs-api](https://github.com/ge-tracker/osrs-api) — used for loot valuation on leaderboards |
+| Framework          | Laravel 11 (Jetstream, Fortify, Sanctum), Inertia v1 |
+| Primary database   | PostgreSQL — relational data (users, roles, accounts, hiscores, equipment, diaries, combat achievements, username history, calendar events, announcements, settings, presence/position/vitals) |
+| Document store     | MongoDB — high-volume snapshots (bank, inventory, looting bag, loot log, quests, group bank, collection log); a static osrsbox item DB for item lookups |
+| Frontend           | Vue 3 + Inertia + DaisyUI (Tailwind v3), with resource-pack texturing |
+| Plugin platform    | RuneLite (Java plugin) |
+| Real-time          | WebSockets — Laravel Reverb + Laravel Echo |
+| Auth & roles       | Fortify/Sanctum auth; Spatie Laravel-Permission |
+| Queue              | Database queue (queued jobs for webhooks, resource-pack installs, hiscore sync) |
+| External APIs      | Official OSRS Hiscores API (skills/bosses/clues), OSRS GIM group page (group-name validation), TempleOSRS (collection log) |
+| GE prices          | Loot value is computed plugin-side and pushed with each drop (no server-side price service) |
 
 ---
 
@@ -416,9 +405,9 @@ Webhooks allow instance members and admins to subscribe to events and receive no
 
 RuneManager is delivered as a managed SaaS. Each customer receives a dedicated instance.
 
-- Customers select a **mode** (CLAN, GROUP, or CASUAL) when signing up.
+- Customers select a **mode** (CLAN, GROUP, or CASUAL) at setup.
 - Billing, provisioning, and instance lifecycle management are handled by a separate **RuneManager Administrative System** (not in scope for this specification).
-- The RuneManager application itself has no awareness of billing or subscription state; it assumes a validly provisioned instance.
+- The application itself has no awareness of billing or subscription state; it assumes a validly provisioned instance.
 
 ---
 
