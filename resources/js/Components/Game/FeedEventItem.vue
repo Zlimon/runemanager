@@ -2,6 +2,7 @@
 import { Link } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import LootItems from "@/Components/Game/LootItems.vue";
+import ImageLightbox from "@/Components/ImageLightbox.vue";
 
 /*
  * One row of the live feed — the account (with ironman badge), a relative
@@ -70,11 +71,8 @@ const sentence = (event) => {
                        :items="event.payload.items"
                        :total-value="event.payload.total_value"
                        class="mt-1.5" />
-            <a v-if="event.screenshot_url" :href="event.screenshot_url" target="_blank" rel="noopener"
-               class="mt-2 block w-fit overflow-hidden rounded border pack-accent-border">
-                <img :src="event.screenshot_url" alt="Event screenshot" loading="lazy"
-                     class="max-h-48 w-auto object-cover transition hover:opacity-90">
-            </a>
+            <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url"
+                           alt="Event screenshot" class="mt-2" />
         </div>
     </div>
 </template>
