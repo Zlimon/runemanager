@@ -26,6 +26,10 @@ const sentence = (event) => {
             return `received a drop from ${payload.source}`;
         case 'quest_complete':
             return `completed ${payload.quest}`;
+        case 'combat_achievement':
+            return payload.tier
+                ? `completed the ${formatSkill(payload.tier)} combat task: ${payload.task}`
+                : `completed the combat task: ${payload.task}`;
         default:
             return type;
     }

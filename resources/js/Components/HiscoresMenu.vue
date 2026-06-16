@@ -85,6 +85,17 @@ const items = computed(() => lists.value[activeKey.value]);
                     </svg>
                     Collection Log
                 </Link>
+
+                <Link :href="route('hiscores.combat-achievements.index')"
+                      class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                    <svg class="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M6.5 6.5 17.5 17.5M4 3h3l11 11v3l-3 0L4 6V3Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m15 5 4-2-2 4M9 19l-4 2 2-4" />
+                    </svg>
+                    Combat Achievements
+                </Link>
             </div>
 
             <div role="tablist" class="tabs tabs-boxed mb-3">

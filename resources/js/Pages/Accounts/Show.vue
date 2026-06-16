@@ -6,6 +6,7 @@ import CollectionLog from "@/Components/Game/CollectionLog.vue";
 import Loot from "@/Components/Game/Loot.vue";
 import Quests from "@/Components/Game/Quests.vue";
 import Diaries from "@/Components/Game/Diaries.vue";
+import CombatAchievements from "@/Components/Game/CombatAchievements.vue";
 import Inventory from "@/Components/Game/Inventory.vue";
 import LootingBag from "@/Components/Game/LootingBag.vue";
 import Freshness from "@/Components/Freshness.vue";
@@ -46,6 +47,10 @@ const props = defineProps({
     diaries: {
         type: Object,
         default: () => ({}),
+    },
+    combatAchievements: {
+        type: Object,
+        default: null,
     },
     avatar: {
         type: Object,
@@ -96,6 +101,7 @@ const activeJournalTab = ref('quests');
 const journalTabs = [
     { key: 'quests', label: 'Quests' },
     { key: 'diaries', label: 'Diaries' },
+    { key: 'combat-achievements', label: 'Combat' },
 ];
 
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
@@ -117,6 +123,7 @@ const RELOAD_PROPS = {
     loot: ['recentLoot', 'freshness'],
     avatar: ['avatar', 'freshness'],
     diaries: ['diaries', 'freshness'],
+    combat_achievements: ['combatAchievements', 'freshness'],
 };
 
 const pendingProps = new Set();
@@ -249,6 +256,12 @@ onBeforeUnmount(() => {
                                                 <Freshness :updated-at="freshness.diaries" :stale-after-minutes="staleAfter" />
                                             </div>
                                             <Diaries :diaries="diaries" />
+                                        </template>
+                                        <template #combat-achievements>
+                                            <div class="flex justify-end">
+                                                <Freshness :updated-at="freshness.combat_achievements" :stale-after-minutes="staleAfter" />
+                                            </div>
+                                            <CombatAchievements :combat-achievements="combatAchievements" />
                                         </template>
                                     </TabbedCard>
                                 </div>

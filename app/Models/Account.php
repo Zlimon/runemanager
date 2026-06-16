@@ -164,6 +164,11 @@ class Account extends Model
         return $this->hasOne(AccountDiary::class);
     }
 
+    public function combatAchievement(): HasOne
+    {
+        return $this->hasOne(AccountCombatAchievement::class);
+    }
+
     /**
      * Public URLs for the player 3D model uploaded by the RuneLite plugin,
      * or null when no avatar has been pushed yet. The MTL is optional (colour-

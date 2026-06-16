@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\ClanController;
+use App\Http\Controllers\Api\CombatAchievementController;
 use App\Http\Controllers\Api\DiaryController;
 use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\GroupBankController;
@@ -42,6 +43,12 @@ Route::middleware([
         Route::put('/quests', [QuestController::class, 'update'])->name('api.plugin.quests');
         // SPEC §5.2 — Achievement Diary completion snapshot.
         Route::put('/diaries', [DiaryController::class, 'update'])->name('api.plugin.diaries');
+        // SPEC §5.2/§7.1 — Combat Achievement points + per-tier status snapshot,
+        // plus a live task-unlock that records a feed event (§8.1).
+        Route::put('/combat-achievements', [CombatAchievementController::class, 'update'])
+            ->name('api.plugin.combat-achievements');
+        Route::post('/combat-achievements/unlock', [CombatAchievementController::class, 'unlock'])
+            ->name('api.plugin.combat-achievements.unlock');
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
         // Loot is append-only — POST, not the snapshot PUT used by the others.
         Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');

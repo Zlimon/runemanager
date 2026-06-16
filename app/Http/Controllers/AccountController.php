@@ -93,6 +93,12 @@ class AccountController extends Controller
             // SPEC §5.2 — Achievement Diary completion ({area: {tier: bool}}).
             'diaries' => fn () => $account->diary?->diaries ?? [],
 
+            // SPEC §5.2/§7.1 — Combat Achievement points + per-tier status, or
+            // null until the plugin has pushed a snapshot.
+            'combatAchievements' => fn () => $account->combatAchievement
+                ? ['points' => $account->combatAchievement->points, 'tiers' => $account->combatAchievement->tiers]
+                : null,
+
             'avatar' => fn () => $account->avatarPayload(),
 
             // SPEC §5.2 Loot — append-only history. Latest 25 drops with hydrated
@@ -112,6 +118,7 @@ class AccountController extends Controller
                 'looting_bag' => optional($account->lootingBag)->updated_at?->toIso8601String(),
                 'quests' => optional($account->quests)->updated_at?->toIso8601String(),
                 'diaries' => optional($account->diary)->updated_at?->toIso8601String(),
+                'combat_achievements' => optional($account->combatAchievement)->updated_at?->toIso8601String(),
                 'equipment' => optional($account->equipment)->updated_at?->toIso8601String(),
                 'avatar' => $account->avatar_uploaded_at?->toIso8601String(),
                 'loot' => $account->latestLootKilledAt()?->toIso8601String(),

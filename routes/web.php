@@ -6,6 +6,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\CollectionHiscoreController;
 use App\Http\Controllers\CollectionLogHiscoreController;
+use App\Http\Controllers\CombatAchievementHiscoreController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiaryHiscoreController;
 use App\Http\Controllers\FeedController;
@@ -107,6 +108,8 @@ Route::middleware([
         Route::get('/diaries', [DiaryHiscoreController::class, 'index'])->name('hiscores.diaries.index');
         // SPEC §7 — Collection Log (total slots unlocked, via TempleOSRS).
         Route::get('/collection-log', [CollectionLogHiscoreController::class, 'index'])->name('hiscores.collection-log.index');
+        // SPEC §7.1 — Combat Achievements (total points).
+        Route::get('/combat-achievements', [CombatAchievementHiscoreController::class, 'index'])->name('hiscores.combat-achievements.index');
         Route::get('/skills/{skill}', [SkillHiscoreController::class, 'index'])->name('hiscores.skills.index');
         Route::get('/bosses/{collection}', [CollectionHiscoreController::class, 'index'])
             ->defaults('category', 'boss')

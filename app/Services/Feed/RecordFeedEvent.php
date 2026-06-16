@@ -143,6 +143,21 @@ class RecordFeedEvent
     }
 
     /**
+     * Record a COMBAT_ACHIEVEMENT unlock (SPEC §8.1). Unlike level-ups/quests
+     * these aren't derived from a snapshot diff — the plugin parses the in-game
+     * completion message and pushes the task name + tier directly.
+     */
+    public function recordCombatAchievement(Account $account, string $task, ?string $tier = null): FeedEvent
+    {
+        return $this->emit([
+            'account_id' => $account->id,
+            'type' => FeedEvent::TYPE_COMBAT_ACHIEVEMENT,
+            'payload' => ['task' => $task, 'tier' => $tier],
+            'occurred_at' => now(),
+        ]);
+    }
+
+    /**
      * Persist a feed event and broadcast it to connected browsers (SPEC §8.3).
      *
      * @param  array<string, mixed>  $attributes

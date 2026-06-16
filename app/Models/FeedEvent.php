@@ -30,6 +30,8 @@ class FeedEvent extends Model
 
     public const TYPE_QUEST_COMPLETE = 'quest_complete';
 
+    public const TYPE_COMBAT_ACHIEVEMENT = 'combat_achievement';
+
     protected $fillable = [
         'account_id',
         'type',
