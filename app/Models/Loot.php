@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use MongoDB\Laravel\Eloquent\Model;
@@ -24,6 +25,8 @@ use MongoDB\Laravel\Eloquent\Model;
  */
 class Loot extends Model
 {
+    use HasFactory;
+
     protected $connection = 'mongodb';
 
     protected $primaryKey = '_id';

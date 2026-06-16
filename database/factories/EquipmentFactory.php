@@ -49,10 +49,11 @@ class EquipmentFactory extends Factory
                     'release_date' => ['$ne' => null],
                 ]],
                 ['$sample' => ['size' => 1]],
-                ['$project' => ['_id' => 1]],
+                // Use the OSRS `id` field, not Mongo's ObjectId `_id`.
+                ['$project' => ['id' => 1, '_id' => 0]],
             ])
             ->toArray()[0] ?? null;
 
-        return $doc ? (int) $doc['_id'] : null;
+        return $doc ? (int) ((array) $doc)['id'] : null;
     }
 }

@@ -73,6 +73,36 @@ class Item extends Model
     }
 
     /**
+     * A batch of random tradeable OSRS item ids in one $sample aggregation —
+     * for seeding inventories/banks/loot without N round-trips.
+     *
+     * @return list<int>
+     */
+    public static function randomItemIds(int $count): array
+    {
+        if ($count < 1) {
+            return [];
+        }
+
+        $docs = (new static)->getConnection()
+            ->getDatabase()
+            ->selectCollection((new static)->getTable())
+            ->aggregate([
+                ['$match' => [
+                    'noted' => false,
+                    'placeholder' => false,
+                    'duplicate' => false,
+                    'release_date' => ['$ne' => null],
+                ]],
+                ['$sample' => ['size' => $count]],
+                ['$project' => ['id' => 1, '_id' => 0]],
+            ])
+            ->toArray();
+
+        return array_values(array_map(fn ($doc): int => (int) ((array) $doc)['id'], $docs));
+    }
+
+    /**
      * Bulk lookup by OSRS item id (the document's `id` field, NOT Mongo's `_id`
      * ObjectId). The Laravel-Mongo driver auto-aliases id↔_id in WHERE clauses,
      * which makes Eloquent's where()/whereIn() against `id` silently match
