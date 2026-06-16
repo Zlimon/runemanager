@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
-import AppLayout from "@/Layouts/AppLayout.vue";
+import SettingsLayout from "@/Layouts/SettingsLayout.vue";
 import Card from "@/Components/Card.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
@@ -80,16 +80,12 @@ const install = (pack) => {
 </script>
 
 <template>
-    <AppLayout title="Appearance">
-        <div class="py-12">
-            <div class="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
-                <div>
-                    <h1 class="header-chatbox-sword text-2xl font-bold">Appearance</h1>
-                    <p class="mt-1 text-sm text-base-content/60">
-                        Pick a resource pack to theme the site for you. Choosing <strong>Default</strong> uses
-                        the instance theme. Your in-game pack (via the RuneLite plugin) also sets this automatically.
-                    </p>
-                </div>
+    <SettingsLayout title="Appearance">
+        <div class="space-y-6">
+                <p class="-mt-2 text-sm text-base-content/60">
+                    Pick a resource pack to theme the site for you. Choosing <strong>Default</strong> uses
+                    the instance theme. Your in-game pack (via the RuneLite plugin) also sets this automatically.
+                </p>
 
                 <Card>
                     <ResourcePackPicker :model-value="selected"
@@ -162,11 +158,10 @@ const install = (pack) => {
                         </div>
                     </div>
                 </Card>
-            </div>
-        </div>
 
-        <ResourcePackInstallModal ref="installer"
-                                  :install-url="route('user.resource-pack.install')"
-                                  :status-url="route('user.resource-pack.status')" />
-    </AppLayout>
+            <ResourcePackInstallModal ref="installer"
+                                      :install-url="route('user.resource-pack.install')"
+                                      :status-url="route('user.resource-pack.status')" />
+        </div>
+    </SettingsLayout>
 </template>

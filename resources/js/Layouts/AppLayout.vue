@@ -99,13 +99,10 @@ const logout = () => {
                             </li>
                             <li>
                                 <NavDropdown :label="page.props.auth?.user?.name ?? 'Account'"
-                                             :active="route().current('themes.*') || route().current('api-tokens.*')">
-                                    <NavDropdownLink :href="route('themes.index')" :active="route().current('themes.*')">
-                                        Appearance
-                                    </NavDropdownLink>
-                                    <NavDropdownLink v-if="$page.props.jetstream.hasApiFeatures"
-                                                     :href="route('api-tokens.index')" :active="route().current('api-tokens.index')">
-                                        API Tokens
+                                             :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*')">
+                                    <NavDropdownLink :href="route('profile.show')"
+                                                     :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*')">
+                                        Settings
                                     </NavDropdownLink>
                                     <button type="button" @click="logout"
                                             class="block w-full rounded px-3 py-2 text-left text-base-content hover:bg-base-300">

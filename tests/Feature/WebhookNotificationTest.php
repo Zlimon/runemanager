@@ -49,12 +49,9 @@ it('forwards a new calendar event to the configured webhook', function () {
     Bus::assertDispatched(fn (DeliverWebhook $job) => $job->url === HOOK && $job->context === 'calendar');
 });
 
-it('saves the webhook URL from the admin settings form', function () {
+it('saves the webhook URL from the admin integrations form', function () {
     $this->actingAs(adminUser())
-        ->put(route('admin.settings.update'), [
-            'instance_mode' => Instance::MODE_CASUAL,
-            'webhook_url' => HOOK,
-        ])
+        ->put(route('admin.integrations.update'), ['webhook_url' => HOOK])
         ->assertRedirect();
 
     expect(Instance::webhookUrl())->toBe(HOOK);
@@ -62,10 +59,7 @@ it('saves the webhook URL from the admin settings form', function () {
 
 it('rejects an invalid webhook URL', function () {
     $this->actingAs(adminUser())
-        ->putJson(route('admin.settings.update'), [
-            'instance_mode' => Instance::MODE_CASUAL,
-            'webhook_url' => 'not-a-url',
-        ])
+        ->putJson(route('admin.integrations.update'), ['webhook_url' => 'not-a-url'])
         ->assertStatus(422)
         ->assertJsonValidationErrors('webhook_url');
 });

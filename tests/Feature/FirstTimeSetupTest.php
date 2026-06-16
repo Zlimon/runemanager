@@ -62,7 +62,7 @@ it('lets the owner reach the setup page while unconfigured', function () {
         ->get(route('admin.settings'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('Admin/Settings')
+            ->component('Admin/Settings/General')
             ->where('configured', false),
         );
 });

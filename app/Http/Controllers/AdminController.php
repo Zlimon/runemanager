@@ -42,11 +42,12 @@ class AdminController extends Controller
         ]);
     }
 
+    /** General instance settings (mode, names, description, appearance defaults). */
     public function settings(InstallResourcePack $installer): Response
     {
         $installer->ensureVanilla();
 
-        return Inertia::render('Admin/Settings', [
+        return Inertia::render('Admin/Settings/General', [
             'settings' => [
                 'instance_mode' => Instance::mode(),
                 'clan_name' => (string) SettingHelper::getSetting('clan_name', ''),
@@ -55,20 +56,56 @@ class AdminController extends Controller
                 'resource_pack_id' => (int) SettingHelper::getSetting('resource_pack_id', 0),
                 'default_dark_mode' => (string) SettingHelper::getSetting('default_dark_mode', ''),
                 'public_anonymize_accounts' => Instance::publicAnonymizeAccounts(),
-                'webhook_url' => (string) SettingHelper::getSetting('webhook_url', ''),
-                'hiscore_refresh_minutes' => Instance::hiscoreRefreshMinutes(),
-                'feed_level_up_thresholds' => implode(', ', Instance::feedLevelUpThresholds()),
-                'feed_loot_min_value' => Instance::feedLootMinValue(),
-            ],
-            'branding' => [
-                'logo_url' => Instance::logoUrl(),
-                'banner_url' => Instance::bannerUrl(),
             ],
             'configured' => Instance::isConfigured(),
             'accountCount' => Account::count(),
             'modes' => Instance::MODES,
             'packs' => ResourcePack::pickerList(),
         ]);
+    }
+
+    /** SPEC §12.4 — branding (logo + banner). */
+    public function branding(): Response
+    {
+        return Inertia::render('Admin/Settings/Branding', [
+            'branding' => [
+                'logo_url' => Instance::logoUrl(),
+                'banner_url' => Instance::bannerUrl(),
+            ],
+        ]);
+    }
+
+    /** SPEC §12.4 — hiscores cadence + live-feed thresholds. */
+    public function feedSync(): Response
+    {
+        return Inertia::render('Admin/Settings/FeedSync', [
+            'settings' => [
+                'hiscore_refresh_minutes' => Instance::hiscoreRefreshMinutes(),
+                'feed_level_up_thresholds' => implode(', ', Instance::feedLevelUpThresholds()),
+                'feed_loot_min_value' => Instance::feedLootMinValue(),
+            ],
+        ]);
+    }
+
+    /** Outbound integrations: the instance webhook (Discord etc.). */
+    public function integrations(): Response
+    {
+        return Inertia::render('Admin/Settings/Integrations', [
+            'settings' => [
+                'webhook_url' => (string) SettingHelper::getSetting('webhook_url', ''),
+            ],
+        ]);
+    }
+
+    public function updateIntegrations(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'webhook_url' => ['nullable', 'url', 'max:2000'],
+        ]);
+
+        SettingHelper::setSetting('webhook_url', $validated['webhook_url'] ?? '');
+
+        return back()->with('status', 'Integrations updated.');
     }
 
     /**
@@ -86,7 +123,6 @@ class AdminController extends Controller
             'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
             'default_dark_mode' => ['nullable', 'string', Rule::in(['', 'light', 'dark'])],
             'public_anonymize_accounts' => ['boolean'],
-            'webhook_url' => ['nullable', 'url', 'max:2000'],
             'confirm' => ['nullable', 'string'],
         ]);
 
@@ -129,7 +165,6 @@ class AdminController extends Controller
         SettingHelper::setSetting('resource_pack_id', (int) ($validated['resource_pack_id'] ?? 0), 'int');
         SettingHelper::setSetting('default_dark_mode', $validated['default_dark_mode'] ?? '');
         SettingHelper::setSetting('public_anonymize_accounts', $validated['public_anonymize_accounts'] ?? false, 'bool');
-        SettingHelper::setSetting('webhook_url', $validated['webhook_url'] ?? '');
         SettingHelper::setSetting('instance_configured', true, 'bool');
 
         return back()->with('status', $switchingToRoster && $hasAccounts

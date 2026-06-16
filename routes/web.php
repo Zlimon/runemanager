@@ -59,10 +59,14 @@ Route::middleware([
     Route::prefix('/admin')->group(function () {
         Route::middleware('can:manage instance')->group(function () {
             Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-            Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
-            Route::put('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+            Route::get('/settings/general', [AdminController::class, 'settings'])->name('admin.settings');
+            Route::put('/settings/general', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+            Route::get('/settings/branding', [AdminController::class, 'branding'])->name('admin.branding');
+            Route::get('/settings/feed', [AdminController::class, 'feedSync'])->name('admin.feed');
+            Route::get('/settings/integrations', [AdminController::class, 'integrations'])->name('admin.integrations');
             Route::put('/config', [AdminController::class, 'updateConfig'])->name('admin.config.update');
             Route::post('/branding', [AdminController::class, 'updateBranding'])->name('admin.branding.update');
+            Route::put('/integrations', [AdminController::class, 'updateIntegrations'])->name('admin.integrations.update');
             Route::get('/packs', [AdminController::class, 'packs'])->name('admin.packs');
             Route::post('/packs/install', [AdminController::class, 'installPack'])->name('admin.packs.install');
             Route::delete('/packs/{pack}', [AdminController::class, 'destroyPack'])
@@ -91,7 +95,7 @@ Route::middleware([
 
     // SPEC §6.2 — per-user appearance: browse packs + set a personal override
     // (instance-global default is set by the owner in admin settings).
-    Route::get('/themes', [UserResourcePackController::class, 'index'])->name('themes.index');
+    Route::get('/user/themes', [UserResourcePackController::class, 'index'])->name('themes.index');
     Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
         ->name('user.resource-pack.update');
     Route::post('/user/resource-pack/install', [UserResourcePackController::class, 'install'])
