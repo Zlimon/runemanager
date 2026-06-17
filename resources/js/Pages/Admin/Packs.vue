@@ -13,9 +13,21 @@ const props = defineProps({
     installed: { type: Array, default: () => [] },
     hubPacks: { type: Array, default: () => [] },
     defaultId: { type: [Number, null], default: null },
+    vanillaMissing: { type: Boolean, default: false },
 });
 
 const installer = ref(null);
+
+// Re-download the bundled Default Vanilla pack (the baseline every other pack
+// borrows missing sprites from) when its on-disk assets have gone missing.
+const reinstalling = ref(false);
+const reinstallVanilla = () => {
+    reinstalling.value = true;
+    router.post(route('admin.packs.reinstall-vanilla'), {}, {
+        preserveScroll: true,
+        onFinish: () => { reinstalling.value = false; },
+    });
+};
 
 // --- Installed packs (manage) ---
 const installedSearch = ref('');
@@ -58,6 +70,21 @@ const install = (pack) => installer.value?.start(pack);
         <div class="py-12">
             <div class="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
                 <h1 class="header-chatbox-sword text-2xl font-bold">Resource packs</h1>
+
+                <!-- The bundled default's files are gone — every pack falls back to it,
+                     so prompt to restore them. -->
+                <div v-if="vanillaMissing" class="alert alert-warning">
+                    <div class="flex-1">
+                        <h3 class="font-bold">Default Vanilla pack is missing</h3>
+                        <p class="text-sm">
+                            Its files aren't on disk. Other packs borrow missing sprites from it, so reinstall it to
+                            restore the baseline theme.
+                        </p>
+                    </div>
+                    <PrimaryButton type="button" :disabled="reinstalling" @click="reinstallVanilla">
+                        {{ reinstalling ? 'Reinstalling…' : 'Reinstall' }}
+                    </PrimaryButton>
+                </div>
 
                 <!-- Installed packs management -->
                 <Card>
@@ -103,6 +130,10 @@ const install = (pack) => installer.value?.start(pack);
                                                       @click="remove(pack)">
                                             Delete
                                         </DangerButton>
+                                        <PrimaryButton v-else type="button" class="btn-xs" :disabled="reinstalling"
+                                                       @click="reinstallVanilla">
+                                            {{ reinstalling ? 'Reinstalling…' : 'Reinstall' }}
+                                        </PrimaryButton>
                                     </td>
                                 </tr>
                                 <tr v-if="!installedView.length">

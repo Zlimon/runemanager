@@ -126,6 +126,33 @@ it('queues an install from the hub', function () {
         fn (FetchResourcePackJob $job) => $job->packName === 'pack-win95ish');
 });
 
+it('reinstalls the bundled Default Vanilla pack', function () {
+    $this->mock(InstallResourcePack::class)
+        ->shouldReceive('install')
+        ->once()
+        ->with(InstallResourcePack::VANILLA_PACK)
+        ->andReturn(uiPack('sample-vanilla'));
+
+    $this->actingAs(adminUser())
+        ->post(route('admin.packs.reinstall-vanilla'))
+        ->assertRedirect();
+});
+
+it('exposes whether the bundled pack files are present', function () {
+    // vanillaMissing reflects on-disk reality; assert it tracks that, not a fixed value.
+    $missing = ! is_dir(public_path('resource-packs/'.InstallResourcePack::VANILLA_PACK));
+
+    $this->actingAs(adminUser())
+        ->get(route('admin.packs'))
+        ->assertInertia(fn (AssertableInertia $page) => $page->where('vanillaMissing', $missing)->etc());
+});
+
+it('forbids non-admins from reinstalling vanilla', function () {
+    $this->actingAs(adminUser(Roles::USER))
+        ->post(route('admin.packs.reinstall-vanilla'))
+        ->assertForbidden();
+});
+
 it('validates the hub install name', function () {
     $this->actingAs(adminUser())
         ->post(route('admin.packs.install'), ['name' => 'evil/../path'])

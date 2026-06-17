@@ -18,6 +18,7 @@ use App\Support\Instance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -251,7 +252,25 @@ class AdminController extends Controller
             'installed' => $installed,
             'hubPacks' => $hub->available(),
             'defaultId' => $defaultId,
+            'vanillaMissing' => ! File::isDirectory(public_path('resource-packs/'.InstallResourcePack::VANILLA_PACK)),
         ]);
+    }
+
+    /**
+     * Re-download the bundled "Default Vanilla" pack from upstream. It's the
+     * baseline every other pack borrows missing sprites from, so it can't be
+     * deleted via the UI — but if its on-disk assets go missing this restores
+     * them (the DB row keeps its "Default Vanilla" identity, see upsertRow()).
+     */
+    public function reinstallVanilla(InstallResourcePack $installer): RedirectResponse
+    {
+        try {
+            $pack = $installer->install(InstallResourcePack::VANILLA_PACK);
+        } catch (\Throwable $e) {
+            return back()->dangerBanner('Could not reinstall the Default Vanilla pack: '.$e->getMessage());
+        }
+
+        return back()->banner("Reinstalled {$pack->alias}.");
     }
 
     /**

@@ -69,6 +69,8 @@ Route::middleware([
             Route::put('/integrations', [AdminController::class, 'updateIntegrations'])->name('admin.integrations.update');
             Route::get('/packs', [AdminController::class, 'packs'])->name('admin.packs');
             Route::post('/packs/install', [AdminController::class, 'installPack'])->name('admin.packs.install');
+            Route::post('/packs/reinstall-vanilla', [AdminController::class, 'reinstallVanilla'])
+                ->name('admin.packs.reinstall-vanilla');
             Route::delete('/packs/{pack}', [AdminController::class, 'destroyPack'])
                 ->whereNumber('pack')->name('admin.packs.destroy');
         });

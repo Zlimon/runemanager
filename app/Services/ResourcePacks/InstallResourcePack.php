@@ -418,19 +418,32 @@ class InstallResourcePack
      */
     private function upsertRow(string $name, array $colors): ResourcePack
     {
-        $properties = $this->fetchProperties($name);
-        $tags = $properties ? array_map('trim', explode(',', $properties['tags'] ?? '')) : [];
-        $tags = array_map(fn ($t) => Str::lower($t), array_filter($tags));
-
         // ResourcePack has no $fillable — set attributes directly to avoid mass-assignment guards.
         $pack = ResourcePack::where('name', $name)->first() ?? new ResourcePack;
         $pack->name = $name;
-        $pack->alias = $properties['displayName'] ?? Str::title(str_replace(['pack-', '-'], ' ', $name));
-        $pack->version = $properties['compatibleVersion'] ?? '1.0.0';
-        $pack->author = $properties['author'] ?? 'unknown';
-        $pack->url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
-        $pack->tags = implode(',', $tags);
-        $pack->dark_mode = in_array('dark', $tags, true);
+
+        if ($name === self::VANILLA_PACK) {
+            // Reinstalling the bundled default keeps the identity ensureVanilla()
+            // gives it, regardless of what the upstream branch declares.
+            $pack->alias = 'Default Vanilla';
+            $pack->version = 'bundled';
+            $pack->author = 'RuneManager';
+            $pack->url = '';
+            $pack->tags = '';
+            $pack->dark_mode = false;
+        } else {
+            $properties = $this->fetchProperties($name);
+            $tags = $properties ? array_map('trim', explode(',', $properties['tags'] ?? '')) : [];
+            $tags = array_map(fn ($t) => Str::lower($t), array_filter($tags));
+
+            $pack->alias = $properties['displayName'] ?? Str::title(str_replace(['pack-', '-'], ' ', $name));
+            $pack->version = $properties['compatibleVersion'] ?? '1.0.0';
+            $pack->author = $properties['author'] ?? 'unknown';
+            $pack->url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
+            $pack->tags = implode(',', $tags);
+            $pack->dark_mode = in_array('dark', $tags, true);
+        }
+
         $pack->background_color = $colors['background_color'];
         $pack->accent_color = $colors['accent_color'];
         $pack->save();
