@@ -2,7 +2,7 @@
 import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
-const { skillIcon, onIconError } = useResourcePackIcon();
+const { skillIcon, vanillaSkillIcon, onIconError } = useResourcePackIcon();
 
 /*
  * The themed account box used on the Accounts index — avatar (with online dot),
@@ -31,16 +31,16 @@ defineProps({
 
             <div v-if="account.level" class="flex items-center space-x-1">
                 <img class="h-6 w-6 object-contain" alt=""
-                     :src="skillIcon('overall') ?? '/images/skill/overall.png'"
-                     @error="onIconError($event, '/images/skill/overall.png')">
+                     :src="skillIcon('overall') ?? vanillaSkillIcon('overall')"
+                     @error="onIconError($event, vanillaSkillIcon('overall'))">
                 <p class="font-normal text-base-content/70">{{ account.level }}</p>
             </div>
 
             <p v-if="account.online && account.activity"
                class="mt-0.5 flex items-center gap-1 truncate text-xs text-success" :title="account.activity">
                 <img v-if="account.activity_icon" class="h-3.5 w-3.5 object-contain" alt=""
-                     :src="skillIcon(account.activity_icon) ?? `/images/skill/${account.activity_icon}.png`"
-                     @error="onIconError($event, `/images/skill/${account.activity_icon}.png`)">
+                     :src="skillIcon(account.activity_icon) ?? vanillaSkillIcon(account.activity_icon)"
+                     @error="onIconError($event, vanillaSkillIcon(account.activity_icon))">
                 {{ account.activity }}
             </p>
             <p v-if="account.online && account.world" class="text-xs text-base-content/50">

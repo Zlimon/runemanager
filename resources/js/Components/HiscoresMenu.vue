@@ -8,21 +8,20 @@ defineProps({
 });
 
 const page = usePage();
-const { packIcon, skillIcon, onIconError } = useResourcePackIcon();
+const { packIcon, skillIcon, vanillaSkillIcon, onIconError } = useResourcePackIcon();
 
 // Category metadata drives the tab strip, the route, and the per-item icon path
 // so the three lists share one template instead of three near-identical blocks.
-// Skills prefer the active pack's icon (bundled fallback via onIconError); bosses
-// and clues have no pack icons, so they use the local /images files — boss slugs
-// are underscore from the hiscores API but the files use dashes, and clue tiers
-// map to {tier}-treasure-trails.png. tabIcon/tabFallback drive the category tab
-// strip, mirroring the Skills/Bosses/Clues tabs on the account profile.
-const localSkill = (slug) => `/images/skill/${slug}.png`;
+// Skills prefer the active pack's icon and fall back to the bundled Default
+// Vanilla pack; bosses and clues have no pack icons, so they use the local
+// /images files — boss slugs are underscore from the hiscores API but the files
+// use dashes, and clue tiers map to {tier}-treasure-trails.png. tabIcon/tabFallback
+// drive the category tab strip, mirroring the Skills/Bosses/Clues profile tabs.
 const localBoss = (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png`;
 const localClue = (slug) => `/images/clue/${slug.replace('clue_scrolls_', '')}-treasure-trails.png`;
 
 const categories = [
-    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => skillIcon(slug) ?? localSkill(slug), fallback: localSkill, tabIcon: packIcon('tab', 'stats') ?? '/images/skill/overall.png', tabFallback: '/images/skill/overall.png' },
+    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => skillIcon(slug) ?? vanillaSkillIcon(slug), fallback: vanillaSkillIcon, tabIcon: packIcon('tab', 'stats') ?? vanillaSkillIcon('overall'), tabFallback: vanillaSkillIcon('overall') },
     { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: localBoss, fallback: localBoss, tabIcon: '/images/boss/bosses.png', tabFallback: '/images/boss/bosses.png' },
     { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: localClue, fallback: localClue, tabIcon: '/images/clue/clues.png', tabFallback: '/images/clue/clues.png' },
 ];
@@ -56,9 +55,9 @@ const items = computed(() => lists.value[activeKey.value]);
             <div class="mb-3 grid grid-cols-2 gap-1">
                 <Link :href="route('hiscores.overall.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="skillIcon('overall') ?? '/images/skill/overall.png'"
+                    <img :src="skillIcon('overall') ?? vanillaSkillIcon('overall')"
                          class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, '/images/skill/overall.png')">
+                         @error="onIconError($event, vanillaSkillIcon('overall'))">
                     Overall
                 </Link>
 
@@ -71,7 +70,7 @@ const items = computed(() => lists.value[activeKey.value]);
 
                 <Link :href="route('hiscores.diaries.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('quests_tab', 'green_achievement_diaries_icon') ?? '/images/journal/diaries.png'"
+                    <img :src="packIcon('quests_tab', 'green_achievement_diaries_icon')"
                          class="h-5 w-5 object-contain" alt=""
                          @error="onIconError($event, '/images/journal/diaries.png')">
                     Achievements Diaries

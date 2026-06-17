@@ -11,7 +11,7 @@ const props = defineProps({
     },
 });
 
-const { packIcon, skillIcon, onIconError } = useResourcePackIcon();
+const { packIcon, skillIcon, vanillaSkillIcon, onIconError } = useResourcePackIcon();
 const activeTab = ref('skills');
 const activeKey = ref(null);
 
@@ -23,7 +23,7 @@ const activeKey = ref(null);
  * (`abyssal_sire`), so the boss path converts on the way out.
  */
 const skillIconSrc = (slug) =>
-    skillIcon(slug) ?? `/images/skill/${slug}.png`;
+    skillIcon(slug) ?? vanillaSkillIcon(slug);
 
 const bossIconSrc = (slug) =>
     `/images/boss/${slug.replace(/_/g, '-')}.png`;
@@ -45,7 +45,7 @@ const skillCells = computed(() => [
         label: props.account.level,
         tooltip: { name: 'Total level', value: props.account.xp.toLocaleString('en-US') },
         iconSrc: () => skillIconSrc('overall'),
-        fallback: '/images/skill/overall.png',
+        fallback: vanillaSkillIcon('overall'),
     },
     ...props.account.skills.map((skill) => ({
         href: route('hiscores.skills.index', skill.slug),
@@ -53,7 +53,7 @@ const skillCells = computed(() => [
         label: skill.level,
         tooltip: { name: skill.name, value: skill.xp.toLocaleString('en-US') },
         iconSrc: () => skillIconSrc(skill.slug),
-        fallback: `/images/skill/${skill.slug}.png`,
+        fallback: vanillaSkillIcon(skill.slug),
     })),
 ]);
 
@@ -92,7 +92,7 @@ const cells = computed(() => {
 });
 
 const tabs = [
-    { key: 'skills', label: 'Skills', icon: packIcon('tab', 'stats'), fallback: '/images/skill/overall.png' },
+    { key: 'skills', label: 'Skills', icon: packIcon('tab', 'stats'), fallback: vanillaSkillIcon('overall') },
     { key: 'bosses', label: 'Bosses', fallback: '/images/boss/bosses.png' },
     { key: 'clues', label: 'Clues', fallback: '/images/clue/clues.png' },
 ];

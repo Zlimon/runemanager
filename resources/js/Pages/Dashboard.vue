@@ -8,7 +8,7 @@ import FeedEventItem from '@/Components/Game/FeedEventItem.vue';
 import { visibleFeedEvents } from '@/feed';
 import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
 
-const { skillIcon, onIconError } = useResourcePackIcon();
+const { skillIcon, vanillaSkillIcon, onIconError } = useResourcePackIcon();
 
 const props = defineProps({
     stats: { type: Object, default: () => ({ accounts: 0, members: 0, online: 0 }) },
@@ -166,8 +166,8 @@ const removeEvent = (id) => {
                                         <span class="min-w-0 flex-1 truncate font-semibold">{{ account.username }}</span>
                                         <span class="flex items-center gap-1 text-sm text-base-content/70">
                                             <img class="h-5 w-5 object-contain" alt=""
-                                                 :src="skillIcon('overall') ?? '/images/skill/overall.png'"
-                                                 @error="onIconError($event, '/images/skill/overall.png')">
+                                                 :src="skillIcon('overall') ?? vanillaSkillIcon('overall')"
+                                                 @error="onIconError($event, vanillaSkillIcon('overall'))">
                                             {{ account.level }}
                                         </span>
                                     </Link>

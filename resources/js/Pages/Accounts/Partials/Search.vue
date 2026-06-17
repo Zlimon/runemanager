@@ -7,7 +7,7 @@ import Search from "@/Components/Search.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
 const page = usePage();
-const { skillIcon, onIconError } = useResourcePackIcon();
+const { skillIcon, vanillaSkillIcon, onIconError } = useResourcePackIcon();
 
 const query = ref('');
 const showDropdown = ref(true);
@@ -72,8 +72,8 @@ watch(query, (value) => {
 
                             <div class="flex items-center space-x-1">
                                 <img class="h-6 w-6 object-contain" alt=""
-                                     :src="skillIcon('overall') ?? '/images/skill/overall.png'"
-                                     @error="onIconError($event, '/images/skill/overall.png')">
+                                     :src="skillIcon('overall') ?? vanillaSkillIcon('overall')"
+                                     @error="onIconError($event, vanillaSkillIcon('overall'))">
                                 <p class="text-md font-normal text-base-content/60">
                                     {{ account.level }}
                                 </p>
