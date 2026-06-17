@@ -96,9 +96,11 @@ const props = defineProps({
 // the values inline) rather than via a prop reload.
 const liveVitals = ref(props.vitals);
 
-// Current in-game activity + area — pushed live on the status broadcast.
+// Current in-game activity + area + world — pushed live on the status broadcast.
 const liveActivity = ref(props.account.activity);
+const liveActivityIcon = ref(props.account.activity_icon);
 const liveLocation = ref(props.location);
+const liveWorld = ref(props.account.world);
 
 const activeTab = ref('inventory');
 
@@ -164,7 +166,9 @@ onMounted(() => {
         .listen(".VitalsUpdated", (event) => { liveVitals.value = event; })
         .listen(".StatusUpdated", (event) => {
             liveActivity.value = event.activity;
+            liveActivityIcon.value = event.activity_icon;
             liveLocation.value = event.location;
+            liveWorld.value = event.world;
         });
 });
 
@@ -186,15 +190,15 @@ onBeforeUnmount(() => {
 
                 <Card class="mt-4" padding="p-6 lg:p-8">
                     <div class="flex items-start justify-between gap-4">
-                        <Header :account="account" :activity="liveActivity" class="flex-1" />
+                        <Header :account="account" :activity="liveActivity" :activity-icon="liveActivityIcon" class="flex-1" />
                         <div class="hidden shrink-0 items-start gap-3 md:flex">
                             <StatusOrbs :vitals="liveVitals" />
                             <div class="flex flex-col items-center gap-1">
                                 <Minimap :username="account.username" :position="position"
                                          :href="position ? route('map.index', { focus: account.username }) : null" />
-                                <p v-if="account.online && liveLocation"
+                                <p v-if="liveLocation"
                                    class="max-w-[12rem] truncate text-xs text-base-content/70" :title="liveLocation">
-                                    {{ liveLocation }}
+                                    <span v-if="!account.online" class="text-base-content/50">Last seen: </span>{{ liveLocation }}<span v-if="account.online && liveWorld" class="text-base-content/50"> · W{{ liveWorld }}</span>
                                 </p>
                             </div>
                         </div>

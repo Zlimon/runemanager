@@ -30,6 +30,9 @@ class AccountResource extends JsonResource
             'xp' => $this->xp,
             'online' => $this->isOnline(),
             'activity' => $this->activity,
+            'activity_icon' => $this->activity_icon,
+            'location' => $this->location,
+            'world' => $this->world_number,
             'skills' => $this->whenAppended('skills', function () {
                 return $this->skills;
             }),

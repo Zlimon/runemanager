@@ -33,17 +33,19 @@ it('stores the activity and broadcasts it on the account + map channels', functi
     Event::fake([AccountStatusUpdated::class]);
     Sanctum::actingAs(statusUser());
 
-    $this->putJson('/api/plugin/status', ['activity' => 'Fighting Vorkath', 'location' => 'Ungael'], statusHeaders())->assertSuccessful();
+    $this->putJson('/api/plugin/status', ['activity' => 'Fishing', 'activity_icon' => 'fishing', 'location' => 'Ungael', 'world' => 302], statusHeaders())->assertSuccessful();
 
     $account = Account::firstOrFail();
-    expect($account->activity)->toBe('Fighting Vorkath');
+    expect($account->activity)->toBe('Fishing');
+    expect($account->activity_icon)->toBe('fishing');
     expect($account->location)->toBe('Ungael');
+    expect($account->world_number)->toBe(302);
 
     Event::assertDispatched(AccountStatusUpdated::class, function (AccountStatusUpdated $event) use ($account): bool {
         $channels = array_map(fn ($c) => $c->name, $event->broadcastOn());
 
         return $event->account->is($account)
-            && $event->broadcastWith() === ['username' => $account->username, 'activity' => 'Fighting Vorkath', 'location' => 'Ungael']
+            && $event->broadcastWith() === ['username' => $account->username, 'activity' => 'Fishing', 'activity_icon' => 'fishing', 'location' => 'Ungael', 'world' => 302]
             && in_array('private-account.'.$account->id, $channels, true)
             && in_array('private-map', $channels, true);
     });

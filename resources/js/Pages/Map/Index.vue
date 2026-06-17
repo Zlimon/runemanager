@@ -119,8 +119,15 @@ onMounted(() => {
         .listen(".AccountMoved", (event) => upsert(event))
         .listen(".StatusUpdated", (event) => {
             const entry = markers.get(event.username);
-            if (entry && entry.account.activity !== event.activity) {
-                entry.account = { ...entry.account, activity: event.activity };
+            if (entry && (entry.account.activity !== event.activity
+                || entry.account.activity_icon !== event.activity_icon
+                || entry.account.world !== event.world)) {
+                entry.account = {
+                    ...entry.account,
+                    activity: event.activity,
+                    activity_icon: event.activity_icon,
+                    world: event.world,
+                };
                 refreshCard(entry);
             }
         });

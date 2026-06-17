@@ -32,8 +32,13 @@ defineProps({
             </div>
 
             <p v-if="account.online && account.activity"
-               class="mt-0.5 truncate text-xs text-success" :title="account.activity">
+               class="mt-0.5 flex items-center gap-1 truncate text-xs text-success" :title="account.activity">
+                <img v-if="account.activity_icon" :src="`/images/skill/${account.activity_icon}.png`"
+                     class="h-3.5 w-3.5 object-contain" alt="" onerror="this.style.display='none'">
                 {{ account.activity }}
+            </p>
+            <p v-if="account.online && account.world" class="text-xs text-base-content/50">
+                World {{ account.world }}
             </p>
         </div>
     </div>

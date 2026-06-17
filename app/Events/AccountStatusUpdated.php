@@ -38,14 +38,16 @@ class AccountStatusUpdated implements ShouldBroadcastNow
     }
 
     /**
-     * @return array<string, ?string>
+     * @return array<string, string|int|null>
      */
     public function broadcastWith(): array
     {
         return [
             'username' => $this->account->username,
             'activity' => $this->account->activity,
+            'activity_icon' => $this->account->activity_icon,
             'location' => $this->account->location,
+            'world' => $this->account->world_number,
         ];
     }
 }

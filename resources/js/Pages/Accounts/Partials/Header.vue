@@ -13,6 +13,10 @@ defineProps({
         type: String,
         default: null,
     },
+    activityIcon: {
+        type: String,
+        default: null,
+    },
 });
 </script>
 
@@ -49,7 +53,9 @@ defineProps({
 
                 <p v-if="account.online && activity"
                    class="mt-1 flex items-center gap-1.5 text-xs font-medium text-success">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
+                    <img v-if="activityIcon" :src="`/images/skill/${activityIcon}.png`"
+                         class="h-4 w-4 object-contain" alt="" onerror="this.style.display='none'">
+                    <span v-else class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
                     {{ activity }}
                 </p>
             </div>
