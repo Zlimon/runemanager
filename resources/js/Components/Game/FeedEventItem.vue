@@ -1,9 +1,10 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import LootItems from "@/Components/Game/LootItems.vue";
 import ImageLightbox from "@/Components/ImageLightbox.vue";
+import { feedSentence } from "@/feed";
 
 /*
  * One row of the live feed — the account (with ironman badge), a relative
@@ -21,9 +22,15 @@ const emit = defineEmits(['deleted']);
 
 const page = usePage();
 
+const isOwner = computed(() => page.props.auth?.user?.id != null
+    && page.props.auth.user.id === props.event.account?.user_id);
+
 // Instance admins, or the owner of the account the entry belongs to, may delete.
-const canDelete = computed(() => page.props.is_admin
-    || (page.props.auth?.user?.id != null && page.props.auth.user.id === props.event.account?.user_id));
+const canDelete = computed(() => page.props.is_admin || isOwner.value);
+
+// Local pin state so the icon flips instantly; the redirect-back refreshes the
+// account's pinned gallery prop.
+const pinned = ref(props.event.pinned ?? false);
 
 const remove = () => {
     if (!confirm('Delete this feed entry?')) {
@@ -36,33 +43,15 @@ const remove = () => {
     });
 };
 
-const formatSkill = (slug) => slug.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-
-const sentence = (event) => {
-    const { type, payload } = event;
-    switch (type) {
-        case 'level_up':
-            return `reached level ${payload.level} ${formatSkill(payload.skill)}`;
-        case 'loot_drop':
-            return `received a drop from ${payload.source}`;
-        case 'quest_complete':
-            return `completed ${payload.quest}`;
-        case 'combat_achievement':
-            return payload.tier
-                ? `completed the ${formatSkill(payload.tier)} combat task: ${payload.task}`
-                : `completed the combat task: ${payload.task}`;
-        case 'collection_log':
-            return `added ${payload.item} to their collection log`;
-        case 'pet':
-            return 'received a pet';
-        case 'death':
-            return 'died';
-        case 'reward':
-            return payload.source ? `opened ${payload.source} rewards` : 'received rewards';
-        default:
-            return type;
-    }
+const togglePin = () => {
+    router.put(route('feed.pin', props.event.id), {}, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => { pinned.value = !pinned.value; },
+    });
 };
+
+const sentence = feedSentence;
 </script>
 
 <template>
@@ -85,6 +74,16 @@ const sentence = (event) => {
                       :title="dayjs(event.occurred_at).format('MMM D, YYYY h:mm A')">
                     {{ dayjs(event.occurred_at).fromNow() }}
                 </span>
+                <button v-if="isOwner" type="button" @click="togglePin"
+                        :class="pinned ? 'text-accent' : 'text-base-content/40 hover:text-accent'"
+                        :aria-label="pinned ? 'Unpin from gallery' : 'Pin to gallery'"
+                        :title="pinned ? 'Unpin from gallery' : 'Pin to gallery'">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" :fill="pinned ? 'currentColor' : 'none'"
+                         stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M9 4h6l-1 6 3 3v2H7v-2l3-3-1-6Zm3 11v5" />
+                    </svg>
+                </button>
                 <button v-if="canDelete" type="button" @click="remove" aria-label="Delete entry"
                         class="text-base-content/40 hover:text-error" title="Delete entry">
                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"

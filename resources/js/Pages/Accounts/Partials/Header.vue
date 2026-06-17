@@ -29,12 +29,7 @@ defineProps({
                         <h1 class="text-xl font-bold md:text-3xl">
                             {{ account.username }}
                         </h1>
-                        <OnlineStatus :online="account.online" class="ms-3" />
                     </div>
-
-                    <PrimaryButton type="button">
-                        Update
-                    </PrimaryButton>
                 </div>
 
                 <p class="mt-1 text-xs text-base-content/60">

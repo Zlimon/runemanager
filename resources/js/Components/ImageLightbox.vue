@@ -42,7 +42,7 @@ onBeforeUnmount(() => {
 <template>
     <div class="w-fit">
         <button type="button" @click="show"
-                class="block w-fit overflow-hidden rounded border pack-accent-border transition hover:opacity-90">
+                class="block w-full overflow-hidden rounded border pack-accent-border transition hover:opacity-90">
             <img :src="src" :alt="alt" loading="lazy" :class="thumbClass">
         </button>
 

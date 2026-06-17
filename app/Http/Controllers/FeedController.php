@@ -50,4 +50,20 @@ class FeedController extends Controller
 
         return back();
     }
+
+    /**
+     * Pin/unpin a feed entry to the account's achievement gallery. Only the
+     * owner of the account curates their own gallery.
+     */
+    public function togglePin(Request $request, FeedEvent $feedEvent): RedirectResponse
+    {
+        abort_unless(
+            $request->user()?->id === $feedEvent->account?->user_id,
+            HttpResponse::HTTP_FORBIDDEN,
+        );
+
+        $feedEvent->update(['pinned_at' => $feedEvent->pinned_at ? null : now()]);
+
+        return back();
+    }
 }

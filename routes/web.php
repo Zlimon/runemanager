@@ -85,6 +85,9 @@ Route::middleware([
     // entries; the controller enforces ownership.
     Route::delete('/feed/{feedEvent}', [FeedController::class, 'destroy'])
         ->whereNumber('feedEvent')->name('feed.destroy');
+    // Owner-only: pin/unpin an entry to the account's achievement gallery.
+    Route::put('/feed/{feedEvent}/pin', [FeedController::class, 'togglePin'])
+        ->whereNumber('feedEvent')->name('feed.pin');
 
     Route::middleware('can:manage calendar')->group(function () {
         Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');

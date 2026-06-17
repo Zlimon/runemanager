@@ -58,6 +58,7 @@ class FeedEventResource extends JsonResource
             'screenshot_url' => $this->screenshot_path
                 ? Storage::disk('public')->url($this->screenshot_path)
                 : null,
+            'pinned' => $this->pinned_at !== null,
             'occurred_at' => $this->occurred_at?->toIso8601String(),
             'account' => [
                 'user_id' => $this->account?->user_id,

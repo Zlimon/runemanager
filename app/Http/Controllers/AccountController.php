@@ -113,6 +113,12 @@ class AccountController extends Controller
                     ->where('account_id', $account->id)->recent(20)->get(),
             )->resolve(),
 
+            // SPEC §8 — owner-pinned events shown as the achievement gallery.
+            'pinnedFeed' => fn () => FeedEventResource::collectionWith(
+                FeedEvent::query()->with('account:id,user_id,username,account_type')
+                    ->where('account_id', $account->id)->pinned()->get(),
+            )->resolve(),
+
             // External API — defer so the page paints first, then the client
             // pulls this in via a follow-up partial reload.
             'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request, app(CollectionLogStructure::class))),

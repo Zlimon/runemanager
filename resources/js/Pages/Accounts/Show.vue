@@ -10,6 +10,7 @@ import CombatAchievements from "@/Components/Game/CombatAchievements.vue";
 import Inventory from "@/Components/Game/Inventory.vue";
 import LootingBag from "@/Components/Game/LootingBag.vue";
 import AccountFeed from "@/Components/Game/AccountFeed.vue";
+import AchievementGallery from "@/Components/Game/AchievementGallery.vue";
 import Freshness from "@/Components/Freshness.vue";
 import Loader from "@/Components/Loader.vue";
 import Search from "@/Pages/Accounts/Partials/Search.vue";
@@ -66,6 +67,10 @@ const props = defineProps({
         default: () => [],
     },
     feed: {
+        type: Array,
+        default: () => [],
+    },
+    pinnedFeed: {
         type: Array,
         default: () => [],
     },
@@ -195,6 +200,11 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
 
+                    <!-- Owner-curated achievement gallery -->
+                    <div class="mt-4">
+                        <AchievementGallery :account="account" :events="pinnedFeed" />
+                    </div>
+
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-1">
                             <div class="flex flex-col items-center">
@@ -249,7 +259,7 @@ onBeforeUnmount(() => {
                             <div class="mx-auto mt-6 grid grid-cols-3 gap-2">
                                 <div class="col-span-2">
                                     <h3>Skills</h3>
-                                    <Skills :account="account" />
+                                    <Skills :account="account" class="mt-4" />
                                 </div>
 
                                 <div class="col-span-1">

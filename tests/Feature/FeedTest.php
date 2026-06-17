@@ -216,6 +216,40 @@ it('forbids a non-owner non-admin from deleting a feed entry', function () {
     expect(FeedEvent::find($event->id))->not->toBeNull();
 });
 
+it('lets the owner pin and unpin a feed entry', function () {
+    $account = makeAccountForFeed('Pinner');
+    $event = FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now()]);
+
+    $this->actingAs($account->user)->put(route('feed.pin', $event))->assertRedirect();
+    expect($event->refresh()->pinned_at)->not->toBeNull();
+
+    $this->actingAs($account->user)->put(route('feed.pin', $event))->assertRedirect();
+    expect($event->refresh()->pinned_at)->toBeNull();
+});
+
+it('forbids a non-owner (even an admin) from pinning a feed entry', function () {
+    $account = makeAccountForFeed('Curated');
+    $event = FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now()]);
+
+    $this->actingAs(adminUser())->put(route('feed.pin', $event))->assertForbidden();
+    expect($event->refresh()->pinned_at)->toBeNull();
+});
+
+it('exposes pinned events as the account gallery', function () {
+    $account = makeAccountForFeed('Galleried');
+    FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_PET, 'payload' => [], 'occurred_at' => now(), 'pinned_at' => now()]);
+    FeedEvent::create(['account_id' => $account->id, 'type' => FeedEvent::TYPE_DEATH, 'payload' => [], 'occurred_at' => now()]);
+
+    $this->actingAs($account->user)
+        ->get(route('accounts.show', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('pinnedFeed', 1)
+            ->where('pinnedFeed.0.type', 'pet')
+            ->where('pinnedFeed.0.pinned', true),
+        );
+});
+
 it('/feed is publicly accessible (no auth required)', function () {
     // No actingAs / Sanctum here on purpose — SPEC §8.2: "publicly visible".
     $this->get(route('feed.index'))->assertOk();

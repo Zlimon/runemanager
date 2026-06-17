@@ -48,12 +48,14 @@ class FeedEvent extends Model
         'type',
         'payload',
         'screenshot_path',
+        'pinned_at',
         'occurred_at',
     ];
 
     protected $casts = [
         'payload' => 'array',
         'occurred_at' => 'datetime',
+        'pinned_at' => 'datetime',
     ];
 
     public function account(): BelongsTo
@@ -69,5 +71,11 @@ class FeedEvent extends Model
     public function scopeOfType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
+    }
+
+    /** Pinned events, newest pin first — drives the account achievement gallery. */
+    public function scopePinned(Builder $query): Builder
+    {
+        return $query->whereNotNull('pinned_at')->orderByDesc('pinned_at');
     }
 }
