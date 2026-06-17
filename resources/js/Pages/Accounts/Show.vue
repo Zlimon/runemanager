@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { Deferred, router } from "@inertiajs/vue3";
+import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CollectionLog from "@/Components/Game/CollectionLog.vue";
 import Loot from "@/Components/Game/Loot.vue";
@@ -102,18 +103,22 @@ const liveActivityIcon = ref(props.account.activity_icon);
 const liveLocation = ref(props.location);
 const liveWorld = ref(props.account.world);
 
+// Inventory + Looting bag use the active pack's in-game tab/bank icons (no local
+// fallback exists, so they show only when a pack is installed).
+const { packIcon } = useResourcePackIcon();
+
 const activeTab = ref('inventory');
 
 const inventoryTabs = [
-    { key: 'inventory', label: 'Inventory' },
-    { key: 'looting-bag', label: 'Looting bag' },
+    { key: 'inventory', label: 'Inventory', icon: packIcon('tab', 'inventory') },
+    { key: 'looting-bag', label: 'Looting bag', icon: packIcon('bank', 'deposit_looting_bag') },
 ];
 
 const activeJournalTab = ref('quests');
 const journalTabs = [
-    { key: 'quests', label: 'Quests' },
-    { key: 'diaries', label: 'Diaries' },
-    { key: 'combat-achievements', label: 'Combat' },
+    { key: 'quests', label: 'Quests', icon: packIcon('tab', 'quests'), fallback: '/images/journal/quests.png' },
+    { key: 'diaries', label: 'Diaries', icon: packIcon('tab', 'quests_green_achievement_diaries'), fallback: '/images/journal/diaries.png' },
+    { key: 'combat-achievements', label: 'Combat', icon: packIcon('tab', 'combat_achievements') },
 ];
 
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);

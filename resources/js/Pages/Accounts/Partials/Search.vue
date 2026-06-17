@@ -4,8 +4,10 @@ import debounce from "lodash/debounce";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import Search from "@/Components/Search.vue";
+import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
 const page = usePage();
+const { skillIcon, onIconError } = useResourcePackIcon();
 
 const query = ref('');
 const showDropdown = ref(true);
@@ -69,8 +71,9 @@ watch(query, (value) => {
                             </div>
 
                             <div class="flex items-center space-x-1">
-                                <img class="h-6 w-6 object-contain"
-                                     src="/images/skill/overall.png">
+                                <img class="h-6 w-6 object-contain" alt=""
+                                     :src="skillIcon('overall') ?? '/images/skill/overall.png'"
+                                     @error="onIconError($event, '/images/skill/overall.png')">
                                 <p class="text-md font-normal text-base-content/60">
                                     {{ account.level }}
                                 </p>

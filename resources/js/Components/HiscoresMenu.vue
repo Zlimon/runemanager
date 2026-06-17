@@ -1,22 +1,30 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
 
 defineProps({
     active: Boolean,
 });
 
 const page = usePage();
+const { packIcon, skillIcon, onIconError } = useResourcePackIcon();
 
-// Category metadata drives the tab strip, the route, and the icon path so the
-// three lists share one template instead of three near-identical blocks. Icon
-// paths mirror the bundled /images conventions: skills are plain png, boss
-// slugs are underscore from the hiscores API but the files use dashes, and clue
-// tiers map to {tier}-treasure-trails.png.
+// Category metadata drives the tab strip, the route, and the per-item icon path
+// so the three lists share one template instead of three near-identical blocks.
+// Skills prefer the active pack's icon (bundled fallback via onIconError); bosses
+// and clues have no pack icons, so they use the local /images files — boss slugs
+// are underscore from the hiscores API but the files use dashes, and clue tiers
+// map to {tier}-treasure-trails.png. tabIcon/tabFallback drive the category tab
+// strip, mirroring the Skills/Bosses/Clues tabs on the account profile.
+const localSkill = (slug) => `/images/skill/${slug}.png`;
+const localBoss = (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png`;
+const localClue = (slug) => `/images/clue/${slug.replace('clue_scrolls_', '')}-treasure-trails.png`;
+
 const categories = [
-    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => `/images/skill/${slug}.png` },
-    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png` },
-    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: (slug) => `/images/clue/${slug.replace('clue_scrolls_', '')}-treasure-trails.png` },
+    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => skillIcon(slug) ?? localSkill(slug), fallback: localSkill, tabIcon: packIcon('tab', 'stats') ?? '/images/skill/overall.png', tabFallback: '/images/skill/overall.png' },
+    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: localBoss, fallback: localBoss, tabIcon: '/images/boss/bosses.png', tabFallback: '/images/boss/bosses.png' },
+    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: localClue, fallback: localClue, tabIcon: '/images/clue/clues.png', tabFallback: '/images/clue/clues.png' },
 ];
 
 const lists = computed(() => ({
@@ -48,61 +56,51 @@ const items = computed(() => lists.value[activeKey.value]);
             <div class="mb-3 grid grid-cols-2 gap-1">
                 <Link :href="route('hiscores.overall.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img src="/images/skill/overall.png" class="h-5 w-5 object-contain" alt=""
-                         onerror="this.style.display='none'">
+                    <img :src="skillIcon('overall') ?? '/images/skill/overall.png'"
+                         class="h-5 w-5 object-contain" alt=""
+                         @error="onIconError($event, '/images/skill/overall.png')">
                     Overall
                 </Link>
 
                 <Link :href="route('hiscores.loot.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <svg class="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="currentColor"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <ellipse cx="12" cy="6" rx="8" ry="3" />
-                        <path d="M4 6v4c0 1.66 3.58 3 8 3s8-1.34 8-3V6c0 1.66-3.58 3-8 3S4 7.66 4 6Z" />
-                        <path d="M4 12v4c0 1.66 3.58 3 8 3s8-1.34 8-3v-4c0 1.66-3.58 3-8 3s-8-1.34-8-3Z" opacity="0.7" />
-                    </svg>
+                    <img :src="packIcon('tab', 'inventory')" class="h-5 w-5 object-contain" alt=""
+                         @error="onIconError($event, null)">
                     Loot
                 </Link>
 
                 <Link :href="route('hiscores.diaries.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <svg class="h-5 w-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6M9 11h6" />
-                    </svg>
-                    Diaries
+                    <img :src="packIcon('quests_tab', 'green_achievement_diaries_icon') ?? '/images/journal/diaries.png'"
+                         class="h-5 w-5 object-contain" alt=""
+                         @error="onIconError($event, '/images/journal/diaries.png')">
+                    Achievements Diaries
                 </Link>
 
                 <Link :href="route('hiscores.collection-log.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <svg class="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m8 12 2.5 2.5L15 10" />
-                    </svg>
+                    <img :src="packIcon('quests_tab', 'combat_achievements_collections_logged') ?? '/images/journal/diaries.png'"
+                         class="h-5 w-5 object-contain" alt=""
+                         @error="onIconError($event, '/images/journal/diaries.png')">
                     Collection Log
                 </Link>
 
                 <Link :href="route('hiscores.combat-achievements.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <svg class="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M6.5 6.5 17.5 17.5M4 3h3l11 11v3l-3 0L4 6V3Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m15 5 4-2-2 4M9 19l-4 2 2-4" />
-                    </svg>
+                    <img :src="packIcon('quests_tab', 'combat_achievements_icon')"
+                         class="h-5 w-5 object-contain" alt=""
+                         @error="onIconError($event, null)">
                     Combat Achievements
                 </Link>
             </div>
 
             <div role="tablist" class="tabs tabs-boxed mb-3">
                 <a v-for="category in categories" :key="category.key"
-                   role="tab" class="tab"
+                   role="tab" class="tab gap-1.5"
                    :class="{ 'tab-active': activeKey === category.key }"
                    @click="activeKey = category.key">
+                    <img :src="category.tabIcon" class="h-4 w-4 object-contain" alt=""
+                         @error="onIconError($event, category.tabFallback)">
                     {{ category.label }}
                 </a>
             </div>
@@ -111,7 +109,8 @@ const items = computed(() => lists.value[activeKey.value]);
                 <Link v-for="item in items" :key="item.slug"
                       :href="route(activeCategory.route, item.slug)"
                       class="flex items-center gap-2 rounded p-2 hover:bg-base-300">
-                    <img :src="activeCategory.icon(item.slug)" class="h-6 w-6 object-contain" :alt="item.name">
+                    <img :src="activeCategory.icon(item.slug)" class="h-6 w-6 object-contain" :alt="item.name"
+                         @error="onIconError($event, activeCategory.fallback(item.slug))">
                     <span class="truncate text-sm capitalize text-base-content">{{ item.name }}</span>
                 </Link>
             </div>

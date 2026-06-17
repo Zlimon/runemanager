@@ -4,6 +4,9 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import Card from '@/Components/Card.vue';
 import DarkModeToggle from '@/Components/DarkModeToggle.vue';
+import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
+
+const { skillIcon, onIconError } = useResourcePackIcon();
 
 defineProps({
     canLogin: { type: Boolean, default: false },
@@ -107,7 +110,9 @@ const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
                                          class="h-5 w-5 object-contain" alt="">
                                     <span class="min-w-0 flex-1 truncate font-semibold">{{ account.username }}</span>
                                     <span class="flex items-center gap-1 text-sm text-base-content/70">
-                                        <img class="h-5 w-5 object-contain" src="/images/skill/overall.png" alt="">
+                                        <img class="h-5 w-5 object-contain" alt=""
+                                             :src="skillIcon('overall') ?? '/images/skill/overall.png'"
+                                             @error="onIconError($event, '/images/skill/overall.png')">
                                         {{ account.level }}
                                     </span>
                                 </component>

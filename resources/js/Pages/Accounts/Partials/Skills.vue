@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref } from "vue";
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import TabbedCard from "@/Components/TabbedCard.vue";
+import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
 
 const props = defineProps({
     account: {
@@ -10,29 +11,19 @@ const props = defineProps({
     },
 });
 
-const page = usePage();
+const { packIcon, skillIcon, onIconError } = useResourcePackIcon();
 const activeTab = ref('skills');
 const activeKey = ref(null);
 
 /*
- * Asset URL helpers — prefer the active pack's icon, fall back to the local
- * /images/{kind}/{slug}.{ext} bundle when the pack doesn't ship one (e.g.
- * Sailing on packs predating Nov 2025) or no pack is active. ?v={version}
- * busts the browser cache when the pack is re-installed.
- *
+ * Asset URL helpers — skills prefer the active pack's icon (bundled fallback via
+ * onIconError); bosses and clues have no pack icons so they use the local files.
  * The local /images/{boss,clue}/ files use dash-separated slugs (e.g.
  * `abyssal-sire.png`), while the OSRS hiscores API ships underscore slugs
  * (`abyssal_sire`), so the boss path converts on the way out.
  */
-const packIcon = (kind, slug) => {
-    const pack = page.props.pack;
-    return pack?.name
-        ? `/resource-packs/${pack.name}/${kind}/${slug}.png?v=${pack.version ?? ''}`
-        : null;
-};
-
 const skillIconSrc = (slug) =>
-    packIcon('skill', slug) ?? `/images/skill/${slug}.png`;
+    skillIcon(slug) ?? `/images/skill/${slug}.png`;
 
 const bossIconSrc = (slug) =>
     `/images/boss/${slug.replace(/_/g, '-')}.png`;
@@ -42,11 +33,6 @@ const bossIconSrc = (slug) =>
 const clueIconSrc = (slug) => {
     const tier = slug.replace(/^clue_scrolls_/, '');
     return `/images/clue/${tier}-treasure-trails.png`;
-};
-
-const onIconError = (event, fallback) => {
-    event.target.onerror = null;
-    event.target.src = fallback;
 };
 
 // Skills includes a synthetic "total" tile prepended to the real skill list so
@@ -106,9 +92,9 @@ const cells = computed(() => {
 });
 
 const tabs = [
-    { key: 'skills', label: 'Skills' },
-    { key: 'bosses', label: 'Bosses' },
-    { key: 'clues', label: 'Clues' },
+    { key: 'skills', label: 'Skills', icon: packIcon('tab', 'stats'), fallback: '/images/skill/overall.png' },
+    { key: 'bosses', label: 'Bosses', fallback: '/images/boss/bosses.png' },
+    { key: 'clues', label: 'Clues', fallback: '/images/clue/clues.png' },
 ];
 </script>
 

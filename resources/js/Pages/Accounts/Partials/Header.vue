@@ -3,6 +3,9 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import OnlineStatus from "@/Components/OnlineStatus.vue";
 import dayjs from "dayjs";
 import Icon from "@/Pages/Accounts/Partials/Icon.vue";
+import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
+
+const { skillIcon, onIconError } = useResourcePackIcon();
 
 defineProps({
     account: {
@@ -53,8 +56,9 @@ defineProps({
 
                 <p v-if="account.online && activity"
                    class="mt-1 flex items-center gap-1.5 text-xs font-medium text-success">
-                    <img v-if="activityIcon" :src="`/images/skill/${activityIcon}.png`"
-                         class="h-4 w-4 object-contain" alt="" onerror="this.style.display='none'">
+                    <img v-if="activityIcon" class="h-4 w-4 object-contain" alt=""
+                         :src="skillIcon(activityIcon) ?? `/images/skill/${activityIcon}.png`"
+                         @error="onIconError($event, `/images/skill/${activityIcon}.png`)">
                     <span v-else class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
                     {{ activity }}
                 </p>
