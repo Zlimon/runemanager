@@ -266,22 +266,14 @@ onBeforeUnmount(() => {
                                     <h3>Journal</h3>
                                     <TabbedCard :tabs="journalTabs" v-model="activeJournalTab" class="mt-4">
                                         <template #quests>
-                                            <div class="flex justify-end">
-                                                <Freshness :updated-at="freshness.quests" :stale-after-minutes="staleAfter" />
-                                            </div>
-                                            <Quests :quests="quests" />
+                                            <Quests :quests="quests" :freshness="freshness.quests" :stale-after="staleAfter" />
                                         </template>
                                         <template #diaries>
-                                            <div class="flex justify-end">
-                                                <Freshness :updated-at="freshness.diaries" :stale-after-minutes="staleAfter" />
-                                            </div>
-                                            <Diaries :diaries="diaries" />
+                                            <Diaries :diaries="diaries" :freshness="freshness.diaries" :stale-after="staleAfter" />
                                         </template>
                                         <template #combat-achievements>
-                                            <div class="flex justify-end">
-                                                <Freshness :updated-at="freshness.combat_achievements" :stale-after-minutes="staleAfter" />
-                                            </div>
-                                            <CombatAchievements :combat-achievements="combatAchievements" />
+                                            <CombatAchievements :combat-achievements="combatAchievements"
+                                                                :freshness="freshness.combat_achievements" :stale-after="staleAfter" />
                                         </template>
                                     </TabbedCard>
                                 </div>

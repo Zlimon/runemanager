@@ -1,8 +1,19 @@
 <script setup>
-defineProps({
+import { computed } from "vue";
+import Freshness from "@/Components/Freshness.vue";
+
+const props = defineProps({
     quests: {
         type: Object,
         default: null,
+    },
+    freshness: {
+        type: String,
+        default: null,
+    },
+    staleAfter: {
+        type: Number,
+        default: 60,
     },
 });
 
@@ -14,20 +25,24 @@ const QUEST_STATUS_COLORS = {
     1: '#ffff00',
     2: '#00ff00',
 };
+
+const list = computed(() => props.quests?.quests ?? []);
+const finished = computed(() => list.value.filter((q) => q[1] === 2).length);
 </script>
 
 <template>
-    <div v-if="quests && quests.quests && quests.quests.length > 0"
-         class="overflow-y-scroll max-h-[15rem]">
-        <div class="m-2">
-            <div v-for="quest in quests.quests" :key="quest[0]">
-                <p :style="{ color: QUEST_STATUS_COLORS[quest[1]] }">
-                    {{ quest[0] }}
-                </p>
-            </div>
+    <div v-if="list.length">
+        <div class="mb-2 flex items-baseline justify-between">
+            <span class="text-xs text-base-content/60">{{ finished }} / {{ list.length }} complete</span>
+            <Freshness :updated-at="freshness" :stale-after-minutes="staleAfter" />
+        </div>
+        <div class="max-h-60 overflow-y-auto pr-1 text-sm">
+            <p v-for="quest in list" :key="quest[0]" :style="{ color: QUEST_STATUS_COLORS[quest[1]] }">
+                {{ quest[0] }}
+            </p>
         </div>
     </div>
-    <div v-else class="flex h-96 items-center justify-center">
-        <p class="text-gray-700 dark:text-gray-200">No quests found for this account</p>
+    <div v-else class="flex h-40 items-center justify-center text-center text-sm text-base-content/60">
+        No quest data yet.
     </div>
 </template>

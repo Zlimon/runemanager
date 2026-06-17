@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from "vue";
+import Freshness from "@/Components/Freshness.vue";
 
 /*
  * Combat Achievements summary: total points + completed tasks per tier, shown as
@@ -11,6 +12,14 @@ const props = defineProps({
     combatAchievements: {
         type: Object,
         default: null,
+    },
+    freshness: {
+        type: String,
+        default: null,
+    },
+    staleAfter: {
+        type: Number,
+        default: 60,
     },
 });
 
@@ -39,9 +48,9 @@ const tierRows = computed(() => TIERS.map((tier) => {
 
 <template>
     <div v-if="hasData">
-        <div class="mb-3 flex items-baseline justify-between">
-            <span class="text-sm text-base-content/70">Points</span>
-            <span class="text-2xl font-extrabold">{{ points.toLocaleString() }}</span>
+        <div class="mb-2 flex items-baseline justify-between">
+            <span class="text-xs text-base-content/60">{{ points.toLocaleString() }} points</span>
+            <Freshness :updated-at="freshness" :stale-after-minutes="staleAfter" />
         </div>
         <ul class="divide-y divide-base-content/10">
             <li v-for="tier in tierRows" :key="tier.key"
@@ -51,7 +60,7 @@ const tierRows = computed(() => TIERS.map((tier) => {
             </li>
         </ul>
     </div>
-    <div v-else class="flex h-32 items-center justify-center text-base-content/60">
+    <div v-else class="flex h-40 items-center justify-center text-center text-sm text-base-content/60">
         No combat achievement data yet.
     </div>
 </template>
