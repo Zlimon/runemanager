@@ -52,7 +52,7 @@ const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
         </header>
 
         <!-- Hero -->
-        <section class="bg-center bg-cover bg-no-repeat bg-[url('/images/background_4.png')] bg-gray-700 bg-blend-multiply"
+        <section class="bg-center bg-cover bg-no-repeat bg-gray-700 bg-blend-multiply"
                  :style="bannerStyle">
             <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-40">
                 <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
