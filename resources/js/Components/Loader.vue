@@ -16,7 +16,7 @@ defineProps({
              'fixed inset-0 h-screen w-full bg-gray-700 p-5': !component && !bare,
              'p-5': component,
          }">
-        <img src="../../images/loading-rat.gif" alt="Loading"
+        <img src="/images/loading-rat.gif" alt="Loading"
              class="h-20 w-20 rounded-full object-cover [image-rendering:pixelated]">
         <slot />
     </div>
