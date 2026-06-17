@@ -63,32 +63,33 @@ const items = computed(() => lists.value[activeKey.value]);
 
                 <Link :href="route('hiscores.loot.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('tab', 'inventory')" class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, null)">
+                    <img :src="packIcon('tab', 'inventory') ?? vanillaIcon('tab', 'inventory')"
+                         class="h-5 w-5 object-contain" alt=""
+                         @error="onIconError($event, vanillaIcon('tab', 'inventory'))">
                     Loot
                 </Link>
 
                 <Link :href="route('hiscores.diaries.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('quests_tab', 'green_achievement_diaries_icon')"
+                    <img :src="packIcon('quests_tab', 'green_achievement_diaries_icon') ?? vanillaIcon('quests_tab', 'green_achievement_diaries_icon')"
                          class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, '/images/journal/diaries.png')">
+                         @error="onIconError($event, vanillaIcon('quests_tab', 'green_achievement_diaries_icon'))">
                     Achievements Diaries
                 </Link>
 
                 <Link :href="route('hiscores.collection-log.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('quests_tab', 'combat_achievements_collections_logged') ?? '/images/journal/diaries.png'"
+                    <img :src="packIcon('quests_tab', 'combat_achievements_collections_logged') ?? vanillaIcon('quests_tab', 'combat_achievements_collections_logged')"
                          class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, '/images/journal/diaries.png')">
+                         @error="onIconError($event, vanillaIcon('quests_tab', 'combat_achievements_collections_logged'))">
                     Collection Log
                 </Link>
 
                 <Link :href="route('hiscores.combat-achievements.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('quests_tab', 'combat_achievements_icon')"
+                    <img :src="packIcon('quests_tab', 'combat_achievements_icon') ?? vanillaIcon('quests_tab', 'combat_achievements_icon')"
                          class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, null)">
+                         @error="onIconError($event, vanillaIcon('quests_tab', 'combat_achievements_icon'))">
                     Combat Achievements
                 </Link>
             </div>

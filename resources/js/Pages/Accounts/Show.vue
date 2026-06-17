@@ -105,20 +105,20 @@ const liveWorld = ref(props.account.world);
 
 // Inventory + Looting bag use the active pack's in-game tab/bank icons (no local
 // fallback exists, so they show only when a pack is installed).
-const { packIcon } = useResourcePackIcon();
+const { packIcon, vanillaIcon } = useResourcePackIcon();
 
 const activeTab = ref('inventory');
 
 const inventoryTabs = [
-    { key: 'inventory', label: 'Inventory', icon: packIcon('tab', 'inventory') },
-    { key: 'looting-bag', label: 'Looting bag', icon: packIcon('bank', 'deposit_looting_bag') },
+    { key: 'inventory', label: 'Inventory', icon: packIcon('tab', 'inventory'), fallback: vanillaIcon('tab', 'inventory') },
+    { key: 'looting-bag', label: 'Looting bag', icon: packIcon('bank', 'deposit_looting_bag'), fallback: vanillaIcon('bank', 'deposit_looting_bag') },
 ];
 
 const activeJournalTab = ref('quests');
 const journalTabs = [
-    { key: 'quests', label: 'Quests', icon: packIcon('tab', 'quests'), fallback: '/images/journal/quests.png' },
-    { key: 'diaries', label: 'Diaries', icon: packIcon('tab', 'quests_green_achievement_diaries'), fallback: '/images/journal/diaries.png' },
-    { key: 'combat-achievements', label: 'Combat', icon: packIcon('tab', 'combat_achievements') },
+    { key: 'quests', label: 'Quests', icon: packIcon('tab', 'quests'), fallback: vanillaIcon('tab', 'quests') },
+    { key: 'diaries', label: 'Diaries', icon: packIcon('tab', 'quests_green_achievement_diaries'), fallback: vanillaIcon('tab', 'quests_green_achievement_diaries') },
+    { key: 'combat-achievements', label: 'Combat', icon: packIcon('tab', 'combat_achievements'), fallback: vanillaIcon('tab', 'combat_achievements') },
 ];
 
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);

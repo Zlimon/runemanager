@@ -37,8 +37,11 @@ export function useResourcePackIcon() {
 
     const skillIcon = (slug) => packIcon("skill", skillSlug(slug));
 
-    // The bundled Default Vanilla pack's copy — the canonical skill-icon fallback.
-    const vanillaSkillIcon = (slug) => `/resource-packs/${VANILLA}/skill/${skillSlug(slug)}.png`;
+    // The bundled Default Vanilla pack's copy of {kind}/{slug}.png — the canonical
+    // fallback for any pack-shipped icon (skills, quest/journal chrome, …).
+    const vanillaIcon = (kind, slug) => `/resource-packs/${VANILLA}/${kind}/${slug}.png`;
+
+    const vanillaSkillIcon = (slug) => vanillaIcon("skill", skillSlug(slug));
 
     // Swap a failed icon to its fallback once, then hide if that fails too.
     const onIconError = (event, fallback) => {
@@ -51,5 +54,5 @@ export function useResourcePackIcon() {
         img.style.display = "none";
     };
 
-    return { packIcon, skillIcon, vanillaSkillIcon, onIconError };
+    return { packIcon, skillIcon, vanillaIcon, vanillaSkillIcon, onIconError };
 }
