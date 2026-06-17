@@ -100,6 +100,22 @@ const logout = () => {
                             <li>
                                 <NavDropdown :label="page.props.auth?.user?.name ?? 'Account'"
                                              :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*')">
+                                    <template v-if="page.props.my_accounts?.length">
+                                        <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-base-content/50">
+                                            My accounts
+                                        </p>
+                                        <NavDropdownLink v-for="acc in page.props.my_accounts" :key="acc.username"
+                                                         :href="route('accounts.show', { account: acc.username })"
+                                                         :active="route().current('accounts.show', { account: acc.username })">
+                                            <span class="flex items-center gap-2">
+                                                <img v-if="acc.account_type && acc.account_type !== 'normal'"
+                                                     :src="`/images/${acc.account_type}.png`"
+                                                     class="h-4 w-4 object-contain" alt="">
+                                                {{ acc.username }}
+                                            </span>
+                                        </NavDropdownLink>
+                                        <hr class="my-1 border-base-content/10">
+                                    </template>
                                     <NavDropdownLink :href="route('profile.show')"
                                                      :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*')">
                                         Settings

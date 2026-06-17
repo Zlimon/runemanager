@@ -64,6 +64,14 @@ class HandleInertiaRequests extends Middleware
             // SPEC §12 — drives the admin-only nav entry. The Owner holds every
             // management permission; clan/group elevation comes later.
             'is_admin' => $user !== null && $user->can(Roles::MANAGE_INSTANCE),
+            // The viewer's own OSRS accounts, for quick links in the nav dropdown.
+            'my_accounts' => $user
+                ? $user->account()->orderBy('username')->get(['id', 'username', 'account_type'])
+                    ->map(fn ($account) => [
+                        'username' => $account->username,
+                        'account_type' => $account->account_type?->value ?? $account->account_type,
+                    ])->all()
+                : [],
             'instance' => [
                 'mode' => Instance::mode(),
                 'name' => Instance::name(),
