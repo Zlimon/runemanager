@@ -41,17 +41,6 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 const slots = useSlots();
 
-// Tabs prefer the active pack's icon (tab.icon); if the pack doesn't ship it,
-// fall back to the bundled icon (tab.fallback), then hide if neither resolves.
-const onTabIconError = (event, fallback) => {
-    const img = event.target;
-    if (fallback && !img.src.endsWith(fallback)) {
-        img.src = fallback;
-        return;
-    }
-    img.style.display = "none";
-};
-
 const internal = ref(props.modelValue ?? props.tabs[0]?.key ?? null);
 
 const active = computed({
@@ -76,11 +65,10 @@ const hasNamedSlots = computed(() => props.tabs.some((tab) => slots[tab.key]));
                role="tab"
                @click="active = tab.key">
                 <!-- Custom tab markup (e.g. the Bank's per-tab item icons);
-                     defaults to the label, optionally prefixed with tab.icon. -->
+                     defaults to the label, optionally prefixed with tab.icon
+                     (an <img> attrs object from packIcon() or { src }). -->
                 <slot name="tab" :tab="tab" :active="active">
-                    <img v-if="tab.icon || tab.fallback" :src="tab.icon || tab.fallback"
-                         class="h-4 w-4 object-contain" alt=""
-                         @error="onTabIconError($event, tab.fallback)">
+                    <img v-if="tab.icon" v-bind="tab.icon" class="h-4 w-4 object-contain" alt="">
                     {{ tab.label }}
                 </slot>
             </a>

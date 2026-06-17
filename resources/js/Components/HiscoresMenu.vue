@@ -8,22 +8,21 @@ defineProps({
 });
 
 const page = usePage();
-const { packIcon, skillIcon, vanillaSkillIcon, onIconError } = useResourcePackIcon();
+const { packIcon } = useResourcePackIcon();
 
-// Category metadata drives the tab strip, the route, and the per-item icon path
-// so the three lists share one template instead of three near-identical blocks.
-// Skills prefer the active pack's icon and fall back to the bundled Default
-// Vanilla pack; bosses and clues have no pack icons, so they use the local
-// /images files — boss slugs are underscore from the hiscores API but the files
-// use dashes, and clue tiers map to {tier}-treasure-trails.png. tabIcon/tabFallback
-// drive the category tab strip, mirroring the Skills/Bosses/Clues profile tabs.
-const localBoss = (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png`;
-const localClue = (slug) => `/images/clue/${slug.replace('clue_scrolls_', '')}-treasure-trails.png`;
+// Category metadata drives the tab strip, the route, and the per-item icon so the
+// three lists share one template. Each `icon`/`tab` is an <img> attrs object:
+// skills resolve through packIcon (active pack → vanilla); bosses and clues have
+// no pack equivalent so they point at /images — boss slugs are underscore from
+// the hiscores API but the files use dashes, and clue tiers map to
+// {tier}-treasure-trails.png.
+const bossIcon = (slug) => ({ src: `/images/boss/${slug.replaceAll('_', '-')}.png` });
+const clueIcon = (slug) => ({ src: `/images/clue/${slug.replace('clue_scrolls_', '')}-treasure-trails.png` });
 
 const categories = [
-    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => skillIcon(slug) ?? vanillaSkillIcon(slug), fallback: vanillaSkillIcon, tabIcon: packIcon('tab', 'stats') ?? vanillaSkillIcon('overall'), tabFallback: vanillaSkillIcon('overall') },
-    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: localBoss, fallback: localBoss, tabIcon: '/images/boss/bosses.png', tabFallback: '/images/boss/bosses.png' },
-    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: localClue, fallback: localClue, tabIcon: '/images/clue/clues.png', tabFallback: '/images/clue/clues.png' },
+    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => packIcon('skill', slug), tab: packIcon('tab', 'stats') },
+    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: bossIcon, tab: { src: '/images/boss/bosses.png' } },
+    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: clueIcon, tab: { src: '/images/clue/clues.png' } },
 ];
 
 const lists = computed(() => ({
@@ -55,41 +54,31 @@ const items = computed(() => lists.value[activeKey.value]);
             <div class="mb-3 grid grid-cols-2 gap-1">
                 <Link :href="route('hiscores.overall.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="skillIcon('overall') ?? vanillaSkillIcon('overall')"
-                         class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, vanillaSkillIcon('overall'))">
+                    <img v-bind="packIcon('skill', 'overall')" class="h-5 w-5 object-contain" alt="">
                     Overall
                 </Link>
 
                 <Link :href="route('hiscores.loot.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('tab', 'inventory') ?? vanillaIcon('tab', 'inventory')"
-                         class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, vanillaIcon('tab', 'inventory'))">
+                    <img v-bind="packIcon('tab', 'inventory')" class="h-5 w-5 object-contain" alt="">
                     Loot
                 </Link>
 
                 <Link :href="route('hiscores.diaries.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('quests_tab', 'green_achievement_diaries_icon') ?? vanillaIcon('quests_tab', 'green_achievement_diaries_icon')"
-                         class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, vanillaIcon('quests_tab', 'green_achievement_diaries_icon'))">
+                    <img v-bind="packIcon('quests_tab', 'green_achievement_diaries_icon')" class="h-5 w-5 object-contain" alt="">
                     Achievements Diaries
                 </Link>
 
                 <Link :href="route('hiscores.collection-log.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('quests_tab', 'combat_achievements_collections_logged') ?? vanillaIcon('quests_tab', 'combat_achievements_collections_logged')"
-                         class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, vanillaIcon('quests_tab', 'combat_achievements_collections_logged'))">
+                    <img v-bind="packIcon('quests_tab', 'combat_achievements_collections_logged')" class="h-5 w-5 object-contain" alt="">
                     Collection Log
                 </Link>
 
                 <Link :href="route('hiscores.combat-achievements.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
-                    <img :src="packIcon('quests_tab', 'combat_achievements_icon') ?? vanillaIcon('quests_tab', 'combat_achievements_icon')"
-                         class="h-5 w-5 object-contain" alt=""
-                         @error="onIconError($event, vanillaIcon('quests_tab', 'combat_achievements_icon'))">
+                    <img v-bind="packIcon('quests_tab', 'combat_achievements_icon')" class="h-5 w-5 object-contain" alt="">
                     Combat Achievements
                 </Link>
             </div>
@@ -99,8 +88,7 @@ const items = computed(() => lists.value[activeKey.value]);
                    role="tab" class="tab gap-1.5"
                    :class="{ 'tab-active': activeKey === category.key }"
                    @click="activeKey = category.key">
-                    <img :src="category.tabIcon" class="h-4 w-4 object-contain" alt=""
-                         @error="onIconError($event, category.tabFallback)">
+                    <img v-bind="category.tab" class="h-4 w-4 object-contain" alt="">
                     {{ category.label }}
                 </a>
             </div>
@@ -109,8 +97,7 @@ const items = computed(() => lists.value[activeKey.value]);
                 <Link v-for="item in items" :key="item.slug"
                       :href="route(activeCategory.route, item.slug)"
                       class="flex items-center gap-2 rounded p-2 hover:bg-base-300">
-                    <img :src="activeCategory.icon(item.slug)" class="h-6 w-6 object-contain" :alt="item.name"
-                         @error="onIconError($event, activeCategory.fallback(item.slug))">
+                    <img v-bind="activeCategory.icon(item.slug)" class="h-6 w-6 object-contain" :alt="item.name">
                     <span class="truncate text-sm capitalize text-base-content">{{ item.name }}</span>
                 </Link>
             </div>

@@ -11,29 +11,19 @@ const props = defineProps({
     },
 });
 
-const { packIcon, skillIcon, vanillaSkillIcon, onIconError } = useResourcePackIcon();
+const { packIcon } = useResourcePackIcon();
 const activeTab = ref('skills');
 const activeKey = ref(null);
 
 /*
- * Asset URL helpers — skills prefer the active pack's icon (bundled fallback via
- * onIconError); bosses and clues have no pack icons so they use the local files.
- * The local /images/{boss,clue}/ files use dash-separated slugs (e.g.
- * `abyssal-sire.png`), while the OSRS hiscores API ships underscore slugs
- * (`abyssal_sire`), so the boss path converts on the way out.
+ * Icons resolve to <img> attrs: skills via packIcon (active pack → vanilla);
+ * bosses and clues have no pack equivalent so they point straight at /images.
+ * The /images/{boss,clue}/ files use dash-separated slugs (e.g. `abyssal-sire`),
+ * while the OSRS hiscores API ships underscore slugs, so boss converts on the
+ * way out; clue tiers map to `{tier}-treasure-trails.png`.
  */
-const skillIconSrc = (slug) =>
-    skillIcon(slug) ?? vanillaSkillIcon(slug);
-
-const bossIconSrc = (slug) =>
-    `/images/boss/${slug.replace(/_/g, '-')}.png`;
-
-// Clue tier slugs from the hiscore API are `clue_scrolls_{tier}`; the bundled
-// /images/clue/ files use `{tier}-treasure-trails.png`.
-const clueIconSrc = (slug) => {
-    const tier = slug.replace(/^clue_scrolls_/, '');
-    return `/images/clue/${tier}-treasure-trails.png`;
-};
+const bossIcon = (slug) => ({ src: `/images/boss/${slug.replace(/_/g, '-')}.png` });
+const clueIcon = (slug) => ({ src: `/images/clue/${slug.replace(/^clue_scrolls_/, '')}-treasure-trails.png` });
 
 // Skills includes a synthetic "total" tile prepended to the real skill list so
 // the user sees their overall first. Total uses account.{level,xp} from the
@@ -44,16 +34,14 @@ const skillCells = computed(() => [
         slug: 'overall',
         label: props.account.level,
         tooltip: { name: 'Total level', value: props.account.xp.toLocaleString('en-US') },
-        iconSrc: () => skillIconSrc('overall'),
-        fallback: vanillaSkillIcon('overall'),
+        icon: packIcon('skill', 'overall'),
     },
     ...props.account.skills.map((skill) => ({
         href: route('hiscores.skills.index', skill.slug),
         slug: skill.slug,
         label: skill.level,
         tooltip: { name: skill.name, value: skill.xp.toLocaleString('en-US') },
-        iconSrc: () => skillIconSrc(skill.slug),
-        fallback: vanillaSkillIcon(skill.slug),
+        icon: packIcon('skill', skill.slug),
     })),
 ]);
 
@@ -65,8 +53,7 @@ const bossCells = computed(() => (props.account.bosses ?? []).map((boss) => ({
         name: boss.name,
         value: `Rank ${boss.rank > 0 ? boss.rank.toLocaleString('en-US') : '—'}`,
     },
-    iconSrc: () => bossIconSrc(boss.slug),
-    fallback: '/images/boss/boss.png',
+    icon: bossIcon(boss.slug),
 })));
 
 const clueCells = computed(() => (props.account.clues ?? []).map((clue) => ({
@@ -77,8 +64,7 @@ const clueCells = computed(() => (props.account.clues ?? []).map((clue) => ({
         name: `${clue.name} clues`,
         value: `Rank ${clue.rank > 0 ? clue.rank.toLocaleString('en-US') : '—'}`,
     },
-    iconSrc: () => clueIconSrc(clue.slug),
-    fallback: '/images/clue/clue.png',
+    icon: clueIcon(clue.slug),
 })));
 
 const cells = computed(() => {
@@ -92,9 +78,9 @@ const cells = computed(() => {
 });
 
 const tabs = [
-    { key: 'skills', label: 'Skills', icon: packIcon('tab', 'stats'), fallback: vanillaSkillIcon('overall') },
-    { key: 'bosses', label: 'Bosses', fallback: '/images/boss/bosses.png' },
-    { key: 'clues', label: 'Clues', fallback: '/images/clue/clues.png' },
+    { key: 'skills', label: 'Skills', icon: packIcon('tab', 'stats') },
+    { key: 'bosses', label: 'Bosses', icon: { src: '/images/boss/bosses.png' } },
+    { key: 'clues', label: 'Clues', icon: { src: '/images/clue/clues.png' } },
 ];
 </script>
 
@@ -115,10 +101,7 @@ const tabs = [
                       class="flex h-9 items-center justify-center gap-1 box resource-pack-box px-1"
                       @mouseleave="activeKey = null"
                       @mouseover="activeKey = cell.slug">
-                    <img :src="cell.iconSrc()"
-                         class="h-5 w-5 object-contain"
-                         :alt="cell.tooltip.name"
-                         @error="onIconError($event, cell.fallback)">
+                    <img v-bind="cell.icon" class="h-5 w-5 object-contain" :alt="cell.tooltip.name">
                     <span class="text-xs font-semibold capitalize text-gray-900 dark:text-white">
                         {{ cell.label }}
                     </span>
