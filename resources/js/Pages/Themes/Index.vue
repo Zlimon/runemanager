@@ -13,6 +13,7 @@ const props = defineProps({
     packs: { type: Array, default: () => [] },
     hubPacks: { type: Array, default: () => [] },
     selectedId: { type: [Number, null], default: null },
+    noPack: { type: Boolean, default: false },
     defaultId: { type: [Number, null], default: null },
     installLimit: { type: Number, default: 0 },
     installedCount: { type: Number, default: 0 },
@@ -35,13 +36,16 @@ const removePack = (pack) => {
     });
 };
 
+// The picker value: 'none' for an explicit no-pack, a pack id, or '' for Default.
+const current = computed(() => (props.noPack ? 'none' : (props.selectedId ?? '')));
+
 const saving = ref(false);
-const selected = ref(props.selectedId ?? '');
+const selected = ref(current.value);
 
 // A resource pack is applied via a server-rendered <link> in the Blade root, so
 // swapping it needs a full page load — reload once the preference is saved.
 const choose = (id) => {
-    if (saving.value || String(id ?? '') === String(props.selectedId ?? '')) {
+    if (saving.value || String(id ?? '') === String(current.value)) {
         return;
     }
     selected.value = id;
@@ -51,7 +55,7 @@ const choose = (id) => {
         {
             preserveScroll: true,
             onSuccess: () => window.location.reload(),
-            onError: () => { saving.value = false; selected.value = props.selectedId ?? ''; },
+            onError: () => { saving.value = false; selected.value = current.value; },
         });
 };
 
@@ -84,13 +88,15 @@ const install = (pack) => {
         <div class="space-y-6">
                 <p class="-mt-2 text-sm text-base-content/60">
                     Pick a resource pack to theme the site for you. Choosing <strong>Default</strong> uses
-                    the instance theme. Your in-game pack (via the RuneLite plugin) also sets this automatically.
+                    the instance theme, while <strong>No resource pack</strong> shows the plain, non-textured
+                    interface. Your in-game pack (via the RuneLite plugin) also sets this automatically.
                 </p>
 
                 <Card>
                     <ResourcePackPicker :model-value="selected"
                                         :packs="packs"
                                         :default-id="defaultId"
+                                        allow-no-pack
                                         @update:model-value="choose" />
                     <p v-if="!packs.length" class="text-center text-base-content/60">
                         No resource packs installed yet.

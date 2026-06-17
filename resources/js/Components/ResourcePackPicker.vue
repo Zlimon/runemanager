@@ -4,14 +4,16 @@ import Badge from "@/Components/Badge.vue";
 /*
  * A thumbnail gallery for choosing a resource pack (icon.png), used for both the
  * owner's global default and a user's personal override. v-model is the selected
- * pack id (or '' / null for "none"). Pass `defaultId` to badge the global default
- * on the "None" tile.
+ * pack id, '' for "Default" (follow the instance theme), or 'none' for an explicit
+ * no-pack / non-textured interface. Pass `defaultId` to badge the global default,
+ * and `allowNoPack` to offer the "No resource pack" tile.
  */
 const props = defineProps({
     modelValue: { type: [Number, String, null], default: '' },
     packs: { type: Array, default: () => [] },
     defaultId: { type: [Number, null], default: null },
     allowNone: { type: Boolean, default: true },
+    allowNoPack: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -33,6 +35,19 @@ const select = (id) => emit('update:modelValue', id);
             <span class="text-sm font-medium">
                 Default
                 <span v-if="defaultId" class="block text-xs text-base-content/50">(instance theme)</span>
+            </span>
+        </button>
+
+        <button v-if="allowNoPack" type="button"
+                class="flex flex-col items-center gap-2 rounded border p-3 text-center transition"
+                :class="isSelected('none') ? 'border-primary bg-primary/10' : 'border-base-300 hover:border-primary/50'"
+                @click="select('none')">
+            <div class="flex h-16 w-16 items-center justify-center rounded bg-base-300 text-xs text-base-content/60">
+                Plain
+            </div>
+            <span class="text-sm font-medium">
+                No resource pack
+                <span class="block text-xs text-base-content/50">(no textures)</span>
             </span>
         </button>
 

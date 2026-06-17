@@ -42,6 +42,7 @@ class UserResourcePackController extends Controller
             'packs' => ResourcePack::pickerList(),
             'hubPacks' => $hub->available(),
             'selectedId' => $user->resource_pack_id,
+            'noPack' => $user->disable_resource_pack,
             'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
             'installLimit' => $this->installLimit(),
             'installedCount' => $this->userInstallCount($user),
@@ -56,12 +57,20 @@ class UserResourcePackController extends Controller
      */
     public function update(Request $request): JsonResponse|RedirectResponse
     {
-        $validated = $request->validate([
-            'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
-        ]);
-
         $user = $request->user();
-        $user->resource_pack_id = $validated['resource_pack_id'] ?? null;
+
+        if ($request->input('resource_pack_id') === 'none') {
+            // Explicit "no resource pack": plain interface, clear any selection.
+            $user->disable_resource_pack = true;
+            $user->resource_pack_id = null;
+        } else {
+            $validated = $request->validate([
+                'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
+            ]);
+            $user->disable_resource_pack = false;
+            $user->resource_pack_id = $validated['resource_pack_id'] ?? null;
+        }
+
         $user->save();
 
         if ($request->header('X-Inertia')) {
@@ -70,6 +79,7 @@ class UserResourcePackController extends Controller
 
         return response()->json([
             'resource_pack_id' => $user->resource_pack_id,
+            'disable_resource_pack' => $user->disable_resource_pack,
             'effective_resource_pack_id' => $user->effectiveResourcePackId(),
         ]);
     }
@@ -203,8 +213,9 @@ class UserResourcePackController extends Controller
         }
 
         // Record the preference even before assets arrive — the Blade root falls
-        // through to the default until they do.
+        // through to the default until they do. Applying a pack re-enables textures.
         $user->resource_pack_id = $pack->id;
+        $user->disable_resource_pack = false;
         $user->save();
 
         $installed = $installer->isInstalled($name) && $pack->version !== 'pending';

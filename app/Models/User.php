@@ -128,6 +128,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'dark_mode' => 'boolean',
+            'disable_resource_pack' => 'boolean',
         ];
     }
 

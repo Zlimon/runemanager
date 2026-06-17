@@ -70,6 +70,42 @@ it('clears the override when sent null', function () {
     expect($user->fresh()->resource_pack_id)->toBeNull();
 });
 
+it('sets an explicit no-resource-pack preference', function () {
+    $user = freshPackUser();
+
+    $this->actingAs($user)
+        ->putJson('/user/resource-pack', ['resource_pack_id' => 'none'])
+        ->assertSuccessful()
+        ->assertJsonPath('disable_resource_pack', true)
+        ->assertJsonPath('resource_pack_id', null);
+
+    expect($user->fresh()->disable_resource_pack)->toBeTrue();
+});
+
+it('clears the no-pack preference when a pack is chosen', function () {
+    $user = freshPackUser();
+    $user->forceFill(['disable_resource_pack' => true])->save();
+    $pack = makePack('sample-vanilla');
+
+    $this->actingAs($user)
+        ->putJson('/user/resource-pack', ['resource_pack_id' => $pack->id])
+        ->assertSuccessful()
+        ->assertJsonPath('disable_resource_pack', false);
+
+    expect($user->fresh()->disable_resource_pack)->toBeFalse();
+});
+
+it('effectiveFor() returns null (no pack) when the user disabled it, ignoring defaults', function () {
+    makePack('sample-vanilla');
+    $global = makePack('global-pack');
+    SettingHelper::setSetting('resource_pack_id', $global->id, 'int');
+
+    $user = freshPackUser();
+    $user->forceFill(['disable_resource_pack' => true])->save();
+
+    expect(ResourcePack::effectiveFor($user->fresh()))->toBeNull();
+});
+
 it('rejects unknown pack ids', function () {
     $user = freshPackUser();
 

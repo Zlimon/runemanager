@@ -70,6 +70,12 @@ class ResourcePack extends Model
      */
     public static function effectiveFor(?User $user): ?self
     {
+        // An explicit personal "no resource pack" wins over every default —
+        // the viewer gets the plain, non-textured interface.
+        if ($user?->disable_resource_pack) {
+            return null;
+        }
+
         $id = $user?->effectiveResourcePackId() ?? SettingHelper::getSetting('resource_pack_id');
         $pack = $id ? self::find($id) : null;
 
