@@ -120,7 +120,15 @@ class Instance
      */
     public static function hiscoreRefreshMinutes(): int
     {
-        $minutes = (int) SettingHelper::getSetting('hiscore_refresh_minutes', 0);
+        try {
+            $minutes = (int) SettingHelper::getSetting('hiscore_refresh_minutes', 0);
+        } catch (\Throwable) {
+            // routes/console.php reads this to build the scheduler's cron at load
+            // time, so it runs on every artisan boot — including package:discover
+            // before the database exists (a fresh checkout / CI's composer install).
+            // Fall back to the default cadence rather than failing to boot.
+            return 60;
+        }
 
         return $minutes > 0 ? $minutes : 60;
     }
