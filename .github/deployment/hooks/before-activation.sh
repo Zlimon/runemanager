@@ -11,3 +11,7 @@ artifacts_path=$3
 "$php_executable" artisan view:cache
 
 "$php_executable" artisan migrate --force
+
+# Restore the bundled Default Vanilla pack (the icon baseline) if the persisted
+# resource-packs dir doesn't have it yet. Best-effort — never fails the deploy.
+"$php_executable" artisan resourcepack:ensure-vanilla || true
