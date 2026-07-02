@@ -21,6 +21,16 @@ else
     real_env_file_path="$base_directory/.env"
 fi
 
+# Resource packs are downloaded at runtime (gitignored, so never in the release
+# artifact). Persist them across releases like storage — otherwise every deploy
+# starts with an empty public/resource-packs and the bundled Default Vanilla pack
+# (the icon baseline used when no pack is applied) disappears until reinstalled.
+if [[ -d "$base_directory/shared" ]]; then
+    real_resource_packs_path="$base_directory/shared/resource-packs"
+else
+    real_resource_packs_path="$base_directory/resource-packs"
+fi
+
 is_first_deployment=$([[ -h "$current_directory_path" ]] && echo false || echo true)
 has_created_lock_directory=false
 release_directory_created=false
@@ -130,6 +140,20 @@ if [[ ! -d "$real_storage_directory_path" ]]; then
 fi
 
 ln -nsfr "$real_storage_directory_path" "$new_release_directory/storage"
+
+echo "Creating a symlink to the resource packs directory."
+
+if [[ ! -d "$real_resource_packs_path" ]]; then
+    mkdir -p "$real_resource_packs_path"
+
+    # First run with a shared packs dir: seed it from the currently-live release
+    # so already-installed packs (incl. Default Vanilla) survive the switch.
+    if [[ -d "$current_directory_path/public/resource-packs" ]] && [[ ! -h "$current_directory_path/public/resource-packs" ]]; then
+        cp -a "$current_directory_path/public/resource-packs/." "$real_resource_packs_path/" 2>/dev/null || true
+    fi
+fi
+
+ln -nsfr "$real_resource_packs_path" "$new_release_directory/public/resource-packs"
 
 if [[ ! -s "$real_env_file_path" ]]; then
     touch "$real_env_file_path"
