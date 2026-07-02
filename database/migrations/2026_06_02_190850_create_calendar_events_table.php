@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('event_type');
+            $table->string('color')->nullable();
             $table->timestamp('starts_at')->index();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();

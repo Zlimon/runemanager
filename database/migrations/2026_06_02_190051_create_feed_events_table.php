@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignIdFor(Account::class)->constrained()->cascadeOnDelete();
             $table->string('type');
             $table->jsonb('payload');
+            $table->string('screenshot_path')->nullable();
+            $table->timestamp('pinned_at')->nullable();
             $table->timestamp('occurred_at')->index();
             $table->timestamps();
 
