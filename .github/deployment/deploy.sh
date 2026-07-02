@@ -141,20 +141,6 @@ fi
 
 ln -nsfr "$real_storage_directory_path" "$new_release_directory/storage"
 
-echo "Creating a symlink to the resource packs directory."
-
-if [[ ! -d "$real_resource_packs_path" ]]; then
-    mkdir -p "$real_resource_packs_path"
-
-    # First run with a shared packs dir: seed it from the currently-live release
-    # so already-installed packs (incl. Default Vanilla) survive the switch.
-    if [[ -d "$current_directory_path/public/resource-packs" ]] && [[ ! -h "$current_directory_path/public/resource-packs" ]]; then
-        cp -a "$current_directory_path/public/resource-packs/." "$real_resource_packs_path/" 2>/dev/null || true
-    fi
-fi
-
-ln -nsfr "$real_resource_packs_path" "$new_release_directory/public/resource-packs"
-
 if [[ ! -s "$real_env_file_path" ]]; then
     touch "$real_env_file_path"
 
@@ -172,6 +158,21 @@ echo "Extracting deployment artifacts."
 cd "$new_release_directory" || exit 1
 
 tar --extract --file="$artifacts_path"
+
+# Symlink the shared resource packs dir now that public/ exists (extracted above).
+echo "Creating a symlink to the resource packs directory."
+
+if [[ ! -d "$real_resource_packs_path" ]]; then
+    mkdir -p "$real_resource_packs_path"
+
+    # First run with a shared packs dir: seed it from the currently-live release
+    # so already-installed packs (incl. Default Vanilla) survive the switch.
+    if [[ -d "$current_directory_path/public/resource-packs" ]] && [[ ! -h "$current_directory_path/public/resource-packs" ]]; then
+        cp -a "$current_directory_path/public/resource-packs/." "$real_resource_packs_path/" 2>/dev/null || true
+    fi
+fi
+
+ln -nsfr "$real_resource_packs_path" "$new_release_directory/public/resource-packs"
 
 if ! [[ $("$php_executable" artisan tinker --help) =~ "--execute" ]]; then
     echo -e "::error::Laravel Tinker is not installed or you are using an outdated version. Laravel Tinker version ^2.0 is required."
