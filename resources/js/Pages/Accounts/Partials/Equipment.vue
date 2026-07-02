@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
-import { usePage } from "@inertiajs/vue3";
 import ItemTooltip from "@/Components/Game/ItemTooltip.vue";
+import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
 const props = defineProps({
     account: {
@@ -10,14 +10,14 @@ const props = defineProps({
     },
 });
 
-const page = usePage();
+const { packIcon } = useResourcePackIcon();
 
 /*
- * The OSRS equipment widget is laid out as a fixed 5-row grid. The active pack
- * (Default Vanilla at minimum — a pack is always in effect) ships one
- * slot_tile.png that paints the textured cell background and a slot_{name}.png
- * "ghost" for every empty slot. We render per-slot so an equipped item swaps
- * the empty ghost out cleanly.
+ * The OSRS equipment widget is laid out as a fixed 5-row grid. Each pack ships
+ * one slot_tile.png that paints the textured cell background and a
+ * slot_{name}.png "ghost" for every empty slot; packIcon falls back to the
+ * bundled Default Vanilla pack when no pack is applied, so slots always render.
+ * We render per-slot so an equipped item swaps the empty ghost out cleanly.
  */
 const rows = [
     ['head'],
@@ -28,35 +28,27 @@ const rows = [
 ];
 
 const emptyAsset = {
-    head: 'slot_head.png',
-    cape: 'slot_cape.png',
-    neck: 'slot_neck.png',
-    ammo: 'slot_ammunition.png',
-    weapon: 'slot_weapon.png',
-    body: 'slot_torso.png',
-    shield: 'slot_shield.png',
-    legs: 'slot_legs.png',
-    hands: 'slot_hands.png',
-    feet: 'slot_feet.png',
-    ring: 'slot_ring.png',
+    head: 'slot_head',
+    cape: 'slot_cape',
+    neck: 'slot_neck',
+    ammo: 'slot_ammunition',
+    weapon: 'slot_weapon',
+    body: 'slot_torso',
+    shield: 'slot_shield',
+    legs: 'slot_legs',
+    hands: 'slot_hands',
+    feet: 'slot_feet',
+    ring: 'slot_ring',
 };
 
-const packAsset = (path) => {
-    const pack = page.props.pack;
-    if (!pack?.name) {
-        return null;
-    }
-    return `/resource-packs/${pack.name}/equipment/${path}?v=${pack.version ?? ''}`;
-};
-
-const slotTileBg = computed(() => {
-    const url = packAsset('slot_tile.png');
-    return url ? { backgroundImage: `url(${url})`, backgroundSize: '100% 100%' } : {};
-});
+const slotTileBg = computed(() => ({
+    backgroundImage: `url(${packIcon('equipment', 'slot_tile').src})`,
+    backgroundSize: '100% 100%',
+}));
 
 const equippedItem = (key) => props.account?.equipment?.[`${key}_item`] ?? null;
 
-const emptySrc = (key) => packAsset(emptyAsset[key]);
+const emptySlot = (key) => packIcon('equipment', emptyAsset[key]);
 
 const hoveredKey = ref(null);
 </script>
@@ -73,9 +65,7 @@ const hoveredKey = ref(null);
                     <img v-if="equippedItem(key)"
                          :src="`data:image/jpeg;base64,${equippedItem(key).icon}`"
                          class="h-7 w-7 object-contain">
-                    <img v-else-if="emptySrc(key)"
-                         :src="emptySrc(key)"
-                         class="h-7 w-7 object-contain opacity-60">
+                    <img v-else v-bind="emptySlot(key)" class="h-7 w-7 object-contain opacity-60" alt="">
 
                     <ItemTooltip v-if="hoveredKey === key && equippedItem(key)"
                                  :name="equippedItem(key).name"
