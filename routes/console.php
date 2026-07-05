@@ -25,3 +25,8 @@ Schedule::command('resourcepack:update')
     ->daily()
     ->withoutOverlapping()
     ->runInBackground();
+
+Schedule::command('items:sync')
+    ->weekly()
+    ->withoutOverlapping()
+    ->runInBackground();
