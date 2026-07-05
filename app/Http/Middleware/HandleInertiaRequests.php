@@ -81,9 +81,10 @@ class HandleInertiaRequests extends Middleware
             ],
             'dark_mode' => $darkMode,
             'can_toggle_dark_mode' => true,
-            // Level-up feed events are stored for every level; the UI shows only
-            // these milestone levels (SPEC §8.2).
+            // Admin display filters for the Live Feed surfaces only (SPEC §8.2).
+            // Everything is stored; the account Activity feed shows it all.
             'feed_level_milestones' => Instance::feedLevelUpThresholds(),
+            'feed_loot_min_value' => Instance::feedLootMinValue(),
             'pack' => $pack ? [
                 'name' => $pack->name,
                 'version' => $pack->updated_at?->timestamp,

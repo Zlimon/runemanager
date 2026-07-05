@@ -49,7 +49,7 @@ const submit = () => form.put(route('admin.config.update'), { preserveScroll: tr
                                class="mt-1 block w-full" placeholder="50, 60, 70, 80, 90, 99"
                                :error="form.errors.feed_level_up_thresholds !== undefined" />
                     <p class="mt-1 text-xs text-base-content/60">
-                        Comma-separated levels (2–99). The feed posts a level-up only when a skill crosses one.
+                        Comma-separated levels (2–99). The Live Feed shows level-ups only at these levels; account pages show every level.
                     </p>
                     <InputError v-if="form.errors.feed_level_up_thresholds" :messages="form.errors.feed_level_up_thresholds" />
                 </div>
@@ -58,7 +58,7 @@ const submit = () => form.put(route('admin.config.update'), { preserveScroll: tr
                     <InputLabel for="feed_loot_min_value" value="Minimum loot value (gp)" />
                     <TextInput id="feed_loot_min_value" v-model.number="form.feed_loot_min_value" type="number" min="0"
                                class="mt-1 block w-full" :error="form.errors.feed_loot_min_value !== undefined" />
-                    <p class="mt-1 text-xs text-base-content/60">Drops below this GE value don't reach the live feed.</p>
+                    <p class="mt-1 text-xs text-base-content/60">Drops below this GE value are hidden from the Live Feed; account pages show whatever the plugin's own feed threshold lets through.</p>
                     <InputError v-if="form.errors.feed_loot_min_value" :messages="form.errors.feed_loot_min_value" />
                 </div>
 

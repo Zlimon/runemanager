@@ -29,9 +29,10 @@ const bannerStyle = computed(() => page.props.instance?.banner_url
 const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
 const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
 
-// Show only milestone level-ups in the feed (every level is stored).
+// Everything is stored; this Live Feed surface applies the admin's display
+// filters (milestone level-ups, minimum loot value).
 const feedEvents = ref([...props.feed]);
-const visibleFeed = computed(() => visibleFeedEvents(feedEvents.value, page.props.feed_level_milestones ?? []));
+const visibleFeed = computed(() => visibleFeedEvents(feedEvents.value, page.props.feed_level_milestones ?? [], page.props.feed_loot_min_value ?? 0));
 const removeEvent = (id) => {
     feedEvents.value = feedEvents.value.filter((e) => e.id !== id);
 };

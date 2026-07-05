@@ -5,7 +5,6 @@ namespace App\Services\Feed;
 use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\FeedEvent;
-use App\Support\Instance;
 use Illuminate\Support\Carbon;
 
 /**
@@ -19,8 +18,10 @@ use Illuminate\Support\Carbon;
 class RecordFeedEvent
 {
     /**
-     * Record a LOOT_DROP event when an inbound loot entry clears the configured
-     * value floor. Returns true if an event was recorded.
+     * Record a LOOT_DROP event. The plugin decides which drops are feed-worthy
+     * (its "Feed loot value" setting flags each entry); the admin's minimum
+     * loot value is a Live Feed display filter, not a storage filter, so the
+     * account Activity feed can show everything the plugin posted.
      *
      * @param  array<int, array{id: int, quantity: int}>  $items
      */
@@ -30,13 +31,8 @@ class RecordFeedEvent
         array $items,
         int $totalValue,
         Carbon $occurredAt,
-    ): bool {
-        $floor = Instance::feedLootMinValue();
-        if ($totalValue < $floor) {
-            return false;
-        }
-
-        $this->emit([
+    ): FeedEvent {
+        return $this->emit([
             'account_id' => $account->id,
             'type' => FeedEvent::TYPE_LOOT_DROP,
             'payload' => [
@@ -46,8 +42,6 @@ class RecordFeedEvent
             ],
             'occurred_at' => $occurredAt,
         ]);
-
-        return true;
     }
 
     /**

@@ -30,7 +30,8 @@ class LootController extends Controller
      *           {"id": 995,  "quantity": 10000}
      *         ],
      *         "total_value": 1230000,        // optional; plugin-computed GE total
-     *         "killed_at": "2026-06-02T17:30:00Z"
+     *         "killed_at": "2026-06-02T17:30:00Z",
+     *         "feed": true                   // optional; false = log only, no feed event
      *       }
      *     ]
      *   }
@@ -48,6 +49,7 @@ class LootController extends Controller
             'loot.*.items.*.quantity' => ['required', 'integer', 'min:1'],
             'loot.*.total_value' => ['nullable', 'integer', 'min:0'],
             'loot.*.killed_at' => ['required', 'date'],
+            'loot.*.feed' => ['nullable', 'boolean'],
         ]);
 
         $docs = [];
@@ -81,6 +83,7 @@ class LootController extends Controller
                 'items' => $items,
                 'total_value' => $totalValue,
                 'killed_at' => $killedAt,
+                'feed' => (bool) ($entry['feed'] ?? true),
             ];
         }
 
@@ -88,8 +91,15 @@ class LootController extends Controller
 
         broadcast(new AccountDataUpdated($account, 'loot'));
 
-        // SPEC §8 — emit a LOOT_DROP for each entry above the configured floor.
+        // SPEC §8 — emit a LOOT_DROP for each entry the plugin marked as
+        // feed-worthy (its "Feed loot value" setting; absent = older plugin,
+        // treat as worthy). The admin's minimum value only filters the Live
+        // Feed display, so these all reach the account Activity feed.
         foreach ($events as $event) {
+            if (! $event['feed']) {
+                continue;
+            }
+
             $this->feed->recordLootDrop(
                 $account,
                 $event['source'],

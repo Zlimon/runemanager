@@ -77,19 +77,16 @@ it('broadcasts FeedEventCreated on the public feed channel when an event is reco
     });
 });
 
-it('records a LOOT_DROP only when total_value clears the configured floor', function () {
+it('records a LOOT_DROP regardless of the admin minimum value (display filter only)', function () {
     config()->set('runemanager.feed.loot_min_value', 100_000);
 
     $account = makeAccountForFeed();
     $recorder = new RecordFeedEvent;
 
-    expect($recorder->recordLootDrop($account, 'Cow', [['id' => 1739, 'quantity' => 1]], 50, now()))
-        ->toBeFalse();
+    $recorder->recordLootDrop($account, 'Cow', [['id' => 1739, 'quantity' => 1]], 50, now());
+    $recorder->recordLootDrop($account, 'Vorkath', [['id' => 21907, 'quantity' => 1]], 250_000_000, now());
 
-    expect($recorder->recordLootDrop($account, 'Vorkath', [['id' => 21907, 'quantity' => 1]], 250_000_000, now()))
-        ->toBeTrue();
-
-    expect(FeedEvent::ofType(FeedEvent::TYPE_LOOT_DROP)->count())->toBe(1);
+    expect(FeedEvent::ofType(FeedEvent::TYPE_LOOT_DROP)->count())->toBe(2);
 });
 
 it('records a QUEST_COMPLETE on the first push that flips a quest to finished', function () {
@@ -255,7 +252,18 @@ it('/feed is publicly accessible (no auth required)', function () {
     $this->get(route('feed.index'))->assertOk();
 });
 
-it('LootController emits a feed event on a qualifying push', function () {
+it('shares the admin display filters with the UI', function () {
+    config()->set('runemanager.feed.loot_min_value', 100_000);
+
+    $this->get(route('feed.index'))->assertInertia(
+        fn (AssertableInertia $page) => $page
+            ->where('feed_loot_min_value', 100_000)
+            ->has('feed_level_milestones'),
+    );
+});
+
+it('LootController honours the plugin feed flag (log-only entries emit no event)', function () {
+    // The admin minimum only filters the Live Feed display, never storage.
     config()->set('runemanager.feed.loot_min_value', 100_000);
 
     $user = User::query()->forceCreate([
@@ -268,27 +276,37 @@ it('LootController emits a feed event on a qualifying push', function () {
 
     $this->postJson('/api/plugin/loot', [
         'loot' => [
-            [
-                'source' => 'Vorkath',
-                'items' => [['id' => 21907, 'quantity' => 1]],
-                'total_value' => 250_000_000,
-                'killed_at' => '2026-06-02T17:30:00Z',
-            ],
-            // Below the floor — should not generate a feed event.
+            // No flag — older plugin; treated as feed-worthy despite the admin floor.
             [
                 'source' => 'Cow',
                 'items' => [['id' => 1739, 'quantity' => 1]],
                 'total_value' => 50,
+                'killed_at' => '2026-06-02T17:30:00Z',
+            ],
+            // Below the plugin's own feed threshold — loot log only.
+            [
+                'source' => 'Man',
+                'items' => [['id' => 995, 'quantity' => 15]],
+                'total_value' => 15,
                 'killed_at' => '2026-06-02T17:31:00Z',
+                'feed' => false,
+            ],
+            [
+                'source' => 'Vorkath',
+                'items' => [['id' => 21907, 'quantity' => 1]],
+                'total_value' => 250_000_000,
+                'killed_at' => '2026-06-02T17:32:00Z',
+                'feed' => true,
             ],
         ],
     ], [
         'Accept' => 'application/json',
         'X-Account-Hash' => 'feed-hash',
         'X-Account-Username' => 'Looter',
-    ])->assertCreated();
+    ])->assertCreated()->assertJsonPath('data.inserted', 3);
 
-    expect(FeedEvent::ofType(FeedEvent::TYPE_LOOT_DROP)->count())->toBe(1);
+    $sources = FeedEvent::ofType(FeedEvent::TYPE_LOOT_DROP)->pluck('payload')->pluck('source');
+    expect($sources->all())->toEqualCanonicalizing(['Cow', 'Vorkath']);
 });
 
 it('records a COLLECTION_LOG event on a slot-unlock push', function () {

@@ -17,9 +17,11 @@ const props = defineProps({
 const events = ref([...props.events]);
 const MAX_EVENTS = 100;
 
-// Every level-up is stored; the feed only shows the configured milestone levels.
+// Everything is stored; the Live Feed applies the admin's display filters
+// (milestone level-ups, minimum loot value).
 const milestones = computed(() => usePage().props.feed_level_milestones ?? []);
-const visibleEvents = computed(() => visibleFeedEvents(events.value, milestones.value));
+const minLootValue = computed(() => usePage().props.feed_loot_min_value ?? 0);
+const visibleEvents = computed(() => visibleFeedEvents(events.value, milestones.value, minLootValue.value));
 
 onMounted(() => {
     window.Echo.channel("feed").listen(".FeedEventCreated", (event) => {

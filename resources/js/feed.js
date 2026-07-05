@@ -1,19 +1,23 @@
 /**
- * Every level-up is stored as a feed event, but the feed only shows the
- * configured milestone levels (SPEC §8.2 — milestones are a display filter).
- * Other event types always pass through.
+ * Admin display filters for the Live Feed surfaces (SPEC §8.2). Everything is
+ * stored; the Live Feed shows only milestone level-ups and loot at or above
+ * the minimum value. The account Activity feed doesn't use this — it shows
+ * every event the plugin posted.
  *
  * @param {Array} events
  * @param {Array<number>} milestones
+ * @param {number} minLootValue
  */
-export function visibleFeedEvents(events, milestones) {
-    if (!milestones || milestones.length === 0) {
-        return events;
-    }
-
-    return events.filter(
-        (event) => event.type !== 'level_up' || milestones.includes(event.payload?.level),
-    );
+export function visibleFeedEvents(events, milestones, minLootValue = 0) {
+    return events.filter((event) => {
+        if (event.type === 'level_up' && milestones?.length > 0) {
+            return milestones.includes(event.payload?.level);
+        }
+        if (event.type === 'loot_drop' && minLootValue > 0) {
+            return (event.payload?.total_value ?? 0) >= minLootValue;
+        }
+        return true;
+    });
 }
 
 const formatSkill = (slug) => (slug ?? '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());

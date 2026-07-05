@@ -1,14 +1,13 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { usePage } from "@inertiajs/vue3";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import FeedEventItem from "@/Components/Game/FeedEventItem.vue";
-import { visibleFeedEvents } from "@/feed";
 
 /*
- * This account's slice of the live feed. Seeds from the server-rendered list,
- * then prepends events from the public `feed` broadcast that belong to this
- * account. Level-ups are stored for every level; the configured milestones
- * filter the display.
+ * This account's Activity feed. Seeds from the server-rendered list, then
+ * prepends events from the public `feed` broadcast that belong to this
+ * account. Unlike the Live Feed page, no admin display filters apply here —
+ * every stored event shows (all level-ups, collection log slots, quests, and
+ * whatever loot the plugin's own feed threshold let through).
  */
 const props = defineProps({
     account: { type: Object, required: true },
@@ -17,9 +16,6 @@ const props = defineProps({
 
 const MAX_EVENTS = 50;
 const liveEvents = ref([...props.events]);
-
-const milestones = computed(() => usePage().props.feed_level_milestones ?? []);
-const visible = computed(() => visibleFeedEvents(liveEvents.value, milestones.value));
 
 const removeEvent = (id) => {
     liveEvents.value = liveEvents.value.filter((e) => e.id !== id);
@@ -50,8 +46,8 @@ onBeforeUnmount(() => window.Echo.leave("feed"));
             </span>
         </div>
 
-        <ul v-if="visible.length" class="mt-2 space-y-2">
-            <li v-for="event in visible" :key="event.id">
+        <ul v-if="liveEvents.length" class="mt-2 space-y-2">
+            <li v-for="event in liveEvents" :key="event.id">
                 <FeedEventItem :event="event" @deleted="removeEvent" />
             </li>
         </ul>
