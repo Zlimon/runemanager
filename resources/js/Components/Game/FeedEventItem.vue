@@ -52,6 +52,13 @@ const togglePin = () => {
 };
 
 const sentence = feedSentence;
+
+// Where the event happened (plugin-supplied). Links to the live map centred
+// on the spot; the area name falls back to raw coordinates for unmapped regions.
+const position = computed(() => props.event.payload?.position ?? null);
+const positionLabel = computed(() => position.value
+    ? (position.value.location ?? `${position.value.x}, ${position.value.y}`)
+    : null);
 </script>
 
 <template>
@@ -95,7 +102,21 @@ const sentence = feedSentence;
             </div>
         </div>
         <div class="mt-1 text-sm text-base-content/80">
-            <p>{{ sentence(event) }}</p>
+            <p>
+                {{ sentence(event) }}
+                <Link v-if="position"
+                      :href="route('map.index', { x: position.x, y: position.y })"
+                      class="inline-flex items-center gap-0.5 align-baseline text-xs text-base-content/50 hover:text-base-content hover:underline"
+                      :title="`${position.x}, ${position.y} (plane ${position.plane})`">
+                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11Z" />
+                        <circle cx="12" cy="10" r="2.5" />
+                    </svg>
+                    {{ positionLabel }}
+                </Link>
+            </p>
             <LootItems v-if="event.type === 'loot_drop'"
                        :items="event.payload.items"
                        :total-value="event.payload.total_value"

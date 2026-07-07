@@ -27,6 +27,7 @@ class QuestController extends Controller
             'quests.*' => ['required', 'array'],
             'quests.*.0' => ['required', 'string'],  // quest name
             'quests.*.1' => ['required', 'integer'], // status (0 = not started, 1 = in progress, 2 = finished)
+            ...RecordFeedEvent::positionRules(),
         ]);
 
         $existing = Quest::where('account_id', $account->id)->first();
@@ -36,8 +37,17 @@ class QuestController extends Controller
         $quests->quests = $request->input('quests');
         $quests->save();
 
-        // SPEC §8 — emit QUEST_COMPLETE for every quest that flipped to finished.
-        $this->feed->recordQuestCompletions($account, $previous, $request->input('quests'));
+        // SPEC §8 — emit QUEST_COMPLETE for every quest that flipped to
+        // finished. The first-ever snapshot is a baseline only: with no
+        // previous state, every already-finished quest would flood the feed.
+        if ($existing !== null) {
+            $this->feed->recordQuestCompletions(
+                $account,
+                $previous,
+                $request->input('quests'),
+                $request->input('position'),
+            );
+        }
 
         return response()->json(['data' => $quests]);
     }

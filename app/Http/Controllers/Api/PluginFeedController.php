@@ -39,6 +39,7 @@ class PluginFeedController extends Controller
             // UI filters to milestones).
             'skill' => ['required_if:type,level_up', 'string', 'max:40'],
             'level' => ['required_if:type,level_up', 'integer', 'min:1', 'max:126'],
+            ...RecordFeedEvent::positionRules(),
         ]);
 
         $payload = match ($validated['type']) {
@@ -49,7 +50,7 @@ class PluginFeedController extends Controller
             default => [],
         };
 
-        $feed->record($account, $validated['type'], $payload);
+        $feed->record($account, $validated['type'], $payload, $validated['position'] ?? null);
 
         return response()->json(['data' => ['recorded' => true]]);
     }

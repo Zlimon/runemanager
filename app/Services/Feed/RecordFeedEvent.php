@@ -11,12 +11,32 @@ use Illuminate\Support\Carbon;
  * Single entry point for SPEC §8 live feed event generation.
  *
  * Each push controller/service that produces qualifying events instantiates
- * this and calls the matching record*() helper; centralising the filtering
- * logic (level thresholds, loot value floor) keeps the rules in one place
- * once the admin backend (§12) lets these be tuned at runtime.
+ * this and calls the matching record*() helper. Every helper takes an optional
+ * plugin-supplied position ({x, y, plane, location}) that is normalised into
+ * the payload so the feed can show where the event happened.
  */
 class RecordFeedEvent
 {
+    /** Plugin quest status code for a finished quest (0/1/2 scale). */
+    private const QUEST_FINISHED = 2;
+
+    /**
+     * Validation rules for an optional plugin-supplied event position, keyed
+     * under $attribute so controllers can splice them into their own rules.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function positionRules(string $attribute = 'position'): array
+    {
+        return [
+            $attribute => ['nullable', 'array'],
+            $attribute.'.x' => ['required_with:'.$attribute, 'integer'],
+            $attribute.'.y' => ['required_with:'.$attribute, 'integer'],
+            $attribute.'.plane' => ['nullable', 'integer', 'between:0,3'],
+            $attribute.'.location' => ['nullable', 'string', 'max:60'],
+        ];
+    }
+
     /**
      * Record a LOOT_DROP event. The plugin decides which drops are feed-worthy
      * (its "Feed loot value" setting flags each entry); the admin's minimum
@@ -24,6 +44,7 @@ class RecordFeedEvent
      * account Activity feed can show everything the plugin posted.
      *
      * @param  array<int, array{id: int, quantity: int}>  $items
+     * @param  ?array<string, mixed>  $position
      */
     public function recordLootDrop(
         Account $account,
@@ -31,28 +52,34 @@ class RecordFeedEvent
         array $items,
         int $totalValue,
         Carbon $occurredAt,
+        ?array $position = null,
     ): FeedEvent {
         return $this->emit([
             'account_id' => $account->id,
             'type' => FeedEvent::TYPE_LOOT_DROP,
-            'payload' => [
+            'payload' => $this->withPosition([
                 'source' => $source,
                 'items' => $items,
                 'total_value' => $totalValue,
-            ],
+            ], $position),
             'occurred_at' => $occurredAt,
         ]);
     }
 
     /**
      * Compare two quest snapshots and record a QUEST_COMPLETE for each quest
-     * that flipped to "finished" (status 901389 — the OSRS sentinel for done).
+     * that flipped to "finished" (plugin status code 2 on the 0/1/2 scale).
      *
      * @param  array<int, array{0: string, 1: int}>  $previous
      * @param  array<int, array{0: string, 1: int}>  $current
+     * @param  ?array<string, mixed>  $position
      */
-    public function recordQuestCompletions(Account $account, array $previous, array $current): int
-    {
+    public function recordQuestCompletions(
+        Account $account,
+        array $previous,
+        array $current,
+        ?array $position = null,
+    ): int {
         $prevStatus = [];
         foreach ($previous as [$name, $status]) {
             $prevStatus[$name] = $status;
@@ -62,14 +89,14 @@ class RecordFeedEvent
         $now = now();
 
         foreach ($current as [$name, $status]) {
-            $wasFinished = ($prevStatus[$name] ?? null) === 901389;
-            $isFinished = $status === 901389;
+            $wasFinished = ($prevStatus[$name] ?? null) === self::QUEST_FINISHED;
+            $isFinished = $status === self::QUEST_FINISHED;
 
             if ($isFinished && ! $wasFinished) {
                 $this->emit([
                     'account_id' => $account->id,
                     'type' => FeedEvent::TYPE_QUEST_COMPLETE,
-                    'payload' => ['quest' => $name],
+                    'payload' => $this->withPosition(['quest' => $name], $position),
                     'occurred_at' => $now,
                 ]);
                 $emitted++;
@@ -85,13 +112,14 @@ class RecordFeedEvent
      * the type + a small payload.
      *
      * @param  array<string, mixed>  $payload
+     * @param  ?array<string, mixed>  $position
      */
-    public function record(Account $account, string $type, array $payload = []): FeedEvent
+    public function record(Account $account, string $type, array $payload = [], ?array $position = null): FeedEvent
     {
         return $this->emit([
             'account_id' => $account->id,
             'type' => $type,
-            'payload' => $payload,
+            'payload' => $this->withPosition($payload, $position),
             'occurred_at' => now(),
         ]);
     }
@@ -100,13 +128,19 @@ class RecordFeedEvent
      * Record a COMBAT_ACHIEVEMENT unlock (SPEC §8.1). Unlike level-ups/quests
      * these aren't derived from a snapshot diff — the plugin parses the in-game
      * completion message and pushes the task name + tier directly.
+     *
+     * @param  ?array<string, mixed>  $position
      */
-    public function recordCombatAchievement(Account $account, string $task, ?string $tier = null): FeedEvent
-    {
+    public function recordCombatAchievement(
+        Account $account,
+        string $task,
+        ?string $tier = null,
+        ?array $position = null,
+    ): FeedEvent {
         return $this->emit([
             'account_id' => $account->id,
             'type' => FeedEvent::TYPE_COMBAT_ACHIEVEMENT,
-            'payload' => ['task' => $task, 'tier' => $tier],
+            'payload' => $this->withPosition(['task' => $task, 'tier' => $tier], $position),
             'occurred_at' => now(),
         ]);
     }
@@ -114,15 +148,44 @@ class RecordFeedEvent
     /**
      * Record a COLLECTION_LOG slot unlock (SPEC §8.1). Like combat achievements,
      * the plugin parses the in-game "new item" notice and pushes the item name.
+     *
+     * @param  ?array<string, mixed>  $position
      */
-    public function recordCollectionLogSlot(Account $account, string $item): FeedEvent
+    public function recordCollectionLogSlot(Account $account, string $item, ?array $position = null): FeedEvent
     {
         return $this->emit([
             'account_id' => $account->id,
             'type' => FeedEvent::TYPE_COLLECTION_LOG,
-            'payload' => ['item' => $item],
+            'payload' => $this->withPosition(['item' => $item], $position),
             'occurred_at' => now(),
         ]);
+    }
+
+    /**
+     * Merge a normalised position into an event payload. Skipped entirely when
+     * the plugin sent none (or an unusable one), so old events and new events
+     * without coordinates look identical.
+     *
+     * @param  array<string, mixed>  $payload
+     * @param  ?array<string, mixed>  $position
+     * @return array<string, mixed>
+     */
+    private function withPosition(array $payload, ?array $position): array
+    {
+        if ($position === null || ! isset($position['x'], $position['y'])) {
+            return $payload;
+        }
+
+        $location = $position['location'] ?? null;
+
+        $payload['position'] = [
+            'x' => (int) $position['x'],
+            'y' => (int) $position['y'],
+            'plane' => (int) ($position['plane'] ?? 0),
+            'location' => $location !== null && $location !== '' ? (string) $location : null,
+        ];
+
+        return $payload;
     }
 
     /**

@@ -24,9 +24,10 @@ class CollectionLogController extends Controller
 
         $validated = $request->validate([
             'item' => ['required', 'string', 'max:255'],
+            ...RecordFeedEvent::positionRules(),
         ]);
 
-        $feed->recordCollectionLogSlot($account, $validated['item']);
+        $feed->recordCollectionLogSlot($account, $validated['item'], $validated['position'] ?? null);
 
         return response()->json(['data' => ['recorded' => true]]);
     }

@@ -58,9 +58,15 @@ class CombatAchievementController extends Controller
             // Nullable: the in-game popup notification (the default setting) gives
             // the task name but not the tier; only the chat message carries it.
             'tier' => ['nullable', 'string', Rule::in(CombatAchievements::tiers())],
+            ...RecordFeedEvent::positionRules(),
         ]);
 
-        $feed->recordCombatAchievement($account, $validated['task'], $validated['tier'] ?? null);
+        $feed->recordCombatAchievement(
+            $account,
+            $validated['task'],
+            $validated['tier'] ?? null,
+            $validated['position'] ?? null,
+        );
 
         return response()->json(['data' => ['recorded' => true]]);
     }

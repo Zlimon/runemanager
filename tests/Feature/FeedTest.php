@@ -68,7 +68,7 @@ it('broadcasts FeedEventCreated on the public feed channel when an event is reco
     Event::fake([FeedEventCreated::class]);
 
     $account = makeAccountForFeed();
-    (new RecordFeedEvent)->recordQuestCompletions($account, [], [['Cooks Assistant', 901389]]);
+    (new RecordFeedEvent)->recordQuestCompletions($account, [], [['Cooks Assistant', 2]]);
 
     Event::assertDispatched(FeedEventCreated::class, function ($event) use ($account): bool {
         return $event->feedEvent->account_id === $account->id
@@ -89,6 +89,75 @@ it('records a LOOT_DROP regardless of the admin minimum value (display filter on
     expect(FeedEvent::ofType(FeedEvent::TYPE_LOOT_DROP)->count())->toBe(2);
 });
 
+it('stores the plugin-supplied position on feed events', function () {
+    $account = makeAccountForFeed('Located');
+    Sanctum::actingAs($account->user);
+    $headers = ['Accept' => 'application/json', 'X-Account-Hash' => 'pos-hash', 'X-Account-Username' => 'Located'];
+
+    $this->postJson('/api/plugin/feed', [
+        'type' => 'level_up',
+        'skill' => 'attack',
+        'level' => 73,
+        'position' => ['x' => 2662, 'y' => 3305, 'plane' => 0, 'location' => 'Ardougne'],
+    ], $headers)->assertSuccessful();
+
+    $this->postJson('/api/plugin/collection-log/unlock', [
+        'item' => 'Bow string spool',
+        'position' => ['x' => 3374, 'y' => 3893],
+    ], $headers)->assertSuccessful();
+
+    expect(FeedEvent::ofType(FeedEvent::TYPE_LEVEL_UP)->firstOrFail()->payload['position'])
+        ->toBe(['x' => 2662, 'y' => 3305, 'plane' => 0, 'location' => 'Ardougne'])
+        ->and(FeedEvent::ofType(FeedEvent::TYPE_COLLECTION_LOG)->firstOrFail()->payload['position'])
+        ->toBe(['x' => 3374, 'y' => 3893, 'plane' => 0, 'location' => null]);
+});
+
+it('records events without a position when the plugin sends none', function () {
+    $account = makeAccountForFeed('Nowhere');
+    Sanctum::actingAs($account->user);
+
+    $this->postJson('/api/plugin/feed', ['type' => 'pet'], [
+        'Accept' => 'application/json', 'X-Account-Hash' => 'np-hash', 'X-Account-Username' => 'Nowhere',
+    ])->assertSuccessful();
+
+    expect(FeedEvent::ofType(FeedEvent::TYPE_PET)->firstOrFail()->payload)
+        ->not->toHaveKey('position');
+});
+
+it('rejects a malformed position', function () {
+    $account = makeAccountForFeed('Malformed');
+    Sanctum::actingAs($account->user);
+
+    $this->postJson('/api/plugin/feed', [
+        'type' => 'pet',
+        'position' => ['x' => 3200],
+    ], [
+        'Accept' => 'application/json', 'X-Account-Hash' => 'mf-hash', 'X-Account-Username' => 'Malformed',
+    ])->assertStatus(422)->assertJsonValidationErrors('position.y');
+});
+
+it('attaches the quest push position to derived QUEST_COMPLETE events', function () {
+    $account = makeAccountForFeed('Quester');
+    Sanctum::actingAs($account->user);
+    $headers = ['Accept' => 'application/json', 'X-Account-Hash' => 'q-hash', 'X-Account-Username' => 'Quester'];
+
+    // First snapshot is a baseline — no events, even for finished quests.
+    $this->putJson('/api/plugin/quests', [
+        'quests' => [['Cooks Assistant', 2], ['Dragon Slayer II', 1]],
+    ], $headers)->assertSuccessful();
+
+    expect(FeedEvent::ofType(FeedEvent::TYPE_QUEST_COMPLETE)->count())->toBe(0);
+
+    $this->putJson('/api/plugin/quests', [
+        'quests' => [['Cooks Assistant', 2], ['Dragon Slayer II', 2]],
+        'position' => ['x' => 3222, 'y' => 3218, 'plane' => 0, 'location' => 'Lumbridge'],
+    ], $headers)->assertSuccessful();
+
+    $event = FeedEvent::ofType(FeedEvent::TYPE_QUEST_COMPLETE)->firstOrFail();
+    expect($event->payload['quest'])->toBe('Dragon Slayer II')
+        ->and($event->payload['position']['location'])->toBe('Lumbridge');
+});
+
 it('records a QUEST_COMPLETE on the first push that flips a quest to finished', function () {
     $account = makeAccountForFeed();
     $recorder = new RecordFeedEvent;
@@ -96,14 +165,14 @@ it('records a QUEST_COMPLETE on the first push that flips a quest to finished', 
     expect($recorder->recordQuestCompletions(
         $account,
         previous: [['Dragon Slayer II', 1]],
-        current: [['Dragon Slayer II', 901389]],
+        current: [['Dragon Slayer II', 2]],
     ))->toBe(1);
 
     // Same payload on the next push (idempotent) — no duplicate event.
     expect($recorder->recordQuestCompletions(
         $account,
-        previous: [['Dragon Slayer II', 901389]],
-        current: [['Dragon Slayer II', 901389]],
+        previous: [['Dragon Slayer II', 2]],
+        current: [['Dragon Slayer II', 2]],
     ))->toBe(0);
 
     expect(FeedEvent::ofType(FeedEvent::TYPE_QUEST_COMPLETE)->count())->toBe(1);

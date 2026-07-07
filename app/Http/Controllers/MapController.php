@@ -17,7 +17,8 @@ class MapController extends Controller
      *
      * An optional `?focus=username` centres the map on that account's last known
      * position (e.g. from the Account Show minimap), even if they aren't
-     * currently sharing.
+     * currently sharing. `?x=&y=` centres on a fixed point instead — used by
+     * feed events that carry the position where they happened.
      */
     public function index(Request $request): Response
     {
@@ -25,6 +26,8 @@ class MapController extends Controller
         if ($username = $request->string('focus')->trim()->value()) {
             $account = Account::whereNotNull('world_x')->where('username', $username)->first();
             $focus = $account ? ['x' => $account->world_x, 'y' => $account->world_y] : null;
+        } elseif ($request->filled('x') && $request->filled('y')) {
+            $focus = ['x' => (int) $request->input('x'), 'y' => (int) $request->input('y')];
         }
 
         $accounts = Account::onMap()

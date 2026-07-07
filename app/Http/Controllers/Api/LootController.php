@@ -50,6 +50,7 @@ class LootController extends Controller
             'loot.*.total_value' => ['nullable', 'integer', 'min:0'],
             'loot.*.killed_at' => ['required', 'date'],
             'loot.*.feed' => ['nullable', 'boolean'],
+            ...RecordFeedEvent::positionRules('loot.*.position'),
         ]);
 
         $docs = [];
@@ -84,6 +85,7 @@ class LootController extends Controller
                 'total_value' => $totalValue,
                 'killed_at' => $killedAt,
                 'feed' => (bool) ($entry['feed'] ?? true),
+                'position' => $entry['position'] ?? null,
             ];
         }
 
@@ -106,6 +108,7 @@ class LootController extends Controller
                 $event['items'],
                 $event['total_value'],
                 $event['killed_at'],
+                $event['position'],
             );
         }
 
