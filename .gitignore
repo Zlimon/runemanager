@@ -23,3 +23,6 @@ yarn-error.log
 /.vscode
 /resources/css/resource-pack*
 /app/Models/Npc*
+/.claude
+.mcp.json
+boost.json
