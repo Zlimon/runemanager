@@ -24,77 +24,15 @@ services:
             - sail
         depends_on:
             - pgsql
-            - mongo
-            - osrsbox-mongo
-    osrsbox-mongo:
-        image: 'mongo:7.0'
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: '${OSRSBOX_MONGO_USERNAME:-ruser}'
-            MONGO_INITDB_ROOT_PASSWORD: '${OSRSBOX_MONGO_PASSWORD:-rpasswd}'
-            MONGO_INITDB_DATABASE: '${OSRSBOX_DATABASE_NAME:-osrsbox-db}'
-            DATABASE_NAME: '${OSRSBOX_DATABASE_NAME:-osrsbox-db}'
-            PROJECT_USERNAME: '${OSRSBOX_PROJECT_USERNAME:-puser}'
-            PROJECT_PASSWORD: '${OSRSBOX_PROJECT_PASSWORD:-ppasswd}'
-        volumes:
-            - 'sail-osrsbox-mongo:/data/db'
-            - './docker/osrsbox/create-database.sh:/docker-entrypoint-initdb.d/create-database.sh:ro'
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - mongosh
-                - --quiet
-                - --eval
-                - 'db.runCommand({ ping: 1 }).ok'
-            retries: 3
-            timeout: 5s
-    osrsbox-populate:
-        build:
-            context: ./docker/osrsbox-api/eve
-        profiles:
-            - populate
-        environment:
-            MONGO_PORT: 27017
-            DATABASE_NAME: '${OSRSBOX_DATABASE_NAME:-osrsbox-db}'
-            PROJECT_USERNAME: '${OSRSBOX_PROJECT_USERNAME:-puser}'
-            PROJECT_PASSWORD: '${OSRSBOX_PROJECT_PASSWORD:-ppasswd}'
-        volumes:
-            - './docker/osrsbox-api/eve/scripts:/scripts'
-        networks:
-            - sail
-        depends_on:
-            - osrsbox-mongo
-        entrypoint: ['python3', '/scripts/mongo_insert_osrsbox.py']
-    mongo:
-        image: 'mongo:7.0'
-        ports:
-            - '${FORWARD_MONGO_PORT:-27017}:27017'
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: sail
-            MONGO_INITDB_ROOT_PASSWORD: password
-            MONGO_INITDB_DATABASE: '${MONGODB_DATABASE:-runemanager}'
-        volumes:
-            - 'sail-mongo:/data/db'
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - mongosh
-                - --quiet
-                - --eval
-                - 'db.runCommand({ ping: 1 }).ok'
-            retries: 3
-            timeout: 5s
+            - mongodb
+            - mongodb-static
     pgsql:
         image: 'postgres:16'
         ports:
             - '${FORWARD_DB_PORT:-5432}:5432'
         environment:
-            PGPASSWORD: '${DB_PASSWORD:-password}'
-            POSTGRES_DB: '${DB_DATABASE}'
-            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_DB: '${DB_DATABASE-runemanager}'
+            POSTGRES_USER: '${DB_USERNAME-sail}'
             POSTGRES_PASSWORD: '${DB_PASSWORD:-password}'
         volumes:
             - 'sail-pgsql:/var/lib/postgresql/data'
@@ -112,13 +50,71 @@ services:
                 - '${DB_USERNAME}'
             retries: 3
             timeout: 5s
+    mongodb:
+        image: 'mongodb/mongodb-atlas-local:latest'
+        environment:
+            MONGO_INITDB_DATABASE: '${MONGODB_DATABASE:-runemanager}'
+            MONGO_INITDB_ROOT_USERNAME: '${MONGODB_USERNAME:-sail}'
+            MONGO_INITDB_ROOT_PASSWORD: '${MONGODB_PASSWORD:-password}'
+        volumes:
+            - 'sail-mongodb:/data/db'
+        ports:
+            - '${FORWARD_MONGODB_PORT:-27017}:27017'
+        networks:
+            - sail
+        healthcheck:
+            test:
+                - CMD
+                - mongosh
+                - 'mongodb://localhost:27017/admin'
+                - '--eval=db.runCommand({ping:1})'
+            retries: 3
+            timeout: 5s
+    mongodb-static:
+        image: 'mongodb/mongodb-atlas-local:latest'
+        environment:
+            MONGO_INITDB_DATABASE: '${MONGODB_STATIC_DATABASE:-runemanager-static}'
+            MONGO_INITDB_ROOT_USERNAME: '${MONGODB_STATIC_USERNAME:-sail}'
+            MONGO_INITDB_ROOT_PASSWORD: '${MONGODB_STATIC_PASSWORD:-password}'
+        volumes:
+            - 'sail-mongodb-static:/data/db'
+            - './docker/osrsbox/create-database.sh:/docker-entrypoint-initdb.d/create-database.sh:ro'
+        networks:
+            - sail
+        healthcheck:
+            test:
+                - CMD
+                - mongosh
+                - 'mongodb://localhost:27017/admin'
+                - '--eval=db.runCommand({ping:1})'
+            retries: 3
+            timeout: 5s
+    mongodb-static-populate:
+        build:
+            context: ./docker/osrsbox-api/eve
+        profiles:
+            - populate
+        environment:
+            MONGO_PORT: 27018
+            DATABASE_NAME: '${MONGODB_STATIC_DATABASE:-runemanager-static}'
+            PROJECT_USERNAME: '${MONGODB_STATIC_USERNAME:-sail}'
+            PROJECT_PASSWORD: '${MONGODB_STATIC_PASSWORD:-ppasswd}'
+        volumes:
+            - './docker/osrsbox-api/eve/scripts:/scripts'
+        networks:
+            - sail
+        depends_on:
+            - mongodb-static
+        entrypoint:
+            - python3
+            - /scripts/mongo_insert_osrsbox.py
 networks:
     sail:
         driver: bridge
 volumes:
-    sail-osrsbox-mongo:
-        driver: local
-    sail-mongo:
-        driver: local
     sail-pgsql:
+        driver: local
+    sail-mongodb:
+        driver: local
+    sail-mongodb-static:
         driver: local

@@ -109,16 +109,16 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
-        'mongodb-static' => [
-            'driver' => 'mongodb',
-            'dsn' => env('MONGODB_STATIC_URI'),
-            'database' => env('MONGODB_STATIC_DATABASE', 'osrsbox-db'),
-        ],
-
         'mongodb' => [
             'driver' => 'mongodb',
             'dsn' => env('MONGODB_URI'),
             'database' => env('MONGODB_DATABASE', 'runemanager'),
+        ],
+
+        'mongodb-static' => [
+            'driver' => 'mongodb',
+            'dsn' => env('MONGODB_STATIC_URI'),
+            'database' => env('MONGODB_STATIC_DATABASE', 'runemanager-static'),
         ],
 
     ],
