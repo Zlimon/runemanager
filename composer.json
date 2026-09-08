@@ -1,7 +1,7 @@
 {
-    "name": "laravel/laravel",
+    "name": "zlimon/runemanager",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A CMS for Old School RuneScape community clans and groups.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
