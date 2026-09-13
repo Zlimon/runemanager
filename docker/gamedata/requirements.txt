@@ -1,0 +1,2 @@
+osrsreboxed==2.3.33
+pymongo==3.11.4

@@ -15,14 +15,13 @@ uses(RefreshDatabase::class);
 
 /*
  * mongodb-static is normally shared (read-only in tests, see phpunit.xml);
- * this suite writes to it, so point it at a scratch database. The osrsbox
- * server's app user can only touch osrsbox-db, so the scratch DB lives on the
- * main mongo server where the test user has full rights.
+ * this suite writes to it, so point it at a scratch database on the main
+ * mongo server instead, keeping the real static dataset untouched.
  */
 beforeEach(function () {
     config([
         'database.connections.mongodb-static.dsn' => config('database.connections.mongodb.dsn'),
-        'database.connections.mongodb-static.database' => 'osrsbox_testing',
+        'database.connections.mongodb-static.database' => 'gamedata_testing',
     ]);
     DB::purge('mongodb-static');
     Item::query()->delete();

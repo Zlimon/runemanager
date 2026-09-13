@@ -1,3 +1,0 @@
-[submodule "docker/osrsbox-api"]
-	path = docker/osrsbox-api
-	url = https://github.com/0xNeffarion/osrsbox-api.git

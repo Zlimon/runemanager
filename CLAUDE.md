@@ -25,7 +25,8 @@ Remaining feature work is tracked in `SPEC.md`.
   settings, presence/position/vitals, calendar, announcements); MongoDB
   (`mongodb/laravel-mongodb`) for high-volume snapshots (bank, inventory,
   looting bag, loot log, quests, group bank, collection log) plus the static
-  osrsbox item DB.
+  item/monster/prayer data (`docker/gamedata`, populated from the `osrsreboxed`
+  dataset on `sail up`).
 - **Real-time**: feed events broadcast over Laravel Reverb + Echo. In prod the
   WebSocket is served same-domain — nginx proxies `/app|/apps` to
   127.0.0.1:8080. `VITE_REVERB_*` values are baked into the JS bundle at CI

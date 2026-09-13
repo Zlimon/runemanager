@@ -23,9 +23,14 @@ services:
         networks:
             - sail
         depends_on:
-            - pgsql
-            - mongodb
-            - mongodb-static
+            pgsql:
+                condition: service_started
+            mongodb:
+                condition: service_started
+            mongodb-static:
+                condition: service_started
+            mongodb-static-populate:
+                condition: service_completed_successfully
     pgsql:
         image: 'postgres:16'
         ports:
@@ -52,10 +57,11 @@ services:
             timeout: 5s
     mongodb:
         image: 'mongodb/mongodb-atlas-local:latest'
+        hostname: mongodb
         environment:
-            MONGO_INITDB_DATABASE: '${MONGODB_DATABASE:-runemanager}'
-            MONGO_INITDB_ROOT_USERNAME: '${MONGODB_USERNAME:-sail}'
-            MONGO_INITDB_ROOT_PASSWORD: '${MONGODB_PASSWORD:-password}'
+            MONGODB_INITDB_DATABASE: '${MONGODB_DATABASE:-runemanager}'
+            MONGODB_INITDB_ROOT_USERNAME: '${MONGODB_USERNAME:-sail}'
+            MONGODB_INITDB_ROOT_PASSWORD: '${MONGODB_PASSWORD:-password}'
         volumes:
             - 'sail-mongodb:/data/db'
         ports:
@@ -72,13 +78,15 @@ services:
             timeout: 5s
     mongodb-static:
         image: 'mongodb/mongodb-atlas-local:latest'
+        hostname: mongodb-static
         environment:
-            MONGO_INITDB_DATABASE: '${MONGODB_STATIC_DATABASE:-runemanager-static}'
-            MONGO_INITDB_ROOT_USERNAME: '${MONGODB_STATIC_USERNAME:-sail}'
-            MONGO_INITDB_ROOT_PASSWORD: '${MONGODB_STATIC_PASSWORD:-password}'
+            MONGODB_INITDB_DATABASE: '${MONGODB_STATIC_DATABASE:-gamedata}'
+            MONGODB_INITDB_ROOT_USERNAME: '${MONGODB_STATIC_USERNAME:-sail}'
+            MONGODB_INITDB_ROOT_PASSWORD: '${MONGODB_STATIC_PASSWORD:-password}'
         volumes:
             - 'sail-mongodb-static:/data/db'
-            - './docker/osrsbox/create-database.sh:/docker-entrypoint-initdb.d/create-database.sh:ro'
+        ports:
+            - '${FORWARD_MONGODB_STATIC_PORT:-27018}:27017'
         networks:
             - sail
         healthcheck:
@@ -91,23 +99,17 @@ services:
             timeout: 5s
     mongodb-static-populate:
         build:
-            context: ./docker/osrsbox-api/eve
-        profiles:
-            - populate
+            context: ./docker/gamedata
         environment:
-            MONGO_PORT: 27018
-            DATABASE_NAME: '${MONGODB_STATIC_DATABASE:-runemanager-static}'
+            MONGO_PORT: 27017
+            DATABASE_NAME: '${MONGODB_STATIC_DATABASE:-gamedata}'
             PROJECT_USERNAME: '${MONGODB_STATIC_USERNAME:-sail}'
-            PROJECT_PASSWORD: '${MONGODB_STATIC_PASSWORD:-ppasswd}'
-        volumes:
-            - './docker/osrsbox-api/eve/scripts:/scripts'
+            PROJECT_PASSWORD: '${MONGODB_STATIC_PASSWORD:-password}'
         networks:
             - sail
         depends_on:
-            - mongodb-static
-        entrypoint:
-            - python3
-            - /scripts/mongo_insert_osrsbox.py
+            mongodb-static:
+                condition: service_healthy
 networks:
     sail:
         driver: bridge

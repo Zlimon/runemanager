@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            OsrsboxStaticSeeder::class,
+            StaticGameDataSeeder::class,
             UserSeeder::class,
             AccountSeeder::class,
             RolesSeeder::class,
