@@ -29,8 +29,6 @@ services:
                 condition: service_started
             mongodb-static:
                 condition: service_started
-            mongodb-static-populate:
-                condition: service_completed_successfully
     pgsql:
         image: 'postgres:16'
         ports:
@@ -64,6 +62,7 @@ services:
             MONGODB_INITDB_ROOT_PASSWORD: '${MONGODB_PASSWORD:-password}'
         volumes:
             - 'sail-mongodb:/data/db'
+            - 'sail-mongodb-configdb:/data/configdb'
         ports:
             - '${FORWARD_MONGODB_PORT:-27017}:27017'
         networks:
@@ -85,6 +84,7 @@ services:
             MONGODB_INITDB_ROOT_PASSWORD: '${MONGODB_STATIC_PASSWORD:-password}'
         volumes:
             - 'sail-mongodb-static:/data/db'
+            - 'sail-mongodb-static-configdb:/data/configdb'
         ports:
             - '${FORWARD_MONGODB_STATIC_PORT:-27018}:27017'
         networks:
@@ -118,5 +118,9 @@ volumes:
         driver: local
     sail-mongodb:
         driver: local
+    sail-mongodb-configdb:
+        driver: local
     sail-mongodb-static:
+        driver: local
+    sail-mongodb-static-configdb:
         driver: local
