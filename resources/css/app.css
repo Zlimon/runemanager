@@ -9,22 +9,75 @@
 }
 
 /*
- * Two base themes, both modelled on the OSRS Wiki:
- *   - runemanager       (light) — the wiki's brown/beige parchment palette
- *   - runemanager-dark  (dark)  — the wiki's dark-blue palette
- * Selected via the `data-theme` attribute set on <html> in AppLayout.vue, which
- * tracks the effective dark_mode flag. Resource packs layer their textures over
- * whichever base theme is active.
+ * Three themes, selected via the `data-theme` attribute set on <html> by the
+ * Blade root and kept in sync by DarkModeToggle.vue:
+ *
+ *   - runemanager          (light) — the OSRS Wiki's brown/beige parchment palette
+ *   - runemanager-dark     (dark)  — the OSRS Wiki's dark-blue palette
+ *   - runemanager-vanilla  (fixed) — Default Vanilla's own scheme
+ *
+ * The first two are the untextured "no resource pack" interface: pure DaisyUI,
+ * no pack stylesheet is loaded, and the viewer switches between them freely.
+ *
+ * runemanager-vanilla is the single fixed scheme behind Default Vanilla, whose
+ * textures are always painted on top. It has no light/dark counterpart and the
+ * toggle is hidden for it (see App\Support\Instance::canToggleDarkMode). Its
+ * tokens are keyed to the vanilla sprite palette so text and borders sit
+ * correctly on the pack's brown chrome instead of inheriting the parchment.
+ *
+ * Other installed packs still ride on the light/dark pair; they get their own
+ * appearance pass later.
  */
 @plugin "daisyui/theme" {
     name: "runemanager";
     default: true;
     prefersdark: false;
     color-scheme: light;
-    --color-primary: #EF9995;
-    --color-primary-content: #282425;
-    --color-secondary: #A4CBB4;
-    --color-secondary-content: #282425;
+    /* DaisyUI 5 leans on three theme flags that none of our three themes ever
+       declared — `themes: false` (above) drops the built-in themes that would
+       otherwise supply them as an inherited fallback — and each is referenced
+       bare (no `var(x, fallback)`) in the recipes below, so leaving one unset
+       doesn't mean "off", it means the whole declaration that reads it is
+       invalid at computed-value time and collapses to ITS OWN initial value,
+       which is usually worse than any real value would be:
+         --depth  → .btn's `--btn-border: color-mix(..., calc(var(--depth)*5%))`
+                    goes invalid → border-color falls back to currentColor (see
+                    the dark theme below for why that reads as a stray white
+                    line). A real value fixes it; we use 1, DaisyUI's own
+                    default depth, for the subtle darkened-rim shading it ships
+                    with everywhere else.
+         --noise  → `background-size: auto, calc(var(--noise)*100%)` goes
+                    invalid → the WHOLE background-size declaration (both
+                    layers) falls back to its initial `auto`, so the always-
+                    present `--fx-noise` SVG grain (defined unconditionally at
+                    :root) renders at full size instead of being scaled to
+                    nothing. We want this OFF, so: 0.
+         --border → `.badge`/`.checkbox`/`.radio`/`.table`/DaisyUI's own
+                    unoverridden `.input`/`.select` all set their edge via
+                    `border: var(--border) solid ...`; since `border` is a
+                    shorthand, one invalid component invalidates the entire
+                    declaration, not just the width — collapsing it to
+                    `medium currentColor` instead of a thin themed line. We
+                    want the themed line, so: 1px.
+       Net effect: no-pack stays flat with zero synthetic DaisyUI texture (any
+       texture comes only from an active resource pack's own sprites in
+       per-pack.css), while borders and shading render as intended instead of
+       accidentally falling back to a loud default. */
+    --depth: 1;
+    --noise: 0;
+    --border: 1px;
+    /* Same undefined-variable trap as --border above: DaisyUI references these
+       bare (no fallback) ~1300 times across buttons, inputs, badges and modals,
+       so leaving them unset invalidated every border-radius and squared off the
+       whole component set. .25rem matches the Tailwind `rounded` the card
+       surfaces use, rather than DaisyUI's rounder .5rem default. */
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --color-primary: #7A4E2D;
+    --color-primary-content: #FBF3E9;
+    --color-secondary: #4F8A6B;
+    --color-secondary-content: #F2F7F3;
     --color-accent: #DC8850;
     --color-accent-content: #282425;
     --color-neutral: #2E282A;
@@ -43,13 +96,45 @@
     --color-error-content: #140202;
 }
 
+/*
+ * base-100 → base-200 → base-300 is NOT a monotonic darken-as-you-go ramp here:
+ * base-300 (#44586E) is lighter than both base-100 (#2A3B4D) and base-200
+ * (#223141). base-300 is the border/elevation token (see R2 in the phase 2
+ * design rules), and in a dark theme a border only reads against its surface
+ * when it is LIGHTER than the card sitting on it — the opposite of the light
+ * and vanilla themes, where the border token is darker than the surface.
+ */
 @plugin "daisyui/theme" {
     name: "runemanager-dark";
     default: false;
     prefersdark: false;
     color-scheme: dark;
-    --color-primary: #5D8BC7;
-    --color-primary-content: #0B1118;
+    /* See the matching comment on the light theme above: with `--depth`
+       unset, a bare `.btn`'s `--btn-border: color-mix(in oklab, var(--btn-bg),
+       #000 calc(var(--depth)*5%))` was invalid at computed-value time, so
+       border-color fell back to `currentColor` — here, a light foreground
+       (base/neutral-content) — producing the washed-out light outline on
+       buttons in no-pack dark mode. That's R3's "ugly white border" bug.
+       Same root cause, different property, on a bare `.badge`: its `border:
+       var(--border) solid var(--badge-color,var(--color-base-200))` had an
+       unset `--border`, invalidating the whole shorthand (not just the
+       width) and collapsing it to `medium currentColor` — the other
+       near-white outline reported. And `--noise` unset made the always-
+       present grain SVG render at full size instead of being scaled to
+       nothing — the unexplained texture in no-pack dark. */
+    --depth: 1;
+    --noise: 0;
+    --border: 1px;
+    /* Same undefined-variable trap as --border above: DaisyUI references these
+       bare (no fallback) ~1300 times across buttons, inputs, badges and modals,
+       so leaving them unset invalidated every border-radius and squared off the
+       whole component set. .25rem matches the Tailwind `rounded` the card
+       surfaces use, rather than DaisyUI's rounder .5rem default. */
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --color-primary: #C9925A;
+    --color-primary-content: #241608;
     --color-secondary: #6FA890;
     --color-secondary-content: #0B1118;
     --color-accent: #E0A93B;
@@ -58,7 +143,7 @@
     --color-neutral-content: #E8EDF2;
     --color-base-100: #2A3B4D;
     --color-base-200: #223141;
-    --color-base-300: #1A2735;
+    --color-base-300: #44586E;
     --color-base-content: #D9E1EA;
     --color-info: #3B82F6;
     --color-info-content: #04122B;
@@ -68,6 +153,60 @@
     --color-warning-content: #110500;
     --color-error: #EF4444;
     --color-error-content: #150202;
+}
+
+@plugin "daisyui/theme" {
+    name: "runemanager-vanilla";
+    default: false;
+    prefersdark: false;
+    /* The surfaces are dark brown, so native widgets and scrollbars must render
+       dark even though this counts as Vanilla's one "light" scheme. */
+    color-scheme: dark;
+    /* See the matching comment on the light theme above. `--noise: 0` is
+       doubly deliberate here: Vanilla's texture must come only from the
+       pack's own sprites via per-pack.css (R5), never from DaisyUI's
+       synthetic grain — the two mixing under the button frame is exactly the
+       "ugly background combined with the textured background" the
+       maintainer reported. `--border` is pinned for the same reason as the
+       other two themes: any DaisyUI component per-pack.css doesn't re-skin
+       (badge, checkbox, table…) needs its themed border to actually render
+       instead of collapsing to `medium currentColor`. */
+    --depth: 1;
+    --noise: 0;
+    --border: 1px;
+    /* Same undefined-variable trap as --border above: DaisyUI references these
+       bare (no fallback) ~1300 times across buttons, inputs, badges and modals,
+       so leaving them unset invalidated every border-radius and squared off the
+       whole component set. .25rem matches the Tailwind `rounded` the card
+       surfaces use, rather than DaisyUI's rounder .5rem default. */
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --color-primary: #8A6F4A;
+    --color-primary-content: #FFF3DF;
+    --color-secondary: #4A5A3C;
+    --color-secondary-content: #E8F0D8;
+    --color-accent: #FF981F;
+    --color-accent-content: #241804;
+    --color-neutral: #2A241C;
+    --color-neutral-content: #D8CDB5;
+    /* base-100 is the panel, base-200 the body it sits on, base-300 the darker
+       chrome/outline below both — the same ordering as the other two themes, so
+       a component styled once reads correctly everywhere. The pack's lighter
+       bevel is not in this ramp: it arrives as --pack-accent (#88827A) and is
+       painted by .pack-accent-border and the pack's own sprites. */
+    --color-base-100: #483F33;
+    --color-base-200: #3E3529;
+    --color-base-300: #2A241C;
+    --color-base-content: #E8DFC8;
+    --color-info: #7AA6D9;
+    --color-info-content: #06101C;
+    --color-success: #3FA34D;
+    --color-success-content: #021205;
+    --color-warning: #D9A441;
+    --color-warning-content: #1C1204;
+    --color-error: #D64B3F;
+    --color-error-content: #170303;
 }
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
@@ -128,23 +267,26 @@
     display: none;
 }
 
+/* Headings deliberately carry no colour of their own: they inherit from the
+ * surface they sit on, so one heading style works on base, neutral and pack
+ * surfaces alike. Give the *container* the colour, never the heading. */
 h1 {
-    @apply text-2xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl;
+    @apply text-3xl font-extrabold leading-tight tracking-tight md:text-4xl;
 }
 h2 {
-    @apply text-xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-4xl lg:text-5xl;
+    @apply text-2xl font-bold leading-tight tracking-tight md:text-3xl;
 }
 h3 {
-    @apply text-lg font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-3xl lg:text-4xl;
+    @apply text-xl font-bold leading-snug tracking-tight md:text-2xl;
 }
 h4 {
-    @apply text-base font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-2xl lg:text-3xl;
+    @apply text-lg font-bold leading-snug tracking-tight;
 }
 h5 {
-    @apply text-sm font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-xl lg:text-2xl;
+    @apply text-base font-bold leading-snug tracking-tight;
 }
 h6 {
-    @apply text-xs font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-lg lg:text-xl;
+    @apply text-sm font-bold leading-snug tracking-tight;
 }
 
 .box {
@@ -162,18 +304,35 @@ h6 {
     @apply border border-base-300;
 }
 
+/* DaisyUI's `.select` and `.input` compute the same height in theory (both
+ * derive from the same --size-field token), but a size modifier on only one
+ * of them (e.g. `select-sm` next to a default-size `.input`, as on
+ * /admin/packs) still renders shorter — see rule R4 in the phase 2 design
+ * rules: text inputs and selects must render at one height. Pin both to an
+ * explicit height so a stray `-sm` class can't reintroduce the mismatch; this
+ * rule is unlayered so it overrides DaisyUI's own (layered) height regardless
+ * of which size class is present. Left out of the shared border rule above:
+ * .select already gets the same base-300 border as .input from that rule, it
+ * only needed a matching height. */
+.input,
+.select {
+    height: 2.5rem;
+}
+
 .box-tooltip {
     /* Mirror the Card surface (pack-bg-card + pack-accent-border) so item/skill
        tooltips pick up the active resource pack's colours instead of a flat box. */
     @apply z-10 absolute rounded border px-3 py-2 text-sm text-base-content shadow-lg;
-    background-color: var(--pack-bg-card);
-    border-color: var(--pack-accent, theme(colors.base-300));
+    /* --pack-bg-card only exists when a pack is loaded (see html.has-pack), and a
+       bare var() with no fallback invalidates the whole declaration — which is
+       what left this tooltip transparent, and unreadable, in the untextured
+       interface. Always give it the theme surface to fall back to. */
+    background-color: var(--pack-bg-card, var(--color-base-100));
+    border-color: var(--pack-accent, var(--color-base-300));
 }
 
 .tab {
-    /* Same dark-mode foreground logic as the page headers — keeps tab labels
-       readable when a pack tints the background dark. */
-    @apply bg-base-100 border-base-300 focus:ring-0 text-gray-900 dark:text-white;
+    @apply bg-base-100 border border-base-300 focus:ring-0 text-base-content/70;
 }
 
 /* The bg-base-100 on .tab above also flattens DaisyUI's default tab-active
@@ -182,50 +341,48 @@ h6 {
  * `.tab.resource-pack-tab` rule in per-pack.css also has two classes but
  * carries !important, so the pack texture still wins. */
 .tab.tab-active {
-    @apply bg-base-200 font-bold;
+    /* Matches the panel below (bg-base-200) and drops the shared edge so the
+       selected tab reads as continuous with its content. */
+    @apply bg-base-200 border-base-300 border-b-base-200 font-bold text-base-content;
 }
 
 /*
  * Pack-aware utilities — picked up automatically when the active resource pack
  * has had its palette extracted (see InstallResourcePack::extractPaletteColors).
- * Fall back to the matching DaisyUI base colour when --pack-* isn't defined,
- * so anonymous visitors and packs without extractable assets keep the default
- * theme.
+ * Every one falls through to a DaisyUI token when --pack-* isn't defined, so the
+ * untextured interface is coloured purely by whichever base theme is active.
  */
 .pack-bg {
-    /* Fallback mirrors the pre-pack body palette so dropping the original
-       bg-beige-300 / dark:bg-gray-800 doesn't regress the no-pack look. */
-    background-color: var(--pack-bg, theme(colors.beige-300));
-}
-.dark .pack-bg {
-    background-color: var(--pack-bg, theme(colors.gray-800));
+    background-color: var(--pack-bg, var(--color-base-200));
 }
 
 /*
- * A darker shade of --pack-bg for cards / sub-panels, so the body and the
- * cards aren't flat against each other. Derived via color-mix so adding a
- * new pack doesn't require a third DB column; for the no-pack case the
- * mix falls back to the body palette and bottoms out a step deeper.
+ * A darker shade of --pack-bg for cards / sub-panels, so the body and the cards
+ * aren't flat against each other. Derived via color-mix so adding a new pack
+ * doesn't require a third DB column.
+ *
+ * Only defined when a pack is actually active: the untextured interface has no
+ * pack palette to darken, so .pack-bg-card resolves to base-100, which already
+ * sits a step apart from the base-200 body. `html.has-pack` is stamped by the
+ * Blade root.
  */
-:root {
-    --pack-bg-card: color-mix(in srgb, var(--pack-bg, theme(colors.beige-300)) 88%, black);
-}
-.dark {
-    --pack-bg-card: color-mix(in srgb, var(--pack-bg, theme(colors.gray-800)) 88%, black);
+html.has-pack {
+    --pack-bg-card: color-mix(in srgb, var(--pack-bg, var(--color-base-100)) 88%, black);
 }
 
 .pack-bg-card {
-    background-color: var(--pack-bg-card);
+    background-color: var(--pack-bg-card, var(--color-base-100));
 }
 
 .pack-bg-soft {
-    background-color: var(--pack-bg, theme(colors.base-200));
+    background-color: var(--pack-bg, var(--color-base-200));
 }
 
 .pack-accent-border {
-    border-color: var(--pack-accent, theme(colors.base-300));
+    border-color: var(--pack-accent, var(--color-base-300));
 }
 
 .pack-accent-text {
-    color: var(--pack-accent, theme(colors.base-content));
+    color: var(--pack-accent, var(--color-base-content));
 }
+

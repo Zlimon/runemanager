@@ -165,7 +165,7 @@
     background-size: 36px 100%, 36px 100%;
     background-color: transparent !important;
     border: 0 !important;
-    color: theme(colors.white) !important;
+    color: #FFFFFF !important;
 }
 .resource-pack-box:hover {
     background-image: url('stats/tile_half_left_selected.png'),
@@ -185,11 +185,11 @@
  * specificity — `.tab.resource-pack-tab` (2 classes) wins. */
 .tab.resource-pack-tab {
     background-color: transparent !important;
-    color: theme(colors.gray-900) !important;
+    color: #111827 !important;
 }
 .tab.resource-pack-tab.is-active,
 .tab.resource-pack-tab.tab-active {
-    color: theme(colors.white) !important;
+    color: #FFFFFF !important;
 }
 
 /*
@@ -203,6 +203,24 @@
 .resource-pack-dialog-tabbed,
 .resource-pack-border {
     border: 0 !important;
+}
+
+/* A card carries both a CSS border (for the untextured interface) and this
+ * sprite frame. When the pack stylesheet is loaded the sprite IS the edge, so
+ * the CSS line is suppressed rather than drawn on top of it. */
+.resource-pack-border { border-color: transparent !important; }
+
+/*
+ * A table's rows — zebra striping especially — paint their own background across
+ * the full width of the panel, which covers the frame sprites drawn at the left
+ * and right edges. The border then appears to break on alternating rows. Inset
+ * the panel's content so rows stop short of the frame instead of painting over
+ * it; 14px clears the sprite's ~13px border line.
+ */
+.resource-pack-border:has(> table),
+.resource-pack-dialog:has(> table),
+.resource-pack-dialog-tabbed:has(> table) {
+    padding-inline: 14px;
 }
 
 /*
