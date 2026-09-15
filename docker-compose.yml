@@ -29,6 +29,32 @@ services:
                 condition: service_started
             mongodb-static:
                 condition: service_started
+    queue:
+        build:
+            context: ./docker/8.4
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: sail-8.4/app
+        command: php artisan queue:work --tries=3
+        tty: true
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        restart: unless-stopped
+        depends_on:
+            pgsql:
+                condition: service_started
+            mongodb:
+                condition: service_started
+            mongodb-static:
+                condition: service_started
     pgsql:
         image: 'postgres:16'
         ports:
