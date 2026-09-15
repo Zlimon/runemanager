@@ -23,7 +23,8 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_DATABASE" value="testing"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value="database/testing.sqlite"/>
         <!-- Isolate the writable Mongo DB so tests never touch real dev data
              (CollectionLog/Inventory/Loot/etc. live on the `mongodb` connection).
              mongodb-static (item/monster/prayer data) is left shared — it's read-only here. -->
