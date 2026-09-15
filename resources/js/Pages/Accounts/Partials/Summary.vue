@@ -36,7 +36,7 @@ const page = usePage();
             </div>
         </div>
 
-        <hr class="my-6 border border-beige-700 bg-beige-700">
+        <hr class="my-6 border border-base-300 bg-base-300">
 
         <div class="mb-2 flex items-baseline justify-between">
             <InputLabel class="text-sm" value="Hiscores" />

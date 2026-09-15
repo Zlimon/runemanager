@@ -13,6 +13,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import SelectInput from "@/Components/SelectInput.vue";
 
 const props = defineProps({
     events: { type: Array, default: () => [] },
@@ -23,7 +24,9 @@ const props = defineProps({
 const page = usePage();
 const currentUserId = computed(() => page.props.auth?.user?.id ?? null);
 const isAdmin = computed(() => page.props.is_admin === true);
-const isDark = computed(() => page.props.dark_mode === true);
+// Default Vanilla is a fixed dark-brown scheme with `dark_mode` always false, so
+// the calendar's own light/dark styling must follow the effective theme instead.
+const isDark = computed(() => page.props.theme === 'runemanager-dark' || page.props.theme === 'runemanager-vanilla');
 
 // Selectable event colours (V-Calendar palette names + a swatch hex to show).
 const COLORS = [
@@ -142,11 +145,11 @@ const destroy = (event) => {
         <div class="py-12">
             <div class="mx-auto max-w-4xl sm:px-6 lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 class="header-chatbox-sword text-2xl font-bold dark:text-white">Calendar</h1>
+                    <h1 class="header-chatbox-sword text-2xl font-bold text-base-content">Calendar</h1>
                     <PrimaryButton v-if="isAdmin" @click="openCreate()">New event</PrimaryButton>
                 </div>
 
-                <div class="mt-4 rounded p-3 pack-bg-card resource-pack-border">
+                <div class="mt-4 p-3 pack-bg-card border pack-accent-border rounded resource-pack-border">
                     <VCalendar expanded borderless transparent
                                :is-dark="isDark"
                                :attributes="attributes"
@@ -157,7 +160,7 @@ const destroy = (event) => {
                             <div class="space-y-1 p-1">
                                 <button v-for="attr in dayAttrs" :key="attr.key"
                                         type="button"
-                                        class="block w-full truncate rounded px-2 py-1 text-left text-sm hover:bg-white/10"
+                                        class="block w-full truncate rounded px-2 py-1 text-left text-sm hover:bg-base-content/10"
                                         @click="selected = attr.customData">
                                     {{ attr.customData.title }}
                                 </button>
@@ -170,14 +173,14 @@ const destroy = (event) => {
                 </p>
 
                 <!-- Upcoming widget -->
-                <h2 class="mt-8 mb-2 text-lg font-semibold dark:text-white">Upcoming</h2>
+                <h2 class="mt-8 mb-2 text-lg font-semibold text-base-content">Upcoming</h2>
                 <div v-if="upcoming.length === 0"
-                     class="rounded p-4 text-center text-sm text-base-content/60 pack-bg-card resource-pack-border">
+                     class="p-4 text-center text-sm text-base-content/60 pack-bg-card border pack-accent-border rounded resource-pack-border">
                     No upcoming events scheduled.
                 </div>
                 <ul v-else class="space-y-2">
                     <li v-for="event in upcoming" :key="event.id"
-                        class="flex cursor-pointer items-center justify-between gap-2 rounded p-3 pack-bg-card resource-pack-border"
+                        class="flex cursor-pointer items-center justify-between gap-2 p-3 pack-bg-card border pack-accent-border rounded resource-pack-border"
                         @click="selected = event">
                         <div class="flex items-center gap-2">
                             <Badge>{{ event.event_type_label }}</Badge>
@@ -228,9 +231,10 @@ const destroy = (event) => {
 
                     <div>
                         <InputLabel for="event-type" value="Type" />
-                        <select id="event-type" v-model="form.event_type" class="select select-bordered mt-1 block w-full">
+                        <SelectInput id="event-type" v-model="form.event_type" class="mt-1 block"
+                                     :error="form.errors.event_type !== undefined">
                             <option v-for="type in eventTypes" :key="type.value" :value="type.value">{{ type.label }}</option>
-                        </select>
+                        </SelectInput>
                         <InputError v-if="form.errors.event_type" :messages="form.errors.event_type" />
                     </div>
 

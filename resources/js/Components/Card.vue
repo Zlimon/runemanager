@@ -14,7 +14,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="pack-bg-card border pack-accent-border rounded" :class="padding">
+    <div class="pack-bg-card border pack-accent-border rounded resource-pack-border" :class="padding">
         <slot />
     </div>
 </template>

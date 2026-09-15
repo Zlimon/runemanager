@@ -40,7 +40,7 @@ const items = computed(() => lists.value[activeKey.value]);
     <div class="dropdown">
         <div tabindex="0" role="button"
              class="flex items-center gap-1 py-2 px-3 rounded cursor-pointer md:p-0"
-             :class="active ? 'text-accent font-semibold' : 'text-base-content hover:text-accent'">
+             :class="active ? 'text-accent font-semibold' : 'text-neutral-content hover:text-accent'">
             Hiscores
             <svg class="h-2.5 w-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                  fill="none" viewBox="0 0 10 6">
@@ -50,7 +50,7 @@ const items = computed(() => lists.value[activeKey.value]);
         </div>
 
         <div tabindex="0"
-             class="dropdown-content z-50 mt-2 w-[32rem] max-w-[90vw] rounded border border-base-300 bg-base-200 p-4 shadow-xl resource-pack-dialog">
+             class="dropdown-content z-50 mt-2 w-[32rem] max-w-[90vw] rounded border border-base-300 bg-base-200 p-4 text-base-content shadow-xl resource-pack-dialog">
             <div class="mb-3 grid grid-cols-2 gap-1">
                 <Link :href="route('hiscores.overall.index')"
                       class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">

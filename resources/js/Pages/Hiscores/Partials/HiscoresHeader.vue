@@ -13,7 +13,7 @@ const search = defineModel('search', { type: String, default: '' });
 
 <template>
     <div class="flex flex-column flex-wrap items-center justify-between space-y-4 pb-4 md:flex-row md:space-y-0">
-        <h1 class="text-2xl font-bold dark:text-white">{{ title }}</h1>
+        <h1 class="text-2xl font-bold text-base-content">{{ title }}</h1>
 
         <div class="flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-center">
             <slot />

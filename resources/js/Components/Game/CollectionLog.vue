@@ -175,19 +175,19 @@ const bossIcon = (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png`;
                         <div class="join">
                             <button v-for="f in ['all', 'obtained', 'missing']" :key="f"
                                     type="button"
-                                    class="btn btn-xs join-item capitalize"
+                                    class="btn btn-outline btn-xs join-item capitalize"
                                     :class="{ 'btn-active': filter === f }"
                                     @click="filter = f">
                                 {{ f }}
                             </button>
                         </div>
                         <div class="join">
-                            <button type="button" class="btn btn-xs join-item"
+                            <button type="button" class="btn btn-outline btn-xs join-item"
                                     :class="{ 'btn-active': order === 'default' }"
                                     @click="order = 'default'">
                                 Default
                             </button>
-                            <button type="button" class="btn btn-xs join-item"
+                            <button type="button" class="btn btn-outline btn-xs join-item"
                                     :class="{ 'btn-active': order === 'date' }"
                                     @click="order = 'date'">
                                 Date

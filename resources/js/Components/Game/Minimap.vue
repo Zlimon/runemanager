@@ -97,7 +97,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .minimap-frame {
-    background: var(--pack-accent, #94866d);
+    background: var(--pack-accent, var(--color-base-300));
     box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 </style>

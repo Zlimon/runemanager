@@ -6,6 +6,7 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import SelectInput from "@/Components/SelectInput.vue";
 
 const props = defineProps({
     settings: { type: Object, required: true },
@@ -35,10 +36,12 @@ const submit = () => form.put(route('admin.config.update'), { preserveScroll: tr
             <form class="space-y-6" @submit.prevent="submit">
                 <div>
                     <InputLabel for="hiscore_refresh_minutes" value="Hiscores refresh" />
-                    <select id="hiscore_refresh_minutes" v-model.number="form.hiscore_refresh_minutes"
-                            class="select select-bordered mt-1 block w-full">
+                    <SelectInput id="hiscore_refresh_minutes" :model-value="form.hiscore_refresh_minutes"
+                                 class="mt-1 block w-full"
+                                 :error="form.errors.hiscore_refresh_minutes !== undefined"
+                                 @update:model-value="(value) => (form.hiscore_refresh_minutes = Number(value))">
                         <option v-for="opt in refreshOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                    </select>
+                    </SelectInput>
                     <p class="mt-1 text-xs text-base-content/60">How often stats are pulled from the OSRS hiscores.</p>
                     <InputError v-if="form.errors.hiscore_refresh_minutes" :messages="form.errors.hiscore_refresh_minutes" />
                 </div>

@@ -20,8 +20,8 @@ defineProps({
                 Please check back soon.
             </p>
             <div class="flex justify-center gap-3 pt-2">
-                <Link :href="route('login')" class="btn btn-neutral btn-sm">Log in</Link>
-                <Link v-if="canRegister" :href="route('register')" class="btn btn-sm">Register</Link>
+                <Link :href="route('login')" class="btn btn-primary btn-sm">Log in</Link>
+                <Link v-if="canRegister" :href="route('register')" class="btn btn-sm btn-outline">Register</Link>
             </div>
         </div>
     </div>

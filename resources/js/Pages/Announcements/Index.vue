@@ -63,10 +63,9 @@ const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
                     </PrimaryButton>
                 </div>
 
-                <div v-if="announcements.length === 0"
-                     class="mt-6 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                <Card v-if="announcements.length === 0" padding="p-6" class="mt-6 text-center text-base-content/60">
                     No announcements right now.
-                </div>
+                </Card>
 
                 <ul v-else class="mt-6 space-y-4">
                     <li v-for="announcement in announcements" :key="announcement.id">

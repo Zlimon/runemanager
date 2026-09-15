@@ -16,7 +16,7 @@ const sizeClass = computed(() => (props.size ? `badge-${props.size}` : ''));
 </script>
 
 <template>
-    <span class="badge resource-pack-badge gap-1 px-2" :class="sizeClass">
+    <span class="badge badge-neutral resource-pack-badge gap-1 px-2" :class="sizeClass">
         <slot />
     </span>
 </template>

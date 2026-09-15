@@ -7,6 +7,8 @@ import Card from "@/Components/Card.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import SelectInput from "@/Components/SelectInput.vue";
+import ResourcePackTile from "@/Components/ResourcePackTile.vue";
 import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
 
 const props = defineProps({
@@ -93,11 +95,11 @@ const install = (pack) => installer.value?.start(pack);
                             Installed <span class="text-base-content/50">({{ installed.length }})</span>
                         </h2>
                         <div class="flex items-center gap-2">
-                            <select v-model="sort" class="select select-bordered select-sm">
+                            <SelectInput v-model="sort" class="w-40">
                                 <option value="alias">Name A–Z</option>
                                 <option value="most">Most used</option>
                                 <option value="least">Least used</option>
-                            </select>
+                            </SelectInput>
                             <TextInput v-model="installedSearch" type="search" placeholder="Filter…" class="w-40" />
                         </div>
                     </div>
@@ -158,26 +160,24 @@ const install = (pack) => installer.value?.start(pack);
                     </p>
 
                     <div v-if="!hubPacks.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
                         Couldn't reach the resource-pack hub right now. Try again later.
                     </div>
 
                     <div v-else-if="!installable.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
                         Nothing new to install — every hub pack is already installed.
                     </div>
 
                     <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                        <div v-for="pack in installable" :key="pack.name"
-                             class="flex flex-col items-center gap-2 rounded p-3 text-center pack-bg-card resource-pack-border">
-                            <img :src="pack.icon_url" :alt="pack.alias"
-                                 class="h-16 w-16 rounded object-cover [image-rendering:pixelated]"
-                                 loading="lazy" onerror="this.style.visibility='hidden'">
-                            <span class="max-w-full truncate text-sm font-medium" :title="pack.alias">{{ pack.alias }}</span>
-                            <PrimaryButton type="button" class="btn-xs" @click="install(pack)">
-                                Install
-                            </PrimaryButton>
-                        </div>
+                        <ResourcePackTile v-for="pack in installable" :key="pack.name"
+                                          :icon-url="pack.icon_url" :alias="pack.alias">
+                            <template #action>
+                                <PrimaryButton type="button" class="btn-xs" @click="install(pack)">
+                                    Install
+                                </PrimaryButton>
+                            </template>
+                        </ResourcePackTile>
                     </div>
                 </Card>
             </div>

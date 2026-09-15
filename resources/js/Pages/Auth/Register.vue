@@ -7,6 +7,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import SelectInput from '@/Components/SelectInput.vue';
 
 const props = defineProps({
     rosterRequired: { type: Boolean, default: false },
@@ -42,7 +43,7 @@ const submit = () => {
         </template>
 
         <div v-if="registrationClosed"
-             class="rounded p-4 text-center text-sm pack-bg-card resource-pack-border">
+             class="rounded p-4 text-center text-sm pack-bg-card border pack-accent-border resource-pack-border">
             Registration is currently closed — there are no available accounts to claim.
             Ask an admin to add you to the roster, then register here.
             <div class="mt-3">
@@ -53,17 +54,18 @@ const submit = () => {
         <form v-else @submit.prevent="submit">
             <div v-if="rosterRequired">
                 <InputLabel for="account_id" value="Your account" />
-                <select
+                <SelectInput
                     id="account_id"
                     v-model="form.account_id"
-                    class="select select-bordered mt-1 block w-full"
+                    class="mt-1 block"
+                    :error="form.errors.account_id !== undefined"
                     required
                 >
                     <option value="" disabled>Select the account you own</option>
                     <option v-for="account in rosterAccounts" :key="account.id" :value="account.id">
                         {{ account.username }}
                     </option>
-                </select>
+                </SelectInput>
                 <InputError class="mt-2" :message="form.errors.account_id" />
             </div>
 

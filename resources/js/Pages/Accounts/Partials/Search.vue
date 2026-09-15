@@ -53,7 +53,7 @@ watch(query, (value) => {
 
         <div class="relative z-[1100] flex justify-end">
             <div v-if="showDropdown && query && results.length > 0"
-                 class="absolute w-[calc(100%+4rem)] overflow-hidden rounded shadow-xl pack-bg-card resource-pack-border">
+                 class="absolute w-[calc(100%+4rem)] overflow-hidden rounded shadow-xl pack-bg-card border pack-accent-border resource-pack-border">
                 <div v-for="account in results" :key="account.username">
                     <Link :href="route('accounts.show', account)"
                           class="flex flex-row items-center space-x-2 border-b border-base-300 p-2 hover:bg-base-300/40">

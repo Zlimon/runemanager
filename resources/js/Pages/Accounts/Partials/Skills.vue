@@ -102,7 +102,7 @@ const tabs = [
                       @mouseleave="activeKey = null"
                       @mouseover="activeKey = cell.slug">
                     <img v-bind="cell.icon" class="h-5 w-5 object-contain" :alt="cell.tooltip.name">
-                    <span class="text-xs font-semibold capitalize text-gray-900 dark:text-white">
+                    <span class="text-xs font-semibold capitalize text-base-content">
                         {{ cell.label }}
                     </span>
                 </Link>

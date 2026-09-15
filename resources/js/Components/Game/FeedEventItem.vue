@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
+import Card from "@/Components/Card.vue";
 import LootItems from "@/Components/Game/LootItems.vue";
 import ImageLightbox from "@/Components/ImageLightbox.vue";
 import { feedSentence } from "@/feed";
@@ -62,7 +63,7 @@ const positionLabel = computed(() => position.value
 </script>
 
 <template>
-    <div class="rounded p-3 pack-bg-card resource-pack-border">
+    <Card padding="p-3">
         <div class="flex items-baseline justify-between">
             <Link :href="route('accounts.show', { account: event.account.username })"
                   class="flex items-center gap-2 font-semibold hover:underline">
@@ -124,5 +125,5 @@ const positionLabel = computed(() => position.value
             <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url"
                            alt="Event screenshot" class="mt-2" />
         </div>
-    </div>
+    </Card>
 </template>

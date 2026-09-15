@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
+import PaginationItem from '@/Components/PaginationItem.vue';
 
 /*
  * Generic table built on DaisyUI's `table` styling with client-side sorting and
@@ -104,7 +105,7 @@ const formatValue = (value, format) => {
 
 <template>
     <div>
-        <div class="overflow-x-auto rounded pack-bg-card resource-pack-border">
+        <div class="overflow-x-auto rounded pack-bg-card border pack-accent-border resource-pack-border">
             <table class="table" :class="{ 'table-zebra': zebra }">
                 <thead>
                     <tr class="text-base-content/70">
@@ -140,24 +141,21 @@ const formatValue = (value, format) => {
             </table>
         </div>
 
-        <div v-if="totalPages > 1" class="mt-4 flex items-center justify-between">
+        <nav v-if="totalPages > 1" class="mt-4 flex items-center justify-between" aria-label="Pagination">
             <p class="text-xs text-base-content/60">
                 Page {{ page }} of {{ totalPages }}
             </p>
-            <div class="join">
-                <button type="button" class="btn btn-sm join-item" :disabled="page === 1" @click="goTo(page - 1)">
+            <div class="join border border-base-300">
+                <PaginationItem :disabled="page === 1" aria-label="Previous page" @click="goTo(page - 1)">
                     «
-                </button>
-                <button v-for="p in pageNumbers" :key="p" type="button"
-                        class="btn btn-sm join-item"
-                        :class="{ 'btn-active': p === page }"
-                        @click="goTo(p)">
+                </PaginationItem>
+                <PaginationItem v-for="p in pageNumbers" :key="p" :active="p === page" @click="goTo(p)">
                     {{ p }}
-                </button>
-                <button type="button" class="btn btn-sm join-item" :disabled="page === totalPages" @click="goTo(page + 1)">
+                </PaginationItem>
+                <PaginationItem :disabled="page === totalPages" aria-label="Next page" @click="goTo(page + 1)">
                     »
-                </button>
+                </PaginationItem>
             </div>
-        </div>
+        </nav>
     </div>
 </template>

@@ -40,13 +40,13 @@ const removeEvent = (id) => {
 
 <template>
     <AppLayout title="Home">
-        <section class="bg-center bg-cover bg-no-repeat bg-gray-700 bg-blend-multiply"
+        <section class="bg-center bg-cover bg-no-repeat bg-neutral bg-blend-multiply"
                  :style="bannerStyle">
             <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-32">
-                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
+                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-neutral-content md:text-5xl lg:text-6xl">
                     Welcome to {{ instanceName }}
                 </h1>
-                <p class="mb-8 whitespace-pre-line text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">
+                <p class="mb-8 whitespace-pre-line text-lg font-normal text-neutral-content/80 lg:text-xl sm:px-16 lg:px-48">
                     {{ description }}
                 </p>
             </div>
@@ -112,9 +112,9 @@ const removeEvent = (id) => {
                                 <FeedEventItem :event="event" @deleted="removeEvent" />
                             </li>
                         </ul>
-                        <div v-else class="mt-4 rounded p-8 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                        <Card v-else padding="p-8" class="mt-4 text-center text-base-content/60">
                             No activity yet — notable events will appear here as accounts sync.
-                        </div>
+                        </Card>
                     </div>
                 </div>
 
@@ -133,7 +133,7 @@ const removeEvent = (id) => {
                                 <Card padding="p-3">
                                     <div class="flex items-start gap-2">
                                         <span class="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                                              :style="{ backgroundColor: event.color || '#DC8850' }"></span>
+                                              :style="{ backgroundColor: event.color || 'var(--color-accent)' }"></span>
                                         <div class="min-w-0">
                                             <p class="truncate font-semibold">{{ event.title }}</p>
                                             <p class="text-xs text-base-content/60">{{ eventDate(event.starts_at) }}</p>

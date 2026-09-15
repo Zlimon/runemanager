@@ -36,7 +36,7 @@ const formatQuantity = (q) => {
 </script>
 
 <template>
-    <div class="relative flex h-12 w-12 items-center justify-center rounded hover:bg-white/10"
+    <div class="relative flex h-12 w-12 items-center justify-center rounded hover:bg-base-content/5"
          @mouseenter="hovered = true" @mouseleave="hovered = false">
         <template v-if="icon || name">
             <span v-if="quantity > 1 && !dimmed"

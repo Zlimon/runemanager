@@ -13,7 +13,7 @@ defineProps({
     <div v-if="loading"
          class="z-50 flex flex-col items-center justify-center gap-3 overflow-hidden text-center"
          :class="{
-             'fixed inset-0 h-screen w-full bg-gray-700 p-5': !component && !bare,
+             'fixed inset-0 h-screen w-full bg-base-100/90 p-5': !component && !bare,
              'p-5': component,
          }">
         <img src="/images/loading-rat.gif" alt="Loading"

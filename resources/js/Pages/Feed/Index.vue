@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
+import Card from "@/Components/Card.vue";
 import FeedEventItem from "@/Components/Game/FeedEventItem.vue";
 import { visibleFeedEvents } from "@/feed";
 
@@ -46,7 +47,7 @@ const removeEvent = (id) => {
         <div class="py-12">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <div class="flex items-baseline justify-between">
-                    <h1 class="header-chatbox-sword text-2xl font-bold dark:text-white">Live Feed</h1>
+                    <h1 class="header-chatbox-sword text-2xl font-bold text-base-content">Live Feed</h1>
                     <span class="flex items-center gap-1.5 text-xs text-base-content/60">
                         <span class="inline-block h-1.5 w-1.5 rounded-full bg-success"></span>
                         Live
@@ -59,9 +60,9 @@ const removeEvent = (id) => {
                     </li>
                 </ul>
 
-                <div v-else class="mt-4 rounded p-8 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                <Card v-else padding="p-8" class="mt-4 text-center text-base-content/60">
                     No events yet — once the plugin starts pushing data, notable events will appear here.
-                </div>
+                </Card>
             </div>
         </div>
     </AppLayout>

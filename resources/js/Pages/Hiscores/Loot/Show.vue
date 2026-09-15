@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Card from "@/Components/Card.vue";
 import Search from "@/Components/Search.vue";
 import ItemSlot from "@/Components/Game/ItemSlot.vue";
 import Badge from "@/Components/Badge.vue";
@@ -58,7 +59,7 @@ const filteredHiscores = computed(() => {
                           class="text-sm text-base-content/60 hover:text-base-content">
                         ← Loot
                     </Link>
-                    <h1 class="text-2xl font-bold dark:text-white">{{ source }}</h1>
+                    <h1 class="text-2xl font-bold text-base-content">{{ source }}</h1>
                     <Badge v-if="category">{{ category }}</Badge>
                     <div class="ml-auto w-full max-w-xs">
                         <Search v-model="search" placeholder="Search by username" />
@@ -66,33 +67,34 @@ const filteredHiscores = computed(() => {
                 </div>
 
                 <ul class="space-y-3">
-                    <li v-for="entry in filteredHiscores" :key="entry.account.username"
-                        class="rounded p-4 pack-bg-card resource-pack-border"
-                        :class="{ 'ring-2 ring-primary/40': entry.account.user_id === ownUserId }">
-                        <div class="flex items-center justify-between gap-3">
-                            <Link :href="route('accounts.show', entry.account)"
-                                  class="flex items-center gap-3 whitespace-nowrap font-semibold text-base-content">
-                                <span class="text-base-content/50">#{{ entry.rank }}</span>
-                                <img :src="`data:image/jpeg;base64,${entry.account.user?.icon ?? entry.account.icon}`"
-                                     class="h-9 w-9 object-contain" alt="">
-                                {{ entry.account.username }}
-                            </Link>
-                            <div class="text-right">
-                                <p class="font-semibold text-base-content">{{ formatValue(entry.total_value) }} gp</p>
-                                <p class="text-xs text-base-content/50">{{ entry.drops.toLocaleString('en-US') }} drops</p>
+                    <li v-for="entry in filteredHiscores" :key="entry.account.username">
+                        <Card padding="p-4" :class="{ 'ring-2 ring-primary/40': entry.account.user_id === ownUserId }">
+                            <div class="flex items-center justify-between gap-3">
+                                <Link :href="route('accounts.show', entry.account)"
+                                      class="flex items-center gap-3 whitespace-nowrap font-semibold text-base-content">
+                                    <span class="text-base-content/50">#{{ entry.rank }}</span>
+                                    <img :src="`data:image/jpeg;base64,${entry.account.user?.icon ?? entry.account.icon}`"
+                                         class="h-9 w-9 object-contain" alt="">
+                                    {{ entry.account.username }}
+                                </Link>
+                                <div class="text-right">
+                                    <p class="font-semibold text-base-content">{{ formatValue(entry.total_value) }} gp</p>
+                                    <p class="text-xs text-base-content/50">{{ entry.drops.toLocaleString('en-US') }} drops</p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            <ItemSlot v-for="item in entry.items" :key="item.id"
-                                      :icon="item.icon" :name="item.name ?? `Item ${item.id}`"
-                                      :quantity="item.quantity" />
-                        </div>
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                <ItemSlot v-for="item in entry.items" :key="item.id"
+                                          :icon="item.icon" :name="item.name ?? `Item ${item.id}`"
+                                          :quantity="item.quantity" />
+                            </div>
+                        </Card>
                     </li>
 
-                    <li v-if="filteredHiscores.length === 0"
-                        class="rounded p-8 text-center text-base-content/60 pack-bg-card resource-pack-border">
-                        No accounts match this search
+                    <li v-if="filteredHiscores.length === 0">
+                        <Card padding="p-8" class="text-center text-base-content/60">
+                            No accounts match this search
+                        </Card>
                     </li>
                 </ul>
             </div>

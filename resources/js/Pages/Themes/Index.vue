@@ -139,18 +139,18 @@ const install = (pack) => {
                     </p>
 
                     <div v-if="!hubPacks.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
                         Couldn't reach the resource-pack hub right now. Try again later.
                     </div>
 
                     <div v-else-if="!installable.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
+                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
                         Nothing new to install — every hub pack is already available above.
                     </div>
 
                     <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                         <div v-for="pack in installable" :key="pack.name"
-                             class="flex flex-col items-center gap-2 rounded p-3 text-center pack-bg-card resource-pack-border">
+                             class="flex flex-col items-center gap-2 rounded p-3 text-center pack-bg-card border pack-accent-border resource-pack-border">
                             <img :src="pack.icon_url" :alt="pack.alias"
                                  class="h-16 w-16 rounded object-cover [image-rendering:pixelated]"
                                  loading="lazy" onerror="this.style.visibility='hidden'">
