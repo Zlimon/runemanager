@@ -35,6 +35,12 @@ Route::get('/announcements', [AnnouncementController::class, 'index'])->name('an
 // too (guests persist to a cookie; logged-in users to their account).
 Route::put('/dark-mode', [UserDarkModeController::class, 'update'])->name('dark-mode.update');
 
+// Resource-pack preference — public for the same reason: a guest must be able to
+// opt out of packs to reach the untextured interface, which is the only one that
+// offers the light/dark toggle. Guests persist to a cookie, users to their account.
+Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
+    ->name('user.resource-pack.update');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -106,8 +112,6 @@ Route::middleware([
     // SPEC §6.2 — per-user appearance: browse packs + set a personal override
     // (instance-global default is set by the owner in admin settings).
     Route::get('/user/themes', [UserResourcePackController::class, 'index'])->name('themes.index');
-    Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
-        ->name('user.resource-pack.update');
     Route::post('/user/resource-pack/install', [UserResourcePackController::class, 'install'])
         ->name('user.resource-pack.install');
     Route::get('/user/resource-pack/status', [UserResourcePackController::class, 'status'])

@@ -52,8 +52,8 @@ class HandleInertiaRequests extends Middleware
 
         // Dark mode resolves through Instance: the viewer's own toggle wins, then
         // a guest's cookie choice, then the owner's instance default, then the
-        // pack's (unreliable) flag. Anyone may toggle — it flips the DaisyUI base
-        // theme while the pack's textures stay on top.
+        // pack's (unreliable) flag. Default Vanilla short-circuits all of it — it
+        // ships one fixed scheme and hides the toggle.
         $darkMode = Instance::resolveDarkMode($user, $pack);
 
         return array_merge(parent::share($request), [
@@ -80,7 +80,14 @@ class HandleInertiaRequests extends Middleware
                 'banner_url' => Instance::bannerUrl(),
             ],
             'dark_mode' => $darkMode,
-            'can_toggle_dark_mode' => true,
+            'can_toggle_dark_mode' => Instance::canToggleDarkMode($pack),
+            // The DaisyUI theme stamped on <html data-theme>; forwarded so the
+            // client can keep it in sync across SPA navigations without
+            // re-deriving the precedence rules.
+            'theme' => Instance::themeFor($pack, $darkMode),
+            // Drives the guest-only appearance picker: guests need a way out of
+            // Default Vanilla to reach the untextured, toggleable interface.
+            'no_pack' => $pack === null,
             // Admin display filters for the Live Feed surfaces only (SPEC §8.2).
             // Everything is stored; the account Activity feed shows it all.
             'feed_level_milestones' => Instance::feedLevelUpThresholds(),

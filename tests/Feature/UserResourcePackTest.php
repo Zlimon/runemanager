@@ -5,6 +5,7 @@ use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\ResourcePacks\InstallResourcePack;
+use App\Support\Instance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
@@ -40,8 +41,21 @@ function makePack(string $name, array $overrides = []): ResourcePack
     ], $overrides));
 }
 
-it('rejects unauthenticated requests', function () {
-    $this->putJson('/user/resource-pack', ['resource_pack_id' => 1])->assertUnauthorized();
+it('stores an unauthenticated preference as a cookie instead of rejecting it', function () {
+    // The route is deliberately public: a guest must be able to opt out of packs
+    // to reach the untextured interface. See AppearanceRulesTest for the rules.
+    $pack = makePack('sample-vanilla');
+
+    $this->putJson('/user/resource-pack', ['resource_pack_id' => $pack->id])
+        ->assertOk()
+        ->assertCookie(Instance::RESOURCE_PACK_COOKIE, (string) $pack->id, encrypted: false);
+});
+
+it('still gates pack installation and deletion behind auth', function () {
+    $pack = makePack('pack-guarded');
+
+    $this->postJson('/user/resource-pack/install', ['name' => 'pack-guarded'])->assertUnauthorized();
+    $this->deleteJson("/user/resource-pack/{$pack->id}")->assertUnauthorized();
 });
 
 it('sets the per-user override on update', function () {

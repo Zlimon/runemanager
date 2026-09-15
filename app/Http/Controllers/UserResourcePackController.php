@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\ResourcePacks\DeleteResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Services\ResourcePacks\ResourcePackHub;
+use App\Support\Instance;
 use App\Support\Roles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -59,7 +60,11 @@ class UserResourcePackController extends Controller
     {
         $user = $request->user();
 
-        if ($request->input('resource_pack_id') === 'none') {
+        if ($user === null) {
+            return $this->updateForGuest($request);
+        }
+
+        if ($request->input('resource_pack_id') === ResourcePack::GUEST_NO_PACK) {
             // Explicit "no resource pack": plain interface, clear any selection.
             $user->disable_resource_pack = true;
             $user->resource_pack_id = null;
@@ -82,6 +87,36 @@ class UserResourcePackController extends Controller
             'disable_resource_pack' => $user->disable_resource_pack,
             'effective_resource_pack_id' => $user->effectiveResourcePackId(),
         ]);
+    }
+
+    /**
+     * The same preference for a logged-out visitor, stored in a long-lived
+     * cookie instead of on an account. Guests need this to reach the untextured
+     * interface, which is the only one offering a light/dark toggle.
+     */
+    private function updateForGuest(Request $request): JsonResponse|RedirectResponse
+    {
+        $choice = $request->input('resource_pack_id');
+
+        if ($choice === ResourcePack::GUEST_NO_PACK) {
+            $value = ResourcePack::GUEST_NO_PACK;
+        } else {
+            $validated = $request->validate([
+                'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
+            ]);
+            // Null clears the cookie back to "follow the instance default".
+            $value = isset($validated['resource_pack_id']) ? (string) $validated['resource_pack_id'] : null;
+        }
+
+        $cookie = $value === null
+            ? cookie()->forget(Instance::RESOURCE_PACK_COOKIE)
+            : cookie(Instance::RESOURCE_PACK_COOKIE, $value, 60 * 24 * 365);
+
+        if ($request->header('X-Inertia')) {
+            return back()->withCookie($cookie);
+        }
+
+        return response()->json(['resource_pack_id' => $value])->withCookie($cookie);
     }
 
     /**

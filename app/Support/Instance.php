@@ -25,6 +25,24 @@ class Instance
     /** Cookie holding a logged-out visitor's light/dark choice ('1' | '0'). */
     public const DARK_MODE_COOKIE = 'dark_mode';
 
+    /**
+     * Cookie holding a logged-out visitor's resource-pack choice: the literal
+     * {@see ResourcePack::GUEST_NO_PACK} or an installed pack id. Guests have no
+     * row to carry `users.disable_resource_pack`, so without this they could
+     * never reach the untextured interface — and so never get the light/dark
+     * toggle, which only the untextured interface offers.
+     */
+    public const RESOURCE_PACK_COOKIE = 'resource_pack';
+
+    /** DaisyUI theme for the untextured interface in light mode. */
+    public const THEME_LIGHT = 'runemanager';
+
+    /** DaisyUI theme for the untextured interface in dark mode. */
+    public const THEME_DARK = 'runemanager-dark';
+
+    /** DaisyUI theme for Default Vanilla's single fixed scheme. */
+    public const THEME_VANILLA = 'runemanager-vanilla';
+
     public static function mode(): string
     {
         $mode = (string) SettingHelper::getSetting('instance_mode', self::MODE_CASUAL);
@@ -217,6 +235,12 @@ class Instance
      */
     public static function resolveDarkMode(?User $user, ?ResourcePack $pack): bool
     {
+        // Default Vanilla ships one fixed scheme and hides the toggle, so it is
+        // never "dark" regardless of what anyone has stored.
+        if (! self::canToggleDarkMode($pack)) {
+            return false;
+        }
+
         if ($user !== null && $user->dark_mode !== null) {
             return (bool) $user->dark_mode;
         }
@@ -229,5 +253,31 @@ class Instance
         }
 
         return self::defaultDarkMode() ?? (bool) $pack?->dark_mode;
+    }
+
+    /**
+     * Whether the viewer may switch between light and dark.
+     *
+     * Only the untextured "no resource pack" interface supports both modes.
+     * Default Vanilla is a single fixed scheme ({@see self::THEME_VANILLA}) and
+     * hides the toggle; every other pack still rides on the two base themes
+     * until resource packs get their own appearance pass.
+     */
+    public static function canToggleDarkMode(?ResourcePack $pack): bool
+    {
+        return ! ($pack?->isVanilla() ?? false);
+    }
+
+    /**
+     * The DaisyUI theme name to stamp on <html data-theme>, given the viewer's
+     * effective pack and resolved dark-mode flag.
+     */
+    public static function themeFor(?ResourcePack $pack, bool $darkMode): string
+    {
+        if ($pack?->isVanilla()) {
+            return self::THEME_VANILLA;
+        }
+
+        return $darkMode ? self::THEME_DARK : self::THEME_LIGHT;
     }
 }

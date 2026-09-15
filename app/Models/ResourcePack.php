@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\SettingHelper;
+use App\Support\Instance;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,6 +45,9 @@ class ResourcePack extends Model
     /** The bundled vanilla template pack, always offered as "Default Vanilla". */
     public const VANILLA = 'sample-vanilla';
 
+    /** Cookie value a logged-out visitor stores to opt out of resource packs. */
+    public const GUEST_NO_PACK = 'none';
+
     /** The member who installed this pack from the hub (null = instance-managed). */
     public function installedBy(): BelongsTo
     {
@@ -76,10 +80,38 @@ class ResourcePack extends Model
             return null;
         }
 
-        $id = $user?->effectiveResourcePackId() ?? SettingHelper::getSetting('resource_pack_id');
+        // Guests carry the same preference in a cookie, since they have no row
+        // to store it on (see Instance::RESOURCE_PACK_COOKIE).
+        $guestChoice = $user === null ? self::guestPackChoice() : null;
+
+        if ($guestChoice === self::GUEST_NO_PACK) {
+            return null;
+        }
+
+        $id = $guestChoice ?? $user?->effectiveResourcePackId() ?? SettingHelper::getSetting('resource_pack_id');
         $pack = $id ? self::find($id) : null;
 
         return $pack ?? self::where('name', self::VANILLA)->first();
+    }
+
+    /**
+     * A logged-out visitor's stored pack preference: the literal
+     * {@see self::GUEST_NO_PACK}, an installed pack id, or null when they have
+     * expressed no preference (or the cookie points at a deleted pack).
+     */
+    private static function guestPackChoice(): string|int|null
+    {
+        $cookie = request()->cookie(Instance::RESOURCE_PACK_COOKIE);
+
+        if ($cookie === self::GUEST_NO_PACK) {
+            return self::GUEST_NO_PACK;
+        }
+
+        if (is_numeric($cookie) && self::whereKey((int) $cookie)->exists()) {
+            return (int) $cookie;
+        }
+
+        return null;
     }
 
     /**
