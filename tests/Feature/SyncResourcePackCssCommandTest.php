@@ -62,6 +62,22 @@ it('skips a directory that was never fully installed', function () {
     expect(File::exists($dir.'/resource-pack.css'))->toBeFalse();
 });
 
+it('borrows a sprite the template newly references but the pack never shipped', function () {
+    $template = File::get(resource_path('css/per-pack.css'));
+    $dir = installedPackDir('pack-synctest-stale', $template);
+    // The pack ships its own frame but no button face, exactly like a partial
+    // pack installed before the template referenced button/middle.png.
+    File::ensureDirectoryExists($dir.'/button');
+    File::put($dir.'/button/corner_top_left.png', 'this pack\'s own corner');
+
+    $result = app(InstallResourcePack::class)->syncTemplateCss();
+
+    expect($result['filled'])->toBeGreaterThan(0);
+    expect(File::exists($dir.'/button/middle.png'))->toBeTrue();
+    // A sprite the pack does ship is never overwritten with vanilla's.
+    expect(File::get($dir.'/button/corner_top_left.png'))->toBe('this pack\'s own corner');
+});
+
 it('reports what it refreshed', function () {
     installedPackDir('pack-synctest-stale', '/* an older copy */');
 

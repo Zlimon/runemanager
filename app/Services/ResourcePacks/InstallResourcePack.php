@@ -417,7 +417,13 @@ class InstallResourcePack
      * the <link> on the file's mtime, so rewriting an identical file would expire
      * every viewer's cached stylesheet for nothing.
      *
-     * @return array{updated: list<string>, unchanged: list<string>}
+     * Every installed pack is also re-completed from vanilla, because a template
+     * edit can start referencing a sprite the pack never shipped (and only
+     * borrowed at install time, from the older template's reference list). Without
+     * this the new url() resolves to a 404 and that background layer renders as a
+     * hole instead of falling back to the standard look.
+     *
+     * @return array{updated: list<string>, unchanged: list<string>, filled: int}
      */
     public function syncTemplateCss(): array
     {
@@ -429,6 +435,7 @@ class InstallResourcePack
         $contents = File::get($template);
         $updated = [];
         $unchanged = [];
+        $filled = 0;
 
         foreach (File::directories(public_path('resource-packs')) as $directory) {
             $target = $directory.'/resource-pack.css';
@@ -440,6 +447,7 @@ class InstallResourcePack
             }
 
             $name = basename($directory);
+            $filled += $this->completeFromVanilla($directory);
 
             if (File::get($target) === $contents) {
                 $unchanged[] = $name;
@@ -454,7 +462,7 @@ class InstallResourcePack
         sort($updated);
         sort($unchanged);
 
-        return ['updated' => $updated, 'unchanged' => $unchanged];
+        return ['updated' => $updated, 'unchanged' => $unchanged, 'filled' => $filled];
     }
 
     private function copyTemplateCss(string $extractTarget): void

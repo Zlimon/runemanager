@@ -26,7 +26,7 @@ class SyncResourcePackCss extends Command
     public function handle(InstallResourcePack $installer): int
     {
         try {
-            ['updated' => $updated, 'unchanged' => $unchanged] = $installer->syncTemplateCss();
+            ['updated' => $updated, 'unchanged' => $unchanged, 'filled' => $filled] = $installer->syncTemplateCss();
         } catch (Throwable $e) {
             $this->warn('Could not sync per-pack CSS: '.$e->getMessage());
 
@@ -38,9 +38,10 @@ class SyncResourcePackCss extends Command
         }
 
         $this->info(sprintf(
-            'Per-pack CSS synced: %d refreshed, %d already current.',
+            'Per-pack CSS synced: %d refreshed, %d already current, %d sprite(s) borrowed from the default pack.',
             count($updated),
             count($unchanged),
+            $filled,
         ));
 
         return CommandAlias::SUCCESS;

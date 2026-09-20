@@ -232,8 +232,11 @@
  * runemanager / runemanager-dark themes remain the no-pack fallback.
  */
 
-/* Buttons — 9-slice metal frame from button/, dialog fill in the centre;
- * brightened for feedback on hover/focus/active. */
+/* Buttons — 9-slice metal frame from button/ with the pack's own button face
+ * (button/middle.png) tiled in the centre; brightened for feedback on
+ * hover/focus/active. The centre is deliberately NOT dialog/background.png:
+ * that is the panel texture, and a pack's panel is rarely the same colour as
+ * its button, so it read as a coloured rectangle inset in the button frame. */
 .btn {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -243,7 +246,7 @@
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
                 url('button/edge_bottom.png') repeat-x,
-                url('dialog/background.png');
+                url('button/middle.png');
     background-position: top left, top right, bottom left, bottom right,
                          top, left, right, bottom, center;
     border: 0 !important;
@@ -272,14 +275,17 @@
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
                 url('button/edge_bottom.png') repeat-x,
-                url('dialog/background.png');
+                url('button/middle.png');
     background-position: top left, top right, bottom left, bottom right,
                          top, left, right, bottom, center;
     filter: brightness(1.12);
 }
 
-/* Badges — reuse the metal button face (cream text reads on every pack's button
- * fill) so small labels like event types match the rest of the UI. */
+/* Badges — reuse the button 9-slice, button face and all (cream text reads on
+ * every pack's button fill), so small labels like event types match the rest of
+ * the UI. Same reason as .btn above for not filling the centre with
+ * dialog/background.png: on most packs the panel texture is a different colour
+ * from the button, so it read as a coloured pill inset in the metal frame. */
 .resource-pack-badge {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -289,7 +295,7 @@
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
                 url('button/edge_bottom.png') repeat-x,
-                url('dialog/background.png');
+                url('button/middle.png');
     background-position: top left, top right, bottom left, bottom right,
                          top, left, right, bottom, center;
     border: 0 !important;
