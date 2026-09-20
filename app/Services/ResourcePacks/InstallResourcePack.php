@@ -404,6 +404,59 @@ class InstallResourcePack
         File::deleteDirectory($tmpDir);
     }
 
+    /**
+     * Re-copy the per-pack CSS template into every already-installed pack.
+     *
+     * {@see copyTemplateCss()} only runs at install time, so editing
+     * resources/css/per-pack.css leaves every installed pack on the copy it was
+     * given when it was fetched. That is true in production too: the deploy
+     * shares public/resource-packs via symlink across releases, so a release
+     * that changes the template ships CSS that never reaches a single pack.
+     *
+     * Packs whose copy already matches are left alone — app.blade.php cache-busts
+     * the <link> on the file's mtime, so rewriting an identical file would expire
+     * every viewer's cached stylesheet for nothing.
+     *
+     * @return array{updated: list<string>, unchanged: list<string>}
+     */
+    public function syncTemplateCss(): array
+    {
+        $template = resource_path('css/per-pack.css');
+        if (! File::exists($template)) {
+            throw new RuntimeException('Per-pack CSS template missing at '.$template);
+        }
+
+        $contents = File::get($template);
+        $updated = [];
+        $unchanged = [];
+
+        foreach (File::directories(public_path('resource-packs')) as $directory) {
+            $target = $directory.'/resource-pack.css';
+
+            // A directory without the stylesheet was never fully installed;
+            // leave it to the installer rather than half-provisioning it here.
+            if (! File::exists($target)) {
+                continue;
+            }
+
+            $name = basename($directory);
+
+            if (File::get($target) === $contents) {
+                $unchanged[] = $name;
+
+                continue;
+            }
+
+            File::put($target, $contents);
+            $updated[] = $name;
+        }
+
+        sort($updated);
+        sort($unchanged);
+
+        return ['updated' => $updated, 'unchanged' => $unchanged];
+    }
+
     private function copyTemplateCss(string $extractTarget): void
     {
         $template = resource_path('css/per-pack.css');
