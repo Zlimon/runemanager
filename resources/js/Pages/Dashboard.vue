@@ -7,8 +7,10 @@ import Card from '@/Components/Card.vue';
 import FeedEventItem from '@/Components/Game/FeedEventItem.vue';
 import { visibleFeedEvents } from '@/feed';
 import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
+import { useEventColor } from '@/composables/useEventColor';
 
 const { packIcon } = useResourcePackIcon();
+const { eventHex } = useEventColor();
 
 const props = defineProps({
     stats: { type: Object, default: () => ({ accounts: 0, members: 0, online: 0 }) },
@@ -133,7 +135,7 @@ const removeEvent = (id) => {
                                 <Card padding="p-3">
                                     <div class="flex items-start gap-2">
                                         <span class="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                                              :style="{ backgroundColor: event.color || 'var(--color-accent)' }"></span>
+                                              :style="{ backgroundColor: eventHex(event) }"></span>
                                         <div class="min-w-0">
                                             <p class="truncate font-semibold">{{ event.title }}</p>
                                             <p class="text-xs text-base-content/60">{{ eventDate(event.starts_at) }}</p>
