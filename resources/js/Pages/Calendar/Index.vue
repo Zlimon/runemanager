@@ -46,8 +46,19 @@ const COLORS = [
 const colorFor = (type) =>
     COLORS[[...(type ?? '')].reduce((sum, c) => sum + c.charCodeAt(0), 0) % COLORS.length].name;
 
+// The swatch an event renders as. `color` holds a V-Calendar palette NAME, not a
+// hex, so it has to resolve through COLORS — several of those names are also CSS
+// keywords but at different shades (CSS `green` is #008000, the swatch #22c55e),
+// which would drift the dot away from the bar it is meant to match.
+const COLOR_HEX = Object.fromEntries(COLORS.map((c) => [c.name, c.hex]));
+const eventHex = (event) =>
+    COLOR_HEX[event.color ?? colorFor(event.event_type)] ?? COLOR_HEX.gray;
+
 // Earliest selectable datetime — start of today (no past events).
 const todayMin = dayjs().startOf('day').format('YYYY-MM-DDTHH:mm');
+
+// Open on the current month. V-Calendar's month is 1-based, dayjs' is 0-based.
+const initialPage = { month: dayjs().month() + 1, year: dayjs().year() };
 
 // Map each event to a V-Calendar attribute. A multi-day event uses a date range
 // so it renders as a connected bar across every day it spans.
@@ -152,6 +163,7 @@ const destroy = (event) => {
                 <div class="mt-4 p-3 pack-bg-card border pack-accent-border rounded resource-pack-border">
                     <VCalendar expanded borderless transparent
                                :is-dark="isDark"
+                               :initial-page="initialPage"
                                :attributes="attributes"
                                title-position="left"
                                @dayclick="onDayClick"
@@ -182,9 +194,11 @@ const destroy = (event) => {
                     <li v-for="event in upcoming" :key="event.id"
                         class="flex cursor-pointer items-center justify-between gap-2 p-3 pack-bg-card border pack-accent-border rounded resource-pack-border"
                         @click="selected = event">
-                        <div class="flex items-center gap-2">
+                        <div class="flex min-w-0 items-center gap-2">
+                            <span class="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                                  :style="{ backgroundColor: eventHex(event) }"></span>
                             <Badge>{{ event.event_type_label }}</Badge>
-                            <span class="font-semibold">{{ event.title }}</span>
+                            <span class="truncate font-semibold">{{ event.title }}</span>
                         </div>
                         <span class="text-xs text-base-content/60">{{ dt(event.starts_at) }}</span>
                     </li>
