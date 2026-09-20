@@ -232,11 +232,22 @@
  * runemanager / runemanager-dark themes remain the no-pack fallback.
  */
 
-/* Buttons — 9-slice metal frame from button/ with the pack's own button face
- * (button/middle.png) tiled in the centre; brightened for feedback on
- * hover/focus/active. The centre is deliberately NOT dialog/background.png:
- * that is the panel texture, and a pack's panel is rarely the same colour as
- * its button, so it read as a coloured rectangle inset in the button frame. */
+/*
+ * Buttons — the pack's 9-slice frame from button/ and nothing else, brightened
+ * for feedback on hover/focus/active.
+ *
+ * The centre is deliberately left unpainted. There IS a sprite for it —
+ * button/middle.png, the button face, shipped alongside middle_selected.png for
+ * the pressed state — but packs disagree about what goes in it: a flat colour on
+ * rs3 and Victorian Rose, a 12×12 noisy swatch on vanilla, and on the 2012 pack
+ * a 56×56 *shaded* face (luma 24–62) that does not even tile vertically. Against
+ * that pack's near-black edge sprites its light centre read as a coloured panel
+ * inset in the frame — the thing this rule exists to avoid. Painting no centre
+ * lets whatever surface the control sits on show through, which looks the same
+ * on every pack. The `background:` shorthand also keeps background-color
+ * transparent, so DaisyUI's variant fill (btn-primary, btn-error…) can't bleed
+ * through underneath.
+ */
 .btn {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -245,10 +256,9 @@
                 url('button/edge_top.png') repeat-x,
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
-                url('button/edge_bottom.png') repeat-x,
-                url('button/middle.png');
+                url('button/edge_bottom.png') repeat-x;
     background-position: top left, top right, bottom left, bottom right,
-                         top, left, right, bottom, center;
+                         top, left, right, bottom;
     border: 0 !important;
     box-shadow: none !important;
     /* The DaisyUI variant's content colour (e.g. btn-error's near-black) is
@@ -262,11 +272,11 @@
 .btn:focus-visible,
 .btn:active,
 .btn.btn-active {
-    /* Keep the pack's own button face + frame and just brighten for feedback.
-     * Swapping to the _selected sprites + background_brighter.png shifted the
-     * hue on many packs (a brown button flashing pink or red), which read as a
-     * different button rather than a hover state. background-color is forced
-     * transparent so DaisyUI's own hover colour can't bleed through. */
+    /* Keep the pack's own frame and just brighten for feedback. Swapping to the
+     * _selected sprites shifted the hue on many packs (a brown button flashing
+     * pink or red), which read as a different button rather than a hover state.
+     * Restating the stack keeps background-color transparent here too, so
+     * DaisyUI's own hover colour can't bleed through. */
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
                 url('button/corner_bottom_left.png') no-repeat,
@@ -274,18 +284,14 @@
                 url('button/edge_top.png') repeat-x,
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
-                url('button/edge_bottom.png') repeat-x,
-                url('button/middle.png');
+                url('button/edge_bottom.png') repeat-x;
     background-position: top left, top right, bottom left, bottom right,
-                         top, left, right, bottom, center;
+                         top, left, right, bottom;
     filter: brightness(1.12);
 }
 
-/* Badges — reuse the button 9-slice, button face and all (cream text reads on
- * every pack's button fill), so small labels like event types match the rest of
- * the UI. Same reason as .btn above for not filling the centre with
- * dialog/background.png: on most packs the panel texture is a different colour
- * from the button, so it read as a coloured pill inset in the metal frame. */
+/* Badges — reuse the button frame so small labels like event types match the
+ * rest of the UI, centre left unpainted for the same reason as .btn above. */
 .resource-pack-badge {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -294,10 +300,9 @@
                 url('button/edge_top.png') repeat-x,
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
-                url('button/edge_bottom.png') repeat-x,
-                url('button/middle.png');
+                url('button/edge_bottom.png') repeat-x;
     background-position: top left, top right, bottom left, bottom right,
-                         top, left, right, bottom, center;
+                         top, left, right, bottom;
     border: 0 !important;
     color: #f0e6d2 !important;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.85);
