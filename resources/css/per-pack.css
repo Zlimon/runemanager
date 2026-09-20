@@ -45,7 +45,8 @@
     background-image: url('chatbox/sword_pointed_right.png');
 }
 
-.resource-pack-dialog {
+.resource-pack-dialog,
+.vc-popover-content {
     background: url('dialog/iron_rivets_corner_top_left.png') no-repeat,
                 url('dialog/iron_rivets_corner_top_right.png') no-repeat,
                 url('dialog/iron_rivets_corner_bottom_left.png') no-repeat,
@@ -201,7 +202,8 @@
  */
 .resource-pack-dialog,
 .resource-pack-dialog-tabbed,
-.resource-pack-border {
+.resource-pack-border,
+.vc-popover-content {
     border: 0 !important;
 }
 
@@ -519,4 +521,30 @@
 
 .status-orb--spec .status-orb__sphere {
     background-image: url('other/minimap_orb_special_icon.png'), url('other/minimap_orb_special.png');
+}
+
+/*
+ * v-calendar paints the day popover with its own chrome — a slate fill, a 1px
+ * border and a caret — which ignores the pack entirely. It takes the dialog
+ * frame above; the rest is handled here.
+ *
+ * The fill has to be cleared explicitly: v-calendar sets background-color on
+ * a later-loading stylesheet, and the frame above only sets background-image
+ * layers, so without this the slate would sit on top of the parchment.
+ *
+ * Padding clears the frame — the rivets read ~14px in from the panel edge, and
+ * the component's own 4px would put the text on top of them.
+ *
+ * The caret is dropped rather than restyled. A sprite frame can't grow an
+ * arrow, and v-calendar draws the caret in its own colours, so it reads as a
+ * foreign notch punched out of the riveted edge.
+ */
+.vc-popover-content {
+    background-color: transparent !important;
+    padding: 14px !important;
+    border-radius: 0 !important;
+}
+
+.vc-popover-caret {
+    display: none !important;
 }
