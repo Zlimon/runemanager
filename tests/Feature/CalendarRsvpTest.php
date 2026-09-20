@@ -139,3 +139,103 @@ it('exposes attendees and rsvp eligibility on the calendar resource', function (
             ->where('events.0.can.rsvp', false),
         );
 });
+
+it('moves the attendance when a member rsvps with a second account', function () {
+    $member = adminUser(Roles::USER);
+    $first = Account::factory()->for($member)->create();
+    $second = Account::factory()->for($member)->create();
+    $event = CalendarEvent::factory()->for(adminUser())->create();
+
+    $this->actingAs($member)
+        ->post(route('calendar.rsvp', $event), ['account_id' => $first->id]);
+    $this->actingAs($member)
+        ->post(route('calendar.rsvp', $event), ['account_id' => $second->id]);
+
+    // A member attends as exactly one account — the second replaces the first
+    // rather than adding to it.
+    expect(CalendarEventRsvp::count())->toBe(1);
+    expect(CalendarEventRsvp::first()->account_id)->toBe($second->id);
+});
+
+it('still lets two different members attend the same event', function () {
+    $one = adminUser(Roles::USER);
+    $two = adminUser(Roles::USER);
+    $event = CalendarEvent::factory()->for(adminUser())->create();
+
+    $this->actingAs($one)->post(route('calendar.rsvp', $event), [
+        'account_id' => Account::factory()->for($one)->create()->id,
+    ]);
+    $this->actingAs($two)->post(route('calendar.rsvp', $event), [
+        'account_id' => Account::factory()->for($two)->create()->id,
+    ]);
+
+    expect(CalendarEventRsvp::count())->toBe(2);
+});
+
+it('refuses an rsvp once the event has taken place', function () {
+    $member = adminUser(Roles::USER);
+    $account = Account::factory()->for($member)->create();
+    $event = CalendarEvent::factory()->for(adminUser())->create([
+        'starts_at' => now()->subWeek(),
+        'ends_at' => now()->subWeek()->addHour(),
+    ]);
+
+    $this->actingAs($member)
+        ->post(route('calendar.rsvp', $event), ['account_id' => $account->id])
+        ->assertForbidden();
+
+    expect(CalendarEventRsvp::count())->toBe(0);
+});
+
+it('refuses to withdraw from an event that has taken place', function () {
+    $member = adminUser(Roles::USER);
+    $account = Account::factory()->for($member)->create();
+    $event = CalendarEvent::factory()->for(adminUser())->create([
+        'starts_at' => now()->subWeek(),
+        'ends_at' => null,
+    ]);
+    CalendarEventRsvp::create([
+        'calendar_event_id' => $event->id,
+        'account_id' => $account->id,
+        'user_id' => $member->id,
+    ]);
+
+    $this->actingAs($member)
+        ->delete(route('calendar.rsvp.destroy', $event), ['account_id' => $account->id])
+        ->assertForbidden();
+
+    // Attendance on a past event is a record of who turned up, so it stands.
+    expect(CalendarEventRsvp::count())->toBe(1);
+});
+
+it('treats a multi-day event as open until it ends', function () {
+    $member = adminUser(Roles::USER);
+    $account = Account::factory()->for($member)->create();
+    $event = CalendarEvent::factory()->for(adminUser())->create([
+        'starts_at' => now()->subDay(),
+        'ends_at' => now()->addDay(),
+    ]);
+
+    $this->actingAs($member)
+        ->post(route('calendar.rsvp', $event), ['account_id' => $account->id])
+        ->assertRedirect();
+
+    expect(CalendarEventRsvp::count())->toBe(1);
+});
+
+it('stops advertising rsvp on a past event in the resource', function () {
+    $member = adminUser(Roles::USER);
+    Account::factory()->for($member)->create();
+    CalendarEvent::factory()->for(adminUser())->create(['starts_at' => now()->subWeek(), 'ends_at' => null]);
+    CalendarEvent::factory()->for(adminUser())->create(['starts_at' => now()->addWeek(), 'ends_at' => null]);
+
+    $this->actingAs($member)
+        ->get(route('calendar.index', ['from' => now()->subMonth()->toDateString(), 'to' => now()->addMonth()->toDateString()]))
+        ->assertInertia(function (AssertableInertia $page) {
+            $events = collect($page->toArray()['props']['events']);
+
+            expect($events)->toHaveCount(2);
+            expect($events->firstWhere('starts_at', '<', now()->toIso8601String())['can']['rsvp'])->toBeFalse();
+            expect($events->firstWhere('starts_at', '>', now()->toIso8601String())['can']['rsvp'])->toBeTrue();
+        });
+});

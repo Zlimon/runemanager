@@ -216,6 +216,20 @@ const myAvailableAccounts = computed(() => {
     const attending = new Set(selected.value.rsvps.map((r) => r.account_id));
     return myAccounts.value.filter((a) => !attending.has(a.id));
 });
+
+// A member attends as exactly one account, so once one of theirs is on the list
+// the rest offer to move the attendance rather than add a second.
+const myAttendingAccountId = computed(() =>
+    selected.value?.rsvps.find((r) => myAccountIds.value.has(r.account_id))?.account_id ?? null);
+
+// `can.rsvp` is false both for a viewer with no accounts and for an event that
+// has been and gone; only the latter is worth explaining in the panel.
+const selectedHasPassed = computed(() => {
+    if (!selected.value) {
+        return false;
+    }
+    return dayjs(selected.value.ends_at ?? selected.value.starts_at).isBefore(dayjs());
+});
 const myAccountIds = computed(() => new Set(myAccounts.value.map((a) => a.id)));
 
 const toggleRsvp = (accountId, attending) => {
@@ -347,6 +361,11 @@ const toggleRsvp = (accountId, attending) => {
                         </ul>
                         <p v-else class="mt-1 text-xs text-base-content/50">No one attending yet.</p>
 
+                        <p v-if="selected && !selected.can.rsvp && selectedHasPassed"
+                           class="mt-2 text-xs text-base-content/50">
+                            This event has already taken place.
+                        </p>
+
                         <div v-if="selected.can.rsvp && myAvailableAccounts.length" class="mt-2 flex flex-wrap gap-2">
                             <button v-for="account in myAvailableAccounts" :key="account.id" type="button"
                                     class="badge badge-outline gap-1"
@@ -354,7 +373,7 @@ const toggleRsvp = (accountId, attending) => {
                                 <img v-if="account.account_type && account.account_type !== 'normal'"
                                      :src="`/images/${account.account_type}.png`"
                                      class="h-3 w-3 object-contain" alt="">
-                                RSVP as {{ account.username }}
+                                {{ myAttendingAccountId === null ? 'RSVP as' : 'Switch to' }} {{ account.username }}
                             </button>
                         </div>
                     </div>

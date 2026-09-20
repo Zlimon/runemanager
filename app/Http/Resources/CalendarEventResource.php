@@ -87,7 +87,10 @@ class CalendarEventResource extends JsonResource
             'can' => [
                 'update' => $this->viewerManages($request),
                 'delete' => $this->viewerManages($request),
-                'rsvp' => $this->viewerCanRsvp ?? self::viewerCanRsvp($request),
+                // Attendance closes once the event is over, so the client stops
+                // offering it rather than discovering the 403 on click.
+                'rsvp' => ($this->viewerCanRsvp ?? self::viewerCanRsvp($request))
+                    && ! $this->resource->hasPassed(),
             ],
         ];
     }

@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -98,12 +99,27 @@ class CalendarEventController extends Controller
     /**
      * SPEC §10 — sign one of your accounts up for an event. RSVP is per account,
      * so the payload names which one; it has to be yours.
+     *
+     * A member attends as exactly one account, so naming a different one moves
+     * the attendance rather than adding a second. Doing it as a delete-then-create
+     * inside a transaction keeps it atomic against the unique index the schema
+     * carries — two concurrent requests cannot leave the member attending twice.
      */
     public function rsvp(Request $request, CalendarEvent $calendarEvent): RedirectResponse
     {
-        $account = $this->ownedAccount($request);
+        $this->abortIfPassed($calendarEvent);
 
-        $calendarEvent->rsvps()->firstOrCreate(['account_id' => $account->id]);
+        $account = $this->ownedAccount($request);
+        $userId = $request->user()->id;
+
+        DB::transaction(function () use ($calendarEvent, $account, $userId): void {
+            $calendarEvent->rsvps()->where('user_id', $userId)->delete();
+
+            $calendarEvent->rsvps()->create([
+                'account_id' => $account->id,
+                'user_id' => $userId,
+            ]);
+        });
 
         return back();
     }
@@ -111,11 +127,22 @@ class CalendarEventController extends Controller
     /** Withdraw an account's attendance; the row's absence *is* "not going". */
     public function destroyRsvp(Request $request, CalendarEvent $calendarEvent): RedirectResponse
     {
+        $this->abortIfPassed($calendarEvent);
+
         $account = $this->ownedAccount($request);
 
         $calendarEvent->rsvps()->where('account_id', $account->id)->delete();
 
         return back();
+    }
+
+    /**
+     * Attendance on an event that has already happened is a record of who turned
+     * up, so it is closed to further change — both signing up and withdrawing.
+     */
+    private function abortIfPassed(CalendarEvent $calendarEvent): void
+    {
+        abort_if($calendarEvent->hasPassed(), HttpResponse::HTTP_FORBIDDEN, 'This event has already taken place.');
     }
 
     /**

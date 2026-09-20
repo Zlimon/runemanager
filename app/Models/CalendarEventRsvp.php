@@ -14,10 +14,12 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $calendar_event_id
  * @property int $account_id
+ * @property int $user_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read CalendarEvent $calendarEvent
  * @property-read Account $account
+ * @property-read User $user
  */
 class CalendarEventRsvp extends Model
 {
@@ -26,6 +28,7 @@ class CalendarEventRsvp extends Model
     protected $fillable = [
         'calendar_event_id',
         'account_id',
+        'user_id',
     ];
 
     public function calendarEvent(): BelongsTo
@@ -36,5 +39,10 @@ class CalendarEventRsvp extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -63,6 +63,16 @@ class CalendarEvent extends Model
         return $this->hasMany(CalendarEventRsvp::class);
     }
 
+    /**
+     * Whether the event is over. A multi-day event runs until its end, so it
+     * only counts as past once `ends_at` has been and gone; a single-point
+     * event is past the moment it starts.
+     */
+    public function hasPassed(): bool
+    {
+        return ($this->ends_at ?? $this->starts_at)?->isPast() ?? false;
+    }
+
     public function scopeUpcoming(Builder $query): Builder
     {
         return $query->where('starts_at', '>=', now())->orderBy('starts_at');
