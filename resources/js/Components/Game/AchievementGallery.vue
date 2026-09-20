@@ -35,25 +35,23 @@ const unpin = (event) => {
             Pin events from the feed below to showcase them here.
         </Card>
 
-        <Card v-else class="mt-2" padding="p-3">
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <Card v-for="event in events" :key="event.id" padding="p-0" frame="dialog"
-                      class="group relative overflow-hidden">
-                    <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url" alt="Achievement"
-                                   thumb-class="h-28 w-full object-cover" class="!w-full" />
-                    <div v-else class="flex h-28 w-full items-center justify-center bg-base-300/40 text-3xl">🏆</div>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <Card v-for="event in events" :key="event.id" padding="p-0" frame="dialog"
+                  class="group relative overflow-hidden">
+                <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url" alt="Achievement"
+                               thumb-class="h-28 w-full object-cover" class="!w-full" />
+                <div v-else class="flex h-28 w-full items-center justify-center bg-base-300/40 text-3xl">🏆</div>
 
-                    <div class="p-2">
-                        <p class="text-xs font-medium leading-snug text-base-content/90">{{ feedSentence(event) }}</p>
-                        <p class="mt-0.5 text-[10px] text-base-content/50">{{ dayjs(event.occurred_at).format('MMM D, YYYY') }}</p>
-                    </div>
+                <div class="p-2">
+                    <p class="text-xs font-medium leading-snug text-base-content/90">{{ feedSentence(event) }}</p>
+                    <p class="mt-0.5 text-[10px] text-base-content/50">{{ dayjs(event.occurred_at).format('MMM D, YYYY') }}</p>
+                </div>
 
-                    <button v-if="isOwner" type="button" @click="unpin(event)" title="Unpin"
-                            class="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 group-hover:flex">
-                        &times;
-                    </button>
-                </Card>
-            </div>
-        </Card>
+                <button v-if="isOwner" type="button" @click="unpin(event)" title="Unpin"
+                        class="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 group-hover:flex">
+                    &times;
+                </button>
+            </Card>
+        </div>
     </div>
 </template>
