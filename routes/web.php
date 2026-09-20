@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiaryHiscoreController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GroupBankController;
+use App\Http\Controllers\ItemSearchController;
 use App\Http\Controllers\LootHiscoreController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\OverallHiscoreController;
@@ -73,6 +74,11 @@ Route::middleware([
             Route::put('/config', [AdminController::class, 'updateConfig'])->name('admin.config.update');
             Route::post('/branding', [AdminController::class, 'updateBranding'])->name('admin.branding.update');
             Route::put('/integrations', [AdminController::class, 'updateIntegrations'])->name('admin.integrations.update');
+            // SPEC §10 — calendar administration: manage every event and pick
+            // which palette colours mark an event as important.
+            Route::get('/calendar', [AdminController::class, 'calendar'])->name('admin.calendar');
+            Route::put('/calendar/settings', [AdminController::class, 'updateCalendarSettings'])
+                ->name('admin.calendar.settings');
             Route::get('/packs', [AdminController::class, 'packs'])->name('admin.packs');
             Route::post('/packs/install', [AdminController::class, 'installPack'])->name('admin.packs.install');
             Route::post('/packs/reinstall-vanilla', [AdminController::class, 'reinstallVanilla'])
@@ -99,9 +105,21 @@ Route::middleware([
 
     Route::middleware('can:manage calendar')->group(function () {
         Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
+        Route::put('/calendar/{calendarEvent}', [CalendarEventController::class, 'update'])
+            ->name('calendar.update');
         Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])
             ->name('calendar.destroy');
     });
+
+    // SPEC §10 — attendance is open to every member: the controller checks the
+    // named account belongs to the caller, so no permission gate here.
+    Route::post('/calendar/{calendarEvent}/rsvp', [CalendarEventController::class, 'rsvp'])
+        ->name('calendar.rsvp');
+    Route::delete('/calendar/{calendarEvent}/rsvp', [CalendarEventController::class, 'destroyRsvp'])
+        ->name('calendar.rsvp.destroy');
+
+    // Typeahead over the static item catalogue, for the calendar's item picker.
+    Route::get('/items/search', ItemSearchController::class)->name('items.search');
 
     Route::middleware('can:manage announcements')->group(function () {
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');

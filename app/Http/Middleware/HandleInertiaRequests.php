@@ -68,6 +68,9 @@ class HandleInertiaRequests extends Middleware
             'my_accounts' => $user
                 ? $user->account()->orderBy('username')->get(['id', 'username', 'account_type'])
                     ->map(fn ($account) => [
+                        // `id` is what anything account-scoped must key on — usernames
+                        // change (see UsernameHistory), ids do not.
+                        'id' => $account->id,
                         'username' => $account->username,
                         'account_type' => $account->account_type?->value ?? $account->account_type,
                     ])->all()

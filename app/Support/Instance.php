@@ -22,6 +22,13 @@ class Instance
 
     public const MODES = [self::MODE_CLAN, self::MODE_GROUP, self::MODE_CASUAL];
 
+    /**
+     * Calendar colours treated as important until the owner configures the list.
+     *
+     * @var list<string>
+     */
+    public const DEFAULT_CALENDAR_HIGHLIGHT_COLORS = ['red'];
+
     /** Cookie holding a logged-out visitor's light/dark choice ('1' | '0'). */
     public const DARK_MODE_COOKIE = 'dark_mode';
 
@@ -203,6 +210,41 @@ class Instance
         return $value !== null && $value !== ''
             ? (int) $value
             : (int) config('runemanager.feed.loot_min_value', 0);
+    }
+
+    /**
+     * Palette colour names that mark a calendar event as important (SPEC §10) —
+     * an event whose colour is in this list is highlighted on the calendar. The
+     * setting holds a JSON array of palette colour names (the same list as
+     * StoreCalendarEventRequest::COLORS); a stored empty array means "highlight
+     * nothing".
+     *
+     * @return list<string>
+     */
+    public static function calendarHighlightColors(): array
+    {
+        try {
+            $raw = SettingHelper::getSetting('calendar_highlight_colors');
+        } catch (\Throwable) {
+            // Settings are read during artisan boot in places that run before the
+            // database exists (see hiscoreRefreshMinutes); never hard-fail on it.
+            return self::DEFAULT_CALENDAR_HIGHLIGHT_COLORS;
+        }
+
+        if ($raw === null || $raw === '') {
+            return self::DEFAULT_CALENDAR_HIGHLIGHT_COLORS;
+        }
+
+        $decoded = is_array($raw) ? $raw : json_decode((string) $raw, true);
+
+        if (! is_array($decoded)) {
+            return self::DEFAULT_CALENDAR_HIGHLIGHT_COLORS;
+        }
+
+        return array_values(array_unique(array_map(
+            fn ($color): string => (string) $color,
+            array_filter($decoded, 'is_scalar'),
+        )));
     }
 
     /**
