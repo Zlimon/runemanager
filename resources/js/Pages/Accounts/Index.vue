@@ -8,6 +8,7 @@ import Search from "@/Components/Search.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import AccountCard from "@/Components/AccountCard.vue";
 import PaginationItem from "@/Components/PaginationItem.vue";
+import Badge from "@/Components/Badge.vue";
 
 const props = defineProps({
     accountTypes: {
@@ -99,8 +100,9 @@ const clearAccountTypeSearch = () => {
                         <div class="flex flex-wrap space-x-2">
                             <div v-if="form.account_types.length > 0"
                                  class="mt-2 flex items-center">
-                                <div class="badge badge-info cursor-pointer"
-                                     @click="clearAccountTypeSearch()">
+                                <Badge variant="info"
+                                       class="cursor-pointer"
+                                       @click="clearAccountTypeSearch()">
                                     <svg class="inline-block h-4 w-4 stroke-current"
                                          fill="none"
                                          viewBox="0 0 24 24"
@@ -110,16 +112,17 @@ const clearAccountTypeSearch = () => {
                                               stroke-linejoin="round"
                                               stroke-width="2" />
                                     </svg>
-                                </div>
+                                </Badge>
                             </div>
 
                             <div v-for="accountType in form.account_types"
                                  :key="accountType"
                                  class="mt-2">
-                                <div class="badge badge-primary cursor-pointer"
-                                     @click="removeAccountTypeSearch(accountType)">
+                                <Badge variant="primary"
+                                       class="cursor-pointer"
+                                       @click="removeAccountTypeSearch(accountType)">
                                     {{ formatAccountTypeName(accountType) }}
-                                </div>
+                                </Badge>
                             </div>
                         </div>
                     </div>
