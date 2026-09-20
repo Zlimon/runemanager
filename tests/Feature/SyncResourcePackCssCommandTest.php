@@ -24,6 +24,18 @@ afterEach(function () {
     }
 });
 
+/**
+ * Give the pack a button face of the given dimensions — the one sprite that
+ * decides how the template renders for it.
+ */
+function packFace(string $dir, int $width, int $height): void
+{
+    File::ensureDirectoryExists($dir.'/button');
+    $image = imagecreatetruecolor($width, $height);
+    imagepng($image, $dir.'/button/middle.png');
+    imagedestroy($image);
+}
+
 it('rewrites a pack whose stylesheet has drifted from the template', function () {
     $dir = installedPackDir('pack-synctest-stale', '/* an older copy */');
 
@@ -76,6 +88,44 @@ it('borrows a sprite the template newly references but the pack never shipped', 
     expect(File::exists($dir.'/button/edge_bottom.png'))->toBeTrue();
     // A sprite the pack does ship is never overwritten with vanilla's.
     expect(File::get($dir.'/button/corner_top_left.png'))->toBe('this pack\'s own corner');
+});
+
+it('tiles the button face for a pack that ships a small seamless swatch', function () {
+    $dir = installedPackDir('pack-synctest-stale', '/* an older copy */');
+    packFace($dir, 12, 12);
+
+    app(InstallResourcePack::class)->syncTemplateCss();
+
+    expect(File::get($dir.'/resource-pack.css'))
+        ->toContain('--pack-face-repeat: repeat;')
+        ->toContain('--pack-face-size: auto;');
+});
+
+it('stretches the button face for a pack that ships a whole pre-rendered face', function () {
+    $dir = installedPackDir('pack-synctest-stale', '/* an older copy */');
+    // Larger than a tileable swatch: repeated across a wide button its joins
+    // would show as the hard vertical seams that read as a panel in the frame.
+    packFace($dir, 56, 56);
+
+    app(InstallResourcePack::class)->syncTemplateCss();
+
+    expect(File::get($dir.'/resource-pack.css'))
+        ->toContain('--pack-face-repeat: no-repeat;')
+        ->toContain('--pack-face-size: 100% 100%;');
+});
+
+it('leaves a stretched pack alone on a second run', function () {
+    $dir = installedPackDir('pack-synctest-stale', '/* an older copy */');
+    packFace($dir, 56, 56);
+
+    $installer = app(InstallResourcePack::class);
+    $installer->syncTemplateCss();
+    // Comparing against the raw template rather than this pack's own render
+    // would rewrite it every run, expiring cached stylesheets for no change.
+    $result = $installer->syncTemplateCss();
+
+    expect($result['unchanged'])->toContain('pack-synctest-stale');
+    expect($result['updated'])->not->toContain('pack-synctest-stale');
 });
 
 it('reports what it refreshed', function () {

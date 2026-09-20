@@ -86,8 +86,11 @@ class InstallResourcePack
         try {
             $this->download($name, $zipPath);
             $this->extract($zipPath, $extractTarget);
-            $this->copyTemplateCss($extractTarget);
             $this->completeFromVanilla($extractTarget);
+            // After completeFromVanilla, not before: rendering the template
+            // inspects the pack's button/middle.png, which a partial pack only
+            // has once it has borrowed vanilla's.
+            $this->copyTemplateCss($extractTarget);
             $this->normalizeBorderSprites($extractTarget);
             $this->generateHorizontalScrollbar($extractTarget);
         } finally {
@@ -432,7 +435,6 @@ class InstallResourcePack
             throw new RuntimeException('Per-pack CSS template missing at '.$template);
         }
 
-        $contents = File::get($template);
         $updated = [];
         $unchanged = [];
         $filled = 0;
@@ -448,6 +450,11 @@ class InstallResourcePack
 
             $name = basename($directory);
             $filled += $this->completeFromVanilla($directory);
+
+            // Rendered per pack — see renderTemplateFor(). Comparing against the
+            // raw template would rewrite every pack whose face is stretched on
+            // every run, expiring cached stylesheets for no change.
+            $contents = $this->renderTemplateFor($directory);
 
             if (File::get($target) === $contents) {
                 $unchanged[] = $name;
@@ -467,11 +474,59 @@ class InstallResourcePack
 
     private function copyTemplateCss(string $extractTarget): void
     {
+        File::put($extractTarget.'/resource-pack.css', $this->renderTemplateFor($extractTarget));
+    }
+
+    /**
+     * A button face wider or taller than this is treated as a whole pre-rendered
+     * face rather than a seamless swatch. Default Vanilla ships 12×12, the 2012
+     * pack 56×56; nothing sits near the line, and a pack whose face is a flat
+     * colour renders the same under either treatment.
+     */
+    private const TILEABLE_FACE_MAX = 24;
+
+    /**
+     * The per-pack CSS template with its :root block resolved for this pack.
+     *
+     * Only button/middle.png's treatment varies. Packs ship two different kinds
+     * of art under that name: a small seamless swatch meant to tile, and a large
+     * pre-shaded face meant to be drawn once. Tiling the second kind lays hard
+     * vertical seams across a wide button, which is what reads as a coloured
+     * panel inside the frame. Since each pack gets its own copy of the
+     * stylesheet anyway, the choice is baked in here rather than asking CSS to
+     * branch on something it cannot measure.
+     *
+     * @throws RuntimeException when the template is missing
+     */
+    private function renderTemplateFor(string $packDir): string
+    {
         $template = resource_path('css/per-pack.css');
         if (! File::exists($template)) {
             throw new RuntimeException('Per-pack CSS template missing at '.$template);
         }
-        File::copy($template, $extractTarget.'/resource-pack.css');
+
+        $contents = File::get($template);
+        $face = $packDir.'/button/middle.png';
+
+        if (! File::exists($face)) {
+            return $contents;
+        }
+
+        $size = @getimagesize($face);
+        if ($size === false) {
+            return $contents;
+        }
+
+        [$width, $height] = $size;
+        if ($width <= self::TILEABLE_FACE_MAX && $height <= self::TILEABLE_FACE_MAX) {
+            return $contents;
+        }
+
+        return str_replace(
+            ['--pack-face-repeat: repeat;', '--pack-face-size: auto;'],
+            ['--pack-face-repeat: no-repeat;', '--pack-face-size: 100% 100%;'],
+            $contents,
+        );
     }
 
     /**

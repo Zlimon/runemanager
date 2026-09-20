@@ -3,7 +3,30 @@
  * directory on `resourcepack:fetch`, where the relative url(...) paths resolve to that
  * pack's extracted assets. The blade root emits a <link> at
  * /resource-packs/{name}/resource-pack.css when the user has an effective pack.
+ *
+ * The copy is not quite verbatim: the :root block below is rewritten per pack by
+ * InstallResourcePack::renderTemplateFor(). It is the one thing that cannot be
+ * shared, because packs disagree about what button/middle.png is.
  */
+
+/*
+ * How the button face (button/middle.png) fills the centre of the 9-slice.
+ *
+ * The defaults tile it at its native size, which is right for the small
+ * seamless swatch most packs ship — 12×12 on Default Vanilla, whose stone grain
+ * has to stay crisp. Packs that instead ship a large pre-shaded face (56×56 on
+ * the 2012 pack) are not tileable: repeated across a wide button the joins show
+ * as hard vertical seams, which is exactly what reads as a "panel" sitting
+ * inside the frame. For those, InstallResourcePack rewrites these two values to
+ * stretch the face once across the control instead.
+ *
+ * A pack whose face is a flat colour (RS3, Victorian Rose) renders identically
+ * either way, so only the two extremes actually depend on this.
+ */
+:root {
+    --pack-face-repeat: repeat;
+    --pack-face-size: auto;
+}
 
 .dropdown-bank-tag-down-arrow {
     width: 2.5rem;
@@ -233,20 +256,16 @@
  */
 
 /*
- * Buttons — the pack's 9-slice frame from button/ and nothing else, brightened
- * for feedback on hover/focus/active.
+ * Buttons — the pack's 9-slice: four corners, four edges, and button/middle.png
+ * as the face, brightened for feedback on hover/focus/active.
  *
- * The centre is deliberately left unpainted. There IS a sprite for it —
- * button/middle.png, the button face, shipped alongside middle_selected.png for
- * the pressed state — but packs disagree about what goes in it: a flat colour on
- * rs3 and Victorian Rose, a 12×12 noisy swatch on vanilla, and on the 2012 pack
- * a 56×56 *shaded* face (luma 24–62) that does not even tile vertically. Against
- * that pack's near-black edge sprites its light centre read as a coloured panel
- * inset in the frame — the thing this rule exists to avoid. Painting no centre
- * lets whatever surface the control sits on show through, which looks the same
- * on every pack. The `background:` shorthand also keeps background-color
- * transparent, so DaisyUI's variant fill (btn-primary, btn-error…) can't bleed
- * through underneath.
+ * Every pack also ships button/regular_large.png, a complete pre-rendered
+ * button. It is the reference this stack is checked against (see /styleguide),
+ * and in all of them the button has a face — leaving the centre unpainted shows
+ * the page surface through the control, which is what dropping it looked like.
+ *
+ * The `background:` shorthand keeps background-color transparent, so DaisyUI's
+ * variant fill (btn-primary, btn-error…) can't bleed through underneath.
  */
 .btn {
     background: url('button/corner_top_left.png') no-repeat,
@@ -256,9 +275,12 @@
                 url('button/edge_top.png') repeat-x,
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
-                url('button/edge_bottom.png') repeat-x;
+                url('button/edge_bottom.png') repeat-x,
+                url('button/middle.png') var(--pack-face-repeat);
     background-position: top left, top right, bottom left, bottom right,
-                         top, left, right, bottom;
+                         top, left, right, bottom, center;
+    background-size: auto, auto, auto, auto, auto, auto, auto, auto,
+                     var(--pack-face-size);
     border: 0 !important;
     box-shadow: none !important;
     /* The DaisyUI variant's content colour (e.g. btn-error's near-black) is
@@ -272,10 +294,10 @@
 .btn:focus-visible,
 .btn:active,
 .btn.btn-active {
-    /* Keep the pack's own frame and just brighten for feedback. Swapping to the
-     * _selected sprites shifted the hue on many packs (a brown button flashing
-     * pink or red), which read as a different button rather than a hover state.
-     * Restating the stack keeps background-color transparent here too, so
+    /* Keep the pack's own frame and face and just brighten for feedback. Swapping
+     * to the _selected sprites shifted the hue on many packs (a brown button
+     * flashing pink or red), which read as a different button rather than a hover
+     * state. Restating the stack keeps background-color transparent here too, so
      * DaisyUI's own hover colour can't bleed through. */
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -284,14 +306,17 @@
                 url('button/edge_top.png') repeat-x,
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
-                url('button/edge_bottom.png') repeat-x;
+                url('button/edge_bottom.png') repeat-x,
+                url('button/middle.png') var(--pack-face-repeat);
     background-position: top left, top right, bottom left, bottom right,
-                         top, left, right, bottom;
+                         top, left, right, bottom, center;
+    background-size: auto, auto, auto, auto, auto, auto, auto, auto,
+                     var(--pack-face-size);
     filter: brightness(1.12);
 }
 
-/* Badges — reuse the button frame so small labels like event types match the
- * rest of the UI, centre left unpainted for the same reason as .btn above. */
+/* Badges — reuse the whole button 9-slice, face included, so small labels like
+ * event types match the rest of the UI. */
 .resource-pack-badge {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -300,9 +325,12 @@
                 url('button/edge_top.png') repeat-x,
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
-                url('button/edge_bottom.png') repeat-x;
+                url('button/edge_bottom.png') repeat-x,
+                url('button/middle.png') var(--pack-face-repeat);
     background-position: top left, top right, bottom left, bottom right,
-                         top, left, right, bottom;
+                         top, left, right, bottom, center;
+    background-size: auto, auto, auto, auto, auto, auto, auto, auto,
+                     var(--pack-face-size);
     border: 0 !important;
     color: #f0e6d2 !important;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.85);
