@@ -16,6 +16,7 @@ use App\Http\Controllers\LootHiscoreController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\OverallHiscoreController;
 use App\Http\Controllers\SkillHiscoreController;
+use App\Http\Controllers\StyleguideController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
 use App\Http\Controllers\WelcomeController;
@@ -41,6 +42,26 @@ Route::put('/dark-mode', [UserDarkModeController::class, 'update'])->name('dark-
 // offers the light/dark toggle. Guests persist to a cookie, users to their account.
 Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
     ->name('user.resource-pack.update');
+
+// Component gallery for validating resource-pack textures against every
+// installed pack. Open locally on purpose: a login between a developer (or a
+// browser check) and the page whose entire job is to be looked at defeats the
+// point, and there is nothing behind it but the instance's own sprites.
+// Everywhere else it sits with the rest of the management surfaces.
+Route::middleware(app()->environment('local') ? [] : [
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    'can:manage instance',
+])->group(function () {
+    Route::get('/styleguide', [StyleguideController::class, 'index'])->name('styleguide');
+    // Plain JSON rather than a deferred Inertia prop: fetching it must not be an
+    // Inertia visit. A visit re-sends the shared props, and DarkModeToggle
+    // watches page.props.theme to restamp <html data-theme> — which would undo
+    // the pack the switcher is previewing every time the panel loaded.
+    Route::get('/styleguide/sprites', [StyleguideController::class, 'sprites'])
+        ->name('styleguide.sprites');
+});
 
 Route::middleware([
     'auth:sanctum',

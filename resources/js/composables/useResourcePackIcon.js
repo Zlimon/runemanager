@@ -1,3 +1,4 @@
+import { unref } from "vue";
 import { usePage } from "@inertiajs/vue3";
 
 /*
@@ -9,8 +10,13 @@ import { usePage } from "@inertiajs/vue3";
  *
  * Icons that live in no pack (boss/clue hiscore icons, account-type badges) are
  * addressed straight from /images — pass `{ src: '/images/…' }` instead.
+ *
+ * `override` is for surfaces that preview a pack other than the active one (the
+ * styleguide's switcher): pass a ref holding { name, version }, or holding null
+ * to mean "no pack", and icons resolve against that instead of page.props.pack.
+ * Omit it everywhere else — the shared prop is the source of truth.
  */
-export function useResourcePackIcon() {
+export function useResourcePackIcon(override = null) {
     const page = usePage();
 
     // The bundled baseline pack, mirroring InstallResourcePack::VANILLA_PACK.
@@ -25,7 +31,10 @@ export function useResourcePackIcon() {
             slug = "total";
         }
 
-        const pack = page.props.pack;
+        // `override` present but holding null is a deliberate "no pack", which
+        // still resolves to vanilla sprites — the same as the shared prop being
+        // null. Only the absence of an override defers to the page.
+        const pack = override ? unref(override) : page.props.pack;
         const name = pack?.name ?? VANILLA;
 
         const fallback = file(VANILLA, kind, slug);
