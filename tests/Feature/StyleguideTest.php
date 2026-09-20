@@ -2,6 +2,7 @@
 
 use App\Models\ResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
+use App\Services\ResourcePacks\PackPalette;
 use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -33,6 +34,24 @@ afterEach(function () {
     File::deleteDirectory(public_path('resource-packs/pack-styleguidetest'));
 });
 
+it('lifts the payload accent for a pack whose accent is too faint for controls', function () {
+    // ScrewedPurple's real palette: the authentic purple is kept as-is, and the
+    // switcher gets a separate, contrast-safe version for form controls.
+    styleguidePack('pack-styleguidetest', true)
+        ->forceFill(['background_color' => '#200b36', 'accent_color' => '#802bc4'])
+        ->save();
+
+    $this->actingAs(adminUser())
+        ->get(route('styleguide'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('packs', 1)
+            ->where('packs.0.accent_color', '#802bc4')
+            ->where('packs.0.accent_ui_color', fn (?string $ui) => $ui !== '#802bc4'
+                && PackPalette::contrastRatio((string) $ui, '#200b36') >= 3.0)
+        );
+});
+
 it('redirects guests away from the styleguide outside local', function () {
     $this->get(route('styleguide'))->assertRedirect(route('login'));
 });
@@ -58,6 +77,9 @@ it('lists every installed pack with what the switcher needs to repaint the page'
             ->where('packs.0.dark_mode', true)
             ->where('packs.0.background_color', '#123456')
             ->where('packs.0.accent_color', '#abcdef')
+            // Derived on read, and left alone here because #abcdef already
+            // clears the contrast bar against #123456 (7.70:1).
+            ->where('packs.0.accent_ui_color', '#abcdef')
             ->where('packs.0.is_vanilla', false)
             // Only vanilla is actually installed on disk, so it is the only one
             // with a stylesheet to link. A pack row without files must still be

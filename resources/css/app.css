@@ -193,8 +193,10 @@
     /* base-100 is the panel, base-200 the body it sits on, base-300 the darker
        chrome/outline below both — the same ordering as the other two themes, so
        a component styled once reads correctly everywhere. The pack's lighter
-       bevel is not in this ramp: it arrives as --pack-accent (#88827A) and is
-       painted by .pack-accent-border and the pack's own sprites. */
+       bevel is not in this ramp: it arrives as --pack-accent (#9E8A6F for
+       Default Vanilla) and is painted by .pack-accent-border and the pack's own
+       sprites. That value is derived at install time by PackPalette, so treat it
+       as illustrative rather than as something to match by hand. */
     --color-base-100: #483F33;
     --color-base-200: #3E3529;
     --color-base-300: #2A241C;
@@ -368,6 +370,24 @@ h6 {
  */
 html.has-pack {
     --pack-bg-card: color-mix(in srgb, var(--pack-bg, var(--color-base-100)) 88%, black);
+    /*
+     * The nav bar sits a full step below the card surface so the chrome reads as
+     * the darkest band on the page — the same ordering the no-pack themes get
+     * from --color-neutral, which is darker than base-300 in all three.
+     *
+     * 60% is the most the mix can keep while still separating visibly from the
+     * body (.pack-bg = --pack-bg undarkened): every installed pack's sampled
+     * surface is dark (the lightest is #483f33), so 60% still leaves the hue
+     * legible — #483f33 → #282320, #200b36 → #130720 — while landing far below
+     * the point where --color-neutral-content (#EDE6D4 / #E8EDF2 / #D8CDB5,
+     * light in all three themes) stops being readable on it. That is why the nav
+     * keeps its DaisyUI content token instead of deriving a foreground: the
+     * token demonstrably works across every pack, and CSS has no portable way to
+     * flip a foreground on measured luminance. A future pack with a genuinely
+     * LIGHT sampled surface would break that assumption and needs a real
+     * contrast pass — no such pack exists today.
+     */
+    --pack-bg-nav: color-mix(in srgb, var(--pack-bg, var(--color-neutral)) 60%, black);
 }
 
 .pack-bg-card {
@@ -378,11 +398,108 @@ html.has-pack {
     background-color: var(--pack-bg, var(--color-base-200));
 }
 
+/*
+ * The nav band. Falls back to --color-neutral, which is exactly what the
+ * `bg-neutral` this replaced resolved to, so the untextured interface renders
+ * an identical colour.
+ */
+.pack-bg-nav {
+    background-color: var(--pack-bg-nav, var(--color-neutral));
+}
+
+/*
+ * Darkening alone cannot separate the chrome from the body on a pack whose
+ * sampled surface is already at the floor: the 2012 pack's #000009 darkens to
+ * #000005, a 1.00 contrast ratio against the body it sits on, and RS3 and
+ * ScrewedPurple only reach 1.03–1.08. Give both bands the same accent hairline
+ * the cards already carry (.pack-accent-border), so the edge is drawn by the one
+ * pack colour that is reliably lighter than the surface rather than by a shade
+ * step that can bottom out.
+ *
+ * Under html.has-pack only, and matched on the elements rather than on
+ * .pack-bg-nav, because that class is also on the nav's mobile dropdown panel,
+ * which is a floating panel with its own full border and wants no extra edge.
+ * The untextured interface keeps its borderless nav and shadow-only header.
+ */
+html.has-pack nav.pack-bg-nav,
+html.has-pack header.pack-bg-card {
+    border-bottom: 1px solid var(--pack-accent);
+}
+
 .pack-accent-border {
     border-color: var(--pack-accent, var(--color-base-300));
 }
 
 .pack-accent-text {
     color: var(--pack-accent, var(--color-base-content));
+}
+
+/*
+ * Form controls under an active pack.
+ *
+ * DaisyUI fills them with base-100, which belongs to the untextured theme and
+ * reads as a bright panel dropped onto a pack surface. Give them the same well
+ * as the cards they sit in; the border below is what delineates the field.
+ *
+ * .textarea rides along with the other two: per-pack.css treats the three as one
+ * group, and leaving it on base-100 next to a pack-filled input is the exact
+ * mismatch this rule exists to remove.
+ *
+ * The fill is unlayered, so it wins over DaisyUI's own (layered) recipe
+ * regardless of specificity — the same mechanism the height pin above relies on.
+ *
+ * The edge rides on --pack-accent-ui rather than --pack-accent.
+ *
+ * --pack-accent is the pack's authentic accent and is decorative: it is what the
+ * nav/header hairline and the card borders use. But it is sampled, not chosen,
+ * so on some packs it lands too close to the surface to function as a control
+ * edge — measured against --pack-bg-card it was 2.04 on Default Vanilla, 2.19 on
+ * CRAZED and 2.70 on ScrewedPurple, all under the WCAG 3:1 minimum for
+ * non-text. --pack-accent-ui is that same hue lightened until it clears 3:1, and
+ * is identical to --pack-accent on the packs that already passed. Functional
+ * edges take the -ui variant; decoration keeps the authentic one.
+ *
+ * THE !important IS LOAD-BEARING — DO NOT "CLEAN IT UP".
+ * per-pack.css:354-357 sets `border-color: var(--pack-accent) !important` on
+ * these same three selectors. That file is a per-pack template served raw from
+ * the pack directory, and the Blade root links it AFTER this stylesheet, so a
+ * plain declaration here loses twice over — first to the !important, then to
+ * source order. Matching it with !important levels the first contest, and
+ * specificity settles the second before order is ever consulted:
+ * `html.has-pack .input` is (0,2,1) against the pack sheet's bare `.input`
+ * (0,1,0). Drop either the !important or the html.has-pack prefix and the pack
+ * sheet silently takes the border back.
+ *
+ * The fallback chain degrades in the right order: -ui when the Blade root emits
+ * it, the authentic accent for a pack rendered before -ui existed, and the theme
+ * border token if a pack has no palette at all.
+ */
+html.has-pack .input,
+html.has-pack .select,
+html.has-pack .textarea {
+    background-color: var(--pack-bg-card);
+    border-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-300))) !important;
+}
+
+/*
+ * Focus ring. DaisyUI derives both the ring (`outline: 2px solid
+ * var(--input-color)`) and the select's border from --input-color, and on focus
+ * swaps it to base-content — a token from the untextured theme again. Retarget
+ * the variable rather than the outline so the whole focus treatment moves to the
+ * pack accent in one declaration.
+ *
+ * A focus indicator is functional, not decorative, so it takes --pack-accent-ui
+ * (the 3:1-guaranteed variant) for the same reason the field border above does.
+ *
+ * Errored fields are excluded: they set --input-color to --color-error, and a
+ * focused invalid field must stay red rather than turn into an ordinary accent.
+ */
+html.has-pack .input:not(.input-error):focus,
+html.has-pack .input:not(.input-error):focus-within,
+html.has-pack .select:not(.select-error):focus,
+html.has-pack .select:not(.select-error):focus-within,
+html.has-pack .textarea:not(.textarea-error):focus,
+html.has-pack .textarea:not(.textarea-error):focus-within {
+    --input-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-content)));
 }
 

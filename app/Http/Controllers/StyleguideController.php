@@ -61,7 +61,7 @@ class StyleguideController extends Controller
      * on the CSS mtime, as the Blade root does, so a template edit is picked up),
      * the palette variables, and whether it is the fixed-scheme vanilla pack.
      *
-     * @return list<array{name: string, alias: string, css: ?string, background_color: ?string, accent_color: ?string, is_vanilla: bool, dark_mode: bool}>
+     * @return list<array{name: string, alias: string, css: ?string, background_color: ?string, accent_color: ?string, accent_ui_color: ?string, is_vanilla: bool, dark_mode: bool}>
      */
     private function packs(): array
     {
@@ -74,6 +74,10 @@ class StyleguideController extends Controller
                 'css' => $this->stylesheet($pack->name),
                 'background_color' => $pack->background_color,
                 'accent_color' => $pack->accent_color,
+                // Derived on read from the two stored colours — the contrast-safe
+                // accent for controls, which the switcher must repaint alongside
+                // --pack-accent or a switched pack keeps the old one's edges.
+                'accent_ui_color' => $pack->accent_ui_color,
                 'is_vanilla' => $pack->isVanilla(),
                 // The pack's own light/dark hint. Instance::resolveDarkMode()
                 // treats it as the last fallback; the switcher uses it to open a

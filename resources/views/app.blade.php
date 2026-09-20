@@ -45,6 +45,7 @@
                     :root {
                         @if ($pack->background_color) --pack-bg: {{ $pack->background_color }}; @endif
                         @if ($pack->accent_color) --pack-accent: {{ $pack->accent_color }}; @endif
+                        @if ($pack->accent_ui_color) --pack-accent-ui: {{ $pack->accent_ui_color }}; @endif
                     }
                 </style>
             @endif

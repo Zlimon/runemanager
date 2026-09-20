@@ -181,3 +181,27 @@ it('marks the document as untextured when no pack is active', function () {
         ->assertSee('no-pack', false)
         ->assertSee('data-theme="'.Instance::THEME_LIGHT.'"', false);
 });
+
+it('emits the pack palette, including the contrast-safe accent, as CSS variables', function () {
+    // ScrewedPurple's real palette: the authentic accent and the lifted one the
+    // controls use both have to reach the document.
+    vanillaPack()->forceFill([
+        'background_color' => '#200b36',
+        'accent_color' => '#802bc4',
+    ])->save();
+
+    $response = $this->get(route('announcements.index'))->assertOk();
+
+    $response->assertSee('--pack-bg: #200b36;', false)
+        ->assertSee('--pack-accent: #802bc4;', false)
+        ->assertSee('--pack-accent-ui: #8f3ad4;', false);
+});
+
+it('emits no palette variables for a pack with no extracted colours', function () {
+    vanillaPack();
+
+    $this->get(route('announcements.index'))
+        ->assertOk()
+        ->assertDontSee('--pack-bg:', false)
+        ->assertDontSee('--pack-accent-ui:', false);
+});

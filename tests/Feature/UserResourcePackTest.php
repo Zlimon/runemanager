@@ -220,7 +220,7 @@ it('website install: selects without re-queuing when the pack is already install
     $pack = makePack('pack-sakurascape', [
         'version' => '1.0.0',
         'background_color' => '#483f33',
-        'accent_color' => '#88827a',
+        'accent_color' => '#9e8a6f',
     ]);
 
     $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
@@ -440,7 +440,7 @@ it('plugin push: 200 + does not re-queue when pack row is fully populated', func
     $pack = makePack('sample-vanilla', [
         'version' => '1.0.0',
         'background_color' => '#483f33',
-        'accent_color' => '#88827a',
+        'accent_color' => '#9e8a6f',
     ]);
 
     $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));

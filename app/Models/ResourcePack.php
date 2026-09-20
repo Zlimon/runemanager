@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\SettingHelper;
+use App\Services\ResourcePacks\PackPalette;
 use App\Support\Instance;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property int $dark_mode
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read string|null $accent_ui_color
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newQuery()
@@ -137,6 +139,27 @@ class ResourcePack extends Model
         $relative = "resource-packs/{$this->name}/icon.png";
 
         return is_file(public_path($relative)) ? '/'.$relative : null;
+    }
+
+    /**
+     * The accent to paint functional controls with: {@see $accent_color} moved
+     * away from {@see $background_color}, hue intact, until the pair clears the
+     * WCAG 1.4.11 contrast bar — and the accent itself, unchanged, when it
+     * already does. That keeps the pack author's authentic accent available for
+     * decorative borders and pack textures while inputs and other boundaries get
+     * an edge that is reliably visible.
+     *
+     * Computed on read rather than stored: it is a pure function of two columns
+     * the row already carries, so there is nothing to migrate or keep in sync.
+     * Null unless both of those are present.
+     */
+    public function getAccentUiColorAttribute(): ?string
+    {
+        if ($this->background_color === null || $this->accent_color === null) {
+            return null;
+        }
+
+        return (new PackPalette)->uiAccent($this->accent_color, $this->background_color);
     }
 
     /**

@@ -145,6 +145,8 @@ const apply = () => {
     el(VARS_ID, "style").textContent = pack
         ? `:root{${pack.background_color ? `--pack-bg:${pack.background_color};` : ""}${
             pack.accent_color ? `--pack-accent:${pack.accent_color};` : ""
+        }${
+            pack.accent_ui_color ? `--pack-accent-ui:${pack.accent_ui_color};` : ""
         }}`
         : "";
 
@@ -244,6 +246,13 @@ const choice = ref("b");
 <template>
     <AppLayout title="Styleguide">
         <Head title="Styleguide" />
+
+        <!-- The page header is one of the pack-coloured surfaces (.pack-bg-card,
+             see AppLayout), and AppLayout only renders it when this slot is
+             filled — so the styleguide has to fill it to show that surface. -->
+        <template #header>
+            <h1>Styleguide</h1>
+        </template>
 
         <div class="mx-auto max-w-screen-xl space-y-8 p-4">
             <!-- Controls stay outside the textured surfaces so they remain

@@ -29,7 +29,7 @@ const logout = () => {
         <Banner/>
 
         <div class="min-h-screen pack-bg">
-            <nav class="bg-neutral text-neutral-content">
+            <nav class="pack-bg-nav text-neutral-content">
                 <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
                     <Link :href="route('dashboard')" class="flex items-center space-x-3 rtl:space-x-reverse">
                         <img v-if="page.props.instance?.logo_url" :src="page.props.instance.logo_url"
@@ -53,7 +53,7 @@ const logout = () => {
                     </button>
                     <div class="w-full items-center justify-between font-medium md:order-1 md:flex md:w-auto"
                          :class="mobileMenuOpen ? 'flex' : 'hidden'">
-                        <ul class="mt-4 flex flex-col rounded-lg border border-neutral-content/20 bg-neutral p-4 rtl:space-x-reverse md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-transparent md:p-0">
+                        <ul class="mt-4 flex flex-col rounded-lg border border-neutral-content/20 pack-bg-nav p-4 rtl:space-x-reverse md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-transparent md:p-0">
                             <li>
                                 <ResponsiveNavLink :href="route('dashboard')"
                                                    :active="route().current('dashboard')">
@@ -139,7 +139,7 @@ const logout = () => {
 
 
             <!-- Page Heading -->
-            <header v-if="$slots.header" class="bg-base-100 shadow">
+            <header v-if="$slots.header" class="pack-bg-card shadow">
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <slot name="header"/>
                 </div>
