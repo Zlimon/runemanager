@@ -28,6 +28,7 @@ const instanceSections = computed(() => page.props.is_admin ? [
     { label: 'Branding', route: 'admin.branding', active: 'admin.branding' },
     { label: 'Feed & sync', route: 'admin.feed', active: 'admin.feed' },
     { label: 'Integrations', route: 'admin.integrations', active: 'admin.integrations' },
+    { label: 'Calendar', route: 'admin.calendar', active: 'admin.calendar' },
 ] : []);
 
 const groups = computed(() => [

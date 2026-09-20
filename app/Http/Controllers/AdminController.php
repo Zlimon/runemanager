@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AccountTypesEnum;
+use App\Enums\CalendarEventType;
 use App\Helpers\SettingHelper;
+use App\Http\Requests\StoreCalendarEventRequest;
+use App\Http\Resources\CalendarEventResource;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\Account;
 use App\Models\Announcement;
+use App\Models\CalendarEvent;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\Hiscores\GroupIronmanValidator;
@@ -191,6 +195,39 @@ class AdminController extends Controller
         SettingHelper::setSetting('feed_loot_min_value', (int) $validated['feed_loot_min_value'], 'int');
 
         return back()->with('status', 'Feed & sync settings updated.');
+    }
+
+    /**
+     * SPEC §10 — admin calendar management: full CRUD (create/edit/delete use
+     * the same `calendar.*` routes as the public grid) plus the "important
+     * event" highlight colours. Unlike the public grid, past events are shown
+     * and remain editable/deletable here — there's no past-date guard.
+     */
+    public function calendar(): Response
+    {
+        return Inertia::render('Admin/Calendar', [
+            'upcoming' => CalendarEventResource::collection(
+                CalendarEvent::with('user:id,name')->upcoming()->get(),
+            )->resolve(),
+            'past' => CalendarEventResource::collection(
+                CalendarEvent::with('user:id,name')->past()->get(),
+            )->resolve(),
+            'eventTypes' => CalendarEventType::options(),
+            'highlightColors' => Instance::calendarHighlightColors(),
+        ]);
+    }
+
+    /** Persist which palette colours mark an event as "important" (SPEC §10). */
+    public function updateCalendarSettings(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'calendar_highlight_colors' => ['array'],
+            'calendar_highlight_colors.*' => [Rule::in(StoreCalendarEventRequest::COLORS)],
+        ]);
+
+        SettingHelper::setSetting('calendar_highlight_colors', json_encode($validated['calendar_highlight_colors']));
+
+        return back()->with('status', 'Calendar settings updated.');
     }
 
     /**
