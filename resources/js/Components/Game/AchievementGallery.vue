@@ -37,7 +37,7 @@ const unpin = (event) => {
 
         <Card v-else class="mt-2" padding="p-3">
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <Card v-for="event in events" :key="event.id" padding="p-0"
+                <Card v-for="event in events" :key="event.id" padding="p-0" frame="dialog"
                       class="group relative overflow-hidden">
                     <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url" alt="Achievement"
                                    thumb-class="h-28 w-full object-cover" class="!w-full" />
