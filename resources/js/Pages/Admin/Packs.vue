@@ -149,42 +149,40 @@ const install = (pack) => installer.value?.start(pack);
                 </Card>
 
                 <!-- Browse the community hub -->
-                <Card>
-                    <div class="flex items-baseline justify-between gap-3">
-                        <h2 class="text-lg font-bold">Browse the hub</h2>
-                        <TextInput v-model="browseSearch" type="search" placeholder="Search packs…" class="w-48" />
-                    </div>
-                    <p class="mt-1 text-sm text-base-content/60">
-                        Install a pack from the RuneLite community hub. Installed packs become selectable as the
-                        instance theme and by members on their Appearance page.
-                    </p>
+                <div class="flex items-baseline justify-between gap-3">
+                    <h2 class="text-lg font-bold">Browse the hub</h2>
+                    <TextInput v-model="browseSearch" type="search" placeholder="Search packs…" />
+                </div>
+                <p class="mt-1 text-sm text-base-content/60">
+                    Install a pack from the RuneLite community hub. Installed packs become selectable as the
+                    instance theme and by members on their Appearance page.
+                </p>
 
-                    <div v-if="!hubPacks.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
-                        Couldn't reach the resource-pack hub right now. Try again later.
-                    </div>
+                <div v-if="!hubPacks.length"
+                     class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
+                    Couldn't reach the resource-pack hub right now. Try again later.
+                </div>
 
-                    <div v-else-if="!installable.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
-                        Nothing new to install — every hub pack is already installed.
-                    </div>
+                <div v-else-if="!installable.length"
+                     class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
+                    Nothing new to install — every hub pack is already installed.
+                </div>
 
-                    <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                        <ResourcePackTile v-for="pack in installable" :key="pack.name"
-                                          interactive
-                                          :icon-url="pack.icon_url" :alias="pack.alias"
-                                          @click="install(pack)">
-                            <template #action>
-                                <!-- A label, not a control: the tile itself is the
-                                     button, so this must not be one too, and must not
-                                     swallow the click. -->
-                                <span class="btn btn-primary btn-xs pointer-events-none">
-                                    Install
-                                </span>
-                            </template>
-                        </ResourcePackTile>
-                    </div>
-                </Card>
+                <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                    <ResourcePackTile v-for="pack in installable" :key="pack.name"
+                                      interactive
+                                      :icon-url="pack.icon_url" :alias="pack.alias"
+                                      @click="install(pack)">
+                        <template #action>
+                            <!-- A label, not a control: the tile itself is the
+                                 button, so this must not be one too, and must not
+                                 swallow the click. -->
+                            <span class="btn btn-primary btn-xs pointer-events-none">
+                                Install
+                            </span>
+                        </template>
+                    </ResourcePackTile>
+                </div>
             </div>
         </div>
 
