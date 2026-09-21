@@ -49,3 +49,62 @@ export function feedSentence(event) {
     }
 }
 
+/** Generic achievement image, for events with no sprite of their own. */
+const TROPHY = { src: '/images/trophy.png' };
+
+/*
+ * A loot source's boss portrait from /images/boss, which names its files as
+ * hyphenated slugs ("Theatre of Blood" -> theatre-of-blood.png).
+ *
+ * A source does not always name a file — "Barrows" is barrows-chests.png, and
+ * chests and clue tiers have no portrait at all — so a miss falls back to the
+ * trophy rather than leaving a broken image. The src guard stops it looping if
+ * the trophy itself fails.
+ */
+const lootIcon = (source) => {
+    const slug = (source ?? '')
+        .toLowerCase()
+        .replace(/['’]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+    return {
+        src: `/images/boss/${slug}.png`,
+        onError: (event) => {
+            if (!event.target.src.endsWith(TROPHY.src)) {
+                event.target.src = TROPHY.src;
+            }
+        },
+    };
+};
+
+/**
+ * Icon for a feed event, as <img> attributes to spread with v-bind:
+ *
+ *   <img v-bind="feedIcon(event, packIcon)" class="h-6 w-6">
+ *
+ * Takes the caller's packIcon rather than calling useResourcePackIcon() here:
+ * a composable belongs in a component's setup, and receiving it keeps pack
+ * sprites on the one resolver, with its fallback to Vanilla when the active
+ * pack omits a sprite.
+ */
+export function feedIcon(event, packIcon) {
+    const { type, payload } = event;
+    switch (type) {
+        case 'level_up':
+            return packIcon('skill', payload.skill);
+        case 'loot_drop':
+            return lootIcon(payload.source);
+        case 'quest_complete':
+            return packIcon('quests_tab', 'blue_quests_icon');
+        case 'combat_achievement':
+            return packIcon('quests_tab', 'combat_achievements_icon');
+        case 'collection_log':
+            return packIcon('quests_tab', 'combat_achievements_collections_logged');
+        case 'death':
+            return packIcon('button', 'equipment_items_lost_on_death');
+        default:
+            // Pets, rewards and anything unrecognised have no sprite in any pack.
+            return TROPHY;
+    }
+}

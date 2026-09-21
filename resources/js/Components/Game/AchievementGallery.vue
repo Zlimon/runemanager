@@ -4,7 +4,8 @@ import { router, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import Card from "@/Components/Card.vue";
 import ImageLightbox from "@/Components/ImageLightbox.vue";
-import { feedSentence } from "@/feed";
+import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
+import { feedIcon, feedSentence } from "@/feed";
 
 /*
  * The account's curated achievement gallery — the feed events its owner has
@@ -22,6 +23,8 @@ const isOwner = computed(() => usePage().props.auth?.user?.id != null
 // Shown if there's anything to show, or to the owner so they see how to fill it.
 const visible = computed(() => props.events.length > 0 || isOwner.value);
 
+const { packIcon } = useResourcePackIcon();
+
 const unpin = (event) => {
     router.put(route('feed.pin', event.id), {}, { preserveScroll: true, preserveState: true });
 };
@@ -29,22 +32,27 @@ const unpin = (event) => {
 
 <template>
     <div v-if="visible">
-        <h3>Achievement Showcase</h3>
-
         <Card v-if="!events.length" padding="p-6" class="mt-2 text-center text-sm text-base-content/60">
             Pin events from the feed below to showcase them here.
         </Card>
 
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <Card v-for="event in events" :key="event.id" padding="p-0" frame="dialog"
+        <div class="flex flex-wrap gap-2">
+            <Card v-for="event in events" :key="event.id" padding="h-sm w-sm p-0" frame="dialog"
                   class="group relative overflow-hidden">
-                <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url" alt="Achievement"
-                               thumb-class="h-28 w-full object-cover" class="!w-full" />
-                <div v-else class="flex h-28 w-full items-center justify-center bg-base-300/40 text-3xl">🏆</div>
-
                 <div class="p-2">
-                    <p class="text-xs font-medium leading-snug text-base-content/90">{{ feedSentence(event) }}</p>
-                    <p class="mt-0.5 text-[10px] text-base-content/50">{{ dayjs(event.occurred_at).format('MMM D, YYYY') }}</p>
+                    <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url" alt="Achievement"
+                                   thumb-class="h-28 w-full object-cover" class="!w-full" />
+                    <div v-else class="flex h-28 w-full items-center justify-center bg-base-300/40">
+                        <img src="/images/trophy.png" alt="" class="h-14 w-14 object-contain [image-rendering:pixelated]" />
+                    </div>
+                </div>
+
+                <div class="px-4 pb-4 flex align-middle items-center gap-2">
+                    <img v-bind="feedIcon(event, packIcon)" alt="" class="h-8 w-8 shrink-0 object-contain [image-rendering:pixelated]" />
+                    <div>
+                        <p class="text-xs font-medium leading-snug text-base-content/90 capitalize">{{ feedSentence(event) }}</p>
+                        <p class="mt-0.5 text-[10px] text-base-content/50">{{ dayjs(event.occurred_at).format('MMM D, YYYY') }}</p>
+                    </div>
                 </div>
 
                 <button v-if="isOwner" type="button" @click="unpin(event)" title="Unpin"
