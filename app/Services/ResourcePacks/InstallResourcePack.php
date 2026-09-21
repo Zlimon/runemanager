@@ -94,6 +94,8 @@ class InstallResourcePack
             // has once it has borrowed vanilla's.
             $this->copyTemplateCss($extractTarget);
             $this->normalizeBorderSprites($extractTarget);
+            $this->normalizeStatTileSprites($extractTarget);
+            $this->normalizeCheckboxSprites($extractTarget);
             $this->generateHorizontalScrollbar($extractTarget);
         } finally {
             @unlink($zipPath);
@@ -165,6 +167,141 @@ class InstallResourcePack
             if (File::exists($path)) {
                 self::padPngTopLeft($path, $width, $height);
             }
+        }
+    }
+
+    /**
+     * The two halves of a skill stat tile, which {@see normalizeStatTileSprites}
+     * trims to their opaque width.
+     *
+     * @var list<string>
+     */
+    private const STAT_TILE_SPRITES = [
+        'stats/tile_half_left.png',
+        'stats/tile_half_right.png',
+        // The hover pair has to be cropped on the same rule as the resting pair:
+        // .resource-pack-box:hover swaps only the images, keeping the 50% sizing,
+        // so a padded _selected sprite reopens the very gap in the middle that
+        // cropping the resting pair closed.
+        'stats/tile_half_left_selected.png',
+        'stats/tile_half_right_selected.png',
+    ];
+
+    /**
+     * Trim the transparent margins from each stat-tile half so the pair meets
+     * seam-to-seam when the CSS paints them at 50% of the cell each.
+     *
+     * Every pack draws roughly 31px of art on a 35 or 36px canvas, but pads it
+     * differently — one pack's left half starts two pixels in, another's four.
+     * Painted at a fixed width and pinned to opposite edges, those margins meet
+     * in the middle as a transparent band and the card shows through the tile.
+     * Cropping to the opaque box here means the CSS can size each half at 50%
+     * and have the art actually touch, whatever the pack shipped.
+     *
+     * Horizontal only: the halves are already full-bleed vertically, and the
+     * CSS stretches their height to the cell.
+     */
+    public function normalizeStatTileSprites(string $packDir): void
+    {
+        foreach (self::STAT_TILE_SPRITES as $relative) {
+            $path = $packDir.'/'.$relative;
+            if (File::exists($path)) {
+                self::cropPngToOpaqueBox($path);
+            }
+        }
+    }
+
+    /**
+     * The checkbox faces, which {@see normalizeCheckboxSprites} trims to their
+     * drawn area.
+     *
+     * @var list<string>
+     */
+    private const CHECKBOX_SPRITES = [
+        'options/checkbox_empty.png',
+        'options/checkbox_empty_round.png',
+        'options/checkbox_checked_red.png',
+    ];
+
+    /**
+     * Trim each checkbox face to the pixels it actually draws.
+     *
+     * Packs ship these as a 36x36 canvas with the art tucked into the top-left
+     * corner and the rest transparent, the glyph itself measuring somewhere
+     * around 14-17px. The CSS paints them with `contain`, which fits that whole
+     * canvas into the control, so the box and its tick rendered at under half
+     * size and sat up and to the left of centre. Cropping to the drawn area lets
+     * `contain` scale the art itself, which both centres it and fills the
+     * control.
+     *
+     * Both axes here, unlike the stat tiles: a checkbox is a free-standing glyph
+     * rather than one half of a seam, so its vertical padding is as unwanted as
+     * its horizontal.
+     */
+    public function normalizeCheckboxSprites(string $packDir): void
+    {
+        foreach (self::CHECKBOX_SPRITES as $relative) {
+            $path = $packDir.'/'.$relative;
+            if (File::exists($path)) {
+                self::cropPngToOpaqueBox($path, bothAxes: true);
+            }
+        }
+    }
+
+    /**
+     * Crop a PNG to the span of its non-transparent pixels. Horizontal only by
+     * default, keeping full height; pass {@code $bothAxes} to trim top and
+     * bottom too. Idempotent: an image already flush with its art has nothing to
+     * trim. No-op for a fully transparent or unreadable image.
+     */
+    private static function cropPngToOpaqueBox(string $path, bool $bothAxes = false): void
+    {
+        $src = @imagecreatefrompng($path);
+        if ($src === false) {
+            return;
+        }
+
+        try {
+            $width = imagesx($src);
+            $height = imagesy($src);
+            $left = $width;
+            $right = -1;
+            $top = $height;
+            $bottom = -1;
+
+            for ($x = 0; $x < $width; $x++) {
+                for ($y = 0; $y < $height; $y++) {
+                    // GD alpha runs 0 (opaque) .. 127 (fully transparent).
+                    if (((imagecolorat($src, $x, $y) >> 24) & 0x7F) < 127) {
+                        $left = min($left, $x);
+                        $right = max($right, $x);
+                        $top = min($top, $y);
+                        $bottom = max($bottom, $y);
+                    }
+                }
+            }
+
+            if ($right < $left) {
+                return;
+            }
+
+            if (! $bothAxes) {
+                $top = 0;
+                $bottom = $height - 1;
+            }
+
+            if ($left === 0 && $right === $width - 1 && $top === 0 && $bottom === $height - 1) {
+                return;
+            }
+
+            $cropped = imagecreatetruecolor($right - $left + 1, $bottom - $top + 1);
+            imagealphablending($cropped, false);
+            imagesavealpha($cropped, true);
+            imagecopy($cropped, $src, 0, 0, $left, $top, $right - $left + 1, $bottom - $top + 1);
+            imagepng($cropped, $path);
+            imagedestroy($cropped);
+        } finally {
+            imagedestroy($src);
         }
     }
 
@@ -306,7 +443,7 @@ class InstallResourcePack
     }
 
     /**
-     * SPEC §6 — ensure the bundled "Default Vanilla" pack has a DB row so it's
+     * SPEC §6 — ensure the bundled "Vanilla" pack has a DB row so it's
      * always selectable alongside "Default" (no pack). The assets ship with the
      * app, so this builds the row from disk (palette only) with no download.
      * Idempotent and cheap after the first call.
@@ -327,7 +464,7 @@ class InstallResourcePack
 
         $pack = new ResourcePack;
         $pack->name = self::VANILLA_PACK;
-        $pack->alias = 'Default Vanilla';
+        $pack->alias = 'Vanilla';
         $pack->version = 'bundled';
         $pack->author = 'RuneManager';
         $pack->url = '';
@@ -481,9 +618,10 @@ class InstallResourcePack
 
     /**
      * A button face wider or taller than this is treated as a whole pre-rendered
-     * face rather than a seamless swatch. Default Vanilla ships 12×12, the 2012
-     * pack 56×56; nothing sits near the line, and a pack whose face is a flat
-     * colour renders the same under either treatment.
+     * face rather than a seamless swatch. The two kinds are far apart in
+     * practice — small tiling swatches run around 12×12, pre-shaded faces
+     * upwards of 56×56 — so nothing sits near the line, and a pack whose face
+     * is a flat colour renders the same under either treatment.
      */
     private const TILEABLE_FACE_MAX = 24;
 
@@ -543,7 +681,7 @@ class InstallResourcePack
         if ($name === self::VANILLA_PACK) {
             // Reinstalling the bundled default keeps the identity ensureVanilla()
             // gives it, regardless of what the upstream branch declares.
-            $pack->alias = 'Default Vanilla';
+            $pack->alias = 'Vanilla';
             $pack->version = 'bundled';
             $pack->author = 'RuneManager';
             $pack->url = '';
@@ -559,7 +697,14 @@ class InstallResourcePack
             $pack->author = $properties['author'] ?? 'unknown';
             $pack->url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
             $pack->tags = implode(',', $tags);
-            $pack->dark_mode = in_array('dark', $tags, true);
+            // The sampled artwork decides, not the tag string: a pack author's
+            // "dark" tag is optional and frequently absent from packs whose art
+            // is plainly dark, and the flag picks which theme — and so which
+            // text colour — is painted over that art. Falls back to the tag only
+            // when no palette could be sampled at all.
+            $pack->dark_mode = $colors['background_color'] !== null
+                ? PackPalette::isDark($colors['background_color'])
+                : in_array('dark', $tags, true);
         }
 
         $pack->background_color = $colors['background_color'];
