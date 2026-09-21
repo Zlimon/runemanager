@@ -7,6 +7,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import Search from "@/Components/Search.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import AccountCard from "@/Components/AccountCard.vue";
+import ClickableCard from "@/Components/ClickableCard.vue";
 import PaginationItem from "@/Components/PaginationItem.vue";
 import Badge from "@/Components/Badge.vue";
 
@@ -130,9 +131,9 @@ const clearAccountTypeSearch = () => {
 
                 <div class="mt-12 grid sm:grid-cols-4 gap-4">
                     <div v-for="account in accounts.data" :key="account.username">
-                        <Link :href="route('accounts.show', account)" class="block hover:opacity-90">
+                        <ClickableCard :href="route('accounts.show', account)" :surface="false">
                             <AccountCard :account="account" />
-                        </Link>
+                        </ClickableCard>
                     </div>
 
                     <div v-if="accounts.data.length === 0"

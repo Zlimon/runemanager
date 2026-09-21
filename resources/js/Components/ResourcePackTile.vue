@@ -1,4 +1,8 @@
 <script setup>
+import { computed } from 'vue';
+import Card from './Card.vue';
+import ClickableCard from './ClickableCard.vue';
+
 /*
  * A single resource-pack tile: icon (or fallback text), name (wrapping up to
  * two lines rather than truncating to one, so it stays readable), an optional
@@ -8,7 +12,7 @@
  * an Install button in the `#action` slot instead, since a tile can't be both
  * a button and contain one).
  */
-defineProps({
+const props = defineProps({
     iconUrl: { type: String, default: null },
     alias: { type: String, required: true },
     // Shown instead of an icon, e.g. "None" / "Plain" for the synthetic tiles.
@@ -19,15 +23,18 @@ defineProps({
 });
 
 defineEmits(['click']);
+
+// A selectable tile is a real clickable card and shares its chrome with the
+// account grid and the loot board; the hub browser's tiles are plain panels
+// with their own Install button, so they stay a Card.
+const surface = computed(() => (props.interactive ? ClickableCard : Card));
 </script>
 
 <template>
-    <component :is="interactive ? 'button' : 'div'"
-               :type="interactive ? 'button' : undefined"
-               class="relative flex flex-col items-center gap-2 rounded-lg p-3 text-center transition pack-bg-card border resource-pack-border"
-               :class="selected
-                   ? 'border-primary ring-2 ring-primary ring-offset-2 ring-offset-base-100'
-                   : 'pack-accent-border hover:border-primary/60'"
+    <component :is="surface"
+               v-bind="interactive ? { selected } : {}"
+               padding="p-3"
+               class="relative flex flex-col items-center gap-2 text-center"
                @click="$emit('click')">
         <span v-if="selected"
               class="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-content">

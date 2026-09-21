@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Card from "@/Components/Card.vue";
+import ClickableCard from "@/Components/ClickableCard.vue";
 import Search from "@/Components/Search.vue";
 import ItemSlot from "@/Components/Game/ItemSlot.vue";
 import Badge from "@/Components/Badge.vue";
@@ -68,15 +69,15 @@ const filteredHiscores = computed(() => {
 
                 <ul class="space-y-3">
                     <li v-for="entry in filteredHiscores" :key="entry.account.username">
-                        <Card padding="p-4" :class="{ 'ring-2 ring-primary/40': entry.account.user_id === ownUserId }">
+                        <ClickableCard :href="route('accounts.show', entry.account)"
+                                       :class="{ 'ring-2 pack-ring-soft': entry.account.user_id === ownUserId }">
                             <div class="flex items-center justify-between gap-3">
-                                <Link :href="route('accounts.show', entry.account)"
-                                      class="flex items-center gap-3 whitespace-nowrap font-semibold text-base-content">
+                                <span class="flex items-center gap-3 whitespace-nowrap font-semibold text-base-content">
                                     <span class="text-base-content/50">#{{ entry.rank }}</span>
                                     <img :src="`data:image/jpeg;base64,${entry.account.user?.icon ?? entry.account.icon}`"
                                          class="h-9 w-9 object-contain" alt="">
                                     {{ entry.account.username }}
-                                </Link>
+                                </span>
                                 <div class="text-right">
                                     <p class="font-semibold text-base-content">{{ formatValue(entry.total_value) }} gp</p>
                                     <p class="text-xs text-base-content/50">{{ entry.drops.toLocaleString('en-US') }} drops</p>
@@ -88,7 +89,7 @@ const filteredHiscores = computed(() => {
                                           :icon="item.icon" :name="item.name ?? `Item ${item.id}`"
                                           :quantity="item.quantity" />
                             </div>
-                        </Card>
+                        </ClickableCard>
                     </li>
 
                     <li v-if="filteredHiscores.length === 0">
