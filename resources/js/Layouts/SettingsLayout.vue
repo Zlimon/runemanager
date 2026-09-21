@@ -51,10 +51,14 @@ const groups = computed(() => [
                         </p>
                         <ul class="space-y-1">
                             <li v-for="section in group.sections" :key="section.route">
+                                <!-- The DaisyUI classes below are the untextured
+                                     rendering; `settings-nav-link` / `is-active`
+                                     are the hooks app.css repaints from the pack
+                                     palette when one is loaded. -->
                                 <Link :href="route(section.route)"
-                                      class="block rounded px-3 py-2 text-sm"
+                                      class="settings-nav-link block rounded px-3 py-2 text-sm"
                                       :class="route().current(section.active)
-                                          ? 'bg-base-300 font-semibold text-base-content'
+                                          ? 'is-active bg-base-300 font-semibold text-base-content'
                                           : 'text-base-content/70 hover:bg-base-300/50'">
                                     {{ section.label }}
                                 </Link>

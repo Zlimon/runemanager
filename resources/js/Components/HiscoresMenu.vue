@@ -53,31 +53,31 @@ const items = computed(() => lists.value[activeKey.value]);
              class="dropdown-content z-50 mt-2 w-[32rem] max-w-[90vw] rounded border border-base-300 bg-base-200 p-4 text-base-content shadow-xl resource-pack-dialog">
             <div class="mb-3 grid grid-cols-2 gap-1">
                 <Link :href="route('hiscores.overall.index')"
-                      class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                      class="flex items-center gap-2 nav-menu-link rounded p-2 font-semibold hover:bg-base-300">
                     <img v-bind="packIcon('skill', 'overall')" class="h-5 w-5 object-contain" alt="">
                     Overall
                 </Link>
 
                 <Link :href="route('hiscores.loot.index')"
-                      class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                      class="flex items-center gap-2 nav-menu-link rounded p-2 font-semibold hover:bg-base-300">
                     <img v-bind="packIcon('tab', 'inventory')" class="h-5 w-5 object-contain" alt="">
                     Loot
                 </Link>
 
                 <Link :href="route('hiscores.diaries.index')"
-                      class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                      class="flex items-center gap-2 nav-menu-link rounded p-2 font-semibold hover:bg-base-300">
                     <img v-bind="packIcon('quests_tab', 'green_achievement_diaries_icon')" class="h-5 w-5 object-contain" alt="">
                     Achievements Diaries
                 </Link>
 
                 <Link :href="route('hiscores.collection-log.index')"
-                      class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                      class="flex items-center gap-2 nav-menu-link rounded p-2 font-semibold hover:bg-base-300">
                     <img v-bind="packIcon('quests_tab', 'combat_achievements_collections_logged')" class="h-5 w-5 object-contain" alt="">
                     Collection Log
                 </Link>
 
                 <Link :href="route('hiscores.combat-achievements.index')"
-                      class="flex items-center gap-2 rounded p-2 font-semibold hover:bg-base-300">
+                      class="flex items-center gap-2 nav-menu-link rounded p-2 font-semibold hover:bg-base-300">
                     <img v-bind="packIcon('quests_tab', 'combat_achievements_icon')" class="h-5 w-5 object-contain" alt="">
                     Combat Achievements
                 </Link>
@@ -85,7 +85,7 @@ const items = computed(() => lists.value[activeKey.value]);
 
             <div role="tablist" class="tabs tabs-boxed mb-3">
                 <a v-for="category in categories" :key="category.key"
-                   role="tab" class="tab gap-1.5"
+                   role="tab" class="tab resource-pack-tab gap-1.5"
                    :class="{ 'tab-active': activeKey === category.key }"
                    @click="activeKey = category.key">
                     <img v-bind="category.tab" class="h-4 w-4 object-contain" alt="">
@@ -96,7 +96,7 @@ const items = computed(() => lists.value[activeKey.value]);
             <div class="grid max-h-80 grid-cols-2 gap-1 overflow-y-auto sm:grid-cols-3">
                 <Link v-for="item in items" :key="item.slug"
                       :href="route(activeCategory.route, item.slug)"
-                      class="flex items-center gap-2 rounded p-2 hover:bg-base-300">
+                      class="flex items-center gap-2 nav-menu-link rounded p-2 hover:bg-base-300">
                     <img v-bind="activeCategory.icon(item.slug)" class="h-6 w-6 object-contain" :alt="item.name">
                     <span class="truncate text-sm capitalize text-base-content">{{ item.name }}</span>
                 </Link>

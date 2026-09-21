@@ -66,17 +66,17 @@ class UserResourcePackController extends Controller
 
         if ($request->input('resource_pack_id') === ResourcePack::GUEST_NO_PACK) {
             // Explicit "no resource pack": plain interface, clear any selection.
-            $user->disable_resource_pack = true;
-            $user->resource_pack_id = null;
+            $this->applySelection($user, null, true);
         } else {
             $validated = $request->validate([
                 'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
             ]);
-            $user->disable_resource_pack = false;
-            $user->resource_pack_id = $validated['resource_pack_id'] ?? null;
+            $this->applySelection(
+                $user,
+                isset($validated['resource_pack_id']) ? (int) $validated['resource_pack_id'] : null,
+                false,
+            );
         }
-
-        $user->save();
 
         if ($request->header('X-Inertia')) {
             return back();
@@ -112,11 +112,53 @@ class UserResourcePackController extends Controller
             ? cookie()->forget(Instance::RESOURCE_PACK_COOKIE)
             : cookie(Instance::RESOURCE_PACK_COOKIE, $value, 60 * 24 * 365);
 
-        if ($request->header('X-Inertia')) {
-            return back()->withCookie($cookie);
+        $response = $request->header('X-Inertia')
+            ? back()
+            : response()->json(['resource_pack_id' => $value]);
+
+        $response = $response->withCookie($cookie);
+
+        // A guest's light/dark cookie is the same stale explicit choice a member
+        // carries on their row; drop it on a real pack change for the same reason
+        // (see applySelection).
+        if ((string) $value !== (string) $request->cookie(Instance::RESOURCE_PACK_COOKIE)) {
+            $response = $response->withCookie(cookie()->forget(Instance::DARK_MODE_COOKIE));
         }
 
-        return response()->json(['resource_pack_id' => $value])->withCookie($cookie);
+        return $response;
+    }
+
+    /**
+     * Point the user's appearance at a new pack selection, and let the newly
+     * selected pack's own light/dark flag govern again.
+     *
+     * Picking a pack *is* choosing an appearance. Left alone, a toggle stored
+     * while a previous pack was active keeps winning forever
+     * ({@see Instance::resolveDarkMode()} puts the user's own flag at the top),
+     * so a pack drawn for dark chrome lands under the light theme and reads as
+     * unreadable. Rather than adding a second source of truth that fights that
+     * precedence, the now-stale explicit choice is dropped: resolution falls
+     * through to its next rungs — the owner's instance default, then the pack's
+     * flag — exactly as it does for a member who never touched the toggle. The
+     * toggle still works, and still wins, until the next pack change.
+     *
+     * Only a genuine change clears it, so re-saving the pack already in effect —
+     * or the plugin re-pushing the in-game pack on every login — leaves a
+     * deliberate preference alone.
+     */
+    private function applySelection(User $user, ?int $packId, bool $disabled): void
+    {
+        $changed = $user->resource_pack_id !== $packId
+            || (bool) $user->disable_resource_pack !== $disabled;
+
+        $user->resource_pack_id = $packId;
+        $user->disable_resource_pack = $disabled;
+
+        if ($changed) {
+            $user->dark_mode = null;
+        }
+
+        $user->save();
     }
 
     /**
@@ -249,9 +291,7 @@ class UserResourcePackController extends Controller
 
         // Record the preference even before assets arrive — the Blade root falls
         // through to the default until they do. Applying a pack re-enables textures.
-        $user->resource_pack_id = $pack->id;
-        $user->disable_resource_pack = false;
-        $user->save();
+        $this->applySelection($user, $pack->id, false);
 
         $installed = $installer->isInstalled($name) && $pack->version !== 'pending';
 

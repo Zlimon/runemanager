@@ -26,7 +26,7 @@ const props = defineProps({
 
 const page = usePage();
 const isAdmin = computed(() => page.props.is_admin === true);
-// Default Vanilla is a fixed dark-brown scheme with `dark_mode` always false, so
+// Vanilla is a fixed dark-brown scheme with `dark_mode` always false, so
 // the calendar's own light/dark styling must follow the effective theme instead.
 const isDark = computed(() => page.props.theme === 'runemanager-dark' || page.props.theme === 'runemanager-vanilla');
 

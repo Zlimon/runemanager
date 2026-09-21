@@ -161,7 +161,7 @@ const removeEvent = (id) => {
                             <ol class="divide-y divide-base-content/10">
                                 <li v-for="(account, index) in topAccounts" :key="account.id">
                                     <Link :href="route('accounts.show', { account: account.username })"
-                                          class="flex items-center gap-3 rounded px-2 py-2 hover:bg-base-300/40">
+                                          class="pack-row flex items-center gap-3 rounded px-2 py-2 hover:bg-base-300/40">
                                         <span class="w-5 text-center text-sm font-bold text-base-content/50">{{ index + 1 }}</span>
                                         <img v-if="account.account_type && account.account_type !== 'normal'"
                                              :src="`/images/${account.account_type}.png`"

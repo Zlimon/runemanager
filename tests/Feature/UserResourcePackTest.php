@@ -155,7 +155,7 @@ it('effectiveResourcePackId() returns null when neither is set', function () {
     expect($user->fresh()->effectiveResourcePackId())->toBeNull();
 });
 
-it('effectiveFor() floors to Default Vanilla when nothing is selected', function () {
+it('effectiveFor() floors to Vanilla when nothing is selected', function () {
     $vanilla = makePack('sample-vanilla');
 
     expect(ResourcePack::effectiveFor(null)?->id)->toBe($vanilla->id);

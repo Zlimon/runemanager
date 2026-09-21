@@ -122,7 +122,7 @@ const logout = () => {
                                         Settings
                                     </NavDropdownLink>
                                     <button type="button" @click="logout"
-                                            class="block w-full rounded px-3 py-2 text-left text-base-content hover:bg-base-300">
+                                            class="pack-row block w-full rounded px-3 py-2 text-left text-base-content hover:bg-base-300">
                                         Log out
                                     </button>
                                 </NavDropdown>

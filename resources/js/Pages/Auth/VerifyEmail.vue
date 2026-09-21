@@ -43,7 +43,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                 <div>
                     <Link
                         :href="route('profile.show')"
-                        class="underline text-sm text-base-content/70 hover:text-base-content rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                        class="underline text-sm text-base-content/70 hover:text-base-content rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--pack-accent-ui,var(--color-primary))]"
                     >
                         Edit Profile</Link>
 
@@ -51,7 +51,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                         :href="route('logout')"
                         method="post"
                         as="button"
-                        class="underline text-sm text-base-content/70 hover:text-base-content rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ms-2"
+                        class="underline text-sm text-base-content/70 hover:text-base-content rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--pack-accent-ui,var(--color-primary))] ms-2"
                     >
                         Log Out
                     </Link>

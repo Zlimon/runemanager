@@ -44,7 +44,7 @@ class ResourcePack extends Model
 {
     use HasFactory;
 
-    /** The bundled vanilla template pack, always offered as "Default Vanilla". */
+    /** The bundled vanilla template pack, always offered as "Vanilla". */
     public const VANILLA = 'sample-vanilla';
 
     /** Cookie value a logged-out visitor stores to opt out of resource packs. */
@@ -70,7 +70,7 @@ class ResourcePack extends Model
 
     /**
      * The pack to actually render for a viewer: their personal pick, then the
-     * instance-global default, and finally the bundled Default Vanilla — so a
+     * instance-global default, and finally the bundled Vanilla — so a
      * pack is always in effect and there's no separate "no resource pack"
      * rendering path. Null only if even the vanilla row is absent.
      */

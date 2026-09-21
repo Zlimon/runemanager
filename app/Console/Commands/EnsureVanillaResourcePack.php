@@ -11,10 +11,10 @@ class EnsureVanillaResourcePack extends Command
 {
     protected $signature = 'resourcepack:ensure-vanilla';
 
-    protected $description = 'Ensure the bundled Default Vanilla resource pack is installed (downloads it if the files are missing). Safe to run on every deploy.';
+    protected $description = 'Ensure the bundled Vanilla resource pack is installed (downloads it if the files are missing). Safe to run on every deploy.';
 
     /**
-     * The Default Vanilla pack is the icon baseline used whenever no pack is
+     * The Vanilla pack is the icon baseline used whenever no pack is
      * applied. Its files are gitignored and downloaded at runtime, so a fresh
      * environment (or a release before it was first installed) has none — this
      * restores them. Best-effort: it never fails so it can't abort a deploy.
@@ -26,13 +26,13 @@ class EnsureVanillaResourcePack extends Command
         try {
             if ($installer->isInstalled($name)) {
                 $installer->ensureVanilla();
-                $this->info('Default Vanilla already installed.');
+                $this->info('Vanilla already installed.');
             } else {
                 $installer->install($name);
-                $this->info('Default Vanilla installed.');
+                $this->info('Vanilla installed.');
             }
         } catch (Throwable $e) {
-            $this->warn('Could not ensure Default Vanilla: '.$e->getMessage());
+            $this->warn('Could not ensure Vanilla: '.$e->getMessage());
         }
 
         return CommandAlias::SUCCESS;

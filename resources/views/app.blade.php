@@ -8,7 +8,7 @@
     // Same precedence as the Inertia share: user toggle > guest cookie >
     // instance default > pack flag (see App\Support\Instance::resolveDarkMode).
     $darkMode = \App\Support\Instance::resolveDarkMode($user, $pack);
-    // Default Vanilla gets its own fixed DaisyUI theme; everything else rides on
+    // Vanilla gets its own fixed DaisyUI theme; everything else rides on
     // the light/dark base pair (see App\Support\Instance::themeFor).
     $theme = \App\Support\Instance::themeFor($pack, $darkMode);
 @endphp

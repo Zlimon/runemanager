@@ -294,17 +294,17 @@ class AdminController extends Controller
     }
 
     /**
-     * Re-download the bundled "Default Vanilla" pack from upstream. It's the
+     * Re-download the bundled "Vanilla" pack from upstream. It's the
      * baseline every other pack borrows missing sprites from, so it can't be
      * deleted via the UI — but if its on-disk assets go missing this restores
-     * them (the DB row keeps its "Default Vanilla" identity, see upsertRow()).
+     * them (the DB row keeps its "Vanilla" identity, see upsertRow()).
      */
     public function reinstallVanilla(InstallResourcePack $installer): RedirectResponse
     {
         try {
             $pack = $installer->install(InstallResourcePack::VANILLA_PACK);
         } catch (\Throwable $e) {
-            return back()->dangerBanner('Could not reinstall the Default Vanilla pack: '.$e->getMessage());
+            return back()->dangerBanner('Could not reinstall the Vanilla pack: '.$e->getMessage());
         }
 
         return back()->banner("Reinstalled {$pack->alias}.");

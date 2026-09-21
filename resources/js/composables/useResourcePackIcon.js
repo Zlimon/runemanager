@@ -3,7 +3,7 @@ import { usePage } from "@inertiajs/vue3";
 
 /*
  * One icon resolver: use the active resource pack's sprite, falling back to the
- * bundled Default Vanilla pack when the active pack doesn't ship it. Returns
+ * bundled Vanilla pack when the active pack doesn't ship it. Returns
  * <img> attributes to spread, so every pack icon is just:
  *
  *   <img v-bind="packIcon('skill', slug)" class="h-5 w-5">

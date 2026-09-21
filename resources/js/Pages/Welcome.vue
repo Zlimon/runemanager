@@ -107,7 +107,7 @@ const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
                                 <component :is="anonymized ? 'div' : Link"
                                            :href="anonymized ? undefined : route('accounts.show', { account: account.username })"
                                            class="flex items-center gap-3 rounded px-2 py-2"
-                                           :class="anonymized ? '' : 'hover:bg-base-300/40'">
+                                           :class="anonymized ? '' : 'pack-row hover:bg-base-300/40'">
                                     <span class="w-5 text-center text-sm font-bold text-base-content/50">{{ index + 1 }}</span>
                                     <img v-if="account.account_type && account.account_type !== 'normal'"
                                          :src="`/images/${account.account_type}.png`"

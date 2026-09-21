@@ -59,8 +59,9 @@ class PackPalette
      * whether the colour still reads as a deliberate line rather than as a
      * rendering fault, and an edge stops reading as deliberate somewhere around
      * 2:1. Being an absolute floor rather than a margin below the derived
-     * accent matters when the derivation overshoots (pack-rs3 reaches 4.81:1) or
-     * is clamped: neither should change what counts as a visible line.
+     * accent matters when the derivation overshoots — some packs' backgrounds
+     * leave room to reach well past 4:1 — or when it is clamped: neither should
+     * change what counts as a visible line.
      */
     private const ACCENT_MIN_DECLARED_CONTRAST = 2.0;
 
@@ -171,12 +172,13 @@ class PackPalette
      *
      * The bundled default pack is the exception, and deliberately not one the
      * contrast rules can express. It is what every user who has never picked a
-     * pack sees, and its declared accent (`#807660`, 2.30:1) reads visibly
-     * fainter than the one the derivation reaches (`#9e8a6f`, 3.11:1). No
-     * threshold can single it out — its declared accent beats pack-crazed's on
-     * contrast (2.30 vs 2.03) *and* sits closer to its own derived accent (0.81
-     * vs 1.05 below) — so preferring authenticity everywhere except the default
-     * interface is stated here as the policy it is.
+     * pack sees, and its declared accent reads visibly fainter than the one the
+     * derivation reaches. No threshold can single it out: there are third-party
+     * packs whose declared accents score worse on both axes — lower contrast
+     * against their background *and* further below their own derived accent —
+     * yet which should keep the colour their author chose. So preferring
+     * authenticity everywhere except the default interface is stated here as
+     * the policy it is, rather than dressed up as a threshold.
      */
     private function preferredAccent(string $packDir, string $background): string
     {
@@ -306,10 +308,12 @@ class PackPalette
      * otherwise the same hue moved away from the background until it does.
      *
      * A pack's declared accent is chosen to look right on the pack's own
-     * artwork, not to carry a form control — ScrewedPurple's `#802bc4` is the
-     * authentic border colour but only reaches 2.63:1 on its background. This
-     * keeps that colour available for decorative edges while giving inputs and
-     * other boundaries a version that meets WCAG 1.4.11.
+     * artwork, not to carry a form control: a saturated accent can be the
+     * authentic border colour and still fall short of 3:1 on its own
+     * background, because a vivid hue carries less relative luminance than its
+     * channel values suggest. This keeps that colour available for decorative
+     * edges while giving inputs and other boundaries a version that meets
+     * WCAG 1.4.11.
      */
     public function uiAccent(string $accent, string $background): string
     {
@@ -412,7 +416,19 @@ class PackPalette
      * Whether a color is dark enough that an accent should be lighter than it
      * rather than darker — i.e. it contrasts better with white than with black.
      */
-    private static function isDark(string $hex): bool
+    /**
+     * Whether a colour is dark enough that light text belongs on it — the point
+     * where contrast with white overtakes contrast with black.
+     *
+     * Public because it decides more than the accent direction: a pack's
+     * dark_mode is derived from its sampled background through this, rather
+     * than from whether the author happened to write "dark" in pack.properties.
+     * The tag is optional and frequently absent from packs whose art is plainly
+     * dark, so a sizeable share of them declared themselves light while
+     * sampling to a near-black background — which put near-black theme text on
+     * near-black pack chrome.
+     */
+    public static function isDark(string $hex): bool
     {
         return self::relativeLuminance($hex) < self::DARK_BACKGROUND_LUMINANCE;
     }

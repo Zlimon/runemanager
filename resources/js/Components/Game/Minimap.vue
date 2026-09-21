@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
         <div class="minimap-frame h-full w-full rounded-full p-[6px]">
             <div v-if="position" ref="mapEl" class="h-full w-full overflow-hidden rounded-full"></div>
             <div v-else
-                 class="flex h-full w-full items-center justify-center rounded-full bg-base-200 p-3 text-center text-xs text-base-content/60">
+                 class="pack-bg-soft flex h-full w-full items-center justify-center rounded-full p-3 text-center text-xs text-base-content/60">
                 Location not shared
             </div>
         </div>

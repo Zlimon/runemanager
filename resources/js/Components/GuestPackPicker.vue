@@ -8,7 +8,7 @@ import { router, usePage } from '@inertiajs/vue3';
  * Members set this on the Appearance page, which is auth-gated; guests have no
  * account row to store `disable_resource_pack` on, so their choice lives in a
  * cookie (see App\Support\Instance::RESOURCE_PACK_COOKIE). Without this control
- * a guest could never leave Default Vanilla — and Default Vanilla is the one
+ * a guest could never leave Vanilla — and Vanilla is the one
  * appearance with no light/dark toggle, so they'd be locked out of both.
  *
  * Only the two states that matter publicly are offered; picking a specific
@@ -52,7 +52,7 @@ const choose = (value) => {
             <li>
                 <button type="button" :class="{ 'active font-semibold': !noPack }"
                         @click="choose(null)">
-                    Default Vanilla
+                    Vanilla
                 </button>
             </li>
             <li>

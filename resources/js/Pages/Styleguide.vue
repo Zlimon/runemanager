@@ -51,7 +51,7 @@ const iconPack = computed(() =>
 const { packIcon } = useResourcePackIcon(iconPack);
 
 /*
- * Default Vanilla ships one fixed scheme with no light/dark counterpart, which
+ * Vanilla ships one fixed scheme with no light/dark counterpart, which
  * is why the site hides the toggle for it (Instance::canToggleDarkMode). The
  * same rule has to hold here or the preview would offer a combination that can
  * never occur.
@@ -182,7 +182,7 @@ const inventory = ref(null);
 /*
  * Fetched on demand, and re-fetched whenever the pack changes while the panel
  * is open. It answers the question that explains most pack differences: which
- * sprites this pack actually draws, and which are Default Vanilla's, copied in
+ * sprites this pack actually draws, and which are Vanilla's, copied in
  * at install time because the pack omitted them.
  *
  * A plain request, not router.reload() — see the route comment. An Inertia
@@ -239,6 +239,7 @@ const TABS = [
 ];
 
 const checked = ref(true);
+const unchecked = ref(false);
 const text = ref("Zezima");
 const choice = ref("b");
 </script>
@@ -301,7 +302,7 @@ const choice = ref("b");
                     <div v-else class="space-y-3">
                         <p class="text-sm">
                             <strong>{{ inventory.own }}</strong> sprite(s) shipped by this pack,
-                            <strong>{{ inventory.borrowed }}</strong> borrowed from Default Vanilla.
+                            <strong>{{ inventory.borrowed }}</strong> borrowed from Vanilla.
                         </p>
                         <p v-if="borrowed.length" class="text-xs opacity-70">
                             Borrowed sprites are why a pack can put its own frame around someone
@@ -403,8 +404,57 @@ const choice = ref("b");
                             <textarea class="textarea textarea-bordered w-48" rows="2">Notes</textarea>
                             <label class="flex items-center gap-2 pb-2">
                                 <Checkbox v-model:checked="checked" />
-                                <span class="text-sm">Checkbox</span>
+                                <span class="text-sm">Checked</span>
                             </label>
+                            <label class="flex items-center gap-2 pb-2">
+                                <Checkbox v-model:checked="unchecked" />
+                                <span class="text-sm">Unchecked</span>
+                            </label>
+                            <label class="flex items-center gap-2 pb-2 opacity-60">
+                                <Checkbox :checked="true" disabled />
+                                <span class="text-sm">Disabled</span>
+                            </label>
+                        </div>
+                        <p class="text-xs opacity-60">
+                            Tab to a checkbox for the focus ring. With no pack the checked fill is
+                            the theme's primary; under a pack per-pack.css replaces the whole control
+                            with the in-game sprites.
+                        </p>
+                    </div>
+
+                    <!--
+                        The row highlights are the one thing on this page that
+                        only exists in a state you have to provoke, so both the
+                        current row and a row to hover are laid out side by side.
+                        The menu column reproduces NavDropdown's framed panel,
+                        because those rows sit on the pack's dialog parchment
+                        rather than on a flat colour — which is what the active
+                        row's accent hairline is there to survive.
+                    -->
+                    <div class="space-y-2">
+                        <h3 class="text-sm uppercase tracking-wide opacity-70">Rows — current and hover</h3>
+                        <div class="flex flex-wrap gap-6">
+                            <ul class="w-56 space-y-1">
+                                <li>
+                                    <a class="settings-nav-link is-active block rounded bg-base-300 px-3 py-2 text-sm font-semibold text-base-content">
+                                        Settings row — current
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="settings-nav-link block rounded px-3 py-2 text-sm text-base-content/70 hover:bg-base-300/50">
+                                        Settings row — hover me
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="w-52 space-y-1 rounded border border-base-300 bg-base-200 p-3 text-base-content shadow-xl resource-pack-dialog">
+                                <a class="nav-menu-link is-active block rounded bg-base-300 px-3 py-2 font-semibold text-base-content">
+                                    Menu row — current
+                                </a>
+                                <a class="nav-menu-link block rounded px-3 py-2 text-base-content hover:bg-base-300">
+                                    Menu row — hover me
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -452,7 +502,7 @@ const choice = ref("b");
                                  v-bind="packIcon('equipment', slug)" :alt="slug" class="h-8 w-8">
                         </div>
                         <p class="text-xs opacity-60">
-                            A sprite the pack omits falls back to Default Vanilla — the inventory above says which.
+                            A sprite the pack omits falls back to Vanilla — the inventory above says which.
                         </p>
                     </div>
 

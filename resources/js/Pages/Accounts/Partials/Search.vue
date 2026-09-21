@@ -56,7 +56,7 @@ watch(query, (value) => {
                  class="absolute w-[calc(100%+4rem)] overflow-hidden rounded shadow-xl pack-bg-card border pack-accent-border resource-pack-border">
                 <div v-for="account in results" :key="account.username">
                     <Link :href="route('accounts.show', account)"
-                          class="flex flex-row items-center space-x-2 border-b border-base-300 p-2 hover:bg-base-300/40">
+                          class="pack-row flex flex-row items-center space-x-2 border-b border-base-300 p-2 hover:bg-base-300/40">
                         <img :src="`data:image/jpeg;base64,${account.icon}`"
                              class="h-16 w-16 rounded-full p-2 ring-2 ring-base-300">
                         <div class="flex flex-col justify-between">

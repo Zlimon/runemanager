@@ -1,5 +1,12 @@
 <script setup>
+import Card from './Card.vue';
 import SectionTitle from './SectionTitle.vue';
+
+/*
+ * The sibling of FormSection for panels that carry their own controls rather
+ * than a submitted form (two-factor, sessions, account deletion). Same Card
+ * surface, so these settings panels follow the active resource pack too.
+ */
 </script>
 
 <template>
@@ -14,9 +21,9 @@ import SectionTitle from './SectionTitle.vue';
         </SectionTitle>
 
         <div class="mt-5 md:mt-0 md:col-span-2">
-            <div class="px-4 py-5 sm:p-6 bg-base-100 shadow sm:rounded-lg">
+            <Card>
                 <slot name="content" />
-            </div>
+            </Card>
         </div>
     </div>
 </template>

@@ -16,7 +16,7 @@ use Inertia\Response;
  * selected.
  *
  * It exists because pack regressions are invisible one component at a time: a
- * button's centre fill looked correct on Default Vanilla purely because that
+ * button's centre fill looked correct on Vanilla purely because that
  * pack's face and frame are a few RGB points apart, and only showed as a
  * mismatched panel on a pack whose frame is near-black. Seeing every component
  * against every pack at once is the only cheap way to catch that.
@@ -106,7 +106,7 @@ class StyleguideController extends Controller
     }
 
     /**
-     * Which sprites the given pack ships itself and which are Default Vanilla's,
+     * Which sprites the given pack ships itself and which are Vanilla's,
      * copied in at install time by {@see InstallResourcePack::completeFromVanilla()}.
      *
      * Packs only override what they change, so "the pack has this file" is not

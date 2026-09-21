@@ -35,7 +35,7 @@ afterEach(function () {
 });
 
 it('lifts the payload accent for a pack whose accent is too faint for controls', function () {
-    // ScrewedPurple's real palette: the authentic purple is kept as-is, and the
+    // A real saturated palette: the authentic purple is kept as-is, and the
     // switcher gets a separate, contrast-safe version for form controls.
     styleguidePack('pack-styleguidetest', true)
         ->forceFill(['background_color' => '#200b36', 'accent_color' => '#802bc4'])

@@ -47,7 +47,7 @@ class Instance
     /** DaisyUI theme for the untextured interface in dark mode. */
     public const THEME_DARK = 'runemanager-dark';
 
-    /** DaisyUI theme for Default Vanilla's single fixed scheme. */
+    /** DaisyUI theme for Vanilla's single fixed scheme. */
     public const THEME_VANILLA = 'runemanager-vanilla';
 
     public static function mode(): string
@@ -274,10 +274,16 @@ class Instance
      * Resolve the effective dark-mode flag for a viewer, in precedence order:
      * the user's own explicit toggle, then a logged-out visitor's cookie choice,
      * then the owner's instance default, and finally the resource pack's flag.
+     *
+     * Selecting a resource pack clears that explicit toggle (member row and
+     * guest cookie alike — see UserResourcePackController::applySelection), so
+     * the new pack's flag governs from here rather than a stale preference left
+     * over from the previous pack. The order below is unchanged by that: the
+     * rung is simply empty again.
      */
     public static function resolveDarkMode(?User $user, ?ResourcePack $pack): bool
     {
-        // Default Vanilla ships one fixed scheme and hides the toggle, so it is
+        // Vanilla ships one fixed scheme and hides the toggle, so it is
         // never "dark" regardless of what anyone has stored.
         if (! self::canToggleDarkMode($pack)) {
             return false;
@@ -301,7 +307,7 @@ class Instance
      * Whether the viewer may switch between light and dark.
      *
      * Only the untextured "no resource pack" interface supports both modes.
-     * Default Vanilla is a single fixed scheme ({@see self::THEME_VANILLA}) and
+     * Vanilla is a single fixed scheme ({@see self::THEME_VANILLA}) and
      * hides the toggle; every other pack still rides on the two base themes
      * until resource packs get their own appearance pass.
      */

@@ -136,7 +136,7 @@ const displayableRole = (role) => {
                                 v-for="(role, i) in availableRoles"
                                 :key="role.key"
                                 type="button"
-                                class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+                                class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-[var(--pack-accent-ui,var(--color-primary))] focus:ring-2 focus:ring-[var(--pack-accent-ui,var(--color-primary))]"
                                 :class="{'border-t border-base-300 focus:border-none rounded-t-none': i > 0, 'rounded-b-none': i != Object.keys(availableRoles).length - 1}"
                                 @click="addTeamMemberForm.role = role.key"
                             >
@@ -286,7 +286,7 @@ const displayableRole = (role) => {
                             v-for="(role, i) in availableRoles"
                             :key="role.key"
                             type="button"
-                            class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+                            class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-[var(--pack-accent-ui,var(--color-primary))] focus:ring-2 focus:ring-[var(--pack-accent-ui,var(--color-primary))]"
                             :class="{'border-t border-base-300 focus:border-none rounded-t-none': i > 0, 'rounded-b-none': i !== Object.keys(availableRoles).length - 1}"
                             @click="updateRoleForm.role = role.key"
                         >

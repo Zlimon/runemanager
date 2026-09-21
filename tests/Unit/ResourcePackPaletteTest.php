@@ -78,7 +78,7 @@ function hue(string $hex): float
 }
 
 it('keeps the hue of a saturated dark pack in its accent', function () {
-    // pack-ScrewedPurple's sampled background. The accent has to stay purple:
+    // A saturated dark purple background. The accent has to stay purple:
     // blending toward white (the old derivation) returned a grey #6e607c.
     $palette = palette('#200b36');
 
@@ -92,7 +92,7 @@ it('keeps the hue of a saturated dark pack in its accent', function () {
 });
 
 it('keeps the hue of a saturated dark teal pack in its accent', function () {
-    // pack-rs3's sampled background — deep teal, previously flattened to #5b6a71.
+    // A deep teal background, which the old derivation flattened to grey.
     [$r, $g, $b] = channels(palette('#031a24')['accent_color']);
 
     expect($b)->toBeGreaterThan($g)
@@ -100,7 +100,7 @@ it('keeps the hue of a saturated dark teal pack in its accent', function () {
 });
 
 it('leaves a greyscale pack grey', function () {
-    // pack-crazed's sampled background: it really is grey, so the accent must be.
+    // A genuinely grey background, so the accent must be grey too.
     $accent = palette('#2f2c2e')['accent_color'];
 
     [$r, $g, $b] = channels($accent);
@@ -109,7 +109,7 @@ it('leaves a greyscale pack grey', function () {
 });
 
 it('treats a near-black background with a token colour cast as grey', function () {
-    // pack-2012-pack samples #000009: black to the eye, but fully saturated blue
+    // Black to the eye, but fully saturated blue
     // in HSL. Amplifying that hue would paint the pack with vivid blue borders.
     [$r, $g, $b] = channels(palette('#000009')['accent_color']);
 
@@ -163,7 +163,7 @@ it('reads 8-digit declared values as alpha-first ARGB', function () {
 });
 
 it('ignores a declared accent that barely separates from the background', function () {
-    // pack-crazed's real case: its declared line colours are nearly its background.
+    // A real case: a pack whose declared line colours are nearly its background.
     $declared = palette('#2f2c2e', <<<'PROPERTIES'
         world_switch_top_and_bottom_lines=0x3f3f3f
         bank_tab_underline=0x38373c
@@ -182,7 +182,7 @@ it('ignores a declared accent too faint to read as a deliberate line', function 
 });
 
 it('keeps a declared accent that reads as a line but falls short of the control bar', function () {
-    // pack-crazed's real case: #5b5b5b is visibly a line at 2.03:1, and is kept
+    // A real case: #5b5b5b is visibly a line at 2.03:1, and is kept
     // as the authentic accent even though it cannot carry a control on its own.
     // uiAccent() is what makes that safe.
     $declared = palette('#2f2c2e', 'chatbox_seperator_line=0x5b5b5b');
@@ -252,7 +252,7 @@ it('computes WCAG contrast ratios, not raw channel gaps', function (string $a, s
 ]);
 
 it('returns the accent untouched when it already clears the contrast bar', function () {
-    // pack-rs3's derived teal is well past 3:1 on its background.
+    // A derived teal, well past 3:1 on its background.
     expect((new PackPalette)->uiAccent('#038dc9', '#031a24'))->toBe('#038dc9');
 });
 

@@ -12,14 +12,14 @@ uses(RefreshDatabase::class);
 /**
  * Appearance rules (SPEC §6.2):
  *   - no resource pack  → untextured, light + dark, toggle shown
- *   - Default Vanilla   → textured, one fixed scheme, toggle hidden
+ *   - Vanilla   → textured, one fixed scheme, toggle hidden
  *   - any other pack    → unchanged for now; rides the light/dark pair
  */
 function vanillaPack(): ResourcePack
 {
     return ResourcePack::query()->forceCreate([
         'name' => ResourcePack::VANILLA,
-        'alias' => 'Default Vanilla',
+        'alias' => 'Vanilla',
         'version' => '1.0.0',
         'author' => 'test',
         'url' => 'https://example.test/vanilla.zip',
@@ -59,7 +59,7 @@ it('serves the light base theme to an untextured viewer in light mode', function
         );
 });
 
-it('hides the toggle and pins one fixed theme for Default Vanilla', function () {
+it('hides the toggle and pins one fixed theme for Vanilla', function () {
     $pack = vanillaPack();
     // Even a stored dark preference must not reach Vanilla's fixed scheme.
     $user = User::factory()->withPersonalTeam()->create([
@@ -76,7 +76,7 @@ it('hides the toggle and pins one fixed theme for Default Vanilla', function () 
         );
 });
 
-it('ignores the instance default appearance while Default Vanilla is active', function () {
+it('ignores the instance default appearance while Vanilla is active', function () {
     vanillaPack();
     SettingHelper::setSetting('default_dark_mode', 'dark');
 
@@ -183,7 +183,7 @@ it('marks the document as untextured when no pack is active', function () {
 });
 
 it('emits the pack palette, including the contrast-safe accent, as CSS variables', function () {
-    // ScrewedPurple's real palette: the authentic accent and the lifted one the
+    // A real saturated palette: the authentic accent and the lifted one the
     // controls use both have to reach the document.
     vanillaPack()->forceFill([
         'background_color' => '#200b36',

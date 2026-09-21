@@ -46,13 +46,13 @@ class HandleInertiaRequests extends Middleware
         // we forward `dark_mode` to drive Tailwind's `dark:` variants and `pack`
         // (name + updated_at timestamp) so Vue components can resolve pack-shipped
         // assets like /resource-packs/{name}/skill/{slug}.png with cache busting.
-        // A pack is always in effect — Default Vanilla is the floor.
+        // A pack is always in effect — Vanilla is the floor.
         $user = $request->user();
         $pack = ResourcePack::effectiveFor($user);
 
         // Dark mode resolves through Instance: the viewer's own toggle wins, then
         // a guest's cookie choice, then the owner's instance default, then the
-        // pack's (unreliable) flag. Default Vanilla short-circuits all of it — it
+        // pack's (unreliable) flag. Vanilla short-circuits all of it — it
         // ships one fixed scheme and hides the toggle.
         $darkMode = Instance::resolveDarkMode($user, $pack);
 
@@ -89,7 +89,7 @@ class HandleInertiaRequests extends Middleware
             // re-deriving the precedence rules.
             'theme' => Instance::themeFor($pack, $darkMode),
             // Drives the guest-only appearance picker: guests need a way out of
-            // Default Vanilla to reach the untextured, toggleable interface.
+            // Vanilla to reach the untextured, toggleable interface.
             'no_pack' => $pack === null,
             // Admin display filters for the Live Feed surfaces only (SPEC §8.2).
             // Everything is stored; the account Activity feed shows it all.

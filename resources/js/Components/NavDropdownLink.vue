@@ -9,9 +9,11 @@ defineProps({
 </script>
 
 <template>
+    <!-- `nav-menu-link` / `is-active` are app.css's hooks for repainting the row
+         from the pack palette; the DaisyUI classes are what renders with no pack. -->
     <Link :href="href"
-          class="block rounded px-3 py-2 text-base-content hover:bg-base-300"
-          :class="{ 'bg-base-300 font-semibold': active }">
+          class="nav-menu-link block rounded px-3 py-2 text-base-content hover:bg-base-300"
+          :class="{ 'is-active bg-base-300 font-semibold': active }">
         <slot />
     </Link>
 </template>

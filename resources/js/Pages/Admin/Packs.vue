@@ -20,7 +20,7 @@ const props = defineProps({
 
 const installer = ref(null);
 
-// Re-download the bundled Default Vanilla pack (the baseline every other pack
+// Re-download the bundled Vanilla pack (the baseline every other pack
 // borrows missing sprites from) when its on-disk assets have gone missing.
 const reinstalling = ref(false);
 const reinstallVanilla = () => {
@@ -77,7 +77,7 @@ const install = (pack) => installer.value?.start(pack);
                      so prompt to restore them. -->
                 <div v-if="vanillaMissing" class="alert alert-warning">
                     <div class="flex-1">
-                        <h3 class="font-bold">Default Vanilla pack is missing</h3>
+                        <h3 class="font-bold">Vanilla pack is missing</h3>
                         <p class="text-sm">
                             Its files aren't on disk. Other packs borrow missing sprites from it, so reinstall it to
                             restore the baseline theme.
