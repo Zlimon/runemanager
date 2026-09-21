@@ -75,6 +75,12 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    // { position, total } among this instance's accounts by total XP, or null
+    // while the account has no XP to rank on.
+    instanceRank: {
+        type: Object,
+        default: null,
+    },
     position: {
         type: Object,
         default: null,
@@ -210,7 +216,7 @@ onBeforeUnmount(() => {
                     </div>
 
                     <!-- Owner-curated achievement gallery -->
-                    <div class="mt-4">
+                    <div class="mt-4 flex justify-center">
                         <AchievementGallery :account="account" :events="pinnedFeed" />
                     </div>
 
@@ -239,7 +245,7 @@ onBeforeUnmount(() => {
                                     </div>
                                 </div>
 
-                                <Summary :account="account" :freshness="freshness" />
+                                <Summary :account="account" :freshness="freshness" :instance-rank="instanceRank" />
                             </div>
 
                             <!-- Vertical Inventory and Looting Bag tabs -->
@@ -267,12 +273,10 @@ onBeforeUnmount(() => {
                         <div class="col-span-2">
                             <div class="mx-auto mt-6 grid grid-cols-3 gap-2">
                                 <div class="col-span-2">
-                                    <h3>Skills</h3>
                                     <Skills :account="account" class="mt-4" />
                                 </div>
 
                                 <div class="col-span-1">
-                                    <h3>Journal</h3>
                                     <TabbedCard :tabs="journalTabs" v-model="activeJournalTab" class="mt-4">
                                         <template #quests>
                                             <Quests :quests="quests" :freshness="freshness.quests" :stale-after="staleAfter" />

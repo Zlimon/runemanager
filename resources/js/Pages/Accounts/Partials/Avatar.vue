@@ -258,7 +258,7 @@ onBeforeUnmount(disposeScene);
              class="flex h-full flex-col items-center justify-center gap-1 p-3 text-center">
             <p class="text-sm font-semibold text-base-content/70">No avatar yet</p>
             <p class="text-xs text-base-content/70">
-                Export your character with the Model-Dumper RuneLite plugin to see it here.
+                Push your avatar from the RuneLite plugin to see it here.
             </p>
         </div>
 

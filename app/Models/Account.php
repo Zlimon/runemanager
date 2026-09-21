@@ -89,6 +89,33 @@ class Account extends Model
     }
 
     /**
+     * This account's place among the instance's accounts by total XP — the
+     * "RuneManager rank" on Account Show, as distinct from its official hiscores
+     * rank. Accounts on equal XP share a position, the usual competition order.
+     *
+     * Only accounts with XP take part. One whose hiscores have not synced yet
+     * carries 0, and ranking it would claim last place and inflate every other
+     * account's "of N"; it is unranked instead, and left out of the total.
+     *
+     * Two plain counts are enough: an instance's accounts table is small, and
+     * this is only ever computed for the one account being viewed, never across
+     * a list.
+     *
+     * @return array{position: int, total: int}|null
+     */
+    public function instanceRank(): ?array
+    {
+        if (($this->xp ?? 0) <= 0) {
+            return null;
+        }
+
+        return [
+            'position' => self::query()->where('xp', '>', $this->xp)->count() + 1,
+            'total' => self::query()->where('xp', '>', 0)->count(),
+        ];
+    }
+
+    /**
      * Live status-orb values (HP/prayer current+max, run energy, special attack),
      * or null until the plugin has pushed them. Drives the Account Show orbs.
      *
