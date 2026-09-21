@@ -440,10 +440,13 @@
 
 /* Text fields — no dedicated in-game sprite, so just tint the border with the
  * pack accent and let the base theme handle the fill (keeps text legible and
- * preserves the select chevron). */
+ * preserves the select chevron). .file-input rides along: DaisyUI builds it
+ * from the same bordered-field recipe, so a pack that skinned every other field
+ * and left this one on the theme's grey was the only tell. */
 .input,
 .select,
-.textarea {
+.textarea,
+.file-input {
     border-color: var(--pack-accent, #94866d) !important;
 }
 

@@ -504,9 +504,40 @@ html.has-pack header.pack-bg-card {
  */
 html.has-pack .input,
 html.has-pack .select,
-html.has-pack .textarea {
+html.has-pack .textarea,
+html.has-pack .file-input {
     background-color: var(--pack-bg-card);
     border-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-300))) !important;
+}
+
+/*
+ * The "Choose file" button inside a file input.
+ *
+ * It is a pseudo-element, so none of the rules above reach it, and DaisyUI
+ * leaves it on a fixed theme surface — a slate-blue chip sitting inside a field
+ * that had otherwise gone fully pack-coloured, which is the only part of the
+ * control that gave the theme away.
+ *
+ * It takes --pack-bg-active rather than a sprite: .btn's 9-slice is painted
+ * from per-pack.css with several background layers, and a pseudo-element cannot
+ * carry that treatment without duplicating the whole recipe here. A lighter
+ * step of the pack surface reads as a raised control against the field's
+ * --pack-bg-card and stays in the same palette.
+ *
+ * Written twice because ::file-selector-button and its legacy -webkit- alias
+ * cannot share a selector list: a browser that does not recognise one would
+ * discard the whole rule.
+ */
+html.has-pack .file-input::file-selector-button {
+    background-color: var(--pack-bg-active);
+    border-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-300)));
+    color: var(--color-base-content);
+}
+
+html.has-pack .file-input::-webkit-file-upload-button {
+    background-color: var(--pack-bg-active);
+    border-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-300)));
+    color: var(--color-base-content);
 }
 
 /*
@@ -527,7 +558,9 @@ html.has-pack .input:not(.input-error):focus-within,
 html.has-pack .select:not(.select-error):focus,
 html.has-pack .select:not(.select-error):focus-within,
 html.has-pack .textarea:not(.textarea-error):focus,
-html.has-pack .textarea:not(.textarea-error):focus-within {
+html.has-pack .textarea:not(.textarea-error):focus-within,
+html.has-pack .file-input:not(.file-input-error):focus,
+html.has-pack .file-input:not(.file-input-error):focus-within {
     --input-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-content)));
 }
 
