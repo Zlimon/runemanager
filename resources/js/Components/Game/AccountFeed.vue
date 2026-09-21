@@ -1,5 +1,6 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import Card from "@/Components/Card.vue";
 import FeedEventItem from "@/Components/Game/FeedEventItem.vue";
 
 /*
@@ -51,8 +52,8 @@ onBeforeUnmount(() => window.Echo.leave("feed"));
                 <FeedEventItem :event="event" @deleted="removeEvent" />
             </li>
         </ul>
-        <div v-else class="mt-2 rounded p-6 text-center text-sm text-base-content/60 pack-bg-card resource-pack-border">
+        <Card v-else padding="p-6" class="mt-2 text-center text-sm text-base-content/60">
             No activity yet.
-        </div>
+        </Card>
     </div>
 </template>

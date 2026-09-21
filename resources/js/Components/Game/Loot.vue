@@ -66,7 +66,7 @@ const groups = computed(() => {
                             · {{ group.drops }} drops
                         </span>
                     </span>
-                    <span class="text-xs text-gray-700 dark:text-gray-200"
+                    <span class="text-xs text-base-content/70"
                           :title="dayjs(group.latest).format('MMM D, YYYY h:mm A')">
                         {{ dayjs(group.latest).fromNow() }}
                     </span>
@@ -77,6 +77,6 @@ const groups = computed(() => {
         </ul>
     </div>
     <div v-else class="flex h-32 items-center justify-center">
-        <p class="text-gray-700 dark:text-gray-200">No loot recorded for this account yet</p>
+        <p class="text-base-content/70">No loot recorded for this account yet</p>
     </div>
 </template>

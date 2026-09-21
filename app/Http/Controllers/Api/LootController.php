@@ -71,7 +71,11 @@ class LootController extends Controller
             $docs[] = [
                 'account_id' => (int) $account->id,
                 'source' => $entry['source'],
-                'type' => $entry['type'] ?? null,
+                // RuneLite's LootRecordType is uppercase (NPC, EVENT, PICKPOCKET…),
+                // and the loot hiscores match on it exactly. Normalised here so a
+                // client sending any other casing still lands on the same record
+                // type rather than on a source page that finds nothing.
+                'type' => filled($entry['type'] ?? null) ? strtoupper($entry['type']) : null,
                 'items' => $items,
                 'total_value' => $totalValue,
                 'killed_at' => $killedAt,

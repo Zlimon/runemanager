@@ -68,6 +68,8 @@ class InstallResourcePack
      */
     private const VANILLA_IMAGE_DIRS = ['equipment', 'skill'];
 
+    public function __construct(private PackPalette $palette = new PackPalette) {}
+
     /**
      * @return ResourcePack the upserted row
      *
@@ -86,15 +88,20 @@ class InstallResourcePack
         try {
             $this->download($name, $zipPath);
             $this->extract($zipPath, $extractTarget);
-            $this->copyTemplateCss($extractTarget);
             $this->completeFromVanilla($extractTarget);
+            // After completeFromVanilla, not before: rendering the template
+            // inspects the pack's button/middle.png, which a partial pack only
+            // has once it has borrowed vanilla's.
+            $this->copyTemplateCss($extractTarget);
             $this->normalizeBorderSprites($extractTarget);
+            $this->normalizeStatTileSprites($extractTarget);
+            $this->normalizeCheckboxSprites($extractTarget);
             $this->generateHorizontalScrollbar($extractTarget);
         } finally {
             @unlink($zipPath);
         }
 
-        $colors = $this->extractPaletteColors($extractTarget);
+        $colors = $this->palette->extractPaletteColors($extractTarget);
 
         return $this->upsertRow($name, $colors);
     }
@@ -160,6 +167,141 @@ class InstallResourcePack
             if (File::exists($path)) {
                 self::padPngTopLeft($path, $width, $height);
             }
+        }
+    }
+
+    /**
+     * The two halves of a skill stat tile, which {@see normalizeStatTileSprites}
+     * trims to their opaque width.
+     *
+     * @var list<string>
+     */
+    private const STAT_TILE_SPRITES = [
+        'stats/tile_half_left.png',
+        'stats/tile_half_right.png',
+        // The hover pair has to be cropped on the same rule as the resting pair:
+        // .resource-pack-box:hover swaps only the images, keeping the 50% sizing,
+        // so a padded _selected sprite reopens the very gap in the middle that
+        // cropping the resting pair closed.
+        'stats/tile_half_left_selected.png',
+        'stats/tile_half_right_selected.png',
+    ];
+
+    /**
+     * Trim the transparent margins from each stat-tile half so the pair meets
+     * seam-to-seam when the CSS paints them at 50% of the cell each.
+     *
+     * Every pack draws roughly 31px of art on a 35 or 36px canvas, but pads it
+     * differently — one pack's left half starts two pixels in, another's four.
+     * Painted at a fixed width and pinned to opposite edges, those margins meet
+     * in the middle as a transparent band and the card shows through the tile.
+     * Cropping to the opaque box here means the CSS can size each half at 50%
+     * and have the art actually touch, whatever the pack shipped.
+     *
+     * Horizontal only: the halves are already full-bleed vertically, and the
+     * CSS stretches their height to the cell.
+     */
+    public function normalizeStatTileSprites(string $packDir): void
+    {
+        foreach (self::STAT_TILE_SPRITES as $relative) {
+            $path = $packDir.'/'.$relative;
+            if (File::exists($path)) {
+                self::cropPngToOpaqueBox($path);
+            }
+        }
+    }
+
+    /**
+     * The checkbox faces, which {@see normalizeCheckboxSprites} trims to their
+     * drawn area.
+     *
+     * @var list<string>
+     */
+    private const CHECKBOX_SPRITES = [
+        'options/checkbox_empty.png',
+        'options/checkbox_empty_round.png',
+        'options/checkbox_checked_red.png',
+    ];
+
+    /**
+     * Trim each checkbox face to the pixels it actually draws.
+     *
+     * Packs ship these as a 36x36 canvas with the art tucked into the top-left
+     * corner and the rest transparent, the glyph itself measuring somewhere
+     * around 14-17px. The CSS paints them with `contain`, which fits that whole
+     * canvas into the control, so the box and its tick rendered at under half
+     * size and sat up and to the left of centre. Cropping to the drawn area lets
+     * `contain` scale the art itself, which both centres it and fills the
+     * control.
+     *
+     * Both axes here, unlike the stat tiles: a checkbox is a free-standing glyph
+     * rather than one half of a seam, so its vertical padding is as unwanted as
+     * its horizontal.
+     */
+    public function normalizeCheckboxSprites(string $packDir): void
+    {
+        foreach (self::CHECKBOX_SPRITES as $relative) {
+            $path = $packDir.'/'.$relative;
+            if (File::exists($path)) {
+                self::cropPngToOpaqueBox($path, bothAxes: true);
+            }
+        }
+    }
+
+    /**
+     * Crop a PNG to the span of its non-transparent pixels. Horizontal only by
+     * default, keeping full height; pass {@code $bothAxes} to trim top and
+     * bottom too. Idempotent: an image already flush with its art has nothing to
+     * trim. No-op for a fully transparent or unreadable image.
+     */
+    private static function cropPngToOpaqueBox(string $path, bool $bothAxes = false): void
+    {
+        $src = @imagecreatefrompng($path);
+        if ($src === false) {
+            return;
+        }
+
+        try {
+            $width = imagesx($src);
+            $height = imagesy($src);
+            $left = $width;
+            $right = -1;
+            $top = $height;
+            $bottom = -1;
+
+            for ($x = 0; $x < $width; $x++) {
+                for ($y = 0; $y < $height; $y++) {
+                    // GD alpha runs 0 (opaque) .. 127 (fully transparent).
+                    if (((imagecolorat($src, $x, $y) >> 24) & 0x7F) < 127) {
+                        $left = min($left, $x);
+                        $right = max($right, $x);
+                        $top = min($top, $y);
+                        $bottom = max($bottom, $y);
+                    }
+                }
+            }
+
+            if ($right < $left) {
+                return;
+            }
+
+            if (! $bothAxes) {
+                $top = 0;
+                $bottom = $height - 1;
+            }
+
+            if ($left === 0 && $right === $width - 1 && $top === 0 && $bottom === $height - 1) {
+                return;
+            }
+
+            $cropped = imagecreatetruecolor($right - $left + 1, $bottom - $top + 1);
+            imagealphablending($cropped, false);
+            imagesavealpha($cropped, true);
+            imagecopy($cropped, $src, 0, 0, $left, $top, $right - $left + 1, $bottom - $top + 1);
+            imagepng($cropped, $path);
+            imagedestroy($cropped);
+        } finally {
+            imagedestroy($src);
         }
     }
 
@@ -301,7 +443,7 @@ class InstallResourcePack
     }
 
     /**
-     * SPEC §6 — ensure the bundled "Default Vanilla" pack has a DB row so it's
+     * SPEC §6 — ensure the bundled "Vanilla" pack has a DB row so it's
      * always selectable alongside "Default" (no pack). The assets ship with the
      * app, so this builds the row from disk (palette only) with no download.
      * Idempotent and cheap after the first call.
@@ -318,11 +460,11 @@ class InstallResourcePack
             return null;
         }
 
-        $colors = $this->extractPaletteColors($dir);
+        $colors = $this->palette->extractPaletteColors($dir);
 
         $pack = new ResourcePack;
         $pack->name = self::VANILLA_PACK;
-        $pack->alias = 'Default Vanilla';
+        $pack->alias = 'Vanilla';
         $pack->version = 'bundled';
         $pack->author = 'RuneManager';
         $pack->url = '';
@@ -404,13 +546,138 @@ class InstallResourcePack
         File::deleteDirectory($tmpDir);
     }
 
-    private function copyTemplateCss(string $extractTarget): void
+    /**
+     * Re-copy the per-pack CSS template into every already-installed pack.
+     *
+     * {@see copyTemplateCss()} only runs at install time, so editing
+     * resources/css/per-pack.css leaves every installed pack on the copy it was
+     * given when it was fetched. That is true in production too: the deploy
+     * shares public/resource-packs via symlink across releases, so a release
+     * that changes the template ships CSS that never reaches a single pack.
+     *
+     * Packs whose copy already matches are left alone — app.blade.php cache-busts
+     * the <link> on the file's mtime, so rewriting an identical file would expire
+     * every viewer's cached stylesheet for nothing.
+     *
+     * Every installed pack is also re-completed from vanilla, because a template
+     * edit can start referencing a sprite the pack never shipped (and only
+     * borrowed at install time, from the older template's reference list). Without
+     * this the new url() resolves to a 404 and that background layer renders as a
+     * hole instead of falling back to the standard look.
+     *
+     * @return array{updated: list<string>, unchanged: list<string>, filled: int}
+     */
+    public function syncTemplateCss(): array
     {
         $template = resource_path('css/per-pack.css');
         if (! File::exists($template)) {
             throw new RuntimeException('Per-pack CSS template missing at '.$template);
         }
-        File::copy($template, $extractTarget.'/resource-pack.css');
+
+        $updated = [];
+        $unchanged = [];
+        $filled = 0;
+
+        foreach (File::directories(public_path('resource-packs')) as $directory) {
+            $target = $directory.'/resource-pack.css';
+
+            // A directory without the stylesheet was never fully installed;
+            // leave it to the installer rather than half-provisioning it here.
+            if (! File::exists($target)) {
+                continue;
+            }
+
+            $name = basename($directory);
+            $filled += $this->completeFromVanilla($directory);
+
+            // Re-run the sprite normalisers here, not just at install. A pack
+            // fetched before a normaliser existed keeps whatever geometry it
+            // shipped with for good, and in production public/resource-packs is
+            // shared by symlink across releases, so installed packs outlive the
+            // deploy that would have fixed them. All three are idempotent and
+            // no-op on a pack that is already trimmed, so this is safe on every
+            // run — the same reason completeFromVanilla() sits here.
+            $this->normalizeBorderSprites($directory);
+            $this->normalizeStatTileSprites($directory);
+            $this->normalizeCheckboxSprites($directory);
+
+            // Rendered per pack — see renderTemplateFor(). Comparing against the
+            // raw template would rewrite every pack whose face is stretched on
+            // every run, expiring cached stylesheets for no change.
+            $contents = $this->renderTemplateFor($directory);
+
+            if (File::get($target) === $contents) {
+                $unchanged[] = $name;
+
+                continue;
+            }
+
+            File::put($target, $contents);
+            $updated[] = $name;
+        }
+
+        sort($updated);
+        sort($unchanged);
+
+        return ['updated' => $updated, 'unchanged' => $unchanged, 'filled' => $filled];
+    }
+
+    private function copyTemplateCss(string $extractTarget): void
+    {
+        File::put($extractTarget.'/resource-pack.css', $this->renderTemplateFor($extractTarget));
+    }
+
+    /**
+     * A button face wider or taller than this is treated as a whole pre-rendered
+     * face rather than a seamless swatch. The two kinds are far apart in
+     * practice — small tiling swatches run around 12×12, pre-shaded faces
+     * upwards of 56×56 — so nothing sits near the line, and a pack whose face
+     * is a flat colour renders the same under either treatment.
+     */
+    private const TILEABLE_FACE_MAX = 24;
+
+    /**
+     * The per-pack CSS template with its :root block resolved for this pack.
+     *
+     * Only button/middle.png's treatment varies. Packs ship two different kinds
+     * of art under that name: a small seamless swatch meant to tile, and a large
+     * pre-shaded face meant to be drawn once. Tiling the second kind lays hard
+     * vertical seams across a wide button, which is what reads as a coloured
+     * panel inside the frame. Since each pack gets its own copy of the
+     * stylesheet anyway, the choice is baked in here rather than asking CSS to
+     * branch on something it cannot measure.
+     *
+     * @throws RuntimeException when the template is missing
+     */
+    private function renderTemplateFor(string $packDir): string
+    {
+        $template = resource_path('css/per-pack.css');
+        if (! File::exists($template)) {
+            throw new RuntimeException('Per-pack CSS template missing at '.$template);
+        }
+
+        $contents = File::get($template);
+        $face = $packDir.'/button/middle.png';
+
+        if (! File::exists($face)) {
+            return $contents;
+        }
+
+        $size = @getimagesize($face);
+        if ($size === false) {
+            return $contents;
+        }
+
+        [$width, $height] = $size;
+        if ($width <= self::TILEABLE_FACE_MAX && $height <= self::TILEABLE_FACE_MAX) {
+            return $contents;
+        }
+
+        return str_replace(
+            ['--pack-face-repeat: repeat;', '--pack-face-size: auto;'],
+            ['--pack-face-repeat: no-repeat;', '--pack-face-size: 100% 100%;'],
+            $contents,
+        );
     }
 
     /**
@@ -425,7 +692,7 @@ class InstallResourcePack
         if ($name === self::VANILLA_PACK) {
             // Reinstalling the bundled default keeps the identity ensureVanilla()
             // gives it, regardless of what the upstream branch declares.
-            $pack->alias = 'Default Vanilla';
+            $pack->alias = 'Vanilla';
             $pack->version = 'bundled';
             $pack->author = 'RuneManager';
             $pack->url = '';
@@ -441,7 +708,14 @@ class InstallResourcePack
             $pack->author = $properties['author'] ?? 'unknown';
             $pack->url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
             $pack->tags = implode(',', $tags);
-            $pack->dark_mode = in_array('dark', $tags, true);
+            // The sampled artwork decides, not the tag string: a pack author's
+            // "dark" tag is optional and frequently absent from packs whose art
+            // is plainly dark, and the flag picks which theme — and so which
+            // text colour — is painted over that art. Falls back to the tag only
+            // when no palette could be sampled at all.
+            $pack->dark_mode = $colors['background_color'] !== null
+                ? PackPalette::isDark($colors['background_color'])
+                : in_array('dark', $tags, true);
         }
 
         $pack->background_color = $colors['background_color'];
@@ -449,134 +723,6 @@ class InstallResourcePack
         $pack->save();
 
         return $pack;
-    }
-
-    /**
-     * Sample a representative background color from the pack's PNG assets, then
-     * derive an accent by shifting luminance away from it. Tries a handful of
-     * known-large-area assets in order; the first one that loads wins.
-     *
-     * @return array{background_color: ?string, accent_color: ?string}
-     */
-    private function extractPaletteColors(string $packDir): array
-    {
-        if (! extension_loaded('gd')) {
-            return ['background_color' => null, 'accent_color' => null];
-        }
-
-        $candidates = [
-            'dialog/background.png',
-            'chatbox/background.png',
-            'fixed_mode/side_panel_background.png',
-        ];
-
-        foreach ($candidates as $rel) {
-            $path = $packDir.'/'.$rel;
-            if (! is_file($path)) {
-                continue;
-            }
-
-            $bg = $this->averageColor($path);
-            if ($bg === null) {
-                continue;
-            }
-
-            return [
-                'background_color' => $bg,
-                'accent_color' => $this->shiftAgainstLuminance($bg, 0.35),
-            ];
-        }
-
-        return ['background_color' => null, 'accent_color' => null];
-    }
-
-    /**
-     * Average the RGB of a 3×3 grid of interior pixels, skipping near-transparent
-     * ones. Returns a `#rrggbb` hex string, or null when nothing usable was found.
-     */
-    private function averageColor(string $path): ?string
-    {
-        $info = @getimagesize($path);
-        if ($info === false) {
-            return null;
-        }
-
-        $image = @imagecreatefrompng($path);
-        if ($image === false) {
-            return null;
-        }
-
-        try {
-            [$width, $height] = $info;
-            $samples = [];
-
-            for ($i = 1; $i <= 3; $i++) {
-                for ($j = 1; $j <= 3; $j++) {
-                    $x = (int) ($width * $i / 4);
-                    $y = (int) ($height * $j / 4);
-                    $rgba = imagecolorat($image, $x, $y);
-
-                    // GD's alpha runs 0 (opaque) .. 127 (fully transparent).
-                    $alpha = ($rgba >> 24) & 0x7F;
-                    if ($alpha > 64) {
-                        continue;
-                    }
-
-                    $samples[] = [
-                        ($rgba >> 16) & 0xFF,
-                        ($rgba >> 8) & 0xFF,
-                        $rgba & 0xFF,
-                    ];
-                }
-            }
-
-            if ($samples === []) {
-                return null;
-            }
-
-            $count = count($samples);
-            $r = (int) round(array_sum(array_column($samples, 0)) / $count);
-            $g = (int) round(array_sum(array_column($samples, 1)) / $count);
-            $b = (int) round(array_sum(array_column($samples, 2)) / $count);
-
-            return sprintf('#%02x%02x%02x', $r, $g, $b);
-        } finally {
-            imagedestroy($image);
-        }
-    }
-
-    /**
-     * Shift the given hex color toward white if it's dark, toward black if it's
-     * light — perceived-luminance threshold (Rec. 709 coefficients) decides which
-     * direction. `$amount` is a 0..1 fraction of the gap to traverse.
-     */
-    private function shiftAgainstLuminance(string $hex, float $amount): string
-    {
-        $hex = ltrim($hex, '#');
-        $r = hexdec(substr($hex, 0, 2));
-        $g = hexdec(substr($hex, 2, 2));
-        $b = hexdec(substr($hex, 4, 2));
-
-        $luminance = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
-
-        if ($luminance < 128) {
-            // Dark background → lighter accent.
-            $r += (255 - $r) * $amount;
-            $g += (255 - $g) * $amount;
-            $b += (255 - $b) * $amount;
-        } else {
-            // Light background → darker accent.
-            $r *= (1 - $amount);
-            $g *= (1 - $amount);
-            $b *= (1 - $amount);
-        }
-
-        return sprintf(
-            '#%02x%02x%02x',
-            max(0, min(255, (int) round($r))),
-            max(0, min(255, (int) round($g))),
-            max(0, min(255, (int) round($b))),
-        );
     }
 
     /**
@@ -590,15 +736,6 @@ class InstallResourcePack
             return null;
         }
 
-        $values = [];
-        foreach (preg_split('/\r\n|\n|\r/', trim($response->body())) as $line) {
-            if (! str_contains($line, '=')) {
-                continue;
-            }
-            [$key, $value] = explode('=', $line, 2);
-            $values[trim($key)] = trim($value);
-        }
-
-        return $values ?: null;
+        return ResourcePackHub::parseProperties($response->body()) ?: null;
     }
 }

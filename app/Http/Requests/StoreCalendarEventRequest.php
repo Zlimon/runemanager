@@ -29,6 +29,7 @@ class StoreCalendarEventRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:2000'],
             'event_type' => ['required', Rule::enum(CalendarEventType::class)],
             'color' => ['nullable', Rule::in(self::COLORS)],
+            'item_id' => ['nullable', 'integer', 'min:1'],
             'starts_at' => ['required', 'date', 'after_or_equal:today'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
         ];

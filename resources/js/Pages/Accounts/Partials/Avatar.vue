@@ -256,9 +256,9 @@ onBeforeUnmount(disposeScene);
 
         <div v-if="!avatar"
              class="flex h-full flex-col items-center justify-center gap-1 p-3 text-center">
-            <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">No avatar yet</p>
-            <p class="text-xs text-gray-600 dark:text-gray-400">
-                Export your character with the Model-Dumper RuneLite plugin to see it here.
+            <p class="text-sm font-semibold text-base-content/70">No avatar yet</p>
+            <p class="text-xs text-base-content/70">
+                Push your avatar from the RuneLite plugin to see it here.
             </p>
         </div>
 
@@ -268,7 +268,7 @@ onBeforeUnmount(disposeScene);
 
         <div v-else-if="status === 'error'"
              class="flex h-full items-center justify-center p-3 text-center">
-            <p class="text-xs text-gray-600 dark:text-gray-400">Couldn't load this avatar model.</p>
+            <p class="text-xs text-base-content/70">Couldn't load this avatar model.</p>
         </div>
     </div>
 </template>

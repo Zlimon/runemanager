@@ -155,10 +155,10 @@ onBeforeUnmount(() => {
         <div class="py-6">
             <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                 <div class="mb-3 flex items-baseline justify-between">
-                    <h1 class="text-2xl font-bold dark:text-white">Live Map</h1>
+                    <h1 class="text-2xl font-bold text-base-content">Live Map</h1>
                     <span class="text-sm text-base-content/60">{{ onlineCount }} sharing</span>
                 </div>
-                <div ref="mapEl" class="h-[75vh] w-full rounded resource-pack-border"></div>
+                <div ref="mapEl" class="h-[75vh] w-full rounded border pack-accent-border resource-pack-border"></div>
             </div>
         </div>
     </AppLayout>

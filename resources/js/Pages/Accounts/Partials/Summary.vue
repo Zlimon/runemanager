@@ -13,6 +13,12 @@ const props = defineProps({
         type: Object,
         default: () => ({ stale_after_minutes: 60 }),
     },
+    // Rank among this instance's accounts by total XP. Null until the account
+    // has hiscores to rank on.
+    instanceRank: {
+        type: Object,
+        default: null,
+    },
 });
 
 const page = usePage();
@@ -24,7 +30,13 @@ const page = usePage();
             <div class="col-span-1">
                 <InputLabel :value="`${page.props.app.name} rank`" class="text-sm"/>
                 <p class="text-xl font-bold text-base-content">
-                    {{ account.rank.toLocaleString('en-US') }}
+                    <template v-if="instanceRank">
+                        #{{ instanceRank.position.toLocaleString('en-US') }}
+                        <span class="text-sm font-normal text-base-content/60">
+                            of {{ instanceRank.total.toLocaleString('en-US') }}
+                        </span>
+                    </template>
+                    <template v-else>Unranked</template>
                 </p>
             </div>
 
@@ -36,7 +48,7 @@ const page = usePage();
             </div>
         </div>
 
-        <hr class="my-6 border border-beige-700 bg-beige-700">
+        <hr class="my-6 border border-base-300 bg-base-300">
 
         <div class="mb-2 flex items-baseline justify-between">
             <InputLabel class="text-sm" value="Hiscores" />
@@ -66,12 +78,6 @@ const page = usePage();
                 </p>
             </div>
 
-            <div class="col-span-1">
-                <InputLabel class="text-sm" value="Account created"/>
-                <p class="text-xl font-bold text-base-content">
-                    {{ dayjs(account.created_at).format('MMM D, YYYY') }}
-                </p>
-            </div>
         </div>
     </div>
 </template>

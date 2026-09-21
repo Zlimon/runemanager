@@ -5,7 +5,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('downloads Default Vanilla when the files are missing', function () {
+it('downloads Vanilla when the files are missing', function () {
     $this->mock(InstallResourcePack::class, function ($mock) {
         $mock->shouldReceive('isInstalled')->with('sample-vanilla')->once()->andReturn(false);
         $mock->shouldReceive('install')->with('sample-vanilla')->once();

@@ -7,7 +7,10 @@ import Card from "@/Components/Card.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import SelectInput from "@/Components/SelectInput.vue";
+import ResourcePackTile from "@/Components/ResourcePackTile.vue";
 import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
+import ResourcePackConfirmModal from "@/Components/ResourcePackConfirmModal.vue";
 
 const props = defineProps({
     installed: { type: Array, default: () => [] },
@@ -18,7 +21,7 @@ const props = defineProps({
 
 const installer = ref(null);
 
-// Re-download the bundled Default Vanilla pack (the baseline every other pack
+// Re-download the bundled Vanilla pack (the baseline every other pack
 // borrows missing sprites from) when its on-disk assets have gone missing.
 const reinstalling = ref(false);
 const reinstallVanilla = () => {
@@ -62,7 +65,16 @@ const installable = computed(() => {
         .filter((p) => !needle || p.alias.toLowerCase().includes(needle) || p.name.toLowerCase().includes(needle));
 });
 
-const install = (pack) => installer.value?.start(pack);
+// Confirmed first: the tile is the click target and start() posts immediately.
+const pendingInstall = ref(null);
+
+const install = (pack) => { pendingInstall.value = pack; };
+
+const confirmInstall = () => {
+    const pack = pendingInstall.value;
+    pendingInstall.value = null;
+    installer.value?.start(pack);
+};
 </script>
 
 <template>
@@ -75,7 +87,7 @@ const install = (pack) => installer.value?.start(pack);
                      so prompt to restore them. -->
                 <div v-if="vanillaMissing" class="alert alert-warning">
                     <div class="flex-1">
-                        <h3 class="font-bold">Default Vanilla pack is missing</h3>
+                        <h3 class="font-bold">Vanilla pack is missing</h3>
                         <p class="text-sm">
                             Its files aren't on disk. Other packs borrow missing sprites from it, so reinstall it to
                             restore the baseline theme.
@@ -93,11 +105,11 @@ const install = (pack) => installer.value?.start(pack);
                             Installed <span class="text-base-content/50">({{ installed.length }})</span>
                         </h2>
                         <div class="flex items-center gap-2">
-                            <select v-model="sort" class="select select-bordered select-sm">
+                            <SelectInput v-model="sort" class="w-40">
                                 <option value="alias">Name A–Z</option>
                                 <option value="most">Most used</option>
                                 <option value="least">Least used</option>
-                            </select>
+                            </SelectInput>
                             <TextInput v-model="installedSearch" type="search" placeholder="Filter…" class="w-40" />
                         </div>
                     </div>
@@ -147,41 +159,48 @@ const install = (pack) => installer.value?.start(pack);
                 </Card>
 
                 <!-- Browse the community hub -->
-                <Card>
-                    <div class="flex items-baseline justify-between gap-3">
-                        <h2 class="text-lg font-bold">Browse the hub</h2>
-                        <TextInput v-model="browseSearch" type="search" placeholder="Search packs…" class="w-48" />
-                    </div>
-                    <p class="mt-1 text-sm text-base-content/60">
-                        Install a pack from the RuneLite community hub. Installed packs become selectable as the
-                        instance theme and by members on their Appearance page.
-                    </p>
+                <div class="flex items-baseline justify-between gap-3">
+                    <h2 class="text-lg font-bold">Browse the hub</h2>
+                    <TextInput v-model="browseSearch" type="search" placeholder="Search packs…" />
+                </div>
+                <p class="mt-1 text-sm text-base-content/60">
+                    Install a pack from the RuneLite community hub. Installed packs become selectable as the
+                    instance theme and by members on their Appearance page.
+                </p>
 
-                    <div v-if="!hubPacks.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
-                        Couldn't reach the resource-pack hub right now. Try again later.
-                    </div>
+                <div v-if="!hubPacks.length"
+                     class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
+                    Couldn't reach the resource-pack hub right now. Try again later.
+                </div>
 
-                    <div v-else-if="!installable.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
-                        Nothing new to install — every hub pack is already installed.
-                    </div>
+                <div v-else-if="!installable.length"
+                     class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
+                    Nothing new to install — every hub pack is already installed.
+                </div>
 
-                    <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                        <div v-for="pack in installable" :key="pack.name"
-                             class="flex flex-col items-center gap-2 rounded p-3 text-center pack-bg-card resource-pack-border">
-                            <img :src="pack.icon_url" :alt="pack.alias"
-                                 class="h-16 w-16 rounded object-cover [image-rendering:pixelated]"
-                                 loading="lazy" onerror="this.style.visibility='hidden'">
-                            <span class="max-w-full truncate text-sm font-medium" :title="pack.alias">{{ pack.alias }}</span>
-                            <PrimaryButton type="button" class="btn-xs" @click="install(pack)">
+                <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                    <ResourcePackTile v-for="pack in installable" :key="pack.name"
+                                      interactive
+                                      :icon-url="pack.icon_url" :alias="pack.alias"
+                                      @click="install(pack)">
+                        <template #action>
+                            <!-- A label, not a control: the tile itself is the
+                                 button, so this must not be one too, and must not
+                                 swallow the click. -->
+                            <span class="btn btn-primary btn-xs pointer-events-none">
                                 Install
-                            </PrimaryButton>
-                        </div>
-                    </div>
-                </Card>
+                            </span>
+                        </template>
+                    </ResourcePackTile>
+                </div>
             </div>
         </div>
+
+        <ResourcePackConfirmModal :show="pendingInstall !== null"
+                                  :pack="pendingInstall"
+                                  action="install"
+                                  @confirm="confirmInstall"
+                                  @close="pendingInstall = null" />
 
         <ResourcePackInstallModal ref="installer"
                                   :install-url="route('admin.packs.install')"

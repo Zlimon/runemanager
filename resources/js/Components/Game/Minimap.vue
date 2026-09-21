@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
         <div class="minimap-frame h-full w-full rounded-full p-[6px]">
             <div v-if="position" ref="mapEl" class="h-full w-full overflow-hidden rounded-full"></div>
             <div v-else
-                 class="flex h-full w-full items-center justify-center rounded-full bg-base-200 p-3 text-center text-xs text-base-content/60">
+                 class="pack-bg-soft flex h-full w-full items-center justify-center rounded-full p-3 text-center text-xs text-base-content/60">
                 Location not shared
             </div>
         </div>
@@ -97,7 +97,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .minimap-frame {
-    background: var(--pack-accent, #94866d);
+    background: var(--pack-accent, var(--color-base-300));
     box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 </style>

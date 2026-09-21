@@ -58,7 +58,7 @@ return [
     |
     | How many community-hub packs a single member may install. The owner/admin
     | is exempt (instance-managed packs don't count against anyone) and the
-    | bundled Default Vanilla is never counted. Deleting a pack frees a slot.
+    | bundled Vanilla is never counted. Deleting a pack frees a slot.
     |
     */
 

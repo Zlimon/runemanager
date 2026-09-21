@@ -85,7 +85,7 @@ onBeforeUnmount(stop);
 
 <template>
     <div v-if="pack" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-        <div class="w-full max-w-sm rounded-lg p-8 text-center shadow-xl pack-bg-card resource-pack-border">
+        <div class="w-full max-w-sm rounded-lg p-8 text-center shadow-xl pack-bg-card border pack-accent-border resource-pack-border">
             <Loader v-if="!timedOut" bare :loading="true">
                 <h3 class="text-lg font-semibold">Installing {{ pack.alias }}…</h3>
                 <p class="text-sm text-base-content/70">

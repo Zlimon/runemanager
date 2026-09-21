@@ -3,7 +3,30 @@
  * directory on `resourcepack:fetch`, where the relative url(...) paths resolve to that
  * pack's extracted assets. The blade root emits a <link> at
  * /resource-packs/{name}/resource-pack.css when the user has an effective pack.
+ *
+ * The copy is not quite verbatim: the :root block below is rewritten per pack by
+ * InstallResourcePack::renderTemplateFor(). It is the one thing that cannot be
+ * shared, because packs disagree about what button/middle.png is.
  */
+
+/*
+ * How the button face (button/middle.png) fills the centre of the 9-slice.
+ *
+ * The defaults tile it at its native size, which is right for the small
+ * seamless swatch most packs ship — around 12×12, whose grain has to stay
+ * crisp. Packs that instead ship a large pre-shaded face (upwards of 56×56)
+ * are not tileable: repeated across a wide button the joins show
+ * as hard vertical seams, which is exactly what reads as a "panel" sitting
+ * inside the frame. For those, InstallResourcePack rewrites these two values to
+ * stretch the face once across the control instead.
+ *
+ * A pack whose face is a flat colour renders identically either way, so only
+ * the two extremes actually depend on this.
+ */
+:root {
+    --pack-face-repeat: repeat;
+    --pack-face-size: auto;
+}
 
 .dropdown-bank-tag-down-arrow {
     width: 2.5rem;
@@ -45,7 +68,8 @@
     background-image: url('chatbox/sword_pointed_right.png');
 }
 
-.resource-pack-dialog {
+.resource-pack-dialog,
+.vc-popover-content {
     background: url('dialog/iron_rivets_corner_top_left.png') no-repeat,
                 url('dialog/iron_rivets_corner_top_right.png') no-repeat,
                 url('dialog/iron_rivets_corner_bottom_left.png') no-repeat,
@@ -128,31 +152,99 @@
                          bottom -15px left, center;
 }
 
-/* Tabs — Inventory / Looting bag header, Bank per-tab strip, anywhere the UI
+/*
+ * Tabs — Inventory / Looting bag header, Bank per-tab strip, anywhere the UI
  * uses a labelled tab. Add `.is-active` (or `.tab-active`) for the selected tab.
+ *
+ * Built from the same iron-rivets family as .resource-pack-dialog-tabbed, the
+ * panel these tabs sit on, so a tab and its card read as one component. They
+ * used to paint bank/tab.png — a 41×40 in-game bank tab stretched to
+ * `100% 100%`, which distorted the sprite and made the strip look like a
+ * foreign control glued to the card.
+ *
+ * The selected tab drops its bottom line and opens straight into the panel
+ * below (which in turn drops its own top edge); an unselected tab keeps the
+ * bottom line and reads as a closed box.
+ *
+ * Only the two TOP corner plates are painted. Those sprites are 25×30 of solid
+ * art, so a second pair pinned to the bottom of a 40px tab would overlap the
+ * first by 20px and swallow the fill; the edge lines close the bottom instead.
+ *
+ * Offsets follow the .resource-pack-dialog convention — each edge sprite
+ * carries its border line ~15px in from its own top-left, so every edge is
+ * nudged 15px outward to land that line on the tab's edge, and the two side
+ * edges start 10px down to clear the corner plates.
+ *
+ * background-image longhand rather than the `background:` shorthand: the
+ * shorthand would reset background-color, which is set by the two-class
+ * `.tab.resource-pack-tab` rule below for reasons documented there.
  */
 .resource-pack-tab {
-    background: url('bank/tab.png') no-repeat;
-    background-size: 100% 100%;
-    color: inherit;
+    /*
+     * Two of the seven layers are switched off per state rather than restated
+     * as a second full list. `none` is a valid background-image layer, so it
+     * holds its slot and keeps background-repeat / background-position aligned
+     * with the images either side of it — which a shorter list would not.
+     */
+    --tab-corner-left: url('dialog/iron_rivets_corner_top_left.png');
+    --tab-edge-left: url('dialog/iron_rivets_vertical.png');
+    --tab-edge-bottom: url('dialog/iron_rivets_bottom.png');
+    background-image: var(--tab-corner-left),
+                      url('dialog/iron_rivets_corner_top_right.png'),
+                      url('dialog/iron_rivets_edge_top.png'),
+                      var(--tab-edge-left),
+                      url('dialog/iron_rivets_edge_right.png'),
+                      var(--tab-edge-bottom),
+                      url('dialog/background.png');
+    background-repeat: no-repeat, no-repeat, repeat-x, repeat-y, repeat-y,
+                       repeat-x, repeat;
+    background-position: top left, top right,
+                         top -15px left,
+                         left -15px top 10px, right -15px top 10px,
+                         bottom -15px left, center;
     border: 0 !important;
 }
-.resource-pack-tab:hover {
-    background-image: url('bank/tab_hovered.png');
+
+/*
+ * Adjacent tabs shared a seam of two border lines — one tab's right edge
+ * against the next tab's left edge. Every tab after the first drops its left
+ * edge and lets its neighbour's right edge be the single divider; the first
+ * tab keeps its own so the strip still closes on the left.
+ *
+ * Matched on the adjacent sibling rather than :not(:first-child) because the
+ * tab strip is not guaranteed to contain only tabs — DaisyUI's tabs-lifted
+ * markup and any wrapper element would both break a positional selector.
+ */
+.resource-pack-tab + .resource-pack-tab {
+    --tab-corner-left: none;
+    --tab-edge-left: none;
 }
 .resource-pack-tab.is-active,
 .resource-pack-tab.tab-active {
-    background-image: url('bank/tab_selected.png');
+    /* Drop the bottom line so the selected tab runs into the panel below. */
+    --tab-edge-bottom: none;
+}
+/* Brighten the texture for hover feedback instead of swapping sprites (same
+   approach, and the same reasoning, as .btn:hover). The selected tab is left
+   out — brightening it would break its continuity with the panel below. */
+.resource-pack-tab:not(.is-active):not(.tab-active):hover {
+    filter: brightness(1.15);
 }
 
 /*
  * Small textured cell — skill stat tiles on Account/Show, generic chips.
  *
- * Each in-game stat tile is a 72×36 pair built from two 36×36 self-contained
- * halves (rounded on the outer side, straight on the inner). They join cleanly
- * only at their natural 36px width; stretching distorts the rounded corner.
- * Cells are pinned to w-[72px] in the Vue so the two halves meet exactly in
- * the middle.
+ * Each in-game stat tile is a pair of self-contained halves, rounded on the
+ * outer side and straight on the inner, meeting in the middle of the cell.
+ *
+ * Each half is painted at 50% of the cell rather than a fixed 36px. Packs
+ * disagree about the canvas they ship — 35px or 36px, with the ~31px of art
+ * padded differently inside it — one pack's left half starts two pixels in,
+ * another's four. Pinned to opposite edges at a fixed width, those transparent
+ * margins met in the middle as a gap with the card showing through.
+ * InstallResourcePack::normalizeStatTileSprites() now crops each half to its
+ * opaque box at install, so 50% lands the two edges exactly on the centre line
+ * whatever the pack shipped.
  *
  * The `box !bg-base-200` no-pack fallback on the cell gets overridden to
  * transparent here so it doesn't paint a brown rectangle behind the texture.
@@ -162,10 +254,10 @@
     background-image: url('stats/tile_half_left.png'), url('stats/tile_half_right.png');
     background-repeat: no-repeat, no-repeat;
     background-position: left center, right center;
-    background-size: 36px 100%, 36px 100%;
+    background-size: 50% 100%, 50% 100%;
     background-color: transparent !important;
     border: 0 !important;
-    color: theme(colors.white) !important;
+    color: #FFFFFF !important;
 }
 .resource-pack-box:hover {
     background-image: url('stats/tile_half_left_selected.png'),
@@ -173,23 +265,32 @@
 }
 
 /*
- * Tab text colour follows the active state rather than the global dark-mode
- * flag — inactive tabs paint the lighter bank/tab.png texture (typically pink
- * or beige in the packs) where dark text reads cleanly, active tabs use the
- * darker bank/tab_selected.png where white text reads cleanly. Overrides
- * `.tab @apply text-gray-900 dark:text-white` from app.css with !important.
+ * Tab label colour.
+ *
+ * It used to follow the active state: the unselected tab painted the lighter
+ * bank/tab.png (pink or beige in most packs) and took near-black text, the
+ * selected tab took the darker bank/tab_selected.png and white. Both states now
+ * paint the same dialog/background.png as the panel, so that split no longer
+ * describes anything — and on a dark pack it left black text on a dark fill.
+ *
+ * One light label serves both states: every installed pack's dialog background
+ * measures dark (relative luminance from effectively nil up to about .19 on
+ * the lightest), so white clears 4.3:1 on the worst of them and 8:1 or better
+ * on the rest. The hard shadow is the same treatment .btn and
+ * .resource-pack-badge already use over these textures. The colour cannot key
+ * off the dark-mode flag either — the texture is the pack's, not the theme's.
+ *
+ * Two-class specificity is still required, for the reason it always was: the
+ * selected tab is styled by `.tab.tab-active` in app.css (two classes, with its
+ * own bg-base-200 and text-base-content), so a single-class rule here would
+ * lose to it. `.tab.resource-pack-tab` ties on specificity and wins on order.
+ * background-color is cleared here rather than in the frame rule above, which
+ * uses background-image longhand precisely so it doesn't touch the colour.
  */
-/* Two-class specificity to beat Tailwind's single-class `.bg-base-200`
- * (also !important) that the Vue template applies to the active tab as a
- * no-pack fallback. Both rules have !important, so cascade falls back to
- * specificity — `.tab.resource-pack-tab` (2 classes) wins. */
 .tab.resource-pack-tab {
     background-color: transparent !important;
-    color: theme(colors.gray-900) !important;
-}
-.tab.resource-pack-tab.is-active,
-.tab.resource-pack-tab.tab-active {
-    color: theme(colors.white) !important;
+    color: #FFFFFF !important;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.85);
 }
 
 /*
@@ -201,8 +302,27 @@
  */
 .resource-pack-dialog,
 .resource-pack-dialog-tabbed,
-.resource-pack-border {
+.resource-pack-border,
+.vc-popover-content {
     border: 0 !important;
+}
+
+/* A card carries both a CSS border (for the untextured interface) and this
+ * sprite frame. When the pack stylesheet is loaded the sprite IS the edge, so
+ * the CSS line is suppressed rather than drawn on top of it. */
+.resource-pack-border { border-color: transparent !important; }
+
+/*
+ * A table's rows — zebra striping especially — paint their own background across
+ * the full width of the panel, which covers the frame sprites drawn at the left
+ * and right edges. The border then appears to break on alternating rows. Inset
+ * the panel's content so rows stop short of the frame instead of painting over
+ * it; 14px clears the sprite's ~13px border line.
+ */
+.resource-pack-border:has(> table),
+.resource-pack-dialog:has(> table),
+.resource-pack-dialog-tabbed:has(> table) {
+    padding-inline: 14px;
 }
 
 /*
@@ -212,8 +332,18 @@
  * runemanager / runemanager-dark themes remain the no-pack fallback.
  */
 
-/* Buttons — 9-slice metal frame from button/, dialog fill in the centre;
- * brightened for feedback on hover/focus/active. */
+/*
+ * Buttons — the pack's 9-slice: four corners, four edges, and button/middle.png
+ * as the face, brightened for feedback on hover/focus/active.
+ *
+ * Every pack also ships button/regular_large.png, a complete pre-rendered
+ * button. It is the reference this stack is checked against (see /styleguide),
+ * and in all of them the button has a face — leaving the centre unpainted shows
+ * the page surface through the control, which is what dropping it looked like.
+ *
+ * The `background:` shorthand keeps background-color transparent, so DaisyUI's
+ * variant fill (btn-primary, btn-error…) can't bleed through underneath.
+ */
 .btn {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -223,9 +353,11 @@
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
                 url('button/edge_bottom.png') repeat-x,
-                url('dialog/background.png');
+                url('button/middle.png') var(--pack-face-repeat);
     background-position: top left, top right, bottom left, bottom right,
                          top, left, right, bottom, center;
+    background-size: auto, auto, auto, auto, auto, auto, auto, auto,
+                     var(--pack-face-size);
     border: 0 !important;
     box-shadow: none !important;
     /* The DaisyUI variant's content colour (e.g. btn-error's near-black) is
@@ -239,11 +371,11 @@
 .btn:focus-visible,
 .btn:active,
 .btn.btn-active {
-    /* Keep the pack's own button face + frame and just brighten for feedback.
-     * Swapping to the _selected sprites + background_brighter.png shifted the
-     * hue on many packs (a brown button flashing pink or red), which read as a
-     * different button rather than a hover state. background-color is forced
-     * transparent so DaisyUI's own hover colour can't bleed through. */
+    /* Keep the pack's own frame and face and just brighten for feedback. Swapping
+     * to the _selected sprites shifted the hue on many packs (a brown button
+     * flashing pink or red), which read as a different button rather than a hover
+     * state. Restating the stack keeps background-color transparent here too, so
+     * DaisyUI's own hover colour can't bleed through. */
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
                 url('button/corner_bottom_left.png') no-repeat,
@@ -252,14 +384,16 @@
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
                 url('button/edge_bottom.png') repeat-x,
-                url('dialog/background.png');
+                url('button/middle.png') var(--pack-face-repeat);
     background-position: top left, top right, bottom left, bottom right,
                          top, left, right, bottom, center;
+    background-size: auto, auto, auto, auto, auto, auto, auto, auto,
+                     var(--pack-face-size);
     filter: brightness(1.12);
 }
 
-/* Badges — reuse the metal button face (cream text reads on every pack's button
- * fill) so small labels like event types match the rest of the UI. */
+/* Badges — reuse the whole button 9-slice, face included, so small labels like
+ * event types match the rest of the UI. */
 .resource-pack-badge {
     background: url('button/corner_top_left.png') no-repeat,
                 url('button/corner_top_right.png') no-repeat,
@@ -269,21 +403,36 @@
                 url('button/edge_left.png') repeat-y,
                 url('button/edge_right.png') repeat-y,
                 url('button/edge_bottom.png') repeat-x,
-                url('dialog/background.png');
+                url('button/middle.png') var(--pack-face-repeat);
     background-position: top left, top right, bottom left, bottom right,
                          top, left, right, bottom, center;
+    background-size: auto, auto, auto, auto, auto, auto, auto, auto,
+                     var(--pack-face-size);
     border: 0 !important;
     color: #f0e6d2 !important;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.85);
 }
 
-/* Checkboxes — swap DaisyUI's drawn box for the in-game checkbox sprites. */
+/*
+ * Checkboxes — swap DaisyUI's drawn box for the in-game checkbox sprites.
+ *
+ * `contain` scales the sprite's own drawn area, which
+ * InstallResourcePack::normalizeCheckboxSprites() has trimmed to the pixels the
+ * pack actually paints. Packs ship these as a 36x36 canvas with the glyph in the
+ * top-left corner, so before that trim `contain` fitted all that empty space
+ * into the control and the box rendered at under half size, up and to the left.
+ *
+ * image-rendering: pixelated because the trimmed glyph is 14-17px of pixel art
+ * being scaled up to the control; smooth interpolation turns its one-pixel
+ * outline into a grey smear.
+ */
 .checkbox {
     -webkit-appearance: none;
     appearance: none;
     background: url('options/checkbox_empty.png') center / contain no-repeat;
     border: 0 !important;
     box-shadow: none !important;
+    image-rendering: pixelated;
 }
 .checkbox:checked {
     background: url('options/checkbox_checked_red.png') center / contain no-repeat;
@@ -291,10 +440,13 @@
 
 /* Text fields — no dedicated in-game sprite, so just tint the border with the
  * pack accent and let the base theme handle the fill (keeps text legible and
- * preserves the select chevron). */
+ * preserves the select chevron). .file-input rides along: DaisyUI builds it
+ * from the same bordered-field recipe, so a pack that skinned every other field
+ * and left this one on the theme's grey was the only tell. */
 .input,
 .select,
-.textarea {
+.textarea,
+.file-input {
     border-color: var(--pack-accent, #94866d) !important;
 }
 
@@ -501,4 +653,30 @@
 
 .status-orb--spec .status-orb__sphere {
     background-image: url('other/minimap_orb_special_icon.png'), url('other/minimap_orb_special.png');
+}
+
+/*
+ * v-calendar paints the day popover with its own chrome — a slate fill, a 1px
+ * border and a caret — which ignores the pack entirely. It takes the dialog
+ * frame above; the rest is handled here.
+ *
+ * The fill has to be cleared explicitly: v-calendar sets background-color on
+ * a later-loading stylesheet, and the frame above only sets background-image
+ * layers, so without this the slate would sit on top of the parchment.
+ *
+ * Padding clears the frame — the rivets read ~14px in from the panel edge, and
+ * the component's own 4px would put the text on top of them.
+ *
+ * The caret is dropped rather than restyled. A sprite frame can't grow an
+ * arrow, and v-calendar draws the caret in its own colours, so it reads as a
+ * foreign notch punched out of the riveted edge.
+ */
+.vc-popover-content {
+    background-color: transparent !important;
+    padding: 14px !important;
+    border-radius: 0 !important;
+}
+
+.vc-popover-caret {
+    display: none !important;
 }

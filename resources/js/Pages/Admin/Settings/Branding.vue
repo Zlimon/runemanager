@@ -35,7 +35,7 @@ const submit = () => {
                     <img v-if="props.branding.logo_url" :src="props.branding.logo_url" alt="Current logo"
                          class="mt-1 h-12 object-contain">
                     <input type="file" accept="image/*"
-                           class="file-input file-input-bordered mt-1 block w-full"
+                           class="file-input file-input-bordered mt-1 w-full"
                            @input="form.logo = $event.target.files[0]">
                     <label v-if="props.branding.logo_url" class="mt-1 flex items-center gap-2 text-xs text-base-content/70">
                         <input type="checkbox" v-model="form.remove_logo" class="checkbox checkbox-xs"> Remove current logo
@@ -48,7 +48,7 @@ const submit = () => {
                     <img v-if="props.branding.banner_url" :src="props.branding.banner_url" alt="Current banner"
                          class="mt-1 h-24 w-full rounded object-cover">
                     <input type="file" accept="image/*"
-                           class="file-input file-input-bordered mt-1 block w-full"
+                           class="file-input file-input-bordered mt-1 w-full"
                            @input="form.banner = $event.target.files[0]">
                     <label v-if="props.branding.banner_url" class="mt-1 flex items-center gap-2 text-xs text-base-content/70">
                         <input type="checkbox" v-model="form.remove_banner" class="checkbox checkbox-xs"> Remove current banner

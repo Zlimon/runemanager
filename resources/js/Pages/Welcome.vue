@@ -4,9 +4,12 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import Card from '@/Components/Card.vue';
 import DarkModeToggle from '@/Components/DarkModeToggle.vue';
+import GuestPackPicker from '@/Components/GuestPackPicker.vue';
 import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
+import { useEventColor } from '@/composables/useEventColor';
 
 const { packIcon } = useResourcePackIcon();
+const { eventHex } = useEventColor();
 
 defineProps({
     canLogin: { type: Boolean, default: false },
@@ -33,40 +36,41 @@ const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
 
     <div class="min-h-screen pack-bg text-base-content">
         <!-- Guest top bar -->
-        <header class="bg-beige-600 dark:bg-gray-900">
+        <header class="bg-base-300">
             <div class="mx-auto flex max-w-screen-xl items-center justify-between p-4">
                 <Link :href="route('home')" class="flex items-center space-x-3">
                     <img v-if="page.props.instance?.logo_url" :src="page.props.instance.logo_url"
                          :alt="instanceName" class="h-12 w-auto object-contain md:h-16">
-                    <span v-else class="self-center whitespace-nowrap text-4xl font-bold dark:text-white md:text-5xl"
+                    <span v-else class="self-center whitespace-nowrap text-4xl font-bold text-base-content md:text-5xl"
                           style="font-family: 'runescape-smooth', sans-serif">
                         {{ instanceName }}
                     </span>
                 </Link>
                 <div class="flex items-center gap-2">
+                    <GuestPackPicker />
                     <DarkModeToggle />
-                    <Link v-if="canLogin" :href="route('login')" class="btn btn-sm">Log in</Link>
-                    <Link v-if="canRegister" :href="route('register')" class="btn btn-sm btn-neutral">Register</Link>
+                    <Link v-if="canLogin" :href="route('login')" class="btn btn-sm btn-outline">Log in</Link>
+                    <Link v-if="canRegister" :href="route('register')" class="btn btn-sm btn-primary">Register</Link>
                 </div>
             </div>
         </header>
 
         <!-- Hero -->
-        <section class="bg-center bg-cover bg-no-repeat bg-gray-700 bg-blend-multiply"
+        <section class="bg-center bg-cover bg-no-repeat bg-neutral bg-blend-multiply"
                  :style="bannerStyle">
             <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-40">
-                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
+                <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-neutral-content md:text-5xl lg:text-6xl">
                     Welcome to {{ instanceName }}
                 </h1>
-                <p class="mb-8 whitespace-pre-line text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">
+                <p class="mb-8 whitespace-pre-line text-lg font-normal text-neutral-content/80 lg:text-xl sm:px-16 lg:px-48">
                     {{ description }}
                 </p>
                 <div v-if="canLogin || canRegister"
                      class="flex flex-col gap-4 sm:flex-row sm:justify-center">
-                    <Link v-if="canRegister" :href="route('register')" class="btn btn-neutral">
+                    <Link v-if="canRegister" :href="route('register')" class="btn btn-primary">
                         Get started
                     </Link>
-                    <Link v-if="canLogin" :href="route('login')" class="btn">
+                    <Link v-if="canLogin" :href="route('login')" class="btn btn-outline">
                         Log in
                     </Link>
                 </div>
@@ -103,7 +107,7 @@ const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
                                 <component :is="anonymized ? 'div' : Link"
                                            :href="anonymized ? undefined : route('accounts.show', { account: account.username })"
                                            class="flex items-center gap-3 rounded px-2 py-2"
-                                           :class="anonymized ? '' : 'hover:bg-base-300/40'">
+                                           :class="anonymized ? '' : 'pack-row hover:bg-base-300/40'">
                                     <span class="w-5 text-center text-sm font-bold text-base-content/50">{{ index + 1 }}</span>
                                     <img v-if="account.account_type && account.account_type !== 'normal'"
                                          :src="`/images/${account.account_type}.png`"
@@ -127,7 +131,7 @@ const eventDate = (iso) => dayjs(iso).format('ddd, MMM D · h:mm A');
                             <Card padding="p-3">
                                 <div class="flex items-start gap-2">
                                     <span class="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                                          :style="{ backgroundColor: event.color || '#DC8850' }"></span>
+                                          :style="{ backgroundColor: eventHex(event) }"></span>
                                     <div class="min-w-0">
                                         <p class="truncate font-semibold">{{ event.title }}</p>
                                         <p class="text-xs text-base-content/60">{{ eventDate(event.starts_at) }}</p>

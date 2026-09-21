@@ -18,6 +18,6 @@ defineProps({
         </li>
     </ul>
     <div v-else class="flex h-96 items-center justify-center">
-        <p class="text-gray-700 dark:text-gray-200">No looting bag found for this account</p>
+        <p class="text-base-content/70">No looting bag found for this account</p>
     </div>
 </template>

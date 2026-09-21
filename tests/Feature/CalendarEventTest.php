@@ -1,11 +1,80 @@
 <?php
 
+use App\Helpers\SettingHelper;
+use App\Http\Resources\CalendarEventResource;
 use App\Models\CalendarEvent;
+use App\Models\Item;
 use App\Models\User;
+use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
+use MongoDB\Driver\Monitoring\CommandFailedEvent;
+use MongoDB\Driver\Monitoring\CommandStartedEvent;
+use MongoDB\Driver\Monitoring\CommandSubscriber;
+use MongoDB\Driver\Monitoring\CommandSucceededEvent;
 
 uses(RefreshDatabase::class);
+
+/*
+ * mongodb-static holds the real item catalogue and is shared + read-only in
+ * tests (see phpunit.xml). The item-icon cases below have to seed it, so they
+ * point the connection at a scratch database first — the same trick
+ * ItemsSyncTest uses. Called per test rather than in a global beforeEach so the
+ * rest of this file keeps running without Mongo.
+ */
+function useScratchItemCatalogue(): void
+{
+    config([
+        'database.connections.mongodb-static.dsn' => config('database.connections.mongodb.dsn'),
+        'database.connections.mongodb-static.database' => 'gamedata_calendar_testing',
+    ]);
+    DB::purge('mongodb-static');
+    Item::query()->delete();
+}
+
+/*
+ * Seed through the raw collection — Eloquent inserts alias `id` to `_id`,
+ * losing the string OSRS id field the lookups match on.
+ */
+function seedCalendarItem(array $document): void
+{
+    (new Item)->getConnection()
+        ->getDatabase()
+        ->selectCollection((new Item)->getTable())
+        ->insertOne($document);
+}
+
+/** Count Mongo `aggregate` commands issued while running $callback. */
+function countItemAggregations(Closure $callback): int
+{
+    $subscriber = new class implements CommandSubscriber
+    {
+        public int $aggregates = 0;
+
+        public function commandStarted(CommandStartedEvent $event): void
+        {
+            if ($event->getCommandName() === 'aggregate') {
+                $this->aggregates++;
+            }
+        }
+
+        public function commandSucceeded(CommandSucceededEvent $event): void {}
+
+        public function commandFailed(CommandFailedEvent $event): void {}
+    };
+
+    MongoDB\Driver\Monitoring\addSubscriber($subscriber);
+
+    try {
+        $callback();
+    } finally {
+        MongoDB\Driver\Monitoring\removeSubscriber($subscriber);
+    }
+
+    return $subscriber->aggregates;
+}
 
 it('renders the calendar index publicly with an upcoming widget', function () {
     $author = User::factory()->withPersonalTeam()->create();
@@ -116,12 +185,24 @@ it('lets the creator delete their own event', function () {
     expect(CalendarEvent::count())->toBe(0);
 });
 
-it('forbids non-creators from deleting other users events', function () {
-    $owner = adminUser();
-    $intruder = adminUser();
-    $event = CalendarEvent::factory()->for($owner)->create();
+it('lets an admin delete another members event', function () {
+    $author = adminUser();
+    $admin = adminUser();
+    $event = CalendarEvent::factory()->for($author)->create();
 
-    $this->actingAs($intruder)
+    $this->actingAs($admin)
+        ->delete(route('calendar.destroy', $event))
+        ->assertRedirect(route('calendar.index'));
+
+    expect(CalendarEvent::count())->toBe(0);
+});
+
+it('forbids a member without manage calendar from deleting someone elses event', function () {
+    $author = adminUser();
+    $member = adminUser(Roles::USER);
+    $event = CalendarEvent::factory()->for($author)->create();
+
+    $this->actingAs($member)
         ->delete(route('calendar.destroy', $event))
         ->assertForbidden();
 
@@ -163,4 +244,206 @@ it('stores the chosen colour and rejects an unknown one', function () {
         ])
         ->assertStatus(422)
         ->assertJsonValidationErrors('color');
+});
+
+it('lets an admin update another members event', function () {
+    $author = adminUser();
+    $admin = adminUser();
+    $event = CalendarEvent::factory()->for($author)->create(['title' => 'Old title']);
+
+    $this->actingAs($admin)
+        ->put(route('calendar.update', $event), [
+            'title' => 'Rescheduled raid',
+            'event_type' => 'pvm_mass',
+            'color' => 'teal',
+            'starts_at' => now()->addDays(3)->toIso8601String(),
+        ])
+        ->assertRedirect(route('calendar.index'));
+
+    expect($event->fresh()->title)->toBe('Rescheduled raid')
+        ->and($event->fresh()->color)->toBe('teal');
+});
+
+it('forbids a member without manage calendar from updating an event', function () {
+    $author = adminUser();
+    $member = adminUser(Roles::USER);
+    $event = CalendarEvent::factory()->for($author)->create(['title' => 'Untouched']);
+
+    $this->actingAs($member)
+        ->put(route('calendar.update', $event), [
+            'title' => 'Hijacked',
+            'event_type' => 'custom',
+            'starts_at' => now()->addDay()->toIso8601String(),
+        ])
+        ->assertForbidden();
+
+    expect($event->fresh()->title)->toBe('Untouched');
+});
+
+it('allows editing an event that has already started', function () {
+    $admin = adminUser();
+    $event = CalendarEvent::factory()->for($admin)->past()->create();
+
+    $this->actingAs($admin)
+        ->put(route('calendar.update', $event), [
+            'title' => 'Corrected after the fact',
+            'event_type' => 'custom',
+            'starts_at' => now()->subDays(2)->toIso8601String(),
+        ])
+        ->assertRedirect(route('calendar.index'));
+
+    expect($event->fresh()->title)->toBe('Corrected after the fact');
+});
+
+it('resolves update/delete permissions server-side per viewer', function () {
+    $author = adminUser();
+    $admin = adminUser();
+    $member = adminUser(Roles::USER);
+    CalendarEvent::factory()->for($author)->create(['starts_at' => now()->addDay()]);
+
+    $assertCan = function (?User $user, bool $expected) {
+        $request = $user ? $this->actingAs($user) : $this;
+
+        $request->get(route('calendar.index'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('events.0.can.update', $expected)
+                ->where('events.0.can.delete', $expected),
+            );
+    };
+
+    $assertCan($author, true);   // creator
+    $assertCan($admin, true);    // holds `manage calendar`
+    $assertCan($member, false);  // plain member
+    $assertCan(null, false);     // guest
+});
+
+it('marks events highlighted when their colour is in the instance list', function () {
+    SettingHelper::setSetting('calendar_highlight_colors', json_encode(['red', 'orange']));
+
+    $author = adminUser();
+    CalendarEvent::factory()->for($author)->create(['color' => 'red', 'starts_at' => now()->addDay()]);
+    CalendarEvent::factory()->for($author)->create(['color' => 'teal', 'starts_at' => now()->addDays(2)]);
+    CalendarEvent::factory()->for($author)->create(['color' => null, 'starts_at' => now()->addDays(3)]);
+
+    $this->get(route('calendar.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('events.0.highlighted', true)
+            ->where('events.1.highlighted', false)
+            ->where('events.2.highlighted', false)
+            ->where('highlightColors', ['red', 'orange']),
+        );
+});
+
+it('falls back to a default highlight palette but honours an explicit empty list', function () {
+    expect(Instance::calendarHighlightColors())->toBe(['red']);
+
+    SettingHelper::setSetting('calendar_highlight_colors', json_encode([]));
+    expect(Instance::calendarHighlightColors())->toBe([]);
+
+    SettingHelper::setSetting('calendar_highlight_colors', 'not json');
+    expect(Instance::calendarHighlightColors())->toBe(['red']);
+});
+
+it('hydrates the events item icon from the static catalogue', function () {
+    useScratchItemCatalogue();
+    seedCalendarItem(['id' => '4151', 'name' => 'Abyssal whip', 'icon' => 'QUJD']);
+
+    $author = adminUser();
+    CalendarEvent::factory()->for($author)->create([
+        'item_id' => 4151,
+        'starts_at' => now()->addDay(),
+    ]);
+    CalendarEvent::factory()->for($author)->create([
+        'item_id' => null,
+        'starts_at' => now()->addDays(2),
+    ]);
+
+    $this->get(route('calendar.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('events.0.item.id', 4151)
+            ->where('events.0.item.name', 'Abyssal whip')
+            ->where('events.0.item.icon', 'QUJD')
+            ->where('events.1.item', null),
+        );
+});
+
+it('resolves every events item in a single mongo query', function () {
+    useScratchItemCatalogue();
+    foreach (range(1, 12) as $id) {
+        seedCalendarItem(['id' => (string) $id, 'name' => 'Item '.$id, 'icon' => 'QUJD']);
+    }
+
+    $author = adminUser();
+    foreach (range(1, 12) as $id) {
+        CalendarEvent::factory()->for($author)->create([
+            'item_id' => $id,
+            'starts_at' => now()->addDays($id),
+        ]);
+    }
+
+    $events = CalendarEvent::query()->orderBy('starts_at')->get();
+
+    $resolved = null;
+    $aggregations = countItemAggregations(function () use ($events, &$resolved) {
+        $resolved = CalendarEventResource::collection($events)->resolve();
+    });
+
+    // One aggregation for the whole 42-day grid, not one per event.
+    expect($aggregations)->toBe(1)
+        ->and($resolved)->toHaveCount(12)
+        ->and($resolved[0]['item']['name'])->toBe('Item 1')
+        ->and($resolved[11]['item']['name'])->toBe('Item 12');
+});
+
+it('does not query mongo at all when no event carries an item', function () {
+    useScratchItemCatalogue();
+
+    $author = adminUser();
+    CalendarEvent::factory()->count(3)->for($author)->create(['item_id' => null]);
+
+    $aggregations = countItemAggregations(function () {
+        CalendarEventResource::collection(CalendarEvent::query()->get())->resolve();
+    });
+
+    expect($aggregations)->toBe(0);
+});
+
+it('searches the item catalogue for the picker', function () {
+    useScratchItemCatalogue();
+    seedCalendarItem(['id' => '4151', 'name' => 'Abyssal whip', 'icon' => 'QUJD']);
+    seedCalendarItem(['id' => '4152', 'name' => 'Abyssal dagger', 'icon' => 'REVG']);
+    seedCalendarItem(['id' => '4153', 'name' => 'Dragon scimitar', 'icon' => 'R0hJ']);
+    // Noted/placeholder duplicates must not clutter the picker.
+    seedCalendarItem(['id' => '4154', 'name' => 'Abyssal whip', 'icon' => 'QUJD', 'noted' => true]);
+
+    $this->actingAs(adminUser())
+        ->getJson(route('items.search', ['q' => 'abyssal']))
+        ->assertOk()
+        ->assertJsonCount(2)
+        ->assertJson([
+            ['id' => 4152, 'name' => 'Abyssal dagger', 'icon' => 'REVG'],
+            ['id' => 4151, 'name' => 'Abyssal whip', 'icon' => 'QUJD'],
+        ]);
+});
+
+it('caps item search results and returns nothing for a blank term', function () {
+    useScratchItemCatalogue();
+    foreach (range(1, 25) as $id) {
+        seedCalendarItem(['id' => (string) $id, 'name' => 'Rune bar '.$id]);
+    }
+
+    $this->actingAs(adminUser())
+        ->getJson(route('items.search', ['q' => 'rune bar']))
+        ->assertOk()
+        ->assertJsonCount(20);
+
+    $this->actingAs(adminUser())
+        ->getJson(route('items.search', ['q' => '']))
+        ->assertOk()
+        ->assertJsonCount(0);
+});
+
+it('requires authentication to search items', function () {
+    $this->get(route('items.search', ['q' => 'whip']))
+        ->assertRedirect(route('login'));
 });

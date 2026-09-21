@@ -16,7 +16,7 @@ const { packIcon } = useResourcePackIcon();
  * The OSRS equipment widget is laid out as a fixed 5-row grid. Each pack ships
  * one slot_tile.png that paints the textured cell background and a
  * slot_{name}.png "ghost" for every empty slot; packIcon falls back to the
- * bundled Default Vanilla pack when no pack is applied, so slots always render.
+ * bundled Vanilla pack when no pack is applied, so slots always render.
  * We render per-slot so an equipped item swaps the empty ghost out cleanly.
  */
 const rows = [

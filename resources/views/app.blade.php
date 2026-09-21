@@ -8,11 +8,16 @@
     // Same precedence as the Inertia share: user toggle > guest cookie >
     // instance default > pack flag (see App\Support\Instance::resolveDarkMode).
     $darkMode = \App\Support\Instance::resolveDarkMode($user, $pack);
+    // Vanilla gets its own fixed DaisyUI theme; everything else rides on
+    // the light/dark base pair (see App\Support\Instance::themeFor).
+    $theme = \App\Support\Instance::themeFor($pack, $darkMode);
 @endphp
 <!DOCTYPE html>
+{{-- `has-pack` gates the pack-derived surface colours in app.css, so the
+     untextured interface resolves straight to DaisyUI tokens instead. --}}
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-      class="{{ $darkMode ? 'dark' : '' }}"
-      data-theme="{{ $darkMode ? 'runemanager-dark' : 'runemanager' }}">
+      class="{{ $darkMode ? 'dark' : '' }} {{ $pack ? 'has-pack' : 'no-pack' }}"
+      data-theme="{{ $theme }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,6 +45,7 @@
                     :root {
                         @if ($pack->background_color) --pack-bg: {{ $pack->background_color }}; @endif
                         @if ($pack->accent_color) --pack-accent: {{ $pack->accent_color }}; @endif
+                        @if ($pack->accent_ui_color) --pack-accent-ui: {{ $pack->accent_ui_color }}; @endif
                     }
                 </style>
             @endif

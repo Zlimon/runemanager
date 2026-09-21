@@ -45,15 +45,15 @@ Remaining feature work is tracked in `SPEC.md`.
   onto those class names.
 - Packs live at `public/resource-packs/{name}/{kind}/{slug}.png` — **gitignored,
   downloaded at runtime**, persisted across deploys via a shared symlink.
-  `sample-vanilla` ("Default Vanilla") is the bundled baseline; installs borrow
+  `sample-vanilla` ("Vanilla") is the bundled baseline; installs borrow
   missing sprites from it, and `resourcepack:ensure-vanilla` restores it on
   every deploy.
 - **All icons resolve through one function**: `packIcon(kind, slug)` from
   `resources/js/composables/useResourcePackIcon.js`, applied with `v-bind` —
-  it serves the active pack's sprite and falls back to Default Vanilla via
+  it serves the active pack's sprite and falls back to Vanilla via
   `onError`. Do not add bespoke icon helpers. Users may select a pack, the
   instance default, or "No resource pack" (`users.disable_resource_pack`);
-  icons still come from Default Vanilla in that case, only component textures
+  icons still come from Vanilla in that case, only component textures
   are dropped.
 - Component texturing comes from `resources/css/per-pack.css`, a template
   copied into each pack as `resource-pack.css` at install time. It is served

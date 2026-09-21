@@ -11,10 +11,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiaryHiscoreController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GroupBankController;
+use App\Http\Controllers\ItemSearchController;
 use App\Http\Controllers\LootHiscoreController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\OverallHiscoreController;
 use App\Http\Controllers\SkillHiscoreController;
+use App\Http\Controllers\StyleguideController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
 use App\Http\Controllers\WelcomeController;
@@ -34,6 +36,32 @@ Route::get('/announcements', [AnnouncementController::class, 'index'])->name('an
 // Light/dark preference — public so the on-page toggle works on the auth screens
 // too (guests persist to a cookie; logged-in users to their account).
 Route::put('/dark-mode', [UserDarkModeController::class, 'update'])->name('dark-mode.update');
+
+// Resource-pack preference — public for the same reason: a guest must be able to
+// opt out of packs to reach the untextured interface, which is the only one that
+// offers the light/dark toggle. Guests persist to a cookie, users to their account.
+Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
+    ->name('user.resource-pack.update');
+
+// Component gallery for validating resource-pack textures against every
+// installed pack. Open locally on purpose: a login between a developer (or a
+// browser check) and the page whose entire job is to be looked at defeats the
+// point, and there is nothing behind it but the instance's own sprites.
+// Everywhere else it sits with the rest of the management surfaces.
+Route::middleware(app()->environment('local') ? [] : [
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    'can:manage instance',
+])->group(function () {
+    Route::get('/styleguide', [StyleguideController::class, 'index'])->name('styleguide');
+    // Plain JSON rather than a deferred Inertia prop: fetching it must not be an
+    // Inertia visit. A visit re-sends the shared props, and DarkModeToggle
+    // watches page.props.theme to restamp <html data-theme> — which would undo
+    // the pack the switcher is previewing every time the panel loaded.
+    Route::get('/styleguide/sprites', [StyleguideController::class, 'sprites'])
+        ->name('styleguide.sprites');
+});
 
 Route::middleware([
     'auth:sanctum',
@@ -67,6 +95,11 @@ Route::middleware([
             Route::put('/config', [AdminController::class, 'updateConfig'])->name('admin.config.update');
             Route::post('/branding', [AdminController::class, 'updateBranding'])->name('admin.branding.update');
             Route::put('/integrations', [AdminController::class, 'updateIntegrations'])->name('admin.integrations.update');
+            // SPEC §10 — calendar administration: manage every event and pick
+            // which palette colours mark an event as important.
+            Route::get('/calendar', [AdminController::class, 'calendar'])->name('admin.calendar');
+            Route::put('/calendar/settings', [AdminController::class, 'updateCalendarSettings'])
+                ->name('admin.calendar.settings');
             Route::get('/packs', [AdminController::class, 'packs'])->name('admin.packs');
             Route::post('/packs/install', [AdminController::class, 'installPack'])->name('admin.packs.install');
             Route::post('/packs/reinstall-vanilla', [AdminController::class, 'reinstallVanilla'])
@@ -93,9 +126,21 @@ Route::middleware([
 
     Route::middleware('can:manage calendar')->group(function () {
         Route::post('/calendar', [CalendarEventController::class, 'store'])->name('calendar.store');
+        Route::put('/calendar/{calendarEvent}', [CalendarEventController::class, 'update'])
+            ->name('calendar.update');
         Route::delete('/calendar/{calendarEvent}', [CalendarEventController::class, 'destroy'])
             ->name('calendar.destroy');
     });
+
+    // SPEC §10 — attendance is open to every member: the controller checks the
+    // named account belongs to the caller, so no permission gate here.
+    Route::post('/calendar/{calendarEvent}/rsvp', [CalendarEventController::class, 'rsvp'])
+        ->name('calendar.rsvp');
+    Route::delete('/calendar/{calendarEvent}/rsvp', [CalendarEventController::class, 'destroyRsvp'])
+        ->name('calendar.rsvp.destroy');
+
+    // Typeahead over the static item catalogue, for the calendar's item picker.
+    Route::get('/items/search', ItemSearchController::class)->name('items.search');
 
     Route::middleware('can:manage announcements')->group(function () {
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
@@ -106,12 +151,12 @@ Route::middleware([
     // SPEC §6.2 — per-user appearance: browse packs + set a personal override
     // (instance-global default is set by the owner in admin settings).
     Route::get('/user/themes', [UserResourcePackController::class, 'index'])->name('themes.index');
-    Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
-        ->name('user.resource-pack.update');
     Route::post('/user/resource-pack/install', [UserResourcePackController::class, 'install'])
         ->name('user.resource-pack.install');
     Route::get('/user/resource-pack/status', [UserResourcePackController::class, 'status'])
         ->name('user.resource-pack.status');
+    Route::get('/user/resource-pack/hub', [UserResourcePackController::class, 'hub'])
+        ->name('user.resource-pack.hub');
     Route::delete('/user/resource-pack/{pack}', [UserResourcePackController::class, 'destroy'])
         ->whereNumber('pack')->name('user.resource-pack.destroy');
 

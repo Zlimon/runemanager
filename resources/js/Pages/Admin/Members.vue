@@ -50,7 +50,7 @@ const intro = computed(() => props.mode === 'clan'
                             <TextInput id="username"
                                        v-model="form.username"
                                        type="text"
-                                       class="mt-1 block w-full"
+                                       class="mt-1 w-full"
                                        autocomplete="off"
                                        :error="form.errors.username !== undefined" />
                             <InputError v-if="form.errors.username" :messages="form.errors.username" />

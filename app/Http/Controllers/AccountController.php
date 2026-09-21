@@ -63,6 +63,9 @@ class AccountController extends Controller
 
         return Inertia::render('Accounts/Show', [
             'account' => (new AccountResource($account))->resolve(),
+            // Kept off AccountResource: that also serves the account lists, where
+            // a count query per account would be one query per row.
+            'instanceRank' => $account->instanceRank(),
 
             // Last known in-game position for the minimap; live updates arrive
             // over the shared map broadcast channel. Null when never shared.

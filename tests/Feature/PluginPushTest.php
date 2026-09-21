@@ -269,6 +269,23 @@ it('upserts the Mongo looting bag doc on PUT /api/plugin/looting-bag', function 
     expect($bag->looting_bag)->toBe([[995, 250000], [560, 100]]);
 });
 
+it('stores loot record types in RuneLite casing whatever the client sent', function () {
+    Sanctum::actingAs(freshUser());
+
+    $this->postJson('/api/plugin/loot', ['loot' => [
+        ['source' => 'Zulrah', 'type' => 'npc', 'items' => [['id' => 995, 'quantity' => 1]], 'killed_at' => '2026-06-02T17:30:00Z'],
+        ['source' => 'Barrows', 'type' => 'Event', 'items' => [['id' => 995, 'quantity' => 1]], 'killed_at' => '2026-06-02T17:31:00Z'],
+        ['source' => 'Goblin', 'type' => '', 'items' => [['id' => 995, 'quantity' => 1]], 'killed_at' => '2026-06-02T17:32:00Z'],
+    ]], pluginHeaders('hash-loot-case', 'Zlimon'))->assertCreated();
+
+    $account = Account::where('account_hash', 'hash-loot-case')->first();
+    $types = Loot::where('account_id', $account->id)->orderBy('killed_at')->pluck('type')->all();
+
+    // The loot hiscores match on the uppercase type exactly; anything else made
+    // the source unreachable. An empty type means "unknown", not a type.
+    expect($types)->toBe(['NPC', 'EVENT', null]);
+});
+
 it('appends loot entries on POST /api/plugin/loot', function () {
     $user = freshUser();
     Sanctum::actingAs($user);

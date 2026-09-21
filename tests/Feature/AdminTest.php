@@ -203,7 +203,7 @@ it('lists installed packs with installer name and usage count', function () {
         fn ($m) => $m->shouldReceive('available')->andReturn([]));
 
     $installer = User::factory()->create(['name' => 'Zezima']);
-    $pack = adminPack('pack-rs3');
+    $pack = adminPack('pack-example');
     $pack->forceFill(['installed_by_user_id' => $installer->id])->save();
     User::factory()->count(2)->create(['resource_pack_id' => $pack->id]);
 
@@ -223,7 +223,7 @@ it('returns JSON for an ajax hub install so the page can poll', function () {
     Queue::fake();
 
     $this->actingAs(adminUser())
-        ->postJson(route('admin.packs.install'), ['name' => 'pack-win95ish'])
+        ->postJson(route('admin.packs.install'), ['name' => 'pack-other'])
         ->assertSuccessful()
         ->assertJsonPath('queued', true);
 

@@ -22,8 +22,33 @@ class Instance
 
     public const MODES = [self::MODE_CLAN, self::MODE_GROUP, self::MODE_CASUAL];
 
+    /**
+     * Calendar colours treated as important until the owner configures the list.
+     *
+     * @var list<string>
+     */
+    public const DEFAULT_CALENDAR_HIGHLIGHT_COLORS = ['red'];
+
     /** Cookie holding a logged-out visitor's light/dark choice ('1' | '0'). */
     public const DARK_MODE_COOKIE = 'dark_mode';
+
+    /**
+     * Cookie holding a logged-out visitor's resource-pack choice: the literal
+     * {@see ResourcePack::GUEST_NO_PACK} or an installed pack id. Guests have no
+     * row to carry `users.disable_resource_pack`, so without this they could
+     * never reach the untextured interface — and so never get the light/dark
+     * toggle, which only the untextured interface offers.
+     */
+    public const RESOURCE_PACK_COOKIE = 'resource_pack';
+
+    /** DaisyUI theme for the untextured interface in light mode. */
+    public const THEME_LIGHT = 'runemanager';
+
+    /** DaisyUI theme for the untextured interface in dark mode. */
+    public const THEME_DARK = 'runemanager-dark';
+
+    /** DaisyUI theme for Vanilla's single fixed scheme. */
+    public const THEME_VANILLA = 'runemanager-vanilla';
 
     public static function mode(): string
     {
@@ -188,6 +213,41 @@ class Instance
     }
 
     /**
+     * Palette colour names that mark a calendar event as important (SPEC §10) —
+     * an event whose colour is in this list is highlighted on the calendar. The
+     * setting holds a JSON array of palette colour names (the same list as
+     * StoreCalendarEventRequest::COLORS); a stored empty array means "highlight
+     * nothing".
+     *
+     * @return list<string>
+     */
+    public static function calendarHighlightColors(): array
+    {
+        try {
+            $raw = SettingHelper::getSetting('calendar_highlight_colors');
+        } catch (\Throwable) {
+            // Settings are read during artisan boot in places that run before the
+            // database exists (see hiscoreRefreshMinutes); never hard-fail on it.
+            return self::DEFAULT_CALENDAR_HIGHLIGHT_COLORS;
+        }
+
+        if ($raw === null || $raw === '') {
+            return self::DEFAULT_CALENDAR_HIGHLIGHT_COLORS;
+        }
+
+        $decoded = is_array($raw) ? $raw : json_decode((string) $raw, true);
+
+        if (! is_array($decoded)) {
+            return self::DEFAULT_CALENDAR_HIGHLIGHT_COLORS;
+        }
+
+        return array_values(array_unique(array_map(
+            fn ($color): string => (string) $color,
+            array_filter($decoded, 'is_scalar'),
+        )));
+    }
+
+    /**
      * Whether usernames are hidden on the public landing page (SPEC §12.4) —
      * the showcase of top accounts then masks names so the leaderboard can be
      * shown to logged-out visitors without exposing who's who.
@@ -214,9 +274,21 @@ class Instance
      * Resolve the effective dark-mode flag for a viewer, in precedence order:
      * the user's own explicit toggle, then a logged-out visitor's cookie choice,
      * then the owner's instance default, and finally the resource pack's flag.
+     *
+     * Selecting a resource pack clears that explicit toggle (member row and
+     * guest cookie alike — see UserResourcePackController::applySelection), so
+     * the new pack's flag governs from here rather than a stale preference left
+     * over from the previous pack. The order below is unchanged by that: the
+     * rung is simply empty again.
      */
     public static function resolveDarkMode(?User $user, ?ResourcePack $pack): bool
     {
+        // Vanilla ships one fixed scheme and hides the toggle, so it is
+        // never "dark" regardless of what anyone has stored.
+        if (! self::canToggleDarkMode($pack)) {
+            return false;
+        }
+
         if ($user !== null && $user->dark_mode !== null) {
             return (bool) $user->dark_mode;
         }
@@ -229,5 +301,31 @@ class Instance
         }
 
         return self::defaultDarkMode() ?? (bool) $pack?->dark_mode;
+    }
+
+    /**
+     * Whether the viewer may switch between light and dark.
+     *
+     * Only the untextured "no resource pack" interface supports both modes.
+     * Vanilla is a single fixed scheme ({@see self::THEME_VANILLA}) and
+     * hides the toggle; every other pack still rides on the two base themes
+     * until resource packs get their own appearance pass.
+     */
+    public static function canToggleDarkMode(?ResourcePack $pack): bool
+    {
+        return ! ($pack?->isVanilla() ?? false);
+    }
+
+    /**
+     * The DaisyUI theme name to stamp on <html data-theme>, given the viewer's
+     * effective pack and resolved dark-mode flag.
+     */
+    public static function themeFor(?ResourcePack $pack, bool $darkMode): string
+    {
+        if ($pack?->isVanilla()) {
+            return self::THEME_VANILLA;
+        }
+
+        return $darkMode ? self::THEME_DARK : self::THEME_LIGHT;
     }
 }

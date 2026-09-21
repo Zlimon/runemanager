@@ -30,20 +30,20 @@ function uiPack(string $name): ResourcePack
     ]);
 }
 
-it('ensures the bundled Default Vanilla pack exists (idempotent)', function () {
+it('ensures the bundled Vanilla pack exists (idempotent)', function () {
     $installer = app(InstallResourcePack::class);
 
     $pack = $installer->ensureVanilla();
 
     expect($pack)->not->toBeNull();
     expect($pack->name)->toBe('sample-vanilla');
-    expect($pack->alias)->toBe('Default Vanilla');
+    expect($pack->alias)->toBe('Vanilla');
 
     $installer->ensureVanilla();
     expect(ResourcePack::where('name', 'sample-vanilla')->count())->toBe(1);
 });
 
-it('lists Default Vanilla first on the appearance page', function () {
+it('lists Vanilla first on the appearance page', function () {
     uiPack('pack-zebra');
     $user = User::factory()->withPersonalTeam()->create();
 
@@ -52,12 +52,12 @@ it('lists Default Vanilla first on the appearance page', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('packs.0.name', 'sample-vanilla')
-            ->where('packs.0.alias', 'Default Vanilla'),
+            ->where('packs.0.alias', 'Vanilla'),
         );
 });
 
 it('renders the user appearance page with installed packs', function () {
-    $pack = uiPack('pack-rs3');
+    $pack = uiPack('pack-example');
     $user = User::factory()->withPersonalTeam()->create(['resource_pack_id' => $pack->id]);
 
     $this->actingAs($user)
@@ -66,10 +66,10 @@ it('renders the user appearance page with installed packs', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Themes/Index')
             ->where('selectedId', $pack->id)
-            // Default Vanilla is auto-ensured and pinned first; pack-rs3 follows.
+            // Vanilla is auto-ensured and pinned first; pack-example follows.
             ->has('packs', 2)
             ->where('packs.0.name', 'sample-vanilla')
-            ->where('packs.1.name', 'pack-rs3')
+            ->where('packs.1.name', 'pack-example')
             ->has('packs.1.icon_url'),
         );
 });
@@ -86,12 +86,12 @@ it('sets the personal override via an inertia request and redirects back', funct
 });
 
 it('lists hub packs and flags installed ones', function () {
-    uiPack('pack-rs3');
+    uiPack('pack-example');
 
     $hub = new ResourcePackHub(new Client(['handler' => HandlerStack::create(new MockHandler([
         new Response(200, [], json_encode([
-            ['name' => 'pack-rs3'],
-            ['name' => 'pack-win95ish'],
+            ['name' => 'pack-example'],
+            ['name' => 'pack-other'],
             ['name' => 'github-actions'], // non-pack branch, filtered out
         ])),
     ]))]));
@@ -99,34 +99,34 @@ it('lists hub packs and flags installed ones', function () {
     $available = $hub->available();
 
     expect($available)->toHaveCount(2);
-    expect(collect($available)->firstWhere('name', 'pack-rs3')['installed'])->toBeTrue();
-    expect(collect($available)->firstWhere('name', 'pack-win95ish')['installed'])->toBeFalse();
+    expect(collect($available)->firstWhere('name', 'pack-example')['installed'])->toBeTrue();
+    expect(collect($available)->firstWhere('name', 'pack-other')['installed'])->toBeFalse();
     expect($available[0]['icon_url'])->toContain('raw.githubusercontent.com');
 });
 
 it('caches the hub branch list', function () {
     Cache::flush();
     $hub = new ResourcePackHub(new Client(['handler' => HandlerStack::create(new MockHandler([
-        new Response(200, [], json_encode([['name' => 'pack-rs3']])),
+        new Response(200, [], json_encode([['name' => 'pack-example']])),
         // No second response queued — a second fetch would throw, proving the cache.
     ]))]));
 
-    expect($hub->branches())->toBe(['pack-rs3']);
-    expect($hub->branches())->toBe(['pack-rs3']);
+    expect($hub->branches())->toBe(['pack-example']);
+    expect($hub->branches())->toBe(['pack-example']);
 });
 
 it('queues an install from the hub', function () {
     Queue::fake();
 
     $this->actingAs(adminUser())
-        ->post(route('admin.packs.install'), ['name' => 'pack-win95ish'])
+        ->post(route('admin.packs.install'), ['name' => 'pack-other'])
         ->assertRedirect();
 
     Queue::assertPushed(FetchResourcePackJob::class,
-        fn (FetchResourcePackJob $job) => $job->packName === 'pack-win95ish');
+        fn (FetchResourcePackJob $job) => $job->packName === 'pack-other');
 });
 
-it('reinstalls the bundled Default Vanilla pack', function () {
+it('reinstalls the bundled Vanilla pack', function () {
     $this->mock(InstallResourcePack::class)
         ->shouldReceive('install')
         ->once()
@@ -163,5 +163,5 @@ it('forbids non-admins from the hub', function () {
     $user = adminUser(Roles::USER);
 
     $this->actingAs($user)->get(route('admin.packs'))->assertForbidden();
-    $this->actingAs($user)->post(route('admin.packs.install'), ['name' => 'pack-rs3'])->assertForbidden();
+    $this->actingAs($user)->post(route('admin.packs.install'), ['name' => 'pack-example'])->assertForbidden();
 });

@@ -9,22 +9,75 @@
 }
 
 /*
- * Two base themes, both modelled on the OSRS Wiki:
- *   - runemanager       (light) — the wiki's brown/beige parchment palette
- *   - runemanager-dark  (dark)  — the wiki's dark-blue palette
- * Selected via the `data-theme` attribute set on <html> in AppLayout.vue, which
- * tracks the effective dark_mode flag. Resource packs layer their textures over
- * whichever base theme is active.
+ * Three themes, selected via the `data-theme` attribute set on <html> by the
+ * Blade root and kept in sync by DarkModeToggle.vue:
+ *
+ *   - runemanager          (light) — the OSRS Wiki's brown/beige parchment palette
+ *   - runemanager-dark     (dark)  — the OSRS Wiki's dark-blue palette
+ *   - runemanager-vanilla  (fixed) — Vanilla's own scheme
+ *
+ * The first two are the untextured "no resource pack" interface: pure DaisyUI,
+ * no pack stylesheet is loaded, and the viewer switches between them freely.
+ *
+ * runemanager-vanilla is the single fixed scheme behind Vanilla, whose
+ * textures are always painted on top. It has no light/dark counterpart and the
+ * toggle is hidden for it (see App\Support\Instance::canToggleDarkMode). Its
+ * tokens are keyed to the vanilla sprite palette so text and borders sit
+ * correctly on the pack's brown chrome instead of inheriting the parchment.
+ *
+ * Other installed packs still ride on the light/dark pair; they get their own
+ * appearance pass later.
  */
 @plugin "daisyui/theme" {
     name: "runemanager";
     default: true;
     prefersdark: false;
     color-scheme: light;
-    --color-primary: #EF9995;
-    --color-primary-content: #282425;
-    --color-secondary: #A4CBB4;
-    --color-secondary-content: #282425;
+    /* DaisyUI 5 leans on three theme flags that none of our three themes ever
+       declared — `themes: false` (above) drops the built-in themes that would
+       otherwise supply them as an inherited fallback — and each is referenced
+       bare (no `var(x, fallback)`) in the recipes below, so leaving one unset
+       doesn't mean "off", it means the whole declaration that reads it is
+       invalid at computed-value time and collapses to ITS OWN initial value,
+       which is usually worse than any real value would be:
+         --depth  → .btn's `--btn-border: color-mix(..., calc(var(--depth)*5%))`
+                    goes invalid → border-color falls back to currentColor (see
+                    the dark theme below for why that reads as a stray white
+                    line). A real value fixes it; we use 1, DaisyUI's own
+                    default depth, for the subtle darkened-rim shading it ships
+                    with everywhere else.
+         --noise  → `background-size: auto, calc(var(--noise)*100%)` goes
+                    invalid → the WHOLE background-size declaration (both
+                    layers) falls back to its initial `auto`, so the always-
+                    present `--fx-noise` SVG grain (defined unconditionally at
+                    :root) renders at full size instead of being scaled to
+                    nothing. We want this OFF, so: 0.
+         --border → `.badge`/`.checkbox`/`.radio`/`.table`/DaisyUI's own
+                    unoverridden `.input`/`.select` all set their edge via
+                    `border: var(--border) solid ...`; since `border` is a
+                    shorthand, one invalid component invalidates the entire
+                    declaration, not just the width — collapsing it to
+                    `medium currentColor` instead of a thin themed line. We
+                    want the themed line, so: 1px.
+       Net effect: no-pack stays flat with zero synthetic DaisyUI texture (any
+       texture comes only from an active resource pack's own sprites in
+       per-pack.css), while borders and shading render as intended instead of
+       accidentally falling back to a loud default. */
+    --depth: 1;
+    --noise: 0;
+    --border: 1px;
+    /* Same undefined-variable trap as --border above: DaisyUI references these
+       bare (no fallback) ~1300 times across buttons, inputs, badges and modals,
+       so leaving them unset invalidated every border-radius and squared off the
+       whole component set. .25rem matches the Tailwind `rounded` the card
+       surfaces use, rather than DaisyUI's rounder .5rem default. */
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --color-primary: #7A4E2D;
+    --color-primary-content: #FBF3E9;
+    --color-secondary: #4F8A6B;
+    --color-secondary-content: #F2F7F3;
     --color-accent: #DC8850;
     --color-accent-content: #282425;
     --color-neutral: #2E282A;
@@ -43,13 +96,45 @@
     --color-error-content: #140202;
 }
 
+/*
+ * base-100 → base-200 → base-300 is NOT a monotonic darken-as-you-go ramp here:
+ * base-300 (#44586E) is lighter than both base-100 (#2A3B4D) and base-200
+ * (#223141). base-300 is the border/elevation token (see R2 in the phase 2
+ * design rules), and in a dark theme a border only reads against its surface
+ * when it is LIGHTER than the card sitting on it — the opposite of the light
+ * and vanilla themes, where the border token is darker than the surface.
+ */
 @plugin "daisyui/theme" {
     name: "runemanager-dark";
     default: false;
     prefersdark: false;
     color-scheme: dark;
-    --color-primary: #5D8BC7;
-    --color-primary-content: #0B1118;
+    /* See the matching comment on the light theme above: with `--depth`
+       unset, a bare `.btn`'s `--btn-border: color-mix(in oklab, var(--btn-bg),
+       #000 calc(var(--depth)*5%))` was invalid at computed-value time, so
+       border-color fell back to `currentColor` — here, a light foreground
+       (base/neutral-content) — producing the washed-out light outline on
+       buttons in no-pack dark mode. That's R3's "ugly white border" bug.
+       Same root cause, different property, on a bare `.badge`: its `border:
+       var(--border) solid var(--badge-color,var(--color-base-200))` had an
+       unset `--border`, invalidating the whole shorthand (not just the
+       width) and collapsing it to `medium currentColor` — the other
+       near-white outline reported. And `--noise` unset made the always-
+       present grain SVG render at full size instead of being scaled to
+       nothing — the unexplained texture in no-pack dark. */
+    --depth: 1;
+    --noise: 0;
+    --border: 1px;
+    /* Same undefined-variable trap as --border above: DaisyUI references these
+       bare (no fallback) ~1300 times across buttons, inputs, badges and modals,
+       so leaving them unset invalidated every border-radius and squared off the
+       whole component set. .25rem matches the Tailwind `rounded` the card
+       surfaces use, rather than DaisyUI's rounder .5rem default. */
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --color-primary: #C9925A;
+    --color-primary-content: #241608;
     --color-secondary: #6FA890;
     --color-secondary-content: #0B1118;
     --color-accent: #E0A93B;
@@ -58,7 +143,7 @@
     --color-neutral-content: #E8EDF2;
     --color-base-100: #2A3B4D;
     --color-base-200: #223141;
-    --color-base-300: #1A2735;
+    --color-base-300: #44586E;
     --color-base-content: #D9E1EA;
     --color-info: #3B82F6;
     --color-info-content: #04122B;
@@ -68,6 +153,62 @@
     --color-warning-content: #110500;
     --color-error: #EF4444;
     --color-error-content: #150202;
+}
+
+@plugin "daisyui/theme" {
+    name: "runemanager-vanilla";
+    default: false;
+    prefersdark: false;
+    /* The surfaces are dark brown, so native widgets and scrollbars must render
+       dark even though this counts as Vanilla's one "light" scheme. */
+    color-scheme: dark;
+    /* See the matching comment on the light theme above. `--noise: 0` is
+       doubly deliberate here: Vanilla's texture must come only from the
+       pack's own sprites via per-pack.css (R5), never from DaisyUI's
+       synthetic grain — the two mixing under the button frame is exactly the
+       "ugly background combined with the textured background" the
+       maintainer reported. `--border` is pinned for the same reason as the
+       other two themes: any DaisyUI component per-pack.css doesn't re-skin
+       (badge, checkbox, table…) needs its themed border to actually render
+       instead of collapsing to `medium currentColor`. */
+    --depth: 1;
+    --noise: 0;
+    --border: 1px;
+    /* Same undefined-variable trap as --border above: DaisyUI references these
+       bare (no fallback) ~1300 times across buttons, inputs, badges and modals,
+       so leaving them unset invalidated every border-radius and squared off the
+       whole component set. .25rem matches the Tailwind `rounded` the card
+       surfaces use, rather than DaisyUI's rounder .5rem default. */
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --color-primary: #8A6F4A;
+    --color-primary-content: #FFF3DF;
+    --color-secondary: #4A5A3C;
+    --color-secondary-content: #E8F0D8;
+    --color-accent: #FF981F;
+    --color-accent-content: #241804;
+    --color-neutral: #2A241C;
+    --color-neutral-content: #D8CDB5;
+    /* base-100 is the panel, base-200 the body it sits on, base-300 the darker
+       chrome/outline below both — the same ordering as the other two themes, so
+       a component styled once reads correctly everywhere. The pack's lighter
+       bevel is not in this ramp: it arrives as --pack-accent (#9E8A6F for
+       Vanilla) and is painted by .pack-accent-border and the pack's own
+       sprites. That value is derived at install time by PackPalette, so treat it
+       as illustrative rather than as something to match by hand. */
+    --color-base-100: #483F33;
+    --color-base-200: #3E3529;
+    --color-base-300: #2A241C;
+    --color-base-content: #E8DFC8;
+    --color-info: #7AA6D9;
+    --color-info-content: #06101C;
+    --color-success: #3FA34D;
+    --color-success-content: #021205;
+    --color-warning: #D9A441;
+    --color-warning-content: #1C1204;
+    --color-error: #D64B3F;
+    --color-error-content: #170303;
 }
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
@@ -128,23 +269,26 @@
     display: none;
 }
 
+/* Headings deliberately carry no colour of their own: they inherit from the
+ * surface they sit on, so one heading style works on base, neutral and pack
+ * surfaces alike. Give the *container* the colour, never the heading. */
 h1 {
-    @apply text-2xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl;
+    @apply text-3xl font-extrabold leading-tight tracking-tight md:text-4xl;
 }
 h2 {
-    @apply text-xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-4xl lg:text-5xl;
+    @apply text-2xl font-bold leading-tight tracking-tight md:text-3xl;
 }
 h3 {
-    @apply text-lg font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-3xl lg:text-4xl;
+    @apply text-xl font-bold leading-snug tracking-tight md:text-2xl;
 }
 h4 {
-    @apply text-base font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-2xl lg:text-3xl;
+    @apply text-lg font-bold leading-snug tracking-tight;
 }
 h5 {
-    @apply text-sm font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-xl lg:text-2xl;
+    @apply text-base font-bold leading-snug tracking-tight;
 }
 h6 {
-    @apply text-xs font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-lg lg:text-xl;
+    @apply text-sm font-bold leading-snug tracking-tight;
 }
 
 .box {
@@ -162,18 +306,35 @@ h6 {
     @apply border border-base-300;
 }
 
+/* DaisyUI's `.select` and `.input` compute the same height in theory (both
+ * derive from the same --size-field token), but a size modifier on only one
+ * of them (e.g. `select-sm` next to a default-size `.input`, as on
+ * /admin/packs) still renders shorter — see rule R4 in the phase 2 design
+ * rules: text inputs and selects must render at one height. Pin both to an
+ * explicit height so a stray `-sm` class can't reintroduce the mismatch; this
+ * rule is unlayered so it overrides DaisyUI's own (layered) height regardless
+ * of which size class is present. Left out of the shared border rule above:
+ * .select already gets the same base-300 border as .input from that rule, it
+ * only needed a matching height. */
+.input,
+.select {
+    height: 2.5rem;
+}
+
 .box-tooltip {
     /* Mirror the Card surface (pack-bg-card + pack-accent-border) so item/skill
        tooltips pick up the active resource pack's colours instead of a flat box. */
     @apply z-10 absolute rounded border px-3 py-2 text-sm text-base-content shadow-lg;
-    background-color: var(--pack-bg-card);
-    border-color: var(--pack-accent, theme(colors.base-300));
+    /* --pack-bg-card only exists when a pack is loaded (see html.has-pack), and a
+       bare var() with no fallback invalidates the whole declaration — which is
+       what left this tooltip transparent, and unreadable, in the untextured
+       interface. Always give it the theme surface to fall back to. */
+    background-color: var(--pack-bg-card, var(--color-base-100));
+    border-color: var(--pack-accent, var(--color-base-300));
 }
 
 .tab {
-    /* Same dark-mode foreground logic as the page headers — keeps tab labels
-       readable when a pack tints the background dark. */
-    @apply bg-base-100 border-base-300 focus:ring-0 text-gray-900 dark:text-white;
+    @apply bg-base-100 border border-base-300 focus:ring-0 text-base-content/70;
 }
 
 /* The bg-base-100 on .tab above also flattens DaisyUI's default tab-active
@@ -182,50 +343,512 @@ h6 {
  * `.tab.resource-pack-tab` rule in per-pack.css also has two classes but
  * carries !important, so the pack texture still wins. */
 .tab.tab-active {
-    @apply bg-base-200 font-bold;
+    /* Matches the panel below (bg-base-200) and drops the shared edge so the
+       selected tab reads as continuous with its content. */
+    @apply bg-base-200 border-base-300 border-b-base-200 font-bold text-base-content;
 }
 
 /*
  * Pack-aware utilities — picked up automatically when the active resource pack
  * has had its palette extracted (see InstallResourcePack::extractPaletteColors).
- * Fall back to the matching DaisyUI base colour when --pack-* isn't defined,
- * so anonymous visitors and packs without extractable assets keep the default
- * theme.
+ * Every one falls through to a DaisyUI token when --pack-* isn't defined, so the
+ * untextured interface is coloured purely by whichever base theme is active.
  */
 .pack-bg {
-    /* Fallback mirrors the pre-pack body palette so dropping the original
-       bg-beige-300 / dark:bg-gray-800 doesn't regress the no-pack look. */
-    background-color: var(--pack-bg, theme(colors.beige-300));
-}
-.dark .pack-bg {
-    background-color: var(--pack-bg, theme(colors.gray-800));
+    background-color: var(--pack-bg, var(--color-base-200));
 }
 
 /*
- * A darker shade of --pack-bg for cards / sub-panels, so the body and the
- * cards aren't flat against each other. Derived via color-mix so adding a
- * new pack doesn't require a third DB column; for the no-pack case the
- * mix falls back to the body palette and bottoms out a step deeper.
+ * A darker shade of --pack-bg for cards / sub-panels, so the body and the cards
+ * aren't flat against each other. Derived via color-mix so adding a new pack
+ * doesn't require a third DB column.
+ *
+ * Only defined when a pack is actually active: the untextured interface has no
+ * pack palette to darken, so .pack-bg-card resolves to base-100, which already
+ * sits a step apart from the base-200 body. `html.has-pack` is stamped by the
+ * Blade root.
  */
-:root {
-    --pack-bg-card: color-mix(in srgb, var(--pack-bg, theme(colors.beige-300)) 88%, black);
-}
-.dark {
-    --pack-bg-card: color-mix(in srgb, var(--pack-bg, theme(colors.gray-800)) 88%, black);
+html.has-pack {
+    --pack-bg-card: color-mix(in srgb, var(--pack-bg, var(--color-base-100)) 88%, black);
+    /*
+     * The nav bar sits a full step below the card surface so the chrome reads as
+     * the darkest band on the page — the same ordering the no-pack themes get
+     * from --color-neutral, which is darker than base-300 in all three.
+     *
+     * 60% is the most the mix can keep while still separating visibly from the
+     * body (.pack-bg = --pack-bg undarkened): every installed pack's sampled
+     * surface is dark (the lightest is #483f33), so 60% still leaves the hue
+     * legible — #483f33 → #282320, #200b36 → #130720 — while landing far below
+     * the point where --color-neutral-content (#EDE6D4 / #E8EDF2 / #D8CDB5,
+     * light in all three themes) stops being readable on it. That is why the nav
+     * keeps its DaisyUI content token instead of deriving a foreground: the
+     * token demonstrably works across every pack, and CSS has no portable way to
+     * flip a foreground on measured luminance. A future pack with a genuinely
+     * LIGHT sampled surface would break that assumption and needs a real
+     * contrast pass — no such pack exists today.
+     */
+    --pack-bg-nav: color-mix(in srgb, var(--pack-bg, var(--color-neutral)) 60%, black);
+
+    /*
+     * Interactive row surfaces — the hovered and the selected/current row of a
+     * list, menu or table.
+     *
+     * These LIGHTEN where --pack-bg-card and --pack-bg-nav darken, and that is
+     * deliberate rather than stylistic. Darkening is how the chrome separates
+     * itself from the body, and it bottoms out: a pack sampling to near-black
+     * cannot go any lower (see the --pack-bg-nav note above, which needs an accent
+     * hairline for exactly that reason). A row highlight has no hairline to fall
+     * back on — if the shade step vanishes the state is simply invisible — so it
+     * moves in the one direction every installed pack has room in. Measured
+     * against --pack-bg-card across every installed pack, the hover step ran
+     * 1.36–1.73:1 and the active step 2.01–2.65:1; the weakest of each was a
+     * near-black pack, and both still read.
+     *
+     * Lightening also fails safe on the one axis packs are inconsistent about:
+     * a pack whose dark_mode flag puts it on the LIGHT theme draws near-black
+     * --color-base-content on a dark sampled surface, so pulling the row toward
+     * white can only help the label on it.
+     *
+     * Consumers pair these with `html.has-pack`, leaving the DaisyUI utility
+     * that was there before as the untextured rendering — see the
+     * .settings-nav-link / .nav-menu-link rules below.
+     */
+    --pack-bg-hover: color-mix(in srgb, var(--pack-bg, var(--color-base-100)) 86%, white);
+    --pack-bg-active: color-mix(in srgb, var(--pack-bg, var(--color-base-100)) 72%, white);
 }
 
 .pack-bg-card {
-    background-color: var(--pack-bg-card);
+    background-color: var(--pack-bg-card, var(--color-base-100));
 }
 
 .pack-bg-soft {
-    background-color: var(--pack-bg, theme(colors.base-200));
+    background-color: var(--pack-bg, var(--color-base-200));
+}
+
+/*
+ * The nav band. Falls back to --color-neutral, which is exactly what the
+ * `bg-neutral` this replaced resolved to, so the untextured interface renders
+ * an identical colour.
+ */
+.pack-bg-nav {
+    background-color: var(--pack-bg-nav, var(--color-neutral));
+}
+
+/*
+ * Darkening alone cannot separate the chrome from the body on a pack whose
+ * sampled surface is already at the floor: a near-black background darkens to
+ * something indistinguishable from itself, a 1.00 contrast ratio against the
+ * body it sits on, and the next-darkest packs only reach 1.03–1.08. Give both
+ * bands the same accent hairline
+ * the cards already carry (.pack-accent-border), so the edge is drawn by the one
+ * pack colour that is reliably lighter than the surface rather than by a shade
+ * step that can bottom out.
+ *
+ * Under html.has-pack only, and matched on the elements rather than on
+ * .pack-bg-nav, because that class is also on the nav's mobile dropdown panel,
+ * which is a floating panel with its own full border and wants no extra edge.
+ * The untextured interface keeps its borderless nav and shadow-only header.
+ */
+html.has-pack nav.pack-bg-nav,
+html.has-pack header.pack-bg-card {
+    border-bottom: 1px solid var(--pack-accent);
 }
 
 .pack-accent-border {
-    border-color: var(--pack-accent, theme(colors.base-300));
+    border-color: var(--pack-accent, var(--color-base-300));
 }
 
 .pack-accent-text {
-    color: var(--pack-accent, theme(colors.base-content));
+    color: var(--pack-accent, var(--color-base-content));
+}
+
+/*
+ * Form controls under an active pack.
+ *
+ * DaisyUI fills them with base-100, which belongs to the untextured theme and
+ * reads as a bright panel dropped onto a pack surface. Give them the same well
+ * as the cards they sit in; the border below is what delineates the field.
+ *
+ * .textarea rides along with the other two: per-pack.css treats the three as one
+ * group, and leaving it on base-100 next to a pack-filled input is the exact
+ * mismatch this rule exists to remove.
+ *
+ * The fill is unlayered, so it wins over DaisyUI's own (layered) recipe
+ * regardless of specificity — the same mechanism the height pin above relies on.
+ *
+ * The edge rides on --pack-accent-ui rather than --pack-accent.
+ *
+ * --pack-accent is the pack's authentic accent and is decorative: it is what the
+ * nav/header hairline and the card borders use. But it is sampled, not chosen,
+ * so on some packs it lands too close to the surface to function as a control
+ * edge — measured against --pack-bg-card, several packs landed between 2.0 and
+ * 2.7:1, all under the WCAG 3:1 minimum for non-text.
+ * --pack-accent-ui is that same hue lightened until it clears 3:1, and
+ * is identical to --pack-accent on the packs that already passed. Functional
+ * edges take the -ui variant; decoration keeps the authentic one.
+ *
+ * THE !important IS LOAD-BEARING — DO NOT "CLEAN IT UP".
+ * per-pack.css:354-357 sets `border-color: var(--pack-accent) !important` on
+ * these same three selectors. That file is a per-pack template served raw from
+ * the pack directory, and the Blade root links it AFTER this stylesheet, so a
+ * plain declaration here loses twice over — first to the !important, then to
+ * source order. Matching it with !important levels the first contest, and
+ * specificity settles the second before order is ever consulted:
+ * `html.has-pack .input` is (0,2,1) against the pack sheet's bare `.input`
+ * (0,1,0). Drop either the !important or the html.has-pack prefix and the pack
+ * sheet silently takes the border back.
+ *
+ * The fallback chain degrades in the right order: -ui when the Blade root emits
+ * it, the authentic accent for a pack rendered before -ui existed, and the theme
+ * border token if a pack has no palette at all.
+ */
+html.has-pack .input,
+html.has-pack .select,
+html.has-pack .textarea,
+html.has-pack .file-input {
+    background-color: var(--pack-bg-card);
+    border-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-300))) !important;
+}
+
+/*
+ * The "Choose file" button inside a file input.
+ *
+ * It is a pseudo-element, so none of the rules above reach it, and DaisyUI
+ * leaves it on a fixed theme surface — a slate-blue chip sitting inside a field
+ * that had otherwise gone fully pack-coloured, which is the only part of the
+ * control that gave the theme away.
+ *
+ * It takes --pack-bg-active rather than a sprite: .btn's 9-slice is painted
+ * from per-pack.css with several background layers, and a pseudo-element cannot
+ * carry that treatment without duplicating the whole recipe here. A lighter
+ * step of the pack surface reads as a raised control against the field's
+ * --pack-bg-card and stays in the same palette.
+ *
+ * Written twice because ::file-selector-button and its legacy -webkit- alias
+ * cannot share a selector list: a browser that does not recognise one would
+ * discard the whole rule.
+ */
+html.has-pack .file-input::file-selector-button {
+    background-color: var(--pack-bg-active);
+    border-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-300)));
+    color: var(--color-base-content);
+}
+
+html.has-pack .file-input::-webkit-file-upload-button {
+    background-color: var(--pack-bg-active);
+    border-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-300)));
+    color: var(--color-base-content);
+}
+
+/*
+ * Focus ring. DaisyUI derives both the ring (`outline: 2px solid
+ * var(--input-color)`) and the select's border from --input-color, and on focus
+ * swaps it to base-content — a token from the untextured theme again. Retarget
+ * the variable rather than the outline so the whole focus treatment moves to the
+ * pack accent in one declaration.
+ *
+ * A focus indicator is functional, not decorative, so it takes --pack-accent-ui
+ * (the 3:1-guaranteed variant) for the same reason the field border above does.
+ *
+ * Errored fields are excluded: they set --input-color to --color-error, and a
+ * focused invalid field must stay red rather than turn into an ordinary accent.
+ */
+html.has-pack .input:not(.input-error):focus,
+html.has-pack .input:not(.input-error):focus-within,
+html.has-pack .select:not(.select-error):focus,
+html.has-pack .select:not(.select-error):focus-within,
+html.has-pack .textarea:not(.textarea-error):focus,
+html.has-pack .textarea:not(.textarea-error):focus-within,
+html.has-pack .file-input:not(.file-input-error):focus,
+html.has-pack .file-input:not(.file-input-error):focus-within {
+    --input-color: var(--pack-accent-ui, var(--pack-accent, var(--color-base-content)));
+}
+
+
+/*
+ * Row highlights under an active pack.
+ *
+ * Every one of these elements keeps the DaisyUI utility it already carried
+ * (`hover:bg-base-300`, `bg-base-300`, `hover:bg-base-200`) in its template.
+ * That utility IS the untextured rendering, unchanged, and these rules only add
+ * a second declaration that wins when a pack is loaded — which is why the
+ * no-pack interface is byte-identical to before this block existed.
+ *
+ * Specificity is what makes that work, not source order: a Tailwind
+ * `hover:bg-base-300` is (0,2,0) — one class plus the :hover pseudo-class — and
+ * `html.has-pack .settings-nav-link:hover` is (0,2,1), so the pack rule takes it
+ * every time. The marker classes (.settings-nav-link, .nav-menu-link, .pack-row,
+ * .is-active) exist only to give these rules something to hook onto; they carry
+ * no styling of their own and mean nothing without `html.has-pack`.
+ *
+ * .pack-row is the generic one: any row-shaped control whose hover should follow
+ * the pack but which is not part of a nav (the account search results, the
+ * dashboard feed rows, the Log out button). The two nav-specific names are kept
+ * because they also carry an active state; a plain row only needs hover.
+ *
+ * Only opaque theme tokens need this. A translucent wash such as
+ * `hover:bg-base-content/10` already tints whatever pack surface sits beneath
+ * it, so those are left alone deliberately — adding a marker there would
+ * replace a tint that works with a flat fill that hides the texture.
+ *
+ * per-pack.css does not style menu rows or tables (it stops at .menu /
+ * .dropdown-content panel fills), so nothing here is contesting it.
+ */
+/*
+ * The shared chrome for a clickable card — the account grid, the resource-pack
+ * picker, the loot board. Applied by Components/ClickableCard.vue; nothing
+ * should hand-roll a card hover again.
+ *
+ * Hover reads as a lift: the surface brightens a step and the card rises 2px.
+ * Deliberately no colour on the edge — the accent edge is reserved for the
+ * SELECTED state below, so the two never say the same thing.
+ *
+ * Keyboard focus does still draw the accent outline. That is not decoration:
+ * without it a keyboard user has no idea which card they are on, and the
+ * background lift alone is far too subtle to serve. It has to be an outline
+ * rather than a border, because cards carry .resource-pack-border and
+ * per-pack.css forces that border-color transparent whenever a pack is active
+ * (the sprite frame is the edge). Outline is outside the border box, untouched
+ * by that rule, and sits clear of the sprite frame instead of fighting it.
+ *
+ * The outline is declared transparent at rest so its 2px never shifts the
+ * layout — only its colour changes.
+ */
+.pack-card-interactive {
+    cursor: pointer;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition: background-color 150ms ease, outline-color 150ms ease, transform 150ms ease;
+}
+
+/*
+ * A card whose action is unavailable — the pack browser once the install limit
+ * is reached. It keeps its surface so the tile still reads as content, but
+ * stops claiming to be pressable: no lift, no pointer. The element is a real
+ * <button>, so :disabled also keeps it out of the tab order for free.
+ *
+ * Every interactive state below is guarded with :not(:disabled) rather than
+ * relying on pointer-events, which would also suppress a title tooltip and
+ * still leave the card focusable.
+ */
+.pack-card-interactive:disabled {
+    cursor: default;
+}
+
+.pack-card-interactive:not(:disabled):hover {
+    background-color: var(--pack-bg-hover, var(--color-base-300));
+    transform: translateY(-2px);
+}
+
+.pack-card-interactive:not(:disabled):focus-visible {
+    background-color: var(--pack-bg-hover, var(--color-base-300));
+    outline-color: var(--pack-accent-ui, var(--pack-accent, var(--color-primary)));
+    transform: translateY(-2px);
+}
+
+/*
+ * When the card's content draws its own surface (ClickableCard's `surface:
+ * false` — the account grid nests an AccountCard, which is also rendered bare
+ * as a map tooltip and so keeps its own fill), that fill is opaque and paints
+ * straight over the lift above. The card then rose on hover without lighting
+ * up, which is not the same affordance the other clickable cards give.
+ *
+ * Push the lift down to the nested surface so every clickable card brightens,
+ * wherever the fill actually lives.
+ */
+.pack-card-interactive:not(:disabled):hover .pack-bg-card,
+.pack-card-interactive:not(:disabled):focus-visible .pack-bg-card {
+    background-color: var(--pack-bg-hover, var(--color-base-300));
+}
+
+/*
+ * The selected card. Drawn as a ring (box-shadow) rather than a border for the
+ * same reason the focus outline is an outline: a pack suppresses the CSS
+ * border. Two stacked shadows reproduce Tailwind's ring-2 + ring-offset-2, so
+ * the accent reads as a ring with a gap rather than a thick edge.
+ */
+.pack-card-selected {
+    box-shadow:
+        0 0 0 2px var(--color-base-100),
+        0 0 0 4px var(--pack-accent-ui, var(--pack-accent, var(--color-primary)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pack-card-interactive {
+        transition: background-color 150ms ease, outline-color 150ms ease;
+    }
+
+    .pack-card-interactive:not(:disabled):hover,
+    .pack-card-interactive:not(:disabled):focus-visible {
+        transform: none;
+    }
+}
+
+/*
+ * A softened accent ring — the "this is you" marker on the loot board. It was
+ * `ring-primary/40`, a theme colour; the alpha is why this needs a rule rather
+ * than an arbitrary utility, since a slash modifier cannot put alpha on a
+ * colour that arrives through a custom property.
+ *
+ * Resolves to the same 40% primary when no pack is active, so the untextured
+ * interface is unchanged.
+ */
+.pack-ring-soft {
+    --tw-ring-color: color-mix(
+        in srgb,
+        var(--pack-accent-ui, var(--color-primary)) 40%,
+        transparent
+    );
+}
+
+html.has-pack .settings-nav-link:hover,
+html.has-pack .nav-menu-link:hover,
+html.has-pack .nav-menu-link:focus,
+html.has-pack .pack-row:hover,
+html.has-pack .pack-row:focus {
+    background-color: var(--pack-bg-hover);
+}
+
+/*
+ * The current row wins over the hovered row (0,3,1 beats 0,2,1), matching the
+ * untextured behaviour where the active item has no hover utility at all.
+ *
+ * The inset hairline is the belt to the fill's braces. The active fill is a
+ * 2.0–2.7:1 step, which reads on every pack, but it is still only a shade step
+ * and a textured panel behind it (NavDropdown's rows sit on the pack's dialog
+ * parchment, not on a flat colour) can eat some of it. The hairline is a control
+ * boundary, so it takes --pack-accent-ui, the variant lightened until it clears
+ * 3:1 — never the decorative --pack-accent. Drawn as an inset box-shadow rather
+ * than a border so it costs no layout and can't shift the row by a pixel.
+ */
+html.has-pack .settings-nav-link.is-active,
+html.has-pack .nav-menu-link.is-active {
+    background-color: var(--pack-bg-active);
+    box-shadow: inset 0 0 0 1px var(--pack-accent-ui, var(--pack-accent, var(--color-base-300)));
+}
+
+/*
+ * Zebra striping. DaisyUI paints the even rows --color-base-200, a token from
+ * the untextured theme, so a maroon pack gets dark-blue bands from the dark
+ * theme's palette. Repaint them off the pack surface instead.
+ *
+ * DaisyUI's own rule lives in `@layer daisyui.l1.l2`, and this one is unlayered,
+ * so it wins regardless of specificity — the same mechanism the .input fill and
+ * the .input/.select height pin above rely on.
+ *
+ * It borrows --pack-bg-hover rather than introducing a third step: a stripe and
+ * a hover answer the same question (lift this row off the surface), and the two
+ * cannot collide because neither DataTable nor the styleguide table has a row
+ * hover. Give the tables a row hover later and it needs its own step, not this
+ * one.
+ */
+/*
+ * v-calendar ships its own palette — a slate/blue ramp it applies through
+ * --vc-* custom properties — so the month arrows, the title and the weekday
+ * row stayed cornflower blue on every pack. Retarget the properties rather
+ * than restyle .vc-arrow / .vc-title / .vc-weekday one at a time: v-calendar
+ * already funnels its chrome through these, so one block moves all of it and
+ * keeps working if the markup changes.
+ *
+ * The text hooks onto --color-base-content rather than a pack colour: it sits
+ * on the pack surface and has to stay legible, and that token already flips
+ * with the light/dark theme the pack selects. Only the interactive parts —
+ * hover fills and the focus ring — take pack colours, and the ring uses
+ * --pack-accent-ui because a focus indicator owes the 3:1 non-text minimum.
+ *
+ * The --vc-accent-* ramp is the rest of it: the month picker's current month,
+ * today, and the focused and selected days all read from it, and the container
+ * carries v-calendar's `vc-blue`, which is where the remaining blue came from.
+ * v-calendar builds those states from several steps of the ramp at once — a
+ * light step for a fill, a dark one for the text on it — so it is rebuilt as a
+ * full ten-step ramp around the pack's accent rather than flattened to one
+ * colour, which would erase the difference between the states.
+ *
+ * The steps mix --pack-accent-ui toward white above 500 and toward black below
+ * it, matching the shape of the Tailwind palette v-calendar expects: 500 is the
+ * accent itself, 50 is nearly white, 900 is deep. The -ui variant is used
+ * because these mark interactive state, and it is the one guaranteed to clear
+ * 3:1 against the pack surface.
+ *
+ * Event bars are not affected, and must not be. Each carries its own colour
+ * class (vc-teal, vc-orange…) on the bar itself, chosen for its event type or
+ * by whoever created the event. That class redefines the ramp on a nearer
+ * element, so it wins over this container-level one.
+ *
+ * The popovers need it separately. The month picker and the day popovers are
+ * teleported out of .vc-container into their own .vc-popover-content, which
+ * carries a `vc-blue` of its own, so they inherit nothing from the calendar
+ * they belong to — the month picker's current month stayed blue until this
+ * rule reached it directly.
+ *
+ * `html.has-pack .vc-container` (0,2,1) outranks `.vc-blue` (0,1,0) on the
+ * same element, and so does the popover selector, so no !important is needed.
+ */
+html.has-pack .vc-container,
+html.has-pack .vc-popover-content {
+    --vc-header-arrow-color: var(--color-base-content);
+    --vc-header-title-color: var(--color-base-content);
+    --vc-nav-title-color: var(--color-base-content);
+    --vc-weekday-color: var(--color-base-content);
+    --vc-header-arrow-hover-bg: var(--pack-bg-hover);
+    --vc-day-content-hover-bg: var(--pack-bg-hover);
+    --vc-focus-ring: 0 0 0 2px var(--pack-accent-ui, var(--pack-accent, var(--color-base-300)));
+
+    --vc-pack-accent: var(--pack-accent-ui, var(--pack-accent, var(--color-primary)));
+    --vc-accent-50: color-mix(in srgb, var(--vc-pack-accent) 8%, white);
+    --vc-accent-100: color-mix(in srgb, var(--vc-pack-accent) 18%, white);
+    --vc-accent-200: color-mix(in srgb, var(--vc-pack-accent) 35%, white);
+    --vc-accent-300: color-mix(in srgb, var(--vc-pack-accent) 55%, white);
+    --vc-accent-400: color-mix(in srgb, var(--vc-pack-accent) 78%, white);
+    --vc-accent-500: var(--vc-pack-accent);
+    --vc-accent-600: color-mix(in srgb, var(--vc-pack-accent) 85%, black);
+    --vc-accent-700: color-mix(in srgb, var(--vc-pack-accent) 70%, black);
+    --vc-accent-800: color-mix(in srgb, var(--vc-pack-accent) 55%, black);
+    --vc-accent-900: color-mix(in srgb, var(--vc-pack-accent) 40%, black);
+}
+
+html.has-pack .table-zebra tbody tr:nth-child(2n) {
+    background-color: var(--pack-bg-hover);
+}
+
+/*
+ * Checkbox.
+ *
+ * Unchecked, DaisyUI draws an outlined box with a transparent fill; checked, it
+ * fills with `var(--input-color, #0000)` — and a bare `.checkbox` with no
+ * `checkbox-primary`-style modifier never sets --input-color, so the checked
+ * fill resolves to TRANSPARENT and the only difference between the two states is
+ * a small base-content tick. That is the state this rule fixes: point
+ * --input-color at a real colour and the checked box gets a solid fill, a
+ * matching focus ring (DaisyUI derives `outline: 2px solid var(--input-color)`
+ * from the same variable) and a tick that reads against the fill.
+ *
+ * --pack-accent-ui first: a checkbox is a control and its fill carries the
+ * checked/unchecked distinction, so it owes 3:1 and takes the guaranteed-3:1
+ * variant rather than the sampled --pack-accent. With no pack it falls through
+ * to --color-primary, which every theme defines and which is already the
+ * interface's "this is on" colour.
+ *
+ * `color` is the tick, drawn from currentColor. --color-base-100 is the lightest
+ * surface token in all three themes (#d8ccb4 / #2A3B4D / #483F33) and each
+ * theme's --color-primary is darker than its own base-100, so the tick reads on
+ * the fill in every untextured combination.
+ *
+ * Under a pack none of this is visible: per-pack.css swaps the whole control for
+ * the in-game sprites with `background: url(...)` (the shorthand wipes the fill)
+ * and `border: 0 !important`. The --input-color still matters there because the
+ * focus outline survives that swap.
+ */
+.checkbox {
+    --input-color: var(--pack-accent-ui, var(--color-primary));
+    color: var(--color-base-100);
+}
+
+/*
+ * ...and because the sprite already draws its own tick, suppress DaisyUI's.
+ * Without this a checked box under a pack shows the sprite's red check with a
+ * second clipped-polygon tick stamped over it.
+ */
+html.has-pack .checkbox::before {
+    content: none;
 }

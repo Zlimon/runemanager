@@ -10,6 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import SelectInput from "@/Components/SelectInput.vue";
 import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
 
 const props = defineProps({
@@ -68,21 +69,21 @@ const confirmReset = () => {
 
 <template>
     <SettingsLayout :title="configured ? 'General' : 'First-time setup'">
-        <div v-if="!configured" class="mb-4 rounded p-4 text-sm pack-bg-card resource-pack-border">
+        <Card v-if="!configured" padding="p-4" class="mb-4 text-sm">
             Welcome! Choose how this site runs. <strong>Clan</strong> mirrors an in-game clan
             (the owner's plugin seeds members), <strong>Group</strong> lets you add members
             by hand, and <strong>Casual</strong> is open registration. You can change this
             later, but switching mode wipes all account data.
-        </div>
+        </Card>
 
         <Card>
             <form class="space-y-6" @submit.prevent="submit">
                 <div>
                     <InputLabel for="instance_mode" value="Mode" />
-                    <select id="instance_mode" v-model="form.instance_mode"
-                            class="select select-bordered mt-1 block w-full">
+                    <SelectInput id="instance_mode" v-model="form.instance_mode"
+                                 class="mt-1" :error="form.errors.instance_mode !== undefined">
                         <option v-for="mode in modes" :key="mode" :value="mode">{{ modeLabel(mode) }}</option>
-                    </select>
+                    </SelectInput>
                     <p class="mt-1 text-xs text-base-content/60">{{ modeHint }}</p>
                     <p v-if="destructiveChange" class="mt-1 text-xs font-medium text-error">
                         Switching mode permanently deletes all accounts and their data.
@@ -92,7 +93,7 @@ const confirmReset = () => {
 
                 <div v-if="form.instance_mode === 'clan'">
                     <InputLabel for="clan_name" value="Clan name" />
-                    <TextInput id="clan_name" v-model="form.clan_name" type="text" class="mt-1 block w-full"
+                    <TextInput id="clan_name" v-model="form.clan_name" type="text" class="mt-1 w-full"
                                :error="form.errors.clan_name !== undefined" />
                     <p class="mt-1 text-xs text-base-content/60">
                         Auto-filled from the owner's clan when the plugin syncs the roster.
@@ -102,7 +103,7 @@ const confirmReset = () => {
 
                 <div v-if="form.instance_mode === 'group'">
                     <InputLabel for="group_name" value="Group name" />
-                    <TextInput id="group_name" v-model="form.group_name" type="text" class="mt-1 block w-full"
+                    <TextInput id="group_name" v-model="form.group_name" type="text" class="mt-1 w-full"
                                :error="form.errors.group_name !== undefined" />
                     <InputError v-if="form.errors.group_name" :messages="form.errors.group_name" />
                 </div>
@@ -126,12 +127,12 @@ const confirmReset = () => {
 
                 <div>
                     <InputLabel for="default_dark_mode" value="Default appearance" />
-                    <select id="default_dark_mode" v-model="form.default_dark_mode"
-                            class="select select-bordered mt-1 block w-full">
+                    <SelectInput id="default_dark_mode" v-model="form.default_dark_mode"
+                                 class="mt-1" :error="form.errors.default_dark_mode !== undefined">
                         <option value="">Follow resource pack</option>
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
-                    </select>
+                    </SelectInput>
                     <p class="mt-1 text-xs text-base-content/60">
                         Overrides the pack's own light/dark flag for anyone who hasn't picked their
                         own — handy when a pack ships an unreliable flag. Members can still toggle.
@@ -169,7 +170,7 @@ const confirmReset = () => {
                 </p>
                 <div class="mt-4">
                     <InputLabel for="confirm" :value="`Type &quot;${form.instance_mode}&quot; to confirm`" />
-                    <TextInput id="confirm" v-model="form.confirm" type="text" class="mt-1 block w-full"
+                    <TextInput id="confirm" v-model="form.confirm" type="text" class="mt-1 w-full"
                                autocomplete="off" :error="form.errors.confirm !== undefined" />
                     <InputError v-if="form.errors.confirm" :messages="form.errors.confirm" />
                 </div>

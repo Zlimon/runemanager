@@ -15,13 +15,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class LootFactory extends Factory
 {
+    /**
+     * Types are RuneLite's LootRecordType values, as the plugin sends them.
+     * Raids and the Barrows chest are not types of their own — the Loot Tracker
+     * records them as EVENT.
+     */
     private const SOURCES = [
-        ['source' => 'Zulrah', 'type' => 'npc'],
-        ['source' => 'Vorkath', 'type' => 'npc'],
-        ['source' => 'Cerberus', 'type' => 'npc'],
-        ['source' => 'Chambers of Xeric', 'type' => 'raid'],
-        ['source' => 'Theatre of Blood', 'type' => 'raid'],
-        ['source' => 'Barrows', 'type' => 'chest'],
+        ['source' => 'Zulrah', 'type' => 'NPC'],
+        ['source' => 'Vorkath', 'type' => 'NPC'],
+        ['source' => 'Cerberus', 'type' => 'NPC'],
+        ['source' => 'Chambers of Xeric', 'type' => 'EVENT'],
+        ['source' => 'Theatre of Blood', 'type' => 'EVENT'],
+        ['source' => 'Barrows', 'type' => 'EVENT'],
     ];
 
     /**

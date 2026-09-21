@@ -5,6 +5,7 @@ use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\ResourcePacks\InstallResourcePack;
+use App\Support\Instance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
@@ -40,8 +41,21 @@ function makePack(string $name, array $overrides = []): ResourcePack
     ], $overrides));
 }
 
-it('rejects unauthenticated requests', function () {
-    $this->putJson('/user/resource-pack', ['resource_pack_id' => 1])->assertUnauthorized();
+it('stores an unauthenticated preference as a cookie instead of rejecting it', function () {
+    // The route is deliberately public: a guest must be able to opt out of packs
+    // to reach the untextured interface. See AppearanceRulesTest for the rules.
+    $pack = makePack('sample-vanilla');
+
+    $this->putJson('/user/resource-pack', ['resource_pack_id' => $pack->id])
+        ->assertOk()
+        ->assertCookie(Instance::RESOURCE_PACK_COOKIE, (string) $pack->id, encrypted: false);
+});
+
+it('still gates pack installation and deletion behind auth', function () {
+    $pack = makePack('pack-guarded');
+
+    $this->postJson('/user/resource-pack/install', ['name' => 'pack-guarded'])->assertUnauthorized();
+    $this->deleteJson("/user/resource-pack/{$pack->id}")->assertUnauthorized();
 });
 
 it('sets the per-user override on update', function () {
@@ -141,7 +155,7 @@ it('effectiveResourcePackId() returns null when neither is set', function () {
     expect($user->fresh()->effectiveResourcePackId())->toBeNull();
 });
 
-it('effectiveFor() floors to Default Vanilla when nothing is selected', function () {
+it('effectiveFor() floors to Vanilla when nothing is selected', function () {
     $vanilla = makePack('sample-vanilla');
 
     expect(ResourcePack::effectiveFor(null)?->id)->toBe($vanilla->id);
@@ -206,7 +220,7 @@ it('website install: selects without re-queuing when the pack is already install
     $pack = makePack('pack-sakurascape', [
         'version' => '1.0.0',
         'background_color' => '#483f33',
-        'accent_color' => '#88827a',
+        'accent_color' => '#9e8a6f',
     ]);
 
     $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
@@ -426,7 +440,7 @@ it('plugin push: 200 + does not re-queue when pack row is fully populated', func
     $pack = makePack('sample-vanilla', [
         'version' => '1.0.0',
         'background_color' => '#483f33',
-        'accent_color' => '#88827a',
+        'accent_color' => '#9e8a6f',
     ]);
 
     $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));

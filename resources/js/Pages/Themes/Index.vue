@@ -3,11 +3,12 @@ import { computed, ref } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import SettingsLayout from "@/Layouts/SettingsLayout.vue";
 import Card from "@/Components/Card.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
+import ResourcePackTile from "@/Components/ResourcePackTile.vue";
 import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
+import ResourcePackConfirmModal from "@/Components/ResourcePackConfirmModal.vue";
 
 const props = defineProps({
     packs: { type: Array, default: () => [] },
@@ -76,10 +77,19 @@ const installable = computed(() => {
 // loading rat). We just hand it the pack once the quota check passes.
 const installer = ref(null);
 
+// Confirmed first: the tile is the click target and start() posts immediately.
+const pendingInstall = ref(null);
+
 const install = (pack) => {
     if (props.canInstall) {
-        installer.value?.start(pack);
+        pendingInstall.value = pack;
     }
+};
+
+const confirmInstall = () => {
+    const pack = pendingInstall.value;
+    pendingInstall.value = null;
+    installer.value?.start(pack);
 };
 </script>
 
@@ -92,16 +102,16 @@ const install = (pack) => {
                     interface. Your in-game pack (via the RuneLite plugin) also sets this automatically.
                 </p>
 
-                <Card>
-                    <ResourcePackPicker :model-value="selected"
-                                        :packs="packs"
-                                        :default-id="defaultId"
-                                        allow-no-pack
-                                        @update:model-value="choose" />
-                    <p v-if="!packs.length" class="text-center text-base-content/60">
-                        No resource packs installed yet.
-                    </p>
-                </Card>
+                <ResourcePackPicker :model-value="selected"
+                                    :packs="packs"
+                                    :default-id="defaultId"
+                                    allow-no-pack
+                                    confirm
+                                    :currently-dark="$page.props.dark_mode ?? null"
+                                    @update:model-value="choose" />
+                <p v-if="!packs.length" class="text-center text-base-content/60">
+                    No resource packs installed yet.
+                </p>
 
                 <Card v-if="myPacks.length">
                     <div class="flex items-baseline justify-between gap-3">
@@ -126,44 +136,49 @@ const install = (pack) => {
                     </ul>
                 </Card>
 
-                <Card>
-                    <div class="flex items-baseline justify-between gap-3">
-                        <h2 class="text-lg font-bold">Browse packs</h2>
-                        <TextInput v-model="search" type="search" placeholder="Search packs…" class="w-44" />
-                    </div>
-                    <p class="mt-1 text-sm text-base-content/60">
-                        Install a community pack from the RuneLite hub to add it to your themes.
-                    </p>
-                    <p v-if="!canInstall" class="mt-1 text-xs font-medium text-error">
-                        You've reached your limit of {{ installLimit }} installed packs — delete one above to add another.
-                    </p>
+                <div class="flex items-baseline justify-between gap-3">
+                    <h2 class="text-lg font-bold">Browse packs</h2>
+                    <TextInput v-model="search" type="search" placeholder="Search packs…" />
+                </div>
+                <p class="mt-1 text-sm text-base-content/60">
+                    Install a community pack from the RuneLite hub to add it to your themes.
+                </p>
+                <p v-if="!canInstall" class="mt-1 text-xs font-medium text-error">
+                    You've reached your limit of {{ installLimit }} installed packs — delete one above to add another.
+                </p>
 
-                    <div v-if="!hubPacks.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
-                        Couldn't reach the resource-pack hub right now. Try again later.
-                    </div>
+                <div v-if="!hubPacks.length"
+                     class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
+                    Couldn't reach the resource-pack hub right now. Try again later.
+                </div>
 
-                    <div v-else-if="!installable.length"
-                         class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card resource-pack-border">
-                        Nothing new to install — every hub pack is already available above.
-                    </div>
+                <div v-else-if="!installable.length"
+                     class="mt-4 rounded p-6 text-center text-base-content/60 pack-bg-card border pack-accent-border resource-pack-border">
+                    Nothing new to install — every hub pack is already available above.
+                </div>
 
-                    <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                        <div v-for="pack in installable" :key="pack.name"
-                             class="flex flex-col items-center gap-2 rounded p-3 text-center pack-bg-card resource-pack-border">
-                            <img :src="pack.icon_url" :alt="pack.alias"
-                                 class="h-16 w-16 rounded object-cover [image-rendering:pixelated]"
-                                 loading="lazy" onerror="this.style.visibility='hidden'">
-                            <span class="max-w-full truncate text-sm font-medium" :title="pack.alias">{{ pack.alias }}</span>
-                            <PrimaryButton type="button" class="btn-xs"
-                                           :class="{ 'opacity-25': !canInstall }"
-                                           :disabled="!canInstall"
-                                           @click="install(pack)">
+                <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                    <ResourcePackTile v-for="pack in installable" :key="pack.name"
+                                      interactive :disabled="!canInstall"
+                                      :icon-url="pack.icon_url" :alias="pack.alias"
+                                      @click="install(pack)">
+                        <template #action>
+                            <!-- A label, not a control: the tile itself is the button,
+                                 so this must not be one too, and must not swallow the
+                                 click. -->
+                            <span class="btn btn-primary btn-xs pointer-events-none"
+                                  :class="{ 'opacity-25': !canInstall }">
                                 Install
-                            </PrimaryButton>
-                        </div>
-                    </div>
-                </Card>
+                            </span>
+                        </template>
+                    </ResourcePackTile>
+                </div>
+
+            <ResourcePackConfirmModal :show="pendingInstall !== null"
+                                      :pack="pendingInstall"
+                                      action="install"
+                                      @confirm="confirmInstall"
+                                      @close="pendingInstall = null" />
 
             <ResourcePackInstallModal ref="installer"
                                       :install-url="route('user.resource-pack.install')"

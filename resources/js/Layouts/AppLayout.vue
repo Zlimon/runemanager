@@ -7,6 +7,7 @@ import HiscoresMenu from '@/Components/HiscoresMenu.vue';
 import NavDropdown from '@/Components/NavDropdown.vue';
 import NavDropdownLink from '@/Components/NavDropdownLink.vue';
 import DarkModeToggle from '@/Components/DarkModeToggle.vue';
+import GuestPackPicker from '@/Components/GuestPackPicker.vue';
 
 defineProps({
     title: String,
@@ -28,13 +29,13 @@ const logout = () => {
         <Banner/>
 
         <div class="min-h-screen pack-bg">
-            <nav class="bg-beige-600 dark:bg-gray-900">
+            <nav class="pack-bg-nav text-neutral-content">
                 <div class="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
                     <Link :href="route('dashboard')" class="flex items-center space-x-3 rtl:space-x-reverse">
                         <img v-if="page.props.instance?.logo_url" :src="page.props.instance.logo_url"
                              :alt="page.props.app.name" class="h-12 w-auto object-contain md:h-16">
                         <span v-else
-                              class="self-center whitespace-nowrap text-2xl text-6xl font-bold dark:text-white md:text-7xl"
+                              class="self-center whitespace-nowrap text-2xl text-6xl font-bold md:text-7xl"
                               style="font-family: 'runescape-smooth', sans-serif">
                             {{ page.props.app.name }}
                         </span>
@@ -52,7 +53,7 @@ const logout = () => {
                     </button>
                     <div class="w-full items-center justify-between font-medium md:order-1 md:flex md:w-auto"
                          :class="mobileMenuOpen ? 'flex' : 'hidden'">
-                        <ul class="mt-4 flex flex-col rounded-lg border border-gray-100 p-4 bg-beige-100 rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 md:space-x-8 md:bg-beige-600 md:mt-0 md:flex-row md:border-0 md:p-0 md:dark:bg-gray-900">
+                        <ul class="mt-4 flex flex-col rounded-lg border border-neutral-content/20 pack-bg-nav p-4 rtl:space-x-reverse md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-transparent md:p-0">
                             <li>
                                 <ResponsiveNavLink :href="route('dashboard')"
                                                    :active="route().current('dashboard')">
@@ -121,12 +122,13 @@ const logout = () => {
                                         Settings
                                     </NavDropdownLink>
                                     <button type="button" @click="logout"
-                                            class="block w-full rounded px-3 py-2 text-left text-base-content hover:bg-base-300">
+                                            class="pack-row block w-full rounded px-3 py-2 text-left text-base-content hover:bg-base-300">
                                         Log out
                                     </button>
                                 </NavDropdown>
                             </li>
-                            <li class="flex items-center">
+                            <li class="flex items-center gap-1">
+                                <GuestPackPicker />
                                 <DarkModeToggle />
                             </li>
                         </ul>
@@ -137,7 +139,7 @@ const logout = () => {
 
 
             <!-- Page Heading -->
-            <header v-if="$slots.header" class="bg-base-100 shadow">
+            <header v-if="$slots.header" class="pack-bg-card shadow">
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <slot name="header"/>
                 </div>

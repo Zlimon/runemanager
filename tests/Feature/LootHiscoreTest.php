@@ -151,3 +151,50 @@ it('404s for a source with no loot', function () {
 it('requires authentication', function () {
     $this->get(route('hiscores.loot.index'))->assertRedirect(route('login'));
 });
+
+/**
+ * Records stored before the API normalised the type — in any casing other than
+ * RuneLite's — were listed in the directory but 404'd on their own page, since
+ * the page matches the uppercase type exactly.
+ */
+it('normalises stored loot types so every listed source is reachable', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user)->create();
+
+    Loot::create(['account_id' => $account->id, 'source' => 'Zulrah', 'type' => 'npc', 'items' => [], 'total_value' => 500, 'killed_at' => now()]);
+    Loot::create(['account_id' => $account->id, 'source' => 'Vorkath', 'type' => 'NPC', 'items' => [], 'total_value' => 400, 'killed_at' => now()]);
+    Loot::create(['account_id' => $account->id, 'source' => 'Goblin', 'type' => null, 'items' => [], 'total_value' => 5, 'killed_at' => now()]);
+
+    // Before the migration the lowercase record cannot be found by its own URL.
+    $this->actingAs($user)->get(route('hiscores.loot.show', ['npc', 'Zulrah']))->assertNotFound();
+
+    (require database_path('migrations/2026_09_21_223647_normalize_loot_record_types.php'))->up();
+
+    expect(Loot::query()->orderBy('total_value', 'desc')->pluck('type')->all())
+        // Already-correct and untyped records are left exactly as they were.
+        ->toBe(['NPC', 'NPC', null]);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.loot.show', ['npc', 'Zulrah']))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page->component('Hiscores/Loot/Show'));
+
+    Loot::query()->delete();
+});
+
+it('files a normalised source under its real section rather than Other', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user)->create();
+
+    Loot::create(['account_id' => $account->id, 'source' => 'Zulrah', 'type' => 'npc', 'items' => [], 'total_value' => 500, 'killed_at' => now()]);
+
+    (require database_path('migrations/2026_09_21_223647_normalize_loot_record_types.php'))->up();
+
+    $this->actingAs($user)
+        ->get(route('hiscores.loot.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('groups.0.label', 'Monsters')
+            ->where('groups.0.sources.0.name', 'Zulrah'));
+
+    Loot::query()->delete();
+});

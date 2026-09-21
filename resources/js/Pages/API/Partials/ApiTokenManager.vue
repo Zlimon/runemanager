@@ -92,7 +92,7 @@ const deleteApiToken = () => {
                         id="name"
                         v-model="createApiTokenForm.name"
                         type="text"
-                        class="mt-1 block w-full"
+                        class="mt-1 w-full"
                         autofocus
                     />
                     <InputError :message="createApiTokenForm.errors.name" class="mt-2" />

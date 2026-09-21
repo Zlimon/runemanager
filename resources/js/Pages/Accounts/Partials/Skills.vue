@@ -88,9 +88,10 @@ const tabs = [
     <!-- Sub-tabs for switching between the hiscore categories; same chrome as
          Show.vue's Inventory/Looting Bag via the shared TabbedCard. -->
     <TabbedCard :tabs="tabs" v-model="activeTab">
-        <!-- Fixed 72px-wide cells so the pack's tile_half_left/right.png pair
-             (36px each) join seam-to-seam instead of stretching. flex-wrap
-             keeps the row count flexible across screen widths. -->
+        <!-- Fixed-width cells; the pack's tile_half_left/right.png pair is
+             painted at 50% each, so they meet on the centre line at whatever
+             width this is. flex-wrap keeps the row count flexible across
+             screen widths. -->
         <ul class="flex flex-wrap justify-center gap-1"
             :class="activeTab === 'bosses' ? 'max-h-96 overflow-y-auto' : ''">
             <li v-for="cell in cells" :key="cell.slug" class="relative w-[72px]">
@@ -102,7 +103,7 @@ const tabs = [
                       @mouseleave="activeKey = null"
                       @mouseover="activeKey = cell.slug">
                     <img v-bind="cell.icon" class="h-5 w-5 object-contain" :alt="cell.tooltip.name">
-                    <span class="text-xs font-semibold capitalize text-gray-900 dark:text-white">
+                    <span class="text-xs font-semibold capitalize text-base-content">
                         {{ cell.label }}
                     </span>
                 </Link>

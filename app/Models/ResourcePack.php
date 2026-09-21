@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Helpers\SettingHelper;
+use App\Services\ResourcePacks\PackPalette;
+use App\Support\Instance;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property int $dark_mode
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read string|null $accent_ui_color
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newQuery()
@@ -41,8 +44,11 @@ class ResourcePack extends Model
 {
     use HasFactory;
 
-    /** The bundled vanilla template pack, always offered as "Default Vanilla". */
+    /** The bundled vanilla template pack, always offered as "Vanilla". */
     public const VANILLA = 'sample-vanilla';
+
+    /** Cookie value a logged-out visitor stores to opt out of resource packs. */
+    public const GUEST_NO_PACK = 'none';
 
     /** The member who installed this pack from the hub (null = instance-managed). */
     public function installedBy(): BelongsTo
@@ -64,7 +70,7 @@ class ResourcePack extends Model
 
     /**
      * The pack to actually render for a viewer: their personal pick, then the
-     * instance-global default, and finally the bundled Default Vanilla — so a
+     * instance-global default, and finally the bundled Vanilla — so a
      * pack is always in effect and there's no separate "no resource pack"
      * rendering path. Null only if even the vanilla row is absent.
      */
@@ -76,10 +82,38 @@ class ResourcePack extends Model
             return null;
         }
 
-        $id = $user?->effectiveResourcePackId() ?? SettingHelper::getSetting('resource_pack_id');
+        // Guests carry the same preference in a cookie, since they have no row
+        // to store it on (see Instance::RESOURCE_PACK_COOKIE).
+        $guestChoice = $user === null ? self::guestPackChoice() : null;
+
+        if ($guestChoice === self::GUEST_NO_PACK) {
+            return null;
+        }
+
+        $id = $guestChoice ?? $user?->effectiveResourcePackId() ?? SettingHelper::getSetting('resource_pack_id');
         $pack = $id ? self::find($id) : null;
 
         return $pack ?? self::where('name', self::VANILLA)->first();
+    }
+
+    /**
+     * A logged-out visitor's stored pack preference: the literal
+     * {@see self::GUEST_NO_PACK}, an installed pack id, or null when they have
+     * expressed no preference (or the cookie points at a deleted pack).
+     */
+    private static function guestPackChoice(): string|int|null
+    {
+        $cookie = request()->cookie(Instance::RESOURCE_PACK_COOKIE);
+
+        if ($cookie === self::GUEST_NO_PACK) {
+            return self::GUEST_NO_PACK;
+        }
+
+        if (is_numeric($cookie) && self::whereKey((int) $cookie)->exists()) {
+            return (int) $cookie;
+        }
+
+        return null;
     }
 
     /**
@@ -89,7 +123,7 @@ class ResourcePack extends Model
      */
     public static function pickerList(): array
     {
-        return self::query()->get()
+        return self::query()->withCount('users')->get()
             ->sortBy(fn (self $pack): string => $pack->name === self::VANILLA ? '' : mb_strtolower($pack->alias))
             ->map(fn (self $pack): array => $pack->toPickerArray())
             ->values()
@@ -108,9 +142,36 @@ class ResourcePack extends Model
     }
 
     /**
+     * The accent to paint functional controls with: {@see $accent_color} moved
+     * away from {@see $background_color}, hue intact, until the pair clears the
+     * WCAG 1.4.11 contrast bar — and the accent itself, unchanged, when it
+     * already does. That keeps the pack author's authentic accent available for
+     * decorative borders and pack textures while inputs and other boundaries get
+     * an edge that is reliably visible.
+     *
+     * Computed on read rather than stored: it is a pure function of two columns
+     * the row already carries, so there is nothing to migrate or keep in sync.
+     * Null unless both of those are present.
+     */
+    public function getAccentUiColorAttribute(): ?string
+    {
+        if ($this->background_color === null || $this->accent_color === null) {
+            return null;
+        }
+
+        return (new PackPalette)->uiAccent($this->accent_color, $this->background_color);
+    }
+
+    /**
      * Shape used by the resource-pack picker UI (owner-global + user-personal).
      *
-     * @return array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool}
+     * Carries more than the grid draws: the confirmation dialog shown before a
+     * switch describes what the pack will do to the interface, and the sampled
+     * palette plus dark_mode are the two things a viewer cannot infer from the
+     * icon — picking a pack repaints every surface from that palette and moves
+     * the whole interface between the light and dark themes.
+     *
+     * @return array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool, author: ?string, version: ?string, tags: list<string>, background_color: ?string, accent_color: ?string, users_count: ?int}
      */
     public function toPickerArray(): array
     {
@@ -121,6 +182,14 @@ class ResourcePack extends Model
             'icon_url' => $this->icon_url,
             'dark_mode' => (bool) $this->dark_mode,
             'installed_by_user_id' => $this->installed_by_user_id,
+            'author' => $this->author ?: null,
+            'version' => $this->version ?: null,
+            'tags' => array_values(array_filter(array_map('trim', explode(',', (string) $this->tags)))),
+            'background_color' => $this->background_color,
+            'accent_color' => $this->accent_color,
+            // Only present when the query asked for it (pickerList() does), so
+            // reading it never falls back to a query per pack.
+            'users_count' => $this->users_count,
         ];
     }
 }

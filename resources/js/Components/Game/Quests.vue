@@ -60,7 +60,7 @@ const visible = computed(() => {
 
         <div role="tablist" class="tabs tabs-boxed mb-2">
             <a v-for="filter in STATUS_FILTERS" :key="filter.key"
-               role="tab" class="tab tab-xs sm:tab-sm"
+               role="tab" class="tab resource-pack-tab tab-xs sm:tab-sm"
                :class="{ 'tab-active': activeFilter === filter.key }"
                @click="activeFilter = filter.key">
                 {{ filter.label }}

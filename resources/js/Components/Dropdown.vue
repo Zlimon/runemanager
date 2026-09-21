@@ -12,7 +12,9 @@ const props = defineProps({
     },
     contentClasses: {
         type: Array,
-        default: () => ['py-1', 'bg-white'],
+        // Themed surface, not a hardcoded white panel — no consumer overrides
+        // this, so the default is what every dropdown actually renders.
+        default: () => ['py-1', 'bg-base-100', 'text-base-content'],
     },
 });
 
@@ -70,7 +72,7 @@ const alignmentClasses = computed(() => {
                 style="display: none;"
                 @click="open = false"
             >
-                <div class="rounded-md ring-1 ring-black ring-opacity-5" :class="contentClasses">
+                <div class="rounded-md border border-base-300 ring-1 ring-base-content/5" :class="contentClasses">
                     <slot name="content" />
                 </div>
             </div>

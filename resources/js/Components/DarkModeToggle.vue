@@ -7,13 +7,18 @@ import { router, usePage } from '@inertiajs/vue3';
  * mount AppLayout. The Blade root sets the correct theme on first paint; this
  * keeps the <html> class + DaisyUI data-theme in sync across SPA navigations,
  * and persists the choice (account for users, cookie for guests).
+ *
+ * Only the untextured "no resource pack" interface supports both modes, so the
+ * button hides itself when the server says the viewer can't toggle — Default
+ * Vanilla ships one fixed scheme. The theme name itself comes from the server
+ * rather than being re-derived here, so the precedence rules live in one place
+ * (App\Support\Instance::themeFor).
  */
 const page = usePage();
 
 const apply = () => {
-    const dark = page.props.dark_mode === true;
-    document.documentElement.classList.toggle('dark', dark);
-    document.documentElement.dataset.theme = dark ? 'runemanager-dark' : 'runemanager';
+    document.documentElement.classList.toggle('dark', page.props.dark_mode === true);
+    document.documentElement.dataset.theme = page.props.theme;
 };
 
 const toggle = () => {
@@ -24,11 +29,12 @@ const toggle = () => {
 };
 
 onMounted(apply);
-watch(() => page.props.dark_mode, apply);
+watch(() => [page.props.dark_mode, page.props.theme], apply);
 </script>
 
 <template>
-    <button type="button"
+    <button v-if="page.props.can_toggle_dark_mode"
+            type="button"
             class="btn btn-ghost btn-circle btn-sm"
             :aria-label="page.props.dark_mode ? 'Switch to light mode' : 'Switch to dark mode'"
             @click="toggle">

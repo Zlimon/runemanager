@@ -30,7 +30,7 @@ All core product surface is done:
 - Admin settings hub (General, Branding, Feed & sync, Integrations, Members,
   Packs).
 - Zero-downtime deployment to production (runemanager.com) with persistent
-  resource packs, self-healing Default Vanilla, Reverb/queue/scheduler runtime.
+  resource packs, self-healing Vanilla, Reverb/queue/scheduler runtime.
 
 ## 2. Remaining
 

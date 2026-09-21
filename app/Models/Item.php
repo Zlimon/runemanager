@@ -162,6 +162,50 @@ class Item extends Model
         return $out;
     }
 
+    /**
+     * Name search for the calendar's item picker. Matches a case-insensitive
+     * substring against `name` and skips the noted/placeholder/duplicate
+     * variants that would otherwise fill the list with the same item three
+     * times. Like the lookups above this has to be a raw aggregation, because
+     * the Mongo driver aliases `id` to `_id` in Eloquent queries.
+     *
+     * @return list<array{id: int, name: string, icon: string|null}>
+     */
+    public static function searchByName(string $term, int $limit = 20): array
+    {
+        $term = trim($term);
+
+        if ($term === '') {
+            return [];
+        }
+
+        $docs = (new static)->getConnection()
+            ->getDatabase()
+            ->selectCollection((new static)->getTable())
+            ->aggregate([
+                ['$match' => [
+                    'name' => ['$regex' => preg_quote($term, '/'), '$options' => 'i'],
+                    'noted' => ['$ne' => true],
+                    'placeholder' => ['$ne' => true],
+                    'duplicate' => ['$ne' => true],
+                ]],
+                ['$project' => ['_id' => 0, 'id' => 1, 'name' => 1, 'icon' => 1]],
+                ['$sort' => ['name' => 1]],
+                ['$limit' => max(1, $limit)],
+            ])
+            ->toArray();
+
+        return array_values(array_map(function ($doc): array {
+            $arr = (array) $doc;
+
+            return [
+                'id' => (int) ($arr['id'] ?? 0),
+                'name' => (string) ($arr['name'] ?? ''),
+                'icon' => $arr['icon'] ?? null,
+            ];
+        }, $docs));
+    }
+
     public static function lookupByOsrsId(int|string $osrsId): array
     {
         $doc = (new static)->getConnection()
