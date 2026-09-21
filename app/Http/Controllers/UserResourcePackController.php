@@ -234,6 +234,26 @@ class UserResourcePackController extends Controller
     }
 
     /**
+     * Website: describe a hub pack before it is installed — its author, version
+     * and tags from pack.properties. Fetched when the install dialog opens rather
+     * than for the whole browse grid, which would mean a request per hub pack on
+     * every page view. {@see ResourcePackHub::properties()} caches it and refuses
+     * any name the hub does not list.
+     */
+    public function hub(Request $request, ResourcePackHub $hub): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
+        ]);
+
+        $properties = $hub->properties($validated['name']);
+
+        abort_if($properties === null, 404);
+
+        return response()->json($properties);
+    }
+
+    /**
      * Plugin push: set the override by pack name. The plugin reads the active
      * pack name from the RuneLite community Resource Packs plugin and pushes it
      * here so the website mirrors what's active in-game.

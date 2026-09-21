@@ -123,7 +123,7 @@ class ResourcePack extends Model
      */
     public static function pickerList(): array
     {
-        return self::query()->get()
+        return self::query()->withCount('users')->get()
             ->sortBy(fn (self $pack): string => $pack->name === self::VANILLA ? '' : mb_strtolower($pack->alias))
             ->map(fn (self $pack): array => $pack->toPickerArray())
             ->values()
@@ -165,7 +165,13 @@ class ResourcePack extends Model
     /**
      * Shape used by the resource-pack picker UI (owner-global + user-personal).
      *
-     * @return array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool}
+     * Carries more than the grid draws: the confirmation dialog shown before a
+     * switch describes what the pack will do to the interface, and the sampled
+     * palette plus dark_mode are the two things a viewer cannot infer from the
+     * icon — picking a pack repaints every surface from that palette and moves
+     * the whole interface between the light and dark themes.
+     *
+     * @return array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool, author: ?string, version: ?string, tags: list<string>, background_color: ?string, accent_color: ?string, users_count: ?int}
      */
     public function toPickerArray(): array
     {
@@ -176,6 +182,14 @@ class ResourcePack extends Model
             'icon_url' => $this->icon_url,
             'dark_mode' => (bool) $this->dark_mode,
             'installed_by_user_id' => $this->installed_by_user_id,
+            'author' => $this->author ?: null,
+            'version' => $this->version ?: null,
+            'tags' => array_values(array_filter(array_map('trim', explode(',', (string) $this->tags)))),
+            'background_color' => $this->background_color,
+            'accent_color' => $this->accent_color,
+            // Only present when the query asked for it (pickerList() does), so
+            // reading it never falls back to a query per pack.
+            'users_count' => $this->users_count,
         ];
     }
 }

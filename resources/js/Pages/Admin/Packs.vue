@@ -10,6 +10,7 @@ import TextInput from "@/Components/TextInput.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import ResourcePackTile from "@/Components/ResourcePackTile.vue";
 import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
+import ResourcePackConfirmModal from "@/Components/ResourcePackConfirmModal.vue";
 
 const props = defineProps({
     installed: { type: Array, default: () => [] },
@@ -64,7 +65,16 @@ const installable = computed(() => {
         .filter((p) => !needle || p.alias.toLowerCase().includes(needle) || p.name.toLowerCase().includes(needle));
 });
 
-const install = (pack) => installer.value?.start(pack);
+// Confirmed first: the tile is the click target and start() posts immediately.
+const pendingInstall = ref(null);
+
+const install = (pack) => { pendingInstall.value = pack; };
+
+const confirmInstall = () => {
+    const pack = pendingInstall.value;
+    pendingInstall.value = null;
+    installer.value?.start(pack);
+};
 </script>
 
 <template>
@@ -185,6 +195,12 @@ const install = (pack) => installer.value?.start(pack);
                 </div>
             </div>
         </div>
+
+        <ResourcePackConfirmModal :show="pendingInstall !== null"
+                                  :pack="pendingInstall"
+                                  action="install"
+                                  @confirm="confirmInstall"
+                                  @close="pendingInstall = null" />
 
         <ResourcePackInstallModal ref="installer"
                                   :install-url="route('admin.packs.install')"

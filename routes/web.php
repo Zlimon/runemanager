@@ -155,6 +155,8 @@ Route::middleware([
         ->name('user.resource-pack.install');
     Route::get('/user/resource-pack/status', [UserResourcePackController::class, 'status'])
         ->name('user.resource-pack.status');
+    Route::get('/user/resource-pack/hub', [UserResourcePackController::class, 'hub'])
+        ->name('user.resource-pack.hub');
     Route::delete('/user/resource-pack/{pack}', [UserResourcePackController::class, 'destroy'])
         ->whereNumber('pack')->name('user.resource-pack.destroy');
 

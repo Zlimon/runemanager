@@ -736,15 +736,6 @@ class InstallResourcePack
             return null;
         }
 
-        $values = [];
-        foreach (preg_split('/\r\n|\n|\r/', trim($response->body())) as $line) {
-            if (! str_contains($line, '=')) {
-                continue;
-            }
-            [$key, $value] = explode('=', $line, 2);
-            $values[trim($key)] = trim($value);
-        }
-
-        return $values ?: null;
+        return ResourcePackHub::parseProperties($response->body()) ?: null;
     }
 }

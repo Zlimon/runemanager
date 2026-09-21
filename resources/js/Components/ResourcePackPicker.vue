@@ -1,6 +1,8 @@
 <script setup>
+import { ref } from "vue";
 import Badge from "@/Components/Badge.vue";
 import ResourcePackTile from "@/Components/ResourcePackTile.vue";
+import ResourcePackConfirmModal from "@/Components/ResourcePackConfirmModal.vue";
 
 /*
  * A thumbnail gallery for choosing a resource pack (icon.png), used for both the
@@ -15,16 +17,47 @@ const props = defineProps({
     defaultId: { type: [Number, null], default: null },
     allowNone: { type: Boolean, default: true },
     allowNoPack: { type: Boolean, default: false },
+    /*
+     * Ask before applying the choice. Opt-in because it is only honest where a
+     * click takes effect on its own: the Appearance page applies immediately and
+     * reloads, while the instance-default picker in admin settings feeds a form
+     * field that does nothing until Save — a dialog there would be confirming
+     * something that has not happened.
+     */
+    confirm: { type: Boolean, default: false },
+    // Passed through so the dialog can say whether confirming moves the
+    // interface between the light and dark themes.
+    currentlyDark: { type: Boolean, default: null },
 });
 
 const emit = defineEmits(['update:modelValue']);
 
 const isSelected = (id) => String(props.modelValue ?? '') === String(id ?? '');
 
-const select = (id) => emit('update:modelValue', id);
+const pending = ref(null);
+
+const select = (id) => {
+    if (!props.confirm || isSelected(id)) {
+        emit('update:modelValue', id);
+
+        return;
+    }
+
+    // The two synthetic tiles have no pack row behind them; describe them well
+    // enough for the dialog rather than suppressing it for them.
+    pending.value = props.packs.find((pack) => String(pack.id) === String(id))
+        ?? { id, alias: id === 'none' ? 'No resource pack' : 'Default', icon_url: null };
+};
+
+const applyPending = () => {
+    const id = pending.value?.id;
+    pending.value = null;
+    emit('update:modelValue', id);
+};
 </script>
 
 <template>
+    <div>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         <ResourcePackTile v-if="allowNone" interactive alias="Default" fallback-text="None"
                            :sublabel="defaultId ? '(instance theme)' : null"
@@ -41,5 +74,13 @@ const select = (id) => emit('update:modelValue', id);
                 <Badge size="xs">Default</Badge>
             </template>
         </ResourcePackTile>
+    </div>
+
+    <ResourcePackConfirmModal :show="pending !== null"
+                              :pack="pending"
+                              :currently-dark="currentlyDark"
+                              action="switch"
+                              @confirm="applyPending"
+                              @close="pending = null" />
     </div>
 </template>

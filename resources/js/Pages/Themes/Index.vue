@@ -8,6 +8,7 @@ import TextInput from "@/Components/TextInput.vue";
 import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
 import ResourcePackTile from "@/Components/ResourcePackTile.vue";
 import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
+import ResourcePackConfirmModal from "@/Components/ResourcePackConfirmModal.vue";
 
 const props = defineProps({
     packs: { type: Array, default: () => [] },
@@ -76,10 +77,19 @@ const installable = computed(() => {
 // loading rat). We just hand it the pack once the quota check passes.
 const installer = ref(null);
 
+// Confirmed first: the tile is the click target and start() posts immediately.
+const pendingInstall = ref(null);
+
 const install = (pack) => {
     if (props.canInstall) {
-        installer.value?.start(pack);
+        pendingInstall.value = pack;
     }
+};
+
+const confirmInstall = () => {
+    const pack = pendingInstall.value;
+    pendingInstall.value = null;
+    installer.value?.start(pack);
 };
 </script>
 
@@ -96,6 +106,8 @@ const install = (pack) => {
                                     :packs="packs"
                                     :default-id="defaultId"
                                     allow-no-pack
+                                    confirm
+                                    :currently-dark="$page.props.dark_mode ?? null"
                                     @update:model-value="choose" />
                 <p v-if="!packs.length" class="text-center text-base-content/60">
                     No resource packs installed yet.
@@ -161,6 +173,12 @@ const install = (pack) => {
                         </template>
                     </ResourcePackTile>
                 </div>
+
+            <ResourcePackConfirmModal :show="pendingInstall !== null"
+                                      :pack="pendingInstall"
+                                      action="install"
+                                      @confirm="confirmInstall"
+                                      @close="pendingInstall = null" />
 
             <ResourcePackInstallModal ref="installer"
                                       :install-url="route('user.resource-pack.install')"
