@@ -582,20 +582,50 @@ html.has-pack .textarea:not(.textarea-error):focus-within {
  * layout — only its colour changes.
  */
 .pack-card-interactive {
+    cursor: pointer;
     outline: 2px solid transparent;
     outline-offset: 2px;
     transition: background-color 150ms ease, outline-color 150ms ease, transform 150ms ease;
 }
 
-.pack-card-interactive:hover {
+/*
+ * A card whose action is unavailable — the pack browser once the install limit
+ * is reached. It keeps its surface so the tile still reads as content, but
+ * stops claiming to be pressable: no lift, no pointer. The element is a real
+ * <button>, so :disabled also keeps it out of the tab order for free.
+ *
+ * Every interactive state below is guarded with :not(:disabled) rather than
+ * relying on pointer-events, which would also suppress a title tooltip and
+ * still leave the card focusable.
+ */
+.pack-card-interactive:disabled {
+    cursor: default;
+}
+
+.pack-card-interactive:not(:disabled):hover {
     background-color: var(--pack-bg-hover, var(--color-base-300));
     transform: translateY(-2px);
 }
 
-.pack-card-interactive:focus-visible {
+.pack-card-interactive:not(:disabled):focus-visible {
     background-color: var(--pack-bg-hover, var(--color-base-300));
     outline-color: var(--pack-accent-ui, var(--pack-accent, var(--color-primary)));
     transform: translateY(-2px);
+}
+
+/*
+ * When the card's content draws its own surface (ClickableCard's `surface:
+ * false` — the account grid nests an AccountCard, which is also rendered bare
+ * as a map tooltip and so keeps its own fill), that fill is opaque and paints
+ * straight over the lift above. The card then rose on hover without lighting
+ * up, which is not the same affordance the other clickable cards give.
+ *
+ * Push the lift down to the nested surface so every clickable card brightens,
+ * wherever the fill actually lives.
+ */
+.pack-card-interactive:not(:disabled):hover .pack-bg-card,
+.pack-card-interactive:not(:disabled):focus-visible .pack-bg-card {
+    background-color: var(--pack-bg-hover, var(--color-base-300));
 }
 
 /*
@@ -615,8 +645,8 @@ html.has-pack .textarea:not(.textarea-error):focus-within {
         transition: background-color 150ms ease, outline-color 150ms ease;
     }
 
-    .pack-card-interactive:hover,
-    .pack-card-interactive:focus-visible {
+    .pack-card-interactive:not(:disabled):hover,
+    .pack-card-interactive:not(:disabled):focus-visible {
         transform: none;
     }
 }

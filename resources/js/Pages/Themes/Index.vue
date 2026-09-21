@@ -3,10 +3,10 @@ import { computed, ref } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import SettingsLayout from "@/Layouts/SettingsLayout.vue";
 import Card from "@/Components/Card.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
+import ResourcePackTile from "@/Components/ResourcePackTile.vue";
 import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
 
 const props = defineProps({
@@ -146,19 +146,20 @@ const install = (pack) => {
                 </div>
 
                 <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                    <div v-for="pack in installable" :key="pack.name"
-                         class="flex flex-col items-center gap-2 rounded p-3 text-center pack-bg-card border pack-accent-border resource-pack-border">
-                        <img :src="pack.icon_url" :alt="pack.alias"
-                             class="h-16 w-16 rounded object-cover [image-rendering:pixelated]"
-                             loading="lazy" onerror="this.style.visibility='hidden'">
-                        <span class="max-w-full truncate text-sm font-medium" :title="pack.alias">{{ pack.alias }}</span>
-                        <PrimaryButton type="button" class="btn-xs"
-                                       :class="{ 'opacity-25': !canInstall }"
-                                       :disabled="!canInstall"
-                                       @click="install(pack)">
-                            Install
-                        </PrimaryButton>
-                    </div>
+                    <ResourcePackTile v-for="pack in installable" :key="pack.name"
+                                      interactive :disabled="!canInstall"
+                                      :icon-url="pack.icon_url" :alias="pack.alias"
+                                      @click="install(pack)">
+                        <template #action>
+                            <!-- A label, not a control: the tile itself is the button,
+                                 so this must not be one too, and must not swallow the
+                                 click. -->
+                            <span class="btn btn-primary btn-xs pointer-events-none"
+                                  :class="{ 'opacity-25': !canInstall }">
+                                Install
+                            </span>
+                        </template>
+                    </ResourcePackTile>
                 </div>
 
             <ResourcePackInstallModal ref="installer"

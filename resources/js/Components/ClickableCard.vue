@@ -32,6 +32,13 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    // Keeps the surface but drops the hover, the pointer and the tab stop —
+    // for a card whose action is temporarily unavailable. Ignored when `href`
+    // is set, since an anchor has no disabled state.
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
     // Draw the card surface. Off when the slot content is already a card.
     surface: {
         type: Boolean,
@@ -65,6 +72,7 @@ const surfaceClasses = computed(() => (props.surface
     <component :is="href ? Link : 'button'"
                :href="href ?? undefined"
                :type="href ? undefined : 'button'"
+               :disabled="href ? undefined : disabled || undefined"
                class="pack-card-interactive block w-full rounded text-left"
                :class="[surfaceClasses, { 'pack-card-selected': selected }]"
                @click="$emit('click')">

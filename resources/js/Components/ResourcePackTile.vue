@@ -7,10 +7,10 @@ import ClickableCard from './ClickableCard.vue';
  * A single resource-pack tile: icon (or fallback text), name (wrapping up to
  * two lines rather than truncating to one, so it stays readable), an optional
  * badge, and a selected/boundary state. Shared by ResourcePackPicker.vue (a
- * selectable grid — pass `interactive` to render the tile itself as the
- * clickable control) and Admin/Packs.vue's hub browser (not selectable; put
- * an Install button in the `#action` slot instead, since a tile can't be both
- * a button and contain one).
+ * selectable grid) and Admin/Packs.vue's hub browser (where clicking the tile
+ * starts the install). Pass `interactive` to render the tile as the clickable
+ * control; anything in the `#action` slot is then a label rather than a
+ * control, since a button cannot contain another one.
  */
 const props = defineProps({
     iconUrl: { type: String, default: null },
@@ -20,6 +20,9 @@ const props = defineProps({
     sublabel: { type: String, default: null },
     selected: { type: Boolean, default: false },
     interactive: { type: Boolean, default: false },
+    // Only meaningful with `interactive`: the tile stays visible but stops
+    // being pressable (the hub browser once the install limit is reached).
+    disabled: { type: Boolean, default: false },
 });
 
 defineEmits(['click']);
@@ -32,7 +35,7 @@ const surface = computed(() => (props.interactive ? ClickableCard : Card));
 
 <template>
     <component :is="surface"
-               v-bind="interactive ? { selected } : {}"
+               v-bind="interactive ? { selected, disabled } : {}"
                padding="p-3"
                class="relative flex flex-col items-center gap-2 text-center"
                @click="$emit('click')">

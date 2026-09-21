@@ -1,7 +1,7 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Card from "@/Components/Card.vue";
+import ClickableCard from "@/Components/ClickableCard.vue";
 
 defineProps({
     groups: {
@@ -37,13 +37,17 @@ const formatValue = (gp) => {
                 <section v-for="group in groups" :key="group.label" class="space-y-3">
                     <h2 class="text-lg font-semibold text-base-content">{{ group.label }}</h2>
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                        <Link v-for="source in group.sources" :key="`${source.type}:${source.name}`"
-                              :href="route('hiscores.loot.show', [source.type, source.name])"
-                              class="flex flex-col gap-1 rounded p-4 transition hover:brightness-110 pack-bg-card border pack-accent-border resource-pack-border">
-                            <span class="font-semibold text-base-content">{{ source.name }}</span>
-                            <span class="text-sm text-base-content/70">{{ formatValue(source.total_value) }} gp</span>
-                            <span class="text-xs text-base-content/50">{{ source.drops.toLocaleString('en-US') }} drops</span>
-                        </Link>
+                        <ClickableCard v-for="source in group.sources" :key="`${source.type}:${source.name}`"
+                                       :href="route('hiscores.loot.show', [source.type, source.name])">
+                            <!-- The layout lives on a child: ClickableCard sets its own
+                                 display, and two display utilities on one element would
+                                 be decided by stylesheet order rather than intent. -->
+                            <div class="flex flex-col gap-1">
+                                <span class="font-semibold text-base-content">{{ source.name }}</span>
+                                <span class="text-sm text-base-content/70">{{ formatValue(source.total_value) }} gp</span>
+                                <span class="text-xs text-base-content/50">{{ source.drops.toLocaleString('en-US') }} drops</span>
+                            </div>
+                        </ClickableCard>
                     </div>
                 </section>
             </div>

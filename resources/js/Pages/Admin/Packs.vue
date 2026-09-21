@@ -171,11 +171,16 @@ const install = (pack) => installer.value?.start(pack);
 
                     <div v-else class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                         <ResourcePackTile v-for="pack in installable" :key="pack.name"
-                                          :icon-url="pack.icon_url" :alias="pack.alias">
+                                          interactive
+                                          :icon-url="pack.icon_url" :alias="pack.alias"
+                                          @click="install(pack)">
                             <template #action>
-                                <PrimaryButton type="button" class="btn-xs" @click="install(pack)">
+                                <!-- A label, not a control: the tile itself is the
+                                     button, so this must not be one too, and must not
+                                     swallow the click. -->
+                                <span class="btn btn-primary btn-xs pointer-events-none">
                                     Install
-                                </PrimaryButton>
+                                </span>
                             </template>
                         </ResourcePackTile>
                     </div>
