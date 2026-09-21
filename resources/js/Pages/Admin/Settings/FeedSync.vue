@@ -37,7 +37,7 @@ const submit = () => form.put(route('admin.config.update'), { preserveScroll: tr
                 <div>
                     <InputLabel for="hiscore_refresh_minutes" value="Hiscores refresh" />
                     <SelectInput id="hiscore_refresh_minutes" :model-value="form.hiscore_refresh_minutes"
-                                 class="mt-1 block w-full"
+                                 class="mt-1 w-full"
                                  :error="form.errors.hiscore_refresh_minutes !== undefined"
                                  @update:model-value="(value) => (form.hiscore_refresh_minutes = Number(value))">
                         <option v-for="opt in refreshOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
@@ -49,7 +49,7 @@ const submit = () => form.put(route('admin.config.update'), { preserveScroll: tr
                 <div>
                     <InputLabel for="feed_level_up_thresholds" value="Level-up milestones" />
                     <TextInput id="feed_level_up_thresholds" v-model="form.feed_level_up_thresholds" type="text"
-                               class="mt-1 block w-full" placeholder="50, 60, 70, 80, 90, 99"
+                               class="mt-1 w-full" placeholder="50, 60, 70, 80, 90, 99"
                                :error="form.errors.feed_level_up_thresholds !== undefined" />
                     <p class="mt-1 text-xs text-base-content/60">
                         Comma-separated levels (2–99). The Live Feed shows level-ups only at these levels; account pages show every level.
@@ -60,7 +60,7 @@ const submit = () => form.put(route('admin.config.update'), { preserveScroll: tr
                 <div>
                     <InputLabel for="feed_loot_min_value" value="Minimum loot value (gp)" />
                     <TextInput id="feed_loot_min_value" v-model.number="form.feed_loot_min_value" type="number" min="0"
-                               class="mt-1 block w-full" :error="form.errors.feed_loot_min_value !== undefined" />
+                               class="mt-1 w-full" :error="form.errors.feed_loot_min_value !== undefined" />
                     <p class="mt-1 text-xs text-base-content/60">Drops below this GE value are hidden from the Live Feed; account pages show whatever the plugin's own feed threshold lets through.</p>
                     <InputError v-if="form.errors.feed_loot_min_value" :messages="form.errors.feed_loot_min_value" />
                 </div>

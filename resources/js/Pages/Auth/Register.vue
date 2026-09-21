@@ -57,7 +57,7 @@ const submit = () => {
                 <SelectInput
                     id="account_id"
                     v-model="form.account_id"
-                    class="mt-1 block"
+                    class="mt-1"
                     :error="form.errors.account_id !== undefined"
                     required
                 >
@@ -75,7 +75,7 @@ const submit = () => {
                     id="name"
                     v-model="form.name"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1 w-full"
                     required
                     autofocus
                     autocomplete="name"
@@ -89,7 +89,7 @@ const submit = () => {
                     id="email"
                     v-model="form.email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="mt-1 w-full"
                     required
                     autocomplete="username"
                 />
@@ -102,7 +102,7 @@ const submit = () => {
                     id="password"
                     v-model="form.password"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1 w-full"
                     required
                     autocomplete="new-password"
                 />
@@ -115,7 +115,7 @@ const submit = () => {
                     id="password_confirmation"
                     v-model="form.password_confirmation"
                     type="password"
-                    class="mt-1 block w-full"
+                    class="mt-1 w-full"
                     required
                     autocomplete="new-password"
                 />

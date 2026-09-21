@@ -81,7 +81,7 @@ const confirmReset = () => {
                 <div>
                     <InputLabel for="instance_mode" value="Mode" />
                     <SelectInput id="instance_mode" v-model="form.instance_mode"
-                                 class="mt-1 block" :error="form.errors.instance_mode !== undefined">
+                                 class="mt-1" :error="form.errors.instance_mode !== undefined">
                         <option v-for="mode in modes" :key="mode" :value="mode">{{ modeLabel(mode) }}</option>
                     </SelectInput>
                     <p class="mt-1 text-xs text-base-content/60">{{ modeHint }}</p>
@@ -93,7 +93,7 @@ const confirmReset = () => {
 
                 <div v-if="form.instance_mode === 'clan'">
                     <InputLabel for="clan_name" value="Clan name" />
-                    <TextInput id="clan_name" v-model="form.clan_name" type="text" class="mt-1 block w-full"
+                    <TextInput id="clan_name" v-model="form.clan_name" type="text" class="mt-1 w-full"
                                :error="form.errors.clan_name !== undefined" />
                     <p class="mt-1 text-xs text-base-content/60">
                         Auto-filled from the owner's clan when the plugin syncs the roster.
@@ -103,7 +103,7 @@ const confirmReset = () => {
 
                 <div v-if="form.instance_mode === 'group'">
                     <InputLabel for="group_name" value="Group name" />
-                    <TextInput id="group_name" v-model="form.group_name" type="text" class="mt-1 block w-full"
+                    <TextInput id="group_name" v-model="form.group_name" type="text" class="mt-1 w-full"
                                :error="form.errors.group_name !== undefined" />
                     <InputError v-if="form.errors.group_name" :messages="form.errors.group_name" />
                 </div>
@@ -128,7 +128,7 @@ const confirmReset = () => {
                 <div>
                     <InputLabel for="default_dark_mode" value="Default appearance" />
                     <SelectInput id="default_dark_mode" v-model="form.default_dark_mode"
-                                 class="mt-1 block" :error="form.errors.default_dark_mode !== undefined">
+                                 class="mt-1" :error="form.errors.default_dark_mode !== undefined">
                         <option value="">Follow resource pack</option>
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
@@ -170,7 +170,7 @@ const confirmReset = () => {
                 </p>
                 <div class="mt-4">
                     <InputLabel for="confirm" :value="`Type &quot;${form.instance_mode}&quot; to confirm`" />
-                    <TextInput id="confirm" v-model="form.confirm" type="text" class="mt-1 block w-full"
+                    <TextInput id="confirm" v-model="form.confirm" type="text" class="mt-1 w-full"
                                autocomplete="off" :error="form.errors.confirm !== undefined" />
                     <InputError v-if="form.errors.confirm" :messages="form.errors.confirm" />
                 </div>

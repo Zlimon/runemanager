@@ -103,7 +103,7 @@ const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
                         <TextInput id="announcement-title"
                                    v-model="form.title"
                                    type="text"
-                                   class="mt-1 block w-full"
+                                   class="mt-1 w-full"
                                    :error="form.errors.title !== undefined" />
                         <InputError v-if="form.errors.title" :messages="form.errors.title" />
                     </div>
@@ -122,7 +122,7 @@ const dt = (iso) => dayjs(iso).format('MMM D, YYYY h:mm A');
                         <TextInput id="announcement-expires-at"
                                    v-model="form.expires_at"
                                    type="datetime-local"
-                                   class="mt-1 block w-full"
+                                   class="mt-1 w-full"
                                    :error="form.errors.expires_at !== undefined" />
                         <InputError v-if="form.errors.expires_at" :messages="form.errors.expires_at" />
                     </div>

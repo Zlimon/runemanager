@@ -24,7 +24,7 @@ const submit = () => form.put(route('admin.integrations.update'), { preserveScro
             <form class="space-y-6" @submit.prevent="submit">
                 <div>
                     <InputLabel for="webhook_url" value="Webhook URL" />
-                    <TextInput id="webhook_url" v-model="form.webhook_url" type="url" class="mt-1 block w-full"
+                    <TextInput id="webhook_url" v-model="form.webhook_url" type="url" class="mt-1 w-full"
                                placeholder="https://discord.com/api/webhooks/..."
                                :error="form.errors.webhook_url !== undefined" />
                     <p class="mt-1 text-xs text-base-content/60">

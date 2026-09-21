@@ -59,7 +59,7 @@ const updateTeamName = () => {
                     id="name"
                     v-model="form.name"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1 w-full"
                     :disabled="! permissions.canUpdateTeam"
                 />
 

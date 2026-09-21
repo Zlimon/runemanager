@@ -215,7 +215,7 @@ const saveHighlights = () => {
                 <div class="space-y-4">
                     <div>
                         <InputLabel for="event-title" value="Title" />
-                        <TextInput id="event-title" v-model="form.title" type="text" class="mt-1 block w-full"
+                        <TextInput id="event-title" v-model="form.title" type="text" class="mt-1 w-full"
                                    :error="form.errors.title !== undefined" />
                         <InputError v-if="form.errors.title" :messages="form.errors.title" />
                     </div>
@@ -230,7 +230,7 @@ const saveHighlights = () => {
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <InputLabel for="event-type" value="Type" />
-                            <SelectInput id="event-type" v-model="form.event_type" class="mt-1 block"
+                            <SelectInput id="event-type" v-model="form.event_type" class="mt-1"
                                          :error="form.errors.event_type !== undefined">
                                 <option v-for="type in eventTypes" :key="type.value" :value="type.value">
                                     {{ type.label }}
@@ -265,13 +265,13 @@ const saveHighlights = () => {
                         <div>
                             <InputLabel for="event-starts-at" value="Starts" />
                             <TextInput id="event-starts-at" v-model="form.starts_at" type="datetime-local"
-                                       class="mt-1 block w-full" :error="form.errors.starts_at !== undefined" />
+                                       class="mt-1 w-full" :error="form.errors.starts_at !== undefined" />
                             <InputError v-if="form.errors.starts_at" :messages="form.errors.starts_at" />
                         </div>
                         <div>
                             <InputLabel for="event-ends-at" value="Ends (optional)" />
                             <TextInput id="event-ends-at" v-model="form.ends_at" type="datetime-local"
-                                       class="mt-1 block w-full" :error="form.errors.ends_at !== undefined" />
+                                       class="mt-1 w-full" :error="form.errors.ends_at !== undefined" />
                             <InputError v-if="form.errors.ends_at" :messages="form.errors.ends_at" />
                         </div>
                     </div>
