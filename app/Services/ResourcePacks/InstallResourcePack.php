@@ -590,6 +590,17 @@ class InstallResourcePack
             $name = basename($directory);
             $filled += $this->completeFromVanilla($directory);
 
+            // Re-run the sprite normalisers here, not just at install. A pack
+            // fetched before a normaliser existed keeps whatever geometry it
+            // shipped with for good, and in production public/resource-packs is
+            // shared by symlink across releases, so installed packs outlive the
+            // deploy that would have fixed them. All three are idempotent and
+            // no-op on a pack that is already trimmed, so this is safe on every
+            // run — the same reason completeFromVanilla() sits here.
+            $this->normalizeBorderSprites($directory);
+            $this->normalizeStatTileSprites($directory);
+            $this->normalizeCheckboxSprites($directory);
+
             // Rendered per pack — see renderTemplateFor(). Comparing against the
             // raw template would rewrite every pack whose face is stretched on
             // every run, expiring cached stylesheets for no change.

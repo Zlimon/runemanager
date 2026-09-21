@@ -19,10 +19,26 @@ function installedPackDir(string $name, string $css): string
 }
 
 afterEach(function () {
-    foreach (['pack-synctest-stale', 'pack-synctest-current', 'pack-synctest-partial'] as $name) {
+    foreach (['pack-synctest-stale', 'pack-synctest-current', 'pack-synctest-partial', 'pack-synctest-sprites'] as $name) {
         File::deleteDirectory(public_path("resource-packs/{$name}"));
     }
 });
+
+/**
+ * Write a sprite of the given canvas size with its artwork confined to a corner
+ * — the shape packs actually ship, and the one the normalisers trim.
+ */
+function paddedSprite(string $path, int $canvas, int $art): void
+{
+    File::ensureDirectoryExists(dirname($path));
+    $image = imagecreatetruecolor($canvas, $canvas);
+    imagealphablending($image, false);
+    imagesavealpha($image, true);
+    imagefilledrectangle($image, 0, 0, $canvas - 1, $canvas - 1, imagecolorallocatealpha($image, 0, 0, 0, 127));
+    imagefilledrectangle($image, 0, 0, $art - 1, $art - 1, imagecolorallocatealpha($image, 200, 40, 90, 0));
+    imagepng($image, $path);
+    imagedestroy($image);
+}
 
 /**
  * Give the pack a button face of the given dimensions — the one sprite that
@@ -144,4 +160,36 @@ it('never fails the deploy when the template is unreadable', function () {
     $this->artisan('resourcepack:sync-css')
         ->expectsOutputToContain('Could not sync per-pack CSS')
         ->assertSuccessful();
+});
+
+/**
+ * The normalisers run at install, but a pack fetched before one of them existed
+ * would keep its untrimmed sprites for good — and in production
+ * public/resource-packs is shared by symlink across releases, so those packs
+ * outlive the deploy that should have fixed them. sync-css is the deploy hook
+ * that repairs them.
+ */
+it('normalises untrimmed sprites on already-installed packs', function () {
+    $dir = installedPackDir('pack-synctest-sprites', '/* an older copy */');
+    packFace($dir, 12, 12);
+    paddedSprite($dir.'/options/checkbox_empty.png', 36, 15);
+    paddedSprite($dir.'/stats/tile_half_left.png', 36, 31);
+
+    app(InstallResourcePack::class)->syncTemplateCss();
+
+    expect(getimagesize($dir.'/options/checkbox_empty.png'))->toMatchArray([0 => 15, 1 => 15])
+        // Stat-tile halves are trimmed horizontally only — each is one side of a
+        // seam and has to keep its full height.
+        ->and(getimagesize($dir.'/stats/tile_half_left.png'))->toMatchArray([0 => 31, 1 => 36]);
+});
+
+it('leaves already-trimmed sprites untouched', function () {
+    $dir = installedPackDir('pack-synctest-sprites', '/* an older copy */');
+    packFace($dir, 12, 12);
+    paddedSprite($dir.'/options/checkbox_empty.png', 15, 15);
+
+    $before = File::get($dir.'/options/checkbox_empty.png');
+    app(InstallResourcePack::class)->syncTemplateCss();
+
+    expect(File::get($dir.'/options/checkbox_empty.png'))->toBe($before);
 });
