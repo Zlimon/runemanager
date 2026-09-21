@@ -756,11 +756,36 @@ html.has-pack .nav-menu-link.is-active {
  * hover fills and the focus ring — take pack colours, and the ring uses
  * --pack-accent-ui because a focus indicator owes the 3:1 non-text minimum.
  *
- * The --vc-accent-* ramp is deliberately left alone. v-calendar builds the
- * selected-day and event-dot fills out of several steps of it, and flattening
- * them to one accent would destroy the contrast between those states.
+ * The --vc-accent-* ramp is the rest of it: the month picker's current month,
+ * today, and the focused and selected days all read from it, and the container
+ * carries v-calendar's `vc-blue`, which is where the remaining blue came from.
+ * v-calendar builds those states from several steps of the ramp at once — a
+ * light step for a fill, a dark one for the text on it — so it is rebuilt as a
+ * full ten-step ramp around the pack's accent rather than flattened to one
+ * colour, which would erase the difference between the states.
+ *
+ * The steps mix --pack-accent-ui toward white above 500 and toward black below
+ * it, matching the shape of the Tailwind palette v-calendar expects: 500 is the
+ * accent itself, 50 is nearly white, 900 is deep. The -ui variant is used
+ * because these mark interactive state, and it is the one guaranteed to clear
+ * 3:1 against the pack surface.
+ *
+ * Event bars are not affected, and must not be. Each carries its own colour
+ * class (vc-teal, vc-orange…) on the bar itself, chosen for its event type or
+ * by whoever created the event. That class redefines the ramp on a nearer
+ * element, so it wins over this container-level one.
+ *
+ * The popovers need it separately. The month picker and the day popovers are
+ * teleported out of .vc-container into their own .vc-popover-content, which
+ * carries a `vc-blue` of its own, so they inherit nothing from the calendar
+ * they belong to — the month picker's current month stayed blue until this
+ * rule reached it directly.
+ *
+ * `html.has-pack .vc-container` (0,2,1) outranks `.vc-blue` (0,1,0) on the
+ * same element, and so does the popover selector, so no !important is needed.
  */
-html.has-pack .vc-container {
+html.has-pack .vc-container,
+html.has-pack .vc-popover-content {
     --vc-header-arrow-color: var(--color-base-content);
     --vc-header-title-color: var(--color-base-content);
     --vc-nav-title-color: var(--color-base-content);
@@ -768,6 +793,18 @@ html.has-pack .vc-container {
     --vc-header-arrow-hover-bg: var(--pack-bg-hover);
     --vc-day-content-hover-bg: var(--pack-bg-hover);
     --vc-focus-ring: 0 0 0 2px var(--pack-accent-ui, var(--pack-accent, var(--color-base-300)));
+
+    --vc-pack-accent: var(--pack-accent-ui, var(--pack-accent, var(--color-primary)));
+    --vc-accent-50: color-mix(in srgb, var(--vc-pack-accent) 8%, white);
+    --vc-accent-100: color-mix(in srgb, var(--vc-pack-accent) 18%, white);
+    --vc-accent-200: color-mix(in srgb, var(--vc-pack-accent) 35%, white);
+    --vc-accent-300: color-mix(in srgb, var(--vc-pack-accent) 55%, white);
+    --vc-accent-400: color-mix(in srgb, var(--vc-pack-accent) 78%, white);
+    --vc-accent-500: var(--vc-pack-accent);
+    --vc-accent-600: color-mix(in srgb, var(--vc-pack-accent) 85%, black);
+    --vc-accent-700: color-mix(in srgb, var(--vc-pack-accent) 70%, black);
+    --vc-accent-800: color-mix(in srgb, var(--vc-pack-accent) 55%, black);
+    --vc-accent-900: color-mix(in srgb, var(--vc-pack-accent) 40%, black);
 }
 
 html.has-pack .table-zebra tbody tr:nth-child(2n) {
