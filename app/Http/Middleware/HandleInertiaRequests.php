@@ -99,7 +99,7 @@ class HandleInertiaRequests extends Middleware
                 'name' => $pack->name,
                 'version' => $pack->updated_at?->timestamp,
             ] : null,
-            'skills' => fn () => Skill::distinct()->select('name', 'slug')->get()->toArray() ?? [],
+            'skills' => fn () => Skill::distinct()->select('name', 'slug', 'order')->ordered()->get()->toArray() ?? [],
 
             // Boss list for the Hiscores nav — derived from a representative
             // account's hiscore activities (the OSRS API returns the full set on
