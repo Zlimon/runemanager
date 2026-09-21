@@ -53,20 +53,30 @@ export function feedSentence(event) {
 const TROPHY = { src: '/images/trophy.png' };
 
 /*
+ * Loot Tracker source names whose /images/boss file is named differently. Only
+ * names confirmed against real loot are listed; anything else that misses falls
+ * back to the trophy below rather than being guessed at here.
+ */
+const LOOT_ICON_ALIASES = {
+    barrows: 'barrows-chests',
+};
+
+/*
  * A loot source's boss portrait from /images/boss, which names its files as
  * hyphenated slugs ("Theatre of Blood" -> theatre-of-blood.png).
  *
- * A source does not always name a file — "Barrows" is barrows-chests.png, and
- * chests and clue tiers have no portrait at all — so a miss falls back to the
- * trophy rather than leaving a broken image. The src guard stops it looping if
- * the trophy itself fails.
+ * A source does not always name a file — chests, clue tiers and ordinary NPCs
+ * have no portrait at all — so a miss falls back to the trophy rather than
+ * leaving a broken image. The src guard stops it looping if the trophy itself
+ * fails. Shared by the feed and the loot directory.
  */
-const lootIcon = (source) => {
-    const slug = (source ?? '')
+export const lootIcon = (source) => {
+    const normalised = (source ?? '')
         .toLowerCase()
         .replace(/['’]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
+    const slug = LOOT_ICON_ALIASES[normalised] ?? normalised;
 
     return {
         src: `/images/boss/${slug}.png`,
