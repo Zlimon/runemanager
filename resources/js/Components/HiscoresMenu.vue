@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
+import TabbedCard from "@/Components/TabbedCard.vue";
 
 defineProps({
     active: Boolean,
@@ -16,13 +17,14 @@ const { packIcon } = useResourcePackIcon();
 // no pack equivalent so they point at /images — boss slugs are underscore from
 // the hiscores API but the files use dashes, and clue tiers map to
 // {tier}-treasure-trails.png.
+const skillIcon = (slug) => packIcon('skill', slug);
 const bossIcon = (slug) => ({ src: `/images/boss/${slug.replaceAll('_', '-')}.png` });
 const clueIcon = (slug) => ({ src: `/images/clue/${slug.replace('clue_scrolls_', '')}-treasure-trails.png` });
 
-const categories = [
-    { key: 'skill', label: 'Skills', route: 'hiscores.skills.index', icon: (slug) => packIcon('skill', slug), tab: packIcon('tab', 'stats') },
-    { key: 'boss', label: 'Bosses', route: 'hiscores.bosses.index', icon: bossIcon, tab: { src: '/images/boss/bosses.png' } },
-    { key: 'clue', label: 'Clues', route: 'hiscores.clues.index', icon: clueIcon, tab: { src: '/images/clue/clues.png' } },
+const hiscoreTabs = [
+    { key: 'skill', label: 'Skills', icon: packIcon('tab', 'stats'), route: 'hiscores.skills.index', entryIconPath: skillIcon },
+    { key: 'boss', label: 'Bosses', icon: { src: '/images/boss/bosses.png' }, route: 'hiscores.bosses.index', entryIconPath: bossIcon },
+    { key: 'clue', label: 'Clues', icon: { src: '/images/clue/clues.png' }, route: 'hiscores.clues.index', entryIconPath: clueIcon },
 ];
 
 const lists = computed(() => ({
@@ -31,9 +33,9 @@ const lists = computed(() => ({
     clue: page.props.clues ?? [],
 }));
 
-const activeKey = ref('skill');
-const activeCategory = computed(() => categories.find((c) => c.key === activeKey.value));
-const items = computed(() => lists.value[activeKey.value]);
+const activeHiscoreTab = ref('skill');
+const activeCategory = computed(() => hiscoreTabs.find((c) => c.key === activeHiscoreTab.value));
+const items = computed(() => lists.value[activeHiscoreTab.value]);
 </script>
 
 <template>
@@ -83,24 +85,18 @@ const items = computed(() => lists.value[activeKey.value]);
                 </Link>
             </div>
 
-            <div role="tablist" class="tabs tabs-boxed mb-3">
-                <a v-for="category in categories" :key="category.key"
-                   role="tab" class="tab resource-pack-tab gap-1.5"
-                   :class="{ 'tab-active': activeKey === category.key }"
-                   @click="activeKey = category.key">
-                    <img v-bind="category.tab" class="h-4 w-4 object-contain" alt="">
-                    {{ category.label }}
-                </a>
-            </div>
-
-            <div class="grid max-h-80 grid-cols-2 gap-1 overflow-y-auto sm:grid-cols-3">
-                <Link v-for="item in items" :key="item.slug"
-                      :href="route(activeCategory.route, item.slug)"
-                      class="flex items-center gap-2 nav-menu-link rounded p-2 hover:bg-base-300">
-                    <img v-bind="activeCategory.icon(item.slug)" class="h-6 w-6 object-contain" :alt="item.name">
-                    <span class="truncate text-sm capitalize text-base-content">{{ item.name }}</span>
-                </Link>
-            </div>
+            <TabbedCard :tabs="hiscoreTabs" v-model="activeHiscoreTab" class="mt-4">
+                <template #default="{ activeHiscoreTab }">
+                    <div class="grid max-h-90 grid-cols-2 gap-1 overflow-y-auto sm:grid-cols-3">
+                        <Link v-for="item in items" :key="item.slug"
+                              :href="route(activeCategory.route, item.slug)"
+                              class="flex items-center gap-2 nav-menu-link rounded p-2 hover:bg-base-300">
+                            <img v-bind="activeCategory.entryIconPath(item.slug)" class="h-6 w-6 object-contain" :alt="item.name">
+                            <span class="truncate text-sm capitalize text-base-content">{{ item.name }}</span>
+                        </Link>
+                    </div>
+                </template>
+            </TabbedCard>
         </div>
     </div>
 </template>
