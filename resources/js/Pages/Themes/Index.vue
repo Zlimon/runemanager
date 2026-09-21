@@ -126,7 +126,7 @@ const install = (pack) => {
 
                 <div class="flex items-baseline justify-between gap-3">
                     <h2 class="text-lg font-bold">Browse packs</h2>
-                    <TextInput v-model="search" type="search" placeholder="Search packs…" class="w-44" />
+                    <TextInput v-model="search" type="search" placeholder="Search packs…" />
                 </div>
                 <p class="mt-1 text-sm text-base-content/60">
                     Install a community pack from the RuneLite hub to add it to your themes.
