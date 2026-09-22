@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreFeedScreenshotRequest;
 use App\Models\Account;
 use App\Services\Feed\RecordFeedEvent;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 /**
  * A clean screenshot of the moment, uploaded by the plugin and attached to the
@@ -18,15 +17,12 @@ use Illuminate\Validation\Rule;
  */
 class FeedScreenshotController extends Controller
 {
-    public function store(Request $request, RecordFeedEvent $feed): JsonResponse
+    public function store(StoreFeedScreenshotRequest $request, RecordFeedEvent $feed): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        $validated = $request->validate([
-            'type' => ['required', 'string', Rule::in(RecordFeedEvent::SCREENSHOT_TYPES)],
-            'image' => ['required', 'image', 'max:4096'],
-        ]);
+        $validated = $request->validated();
 
         $attached = $feed->attachScreenshot($account, $validated['type'], $request->file('image'));
 

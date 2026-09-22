@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateFeedSyncSettingsRequest;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,13 +29,9 @@ class FeedSyncController extends Controller
      * milestone thresholds. The thresholds string is stored raw and sanitised on
      * read (see Instance::feedLevelUpThresholds).
      */
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateFeedSyncSettingsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'hiscore_refresh_minutes' => ['required', 'integer', Rule::in([30, 60, 180, 360, 720, 1440])],
-            'feed_level_up_thresholds' => ['nullable', 'string', 'max:200', 'regex:/^[0-9,\s]*$/'],
-            'feed_loot_min_value' => ['required', 'integer', 'min:0', 'max:2147483647'],
-        ]);
+        $validated = $request->validated();
 
         SettingHelper::setSetting('hiscore_refresh_minutes', (int) $validated['hiscore_refresh_minutes'], 'int');
         SettingHelper::setSetting('feed_level_up_thresholds', $validated['feed_level_up_thresholds'] ?? '');

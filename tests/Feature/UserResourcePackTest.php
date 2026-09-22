@@ -51,6 +51,21 @@ it('stores an unauthenticated preference as a cookie instead of rejecting it', f
         ->assertCookie(Instance::RESOURCE_PACK_COOKIE, (string) $pack->id, encrypted: false);
 });
 
+it('stores a guest no-resource-pack choice and rejects invalid guest pack ids', function () {
+    $this->putJson('/user/resource-pack', ['resource_pack_id' => ResourcePack::GUEST_NO_PACK])
+        ->assertOk()
+        ->assertJson(['resource_pack_id' => ResourcePack::GUEST_NO_PACK])
+        ->assertCookie(Instance::RESOURCE_PACK_COOKIE, ResourcePack::GUEST_NO_PACK, encrypted: false);
+
+    $this->putJson('/user/resource-pack', ['resource_pack_id' => 99999])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['resource_pack_id']);
+
+    $this->putJson('/user/resource-pack', ['resource_pack_id' => 'not-a-pack'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['resource_pack_id']);
+});
+
 it('still gates pack installation and deletion behind auth', function () {
     $pack = makePack('pack-guarded');
 

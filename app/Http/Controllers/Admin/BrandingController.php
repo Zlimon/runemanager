@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateBrandingRequest;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,15 +29,8 @@ class BrandingController extends Controller
      * Instance branding (logo + banner) image uploads, stored on
      * the public disk. POST (multipart); a `remove_*` flag clears an asset.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateBrandingRequest $request): RedirectResponse
     {
-        $request->validate([
-            'logo' => ['nullable', 'image', 'max:1024'],
-            'banner' => ['nullable', 'image', 'max:2048'],
-            'remove_logo' => ['nullable', 'boolean'],
-            'remove_banner' => ['nullable', 'boolean'],
-        ]);
-
         $this->storeBrandingAsset($request, 'logo', 'logo_path', $request->boolean('remove_logo'));
         $this->storeBrandingAsset($request, 'banner', 'banner_path', $request->boolean('remove_banner'));
 

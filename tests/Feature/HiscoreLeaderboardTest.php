@@ -152,3 +152,60 @@ it('requires authentication for the skill and activity boards', function () {
     $this->get(route('hiscores.bosses.index', 'zulrah'))->assertRedirect(route('login'));
     $this->get(route('hiscores.clues.index', 'clue-scrolls-all'))->assertRedirect(route('login'));
 });
+
+it('sorts accounts the OSRS hiscores report as rank -1 after ranked ones on a boss board', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $unranked = Account::factory()->for($user)->create(['username' => 'Unranked']);
+    $ranked = Account::factory()->for($user)->create(['username' => 'Ranked']);
+
+    leaderboardHiscore($unranked, activities: ['zulrah' => ['rank' => -1, 'score' => -1]]);
+    leaderboardHiscore($ranked, activities: ['zulrah' => ['rank' => 5_000, 'score' => 50]]);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.bosses.index', 'zulrah'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('hiscores', 2)
+            ->where('hiscores.0.account.username', 'Ranked')
+            ->where('hiscores.1.account.username', 'Unranked')
+            ->where('hiscores.1.rank', 0)
+            ->where('hiscores.1.kill_count', 0),
+        );
+});
+
+it('sorts accounts the OSRS hiscores report as rank -1 after ranked ones on a clue board', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $unranked = Account::factory()->for($user)->create(['username' => 'Unranked']);
+    $ranked = Account::factory()->for($user)->create(['username' => 'Ranked']);
+
+    leaderboardHiscore($unranked, activities: ['clue_scrolls_elite' => ['rank' => -1, 'score' => -1]]);
+    leaderboardHiscore($ranked, activities: ['clue_scrolls_elite' => ['rank' => 900, 'score' => 5]]);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.clues.index', 'clue-scrolls-elite'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('hiscores.0.account.username', 'Ranked')
+            ->where('hiscores.1.account.username', 'Unranked')
+            ->where('hiscores.1.kill_count', 0),
+        );
+});
+
+it('sorts accounts the OSRS hiscores report as rank -1 after ranked ones on a skill board', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $unranked = Account::factory()->for($user)->create(['username' => 'Unranked']);
+    $ranked = Account::factory()->for($user)->create(['username' => 'Ranked']);
+
+    leaderboardHiscore($unranked, ['attack' => ['rank' => -1, 'level' => 1, 'xp' => -1]]);
+    leaderboardHiscore($ranked, ['attack' => ['rank' => 2_000_000, 'level' => 1, 'xp' => 0]]);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.skills.index', 'attack'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('hiscores.0.account.username', 'Ranked')
+            ->where('hiscores.1.account.username', 'Unranked')
+            ->where('hiscores.1.rank', 0)
+            ->where('hiscores.1.xp', 0),
+        );
+});

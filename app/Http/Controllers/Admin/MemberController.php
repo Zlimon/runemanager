@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\AccountTypesEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreMemberRequest;
 use App\Models\Account;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -39,16 +39,10 @@ class MemberController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreMemberRequest $request): RedirectResponse
     {
-        abort_unless(Instance::requiresRosterClaim(), 403, 'Members are only managed in clan or group mode.');
-
-        $validated = $request->validate([
-            'username' => ['required', 'string', 'max:12', 'regex:/^[A-Za-z0-9 _-]+$/', 'unique:accounts,username'],
-        ]);
-
         Account::rosterPlaceholder(
-            trim($validated['username']),
+            trim($request->validated('username')),
             Instance::isGroup() ? AccountTypesEnum::GROUP_IRONMAN : AccountTypesEnum::NORMAL,
         )->save();
 

@@ -63,6 +63,21 @@ it('rejects an unknown highlight colour', function () {
         ->assertJsonValidationErrors('calendar_highlight_colors.0');
 });
 
+it('requires the highlight colour list to be present', function () {
+    $this->actingAs(adminUser())
+        ->putJson(route('admin.calendar.settings'), [])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('calendar_highlight_colors');
+});
+
+it('accepts an empty highlight colour list', function () {
+    $this->actingAs(adminUser())
+        ->put(route('admin.calendar.settings'), ['calendar_highlight_colors' => []])
+        ->assertRedirect();
+
+    expect(Instance::calendarHighlightColors())->toBe([]);
+});
+
 it('forbids a user without manage instance from updating the highlight setting', function () {
     $this->actingAs(adminUser(Roles::USER))
         ->putJson(route('admin.calendar.settings'), [

@@ -27,6 +27,7 @@ class AnnouncementController extends Controller
         $account = $request->attributes->get('account');
 
         $announcements = Announcement::query()
+            ->with('user:id,name')
             ->active()
             ->whereDoesntHave('acknowledgedBy', fn ($query) => $query->whereKey($account->id))
             ->get();

@@ -25,7 +25,7 @@ class FeedController extends Controller
 
         return Inertia::render('Feed/Index', [
             'events' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,user_id,username,account_type')->recent($pageSize)->get(),
+                FeedEvent::query()->recent($pageSize)->get(),
             )->resolve(),
         ]);
     }

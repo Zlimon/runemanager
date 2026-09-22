@@ -8,7 +8,10 @@ use App\Models\AccountHiscore;
 /**
  * Instance leaderboards built from the synced OSRS hiscore entries. Rows are
  * ordered like the official boards: by OSRS rank, with unranked accounts
- * (rank 0) after every ranked one, then by the board's own tie-breaks.
+ * after every ranked one, then by the board's own tie-breaks.
+ *
+ * The OSRS hiscores report an unranked skill or activity as rank -1 (and XP
+ * or score -1), which is stored as-is; every row shows it as 0.
  */
 class HiscoreLeaderboard
 {
@@ -28,9 +31,9 @@ class HiscoreLeaderboard
 
                 return [
                     'account' => (new AccountResource($row->account))->resolve(),
-                    'rank' => $entry['rank'] ?? 0,
+                    'rank' => max(0, $entry['rank'] ?? 0),
                     'level' => $entry['level'] ?? $unrankedLevel,
-                    'xp' => $entry['xp'] ?? 0,
+                    'xp' => max(0, $entry['xp'] ?? 0),
                 ];
             })
             ->sort(fn (array $a, array $b): int => $this->compareByRank($a, $b)
@@ -54,8 +57,8 @@ class HiscoreLeaderboard
 
                 return [
                     'account' => (new AccountResource($row->account))->resolve(),
-                    'rank' => $entry['rank'] ?? 0,
-                    'kill_count' => $entry['score'] ?? 0,
+                    'rank' => max(0, $entry['rank'] ?? 0),
+                    'kill_count' => max(0, $entry['score'] ?? 0),
                 ];
             })
             ->sort(fn (array $a, array $b): int => $this->compareByRank($a, $b)
@@ -65,15 +68,15 @@ class HiscoreLeaderboard
     }
 
     /**
-     * Ascending rank with unranked (rank 0) rows last; 0 when the ranks tie.
+     * Ascending rank with unranked (rank 0 or below) rows last; 0 when the ranks tie.
      *
      * @param  array{rank: int}  $a
      * @param  array{rank: int}  $b
      */
     private function compareByRank(array $a, array $b): int
     {
-        if (($a['rank'] === 0) !== ($b['rank'] === 0)) {
-            return $a['rank'] === 0 ? 1 : -1;
+        if (($a['rank'] <= 0) !== ($b['rank'] <= 0)) {
+            return $a['rank'] <= 0 ? 1 : -1;
         }
 
         return $a['rank'] <=> $b['rank'];

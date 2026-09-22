@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreClanRosterRequest;
+use App\Http\Requests\UpdateClanRankRequest;
 use App\Models\Account;
 use App\Services\Clan\SyncClanRoster;
 use App\Support\Instance;
-use App\Support\Roles;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * Clan endpoints pushed by the plugin:
@@ -22,15 +22,12 @@ class ClanController extends Controller
 {
     public function __construct(private SyncClanRoster $syncClanRoster) {}
 
-    public function update(Request $request): JsonResponse
+    public function update(UpdateClanRankRequest $request): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        $validated = $request->validate([
-            'clan_rank' => ['nullable', 'integer', 'between:-128,127'],
-            'clan_title' => ['nullable', 'string', 'max:60'],
-        ]);
+        $validated = $request->validated();
 
         $account->forceFill([
             'clan_rank' => $validated['clan_rank'] ?? null,
@@ -49,19 +46,9 @@ class ClanController extends Controller
      * Seed/refresh the clan roster. Requires the member-management permission
      * (the clan owner is the instance Owner), and only while in CLAN mode.
      */
-    public function roster(Request $request): JsonResponse
+    public function roster(StoreClanRosterRequest $request): JsonResponse
     {
-        if (! $request->user()->can(Roles::MANAGE_MEMBERS)) {
-            abort(403, 'You do not have permission to seed the clan roster.');
-        }
-
-        $validated = $request->validate([
-            'clan_name' => ['nullable', 'string', 'max:60'],
-            'members' => ['present', 'array'],
-            'members.*.username' => ['required', 'string', 'max:13'],
-            'members.*.rank' => ['nullable', 'integer', 'between:-128,127'],
-            'members.*.title' => ['nullable', 'string', 'max:60'],
-        ]);
+        $validated = $request->validated();
 
         if (! Instance::isClan()) {
             return response()->json(['data' => ['synced' => 0]]);

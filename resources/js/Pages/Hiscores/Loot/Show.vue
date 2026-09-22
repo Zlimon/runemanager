@@ -74,7 +74,7 @@ const filteredHiscores = computed(() => {
                             <div class="flex items-center justify-between gap-3">
                                 <span class="flex items-center gap-3 whitespace-nowrap font-semibold text-base-content">
                                     <span class="text-base-content/50">#{{ entry.rank }}</span>
-                                    <img :src="`data:image/jpeg;base64,${entry.account.user?.icon ?? entry.account.icon}`"
+                                    <img :src="`data:image/jpeg;base64,${entry.account.icon}`"
                                          class="h-9 w-9 object-contain" alt="">
                                     {{ entry.account.username }}
                                 </span>

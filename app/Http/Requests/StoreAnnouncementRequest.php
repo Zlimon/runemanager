@@ -7,14 +7,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAnnouncementRequest extends FormRequest
 {
-    /**
-     * Admins create announcements. Roles aren't modelled yet,
-     * so for now any authenticated user can create. Swap in a policy when roles
-     * land (mirrors StoreCalendarEventRequest).
-     */
+    /** Access is enforced by the route's permission middleware. */
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return true;
     }
 
     /**

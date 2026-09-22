@@ -271,7 +271,7 @@ class Account extends Model
 
     protected function userIcon(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->user->icon);
+        return Attribute::make(get: fn (): ?string => $this->user?->icon);
     }
 
     /**

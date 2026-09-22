@@ -103,6 +103,13 @@ The product overview, data flow and storage split are covered in the hand-writte
 - Reusable query constraints are model scopes. Instance settings are typed accessors on `Instance` (for example `Instance::defaultResourcePackId()`). Response shapes shared by more than one caller are API Resources in `app/Http/Resources`.
 - Controller traits are not a place for business logic; use a service.
 
+## Validation and API resources
+
+- Validate every request body in a FormRequest (`app/Http/Requests/<Verb><Thing>Request.php`, flat), never with `$request->validate()` or `Validator::make` in a controller. Read input back through `$request->validated()`; uploaded files (`$request->file()`) and boolean flags (`$request->boolean()`) are still read from the request. Why: rules stay in one testable place, and plugin/web controllers only do work.
+- `authorize()` returns `true` when route middleware (`auth`, `plugin.account`, `can:`) already guards the route. Put a check in `authorize()` only if it must return 403 *before* validation, and return `Response::deny('message')` to keep the message. Ownership checks that need a validated id stay in the controller. Why: a FormRequest validates before the controller body runs, so a guard left in the body would turn 403s into 422s.
+- Exceptions: Fortify/Jetstream actions keep `Validator::make()->validateWithBag()` (vendor contract and named error bags), and optional GET query params that fall back to a default on bad input are read directly.
+- Shape shared or eager-load-sensitive output with an `app/Http/Resources` class and pass `->resolve()` to Inertia. The one exception is a paginated collection, which is passed unresolved for `links`/`meta`. A resource that hydrates Mongo items or relations for a list does it once in a static `collection()`/`collectionWith()` (see `CalendarEventResource`). `AccountResource` is the exception: its `icon` reads the owner, so callers eager-load `user`. A single-use prop shape stays inline in the controller.
+
 ## Pages and components (resources/js)
 
 - Every page is a directory: `Pages/<Page>/Index.vue` for a list or single view, `Show.vue` for a record. Components used by only that page go in `Pages/<Page>/Partials/`. The render name matches the path (`Inertia::render('Admin/Calendar/Index')`).

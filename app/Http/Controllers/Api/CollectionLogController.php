@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UnlockCollectionLogSlotRequest;
 use App\Models\Account;
 use App\Services\Feed\RecordFeedEvent;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * A collection-log slot unlock pushed by the plugin (parsed from the
@@ -17,15 +17,12 @@ use Illuminate\Http\Request;
  */
 class CollectionLogController extends Controller
 {
-    public function unlock(Request $request, RecordFeedEvent $feed): JsonResponse
+    public function unlock(UnlockCollectionLogSlotRequest $request, RecordFeedEvent $feed): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        $validated = $request->validate([
-            'item' => ['required', 'string', 'max:255'],
-            ...RecordFeedEvent::positionRules(),
-        ]);
+        $validated = $request->validated();
 
         $feed->recordCollectionLogSlot($account, $validated['item'], $validated['position'] ?? null);
 

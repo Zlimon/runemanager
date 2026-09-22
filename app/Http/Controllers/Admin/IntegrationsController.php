@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateIntegrationsRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,13 +21,9 @@ class IntegrationsController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateIntegrationsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'webhook_url' => ['nullable', 'url', 'max:2000'],
-        ]);
-
-        SettingHelper::setSetting('webhook_url', $validated['webhook_url'] ?? '');
+        SettingHelper::setSetting('webhook_url', $request->validated('webhook_url') ?? '');
 
         return back()->with('status', 'Integrations updated.');
     }

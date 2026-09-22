@@ -33,6 +33,12 @@ it('lets guests persist their choice to a cookie', function () {
         ->assertCookie(Instance::DARK_MODE_COOKIE, '1', encrypted: false);
 });
 
+it('rejects a non-boolean dark_mode value from a guest', function () {
+    $this->putJson(route('dark-mode.update'), ['dark_mode' => 'maybe'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('dark_mode');
+});
+
 it('keeps the toggle available and user-driven even with a pack active', function () {
     $pack = darkPack();
     // Pack flag is dark, but the user prefers light — the user's choice wins.

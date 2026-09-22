@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\AccountVitalsUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateVitalsRequest;
 use App\Models\Account;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class VitalsController extends Controller
 {
@@ -17,19 +17,12 @@ class VitalsController extends Controller
      *
      * The Account is resolved by the plugin.account middleware.
      */
-    public function update(Request $request): JsonResponse
+    public function update(UpdateVitalsRequest $request): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        $validated = $request->validate([
-            'hitpoints' => ['required', 'integer', 'min:0'],
-            'hitpoints_max' => ['required', 'integer', 'min:1'],
-            'prayer' => ['required', 'integer', 'min:0'],
-            'prayer_max' => ['required', 'integer', 'min:1'],
-            'run_energy' => ['required', 'integer', 'min:0', 'max:100'],
-            'special_attack' => ['required', 'integer', 'min:0', 'max:100'],
-        ]);
+        $validated = $request->validated();
 
         $account->forceFill([...$validated, 'vitals_updated_at' => now()])->save();
 

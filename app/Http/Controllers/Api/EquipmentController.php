@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateEquipmentRequest;
 use App\Models\Equipment;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class EquipmentController extends Controller
 {
@@ -16,17 +16,11 @@ class EquipmentController extends Controller
      * The plugin sends `equipment` as a sparse array indexed by OSRS KitType slot. Each
      * present slot is a [itemId, quantity] pair; -1 in position 0 means an empty slot.
      */
-    public function update(Request $request): JsonResponse
+    public function update(UpdateEquipmentRequest $request): JsonResponse
     {
         $account = $request->attributes->get('account');
 
-        $request->validate([
-            'equipment' => ['required', 'array'],
-            'equipment.*' => ['required', 'array', 'min:1'],
-            'equipment.*.0' => ['required', 'integer'],
-        ]);
-
-        $slots = $request->input('equipment');
+        $slots = $request->validated('equipment');
 
         $equipment = Equipment::where('account_id', $account->id)->first() ?? new Equipment;
         $equipment->account_id = $account->id;

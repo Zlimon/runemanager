@@ -443,6 +443,13 @@ it('caps item search results and returns nothing for a blank term', function () 
         ->assertJsonCount(0);
 });
 
+it('rejects an item search term longer than 64 characters', function () {
+    $this->actingAs(adminUser())
+        ->getJson(route('items.search', ['q' => str_repeat('a', 65)]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('q');
+});
+
 it('requires authentication to search items', function () {
     $this->get(route('items.search', ['q' => 'whip']))
         ->assertRedirect(route('login'));

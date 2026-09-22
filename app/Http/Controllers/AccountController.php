@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AccountTypesEnum;
+use App\Http\Requests\FilterAccountsRequest;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\BankResource;
 use App\Http\Resources\FeedEventResource;
@@ -11,7 +12,6 @@ use App\Http\Resources\LootingBagResource;
 use App\Http\Resources\LootResource;
 use App\Models\Account;
 use App\Models\FeedEvent;
-use App\Rules\AccountUsernameRule;
 use App\Services\CollectionLog\CollectionLogView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -20,18 +20,12 @@ use Inertia\Response;
 
 class AccountController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(FilterAccountsRequest $request): Response
     {
         $allAccountTypes = array_values(AccountTypesEnum::returnAllAccountTypes());
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-            'username' => ['nullable', 'string', new AccountUsernameRule],
-            'account_types' => ['nullable', 'array'],
-            'account_types.*' => ['string', 'in:'.implode(',', $allAccountTypes)],
-            'per_page' => ['nullable', 'integer', 'min:4', 'max:64'],
-        ]);
-
-        $query = Account::query()->searchUsername($validated['username'] ?? null);
+        $query = Account::query()->with('user')->searchUsername($validated['username'] ?? null);
 
         if (! empty($validated['account_types'] ?? [])) {
             $normalized = array_map(
@@ -111,13 +105,13 @@ class AccountController extends Controller
 
             // This account's slice of the live feed.
             'feed' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,user_id,username,account_type')
+                FeedEvent::query()
                     ->where('account_id', $account->id)->recent(20)->get(),
             )->resolve(),
 
             // Owner-pinned events shown as the achievement gallery.
             'pinnedFeed' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,user_id,username,account_type')
+                FeedEvent::query()
                     ->where('account_id', $account->id)->pinned()->get(),
             )->resolve(),
 

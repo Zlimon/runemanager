@@ -9,14 +9,10 @@ use Illuminate\Validation\Rule;
 
 class StoreCalendarEventRequest extends FormRequest
 {
-    /**
-     * Admins / clan leaders / discretionary members create events.
-     * Roles aren't modelled yet, so for now any authenticated user
-     * can create. Swap in a real policy when those land.
-     */
+    /** Access is enforced by the route's permission middleware. */
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return true;
     }
 
     /**

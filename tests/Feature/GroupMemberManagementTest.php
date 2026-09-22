@@ -66,6 +66,17 @@ it('does not allow member management in casual mode', function () {
         ->assertForbidden();
 });
 
+it('refuses member management in casual mode before validating the username', function () {
+    SettingHelper::setSetting('instance_mode', Instance::MODE_CASUAL);
+
+    $this->actingAs(groupAdmin())
+        ->postJson(route('admin.members.store'), ['username' => 'bad@name!'])
+        ->assertForbidden()
+        ->assertJsonPath('message', 'Members are only managed in clan or group mode.');
+
+    expect(Account::count())->toBe(0);
+});
+
 it('renders the members page with the roster', function () {
     $admin = groupAdmin();
     Account::factory()->create(['username' => 'Listed', 'user_id' => null]);

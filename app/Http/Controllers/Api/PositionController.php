@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\AccountMoved;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdatePositionRequest;
 use App\Models\Account;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PositionController extends Controller
 {
@@ -19,16 +19,12 @@ class PositionController extends Controller
      *
      * Payload: { "x": 3221, "y": 3219, "plane": 0 }
      */
-    public function update(Request $request): JsonResponse
+    public function update(UpdatePositionRequest $request): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        $validated = $request->validate([
-            'x' => ['required', 'integer'],
-            'y' => ['required', 'integer'],
-            'plane' => ['required', 'integer', 'min:0', 'max:3'],
-        ]);
+        $validated = $request->validated();
 
         $account->forceFill([
             'world_x' => $validated['x'],

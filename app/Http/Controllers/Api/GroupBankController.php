@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\GroupBankUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateGroupBankRequest;
 use App\Models\GroupBank;
 use App\Support\Instance;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * Any GROUP-mode member's plugin pushes the full shared group bank
@@ -18,13 +18,9 @@ use Illuminate\Http\Request;
  */
 class GroupBankController extends Controller
 {
-    public function update(Request $request): JsonResponse
+    public function update(UpdateGroupBankRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'group_bank' => ['present', 'array'],
-            'group_bank.*' => ['array', 'size:2'],
-            'group_bank.*.*' => ['integer'],
-        ]);
+        $validated = $request->validated();
 
         if (! Instance::isGroup()) {
             return response()->json(['data' => ['stored' => false]]);

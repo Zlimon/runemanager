@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\CalendarEventType;
 use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCalendarEventRequest;
+use App\Http\Requests\UpdateCalendarHighlightsRequest;
 use App\Http\Resources\CalendarEventResource;
 use App\Models\CalendarEvent;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,14 +36,9 @@ class CalendarController extends Controller
     }
 
     /** Persist which palette colours mark an event as "important". */
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateCalendarHighlightsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'calendar_highlight_colors' => ['array'],
-            'calendar_highlight_colors.*' => [Rule::in(StoreCalendarEventRequest::COLORS)],
-        ]);
-
-        SettingHelper::setSetting('calendar_highlight_colors', json_encode($validated['calendar_highlight_colors']));
+        SettingHelper::setSetting('calendar_highlight_colors', json_encode($request->validated('calendar_highlight_colors')));
 
         return back()->with('status', 'Calendar settings updated.');
     }

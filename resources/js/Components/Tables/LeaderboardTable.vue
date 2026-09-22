@@ -32,7 +32,7 @@ const rowClass = (row) => (row.account.user_id === ownUserId.value ? 'bg-primary
         <template #cell-account="{ row }">
             <Link :href="route('accounts.show', row.account)"
                   class="flex items-center gap-3 whitespace-nowrap font-semibold text-base-content">
-                <img :src="`data:image/jpeg;base64,${row.account.user?.icon ?? row.account.icon}`"
+                <img :src="`data:image/jpeg;base64,${row.account.icon}`"
                      class="h-9 w-9 object-contain" alt="">
                 {{ row.account.username }}
             </Link>

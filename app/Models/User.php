@@ -68,7 +68,7 @@ class User extends Authenticatable
      */
     protected function icon(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => data_get(Item::lookupByOsrsId($this->icon_id), 'icon'));
+        return Attribute::make(get: fn (): ?string => data_get(Item::lookupByOsrsId($this->icon_id), 'icon'))->shouldCache();
     }
 
     public function resourcePack(): BelongsTo

@@ -36,7 +36,7 @@ class DashboardController extends Controller
                 Account::query()->with('user')->topByLevel(5)->get(),
             )->resolve(),
             'feed' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,username,account_type')->recent(8)->get(),
+                FeedEvent::query()->recent(8)->get(),
             )->resolve(),
         ]);
     }

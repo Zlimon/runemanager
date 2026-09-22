@@ -87,8 +87,8 @@ Route::middleware([
 
     // The owner's clan roster push. Outside plugin.account: it
     // bootstraps accounts (incl. the owner's own) from nothing, so it must not
-    // require the owner's account to already be resolved. Admin-gated in the
-    // controller.
+    // require the owner's account to already be resolved. Admin-gated in
+    // StoreClanRosterRequest::authorize().
     Route::post('/plugin/clan/roster', [ClanController::class, 'roster'])->name('api.plugin.clan.roster');
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it

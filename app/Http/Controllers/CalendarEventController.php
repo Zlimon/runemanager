@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CalendarEventType;
+use App\Http\Requests\RsvpCalendarEventRequest;
 use App\Http\Requests\StoreCalendarEventRequest;
 use App\Http\Requests\UpdateCalendarEventRequest;
 use App\Http\Resources\CalendarEventResource;
@@ -98,10 +99,8 @@ class CalendarEventController extends Controller
      * inside a transaction keeps it atomic against the unique index the schema
      * carries — two concurrent requests cannot leave the member attending twice.
      */
-    public function rsvp(Request $request, CalendarEvent $calendarEvent): RedirectResponse
+    public function rsvp(RsvpCalendarEventRequest $request, CalendarEvent $calendarEvent): RedirectResponse
     {
-        $this->abortIfPassed($calendarEvent);
-
         $account = $this->ownedAccount($request);
         $userId = $request->user()->id;
 
@@ -118,10 +117,8 @@ class CalendarEventController extends Controller
     }
 
     /** Withdraw an account's attendance; the row's absence *is* "not going". */
-    public function destroyRsvp(Request $request, CalendarEvent $calendarEvent): RedirectResponse
+    public function destroyRsvp(RsvpCalendarEventRequest $request, CalendarEvent $calendarEvent): RedirectResponse
     {
-        $this->abortIfPassed($calendarEvent);
-
         $account = $this->ownedAccount($request);
 
         $calendarEvent->rsvps()->where('account_id', $account->id)->delete();
@@ -130,25 +127,12 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * Attendance on an event that has already happened is a record of who turned
-     * up, so it is closed to further change — both signing up and withdrawing.
-     */
-    private function abortIfPassed(CalendarEvent $calendarEvent): void
-    {
-        abort_if($calendarEvent->hasPassed(), HttpResponse::HTTP_FORBIDDEN, 'This event has already taken place.');
-    }
-
-    /**
      * Resolve the `account_id` in the request, rejecting accounts the caller
      * doesn't own — otherwise anyone could RSVP on someone else's behalf.
      */
-    private function ownedAccount(Request $request): Account
+    private function ownedAccount(RsvpCalendarEventRequest $request): Account
     {
-        $validated = $request->validate([
-            'account_id' => ['required', 'integer', 'exists:accounts,id'],
-        ]);
-
-        $account = Account::findOrFail($validated['account_id']);
+        $account = Account::findOrFail($request->validated('account_id'));
 
         abort_if($account->user_id !== $request->user()?->id, HttpResponse::HTTP_FORBIDDEN);
 

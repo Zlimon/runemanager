@@ -56,6 +56,9 @@ it('masks usernames on the public page when anonymisation is enabled', function 
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('anonymized', true)
-            ->where('topAccounts.0.username', 'Z•••••'),
+            ->where('topAccounts.0.username', 'Z•••••')
+            ->missing('topAccounts.0.user')
+            ->missing('topAccounts.0.id')
+            ->missing('topAccounts.0.user_id'),
         );
 });

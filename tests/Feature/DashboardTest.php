@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\Announcement;
 use App\Models\CalendarEvent;
+use App\Models\FeedEvent;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -82,5 +83,19 @@ it('surfaces active announcements and upcoming events', function () {
             ->where('announcements.0.title', 'Welcome')
             ->has('upcoming', 1)
             ->where('upcoming.0.title', 'Raid Night'),
+        );
+});
+
+it('includes the owning user id on feed accounts so the owner sees pin/delete', function () {
+    $account = Account::factory()->for($this->user)->create();
+    FeedEvent::factory()->for($account)->create();
+
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('feed', 1)
+            ->where('feed.0.account.user_id', $this->user->id)
+            ->where('feed.0.account.username', $account->username),
         );
 });

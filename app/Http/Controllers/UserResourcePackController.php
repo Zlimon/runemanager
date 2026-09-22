@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HubPackNameRequest;
+use App\Http\Requests\UpdatePluginResourcePackRequest;
+use App\Http\Requests\UpdateResourcePackPreferenceRequest;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Services\ResourcePacks\DeleteResourcePack;
@@ -30,7 +32,7 @@ class UserResourcePackController extends Controller
      * back (the picker full-reloads to swap the server-rendered pack CSS); API
      * callers get JSON.
      */
-    public function update(Request $request, SelectResourcePack $selector): JsonResponse|RedirectResponse
+    public function update(UpdateResourcePackPreferenceRequest $request, SelectResourcePack $selector): JsonResponse|RedirectResponse
     {
         $user = $request->user();
 
@@ -38,18 +40,13 @@ class UserResourcePackController extends Controller
             return $this->updateForGuest($request);
         }
 
-        if ($request->input('resource_pack_id') === ResourcePack::GUEST_NO_PACK) {
+        $choice = $request->validated('resource_pack_id');
+
+        if ($choice === ResourcePack::GUEST_NO_PACK) {
             // Explicit "no resource pack": plain interface, clear any selection.
             $selector->select($user, null, true);
         } else {
-            $validated = $request->validate([
-                'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
-            ]);
-            $selector->select(
-                $user,
-                isset($validated['resource_pack_id']) ? (int) $validated['resource_pack_id'] : null,
-                false,
-            );
+            $selector->select($user, $choice !== null ? (int) $choice : null, false);
         }
 
         if ($request->header('X-Inertia')) {
@@ -68,19 +65,12 @@ class UserResourcePackController extends Controller
      * cookie instead of on an account. Guests need this to reach the untextured
      * interface, which is the only one offering a light/dark toggle.
      */
-    private function updateForGuest(Request $request): JsonResponse|RedirectResponse
+    private function updateForGuest(UpdateResourcePackPreferenceRequest $request): JsonResponse|RedirectResponse
     {
-        $choice = $request->input('resource_pack_id');
+        $choice = $request->validated('resource_pack_id');
 
-        if ($choice === ResourcePack::GUEST_NO_PACK) {
-            $value = ResourcePack::GUEST_NO_PACK;
-        } else {
-            $validated = $request->validate([
-                'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
-            ]);
-            // Null clears the cookie back to "follow the instance default".
-            $value = isset($validated['resource_pack_id']) ? (string) $validated['resource_pack_id'] : null;
-        }
+        // Null clears the cookie back to "follow the instance default".
+        $value = $choice !== null ? (string) $choice : null;
 
         $cookie = $value === null
             ? cookie()->forget(Instance::RESOURCE_PACK_COOKIE)
@@ -191,14 +181,10 @@ class UserResourcePackController extends Controller
      *   preference, return 202. Once the job lands, the user's next page load
      *   (or focus-refresh) picks up the assets.
      */
-    public function updateFromPlugin(Request $request, SelectResourcePack $selector): JsonResponse
+    public function updateFromPlugin(UpdatePluginResourcePackRequest $request, SelectResourcePack $selector): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9_-]+$/'],
-        ]);
-
         $user = $request->user();
-        $installed = $selector->installAndSelect($user, $validated['name']);
+        $installed = $selector->installAndSelect($user, $request->validated('name'));
 
         return response()->json([
             'resource_pack_id' => $user->resource_pack_id,
