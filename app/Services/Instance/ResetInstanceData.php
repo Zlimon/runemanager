@@ -17,7 +17,7 @@ use App\Models\UsernameHistory;
 use App\Support\Roles;
 
 /**
- * SPEC §5/§12 — wipe all account data when the instance mode changes. The site's
+ * Wipe all account data when the instance mode changes. The site's
  * whole context (clan vs group vs casual) differs per mode, so accounts start
  * fresh. Users are kept (they re-claim a roster account) but every non-owner is
  * reset to a plain `member`.

@@ -317,7 +317,7 @@ it('exposes pinned events as the account gallery', function () {
 });
 
 it('/feed is publicly accessible (no auth required)', function () {
-    // No actingAs / Sanctum here on purpose — SPEC §8.2: "publicly visible".
+    // No actingAs / Sanctum here on purpose — the feed is publicly visible.
     $this->get(route('feed.index'))->assertOk();
 });
 

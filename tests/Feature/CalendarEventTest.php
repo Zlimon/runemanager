@@ -83,7 +83,7 @@ it('renders the calendar index publicly with an upcoming widget', function () {
         'starts_at' => now()->addDays(2),
     ]);
 
-    // No actingAs — viewing is public per SPEC §10.2.
+    // No actingAs — viewing is public.
     $this->get(route('calendar.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page

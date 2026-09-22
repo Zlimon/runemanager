@@ -74,7 +74,7 @@ it('renders the members page with the roster', function () {
         ->get(route('admin.members'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('Admin/Members')
+            ->component('Admin/Members/Index')
             ->where('manageable', true)
             ->has('accounts', 1)
             ->where('accounts.0.username', 'Listed'),

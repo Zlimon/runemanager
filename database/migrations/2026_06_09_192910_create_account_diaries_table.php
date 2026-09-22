@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('account_diaries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->constrained()->cascadeOnDelete()->unique();
-            // {area: {tier: bool}} — completion per Achievement Diary tier (SPEC §5.2).
+            // {area: {tier: bool}} — completion per Achievement Diary tier.
             $table->jsonb('diaries');
             $table->timestamps();
         });

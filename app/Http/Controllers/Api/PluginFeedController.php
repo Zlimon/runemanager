@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 /**
- * SPEC §8.1 — simple notable events the plugin detects in-game (mirroring the
+ * Simple notable events the plugin detects in-game (mirroring the
  * official Screenshot plugin): a pet drop, a death, or opening a reward screen.
  * Each becomes a live-feed event; a screenshot is attached separately.
  *

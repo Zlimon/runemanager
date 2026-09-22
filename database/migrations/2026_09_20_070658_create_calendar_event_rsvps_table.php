@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * SPEC §10 — who is attending an event. RSVP is per ACCOUNT rather than per
+     * Who is attending an event. RSVP is per ACCOUNT rather than per
      * user: a member with several accounts signs up with the one they'll show up
      * on. A row means "attending"; un-RSVPing deletes it.
      */

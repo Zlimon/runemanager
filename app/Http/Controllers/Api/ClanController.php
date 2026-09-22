@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * SPEC §5.2 — clan endpoints pushed by the plugin:
+ * Clan endpoints pushed by the plugin:
  *   - update(): the logged-in player's own rank/title (keeps their role fresh).
  *   - roster(): the full clan roster, pushed by the owner, to pre-create the
  *     unclaimed accounts members later link to.
@@ -37,7 +37,7 @@ class ClanController extends Controller
             'clan_title' => $validated['clan_title'] ?? null,
         ])->save();
 
-        // Clan-rank → website-role mapping is deferred (SPEC §5.2, later).
+        // Clan-rank → website-role mapping is deferred to later.
 
         return response()->json(['data' => [
             'clan_rank' => $account->clan_rank,

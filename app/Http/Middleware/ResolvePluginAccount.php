@@ -70,7 +70,7 @@ class ResolvePluginAccount
         if (! $account) {
             // No hash match — fall through to a username lookup so the plugin can
             // adopt an existing row. This covers a pre-created roster account
-            // (user_id null, SPEC §5.2) that this login now claims, plus a
+            // (user_id null) that this login now claims, plus a
             // placeholder-hash row already owned by this user. Usernames are
             // globally unique, so we find at most one row.
             $byUsername = Account::where('username', $username)->first();

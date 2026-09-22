@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * SPEC §5.2 — any GROUP-mode member's plugin pushes the full shared group bank
+ * Any GROUP-mode member's plugin pushes the full shared group bank
  * whenever it changes. Stored as a single overwritten document and broadcast so
  * the shared Group Bank page updates live. No-op outside GROUP mode.
  *

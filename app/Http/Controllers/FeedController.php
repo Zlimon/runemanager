@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class FeedController extends Controller
 {
     /**
-     * SPEC §8 — reverse-chronological event stream for the instance. Seeds the
+     * Reverse-chronological event stream for the instance. Seeds the
      * page; new events arrive live on the public `feed` broadcast channel
      * (FeedEventCreated), so there's no polling.
      */

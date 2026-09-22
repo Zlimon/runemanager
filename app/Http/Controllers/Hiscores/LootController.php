@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Hiscores;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use App\Models\Item;
@@ -9,11 +10,11 @@ use App\Models\Loot;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class LootHiscoreController extends Controller
+class LootController extends Controller
 {
     /**
      * The Loot Tracker record types we receive, mapped to display sections and
-     * ordered the way they appear on the loot directory (SPEC §7 loot-by-source).
+     * ordered the way they appear on the loot directory.
      */
     private const CATEGORIES = [
         'NPC' => 'Monsters',
@@ -27,7 +28,7 @@ class LootHiscoreController extends Controller
     private const OTHER_TOKEN = 'other';
 
     /**
-     * SPEC §7 — loot directory. Lists every unique loot source grouped into
+     * Loot directory. Lists every unique loot source grouped into
      * category sections by the plugin-recorded type. A source's identity is
      * (source, type), not the name alone, so e.g. a pickpocketed "Man" and a
      * killed "Man" are distinct entries in different sections — matching how
@@ -73,7 +74,7 @@ class LootHiscoreController extends Controller
     }
 
     /**
-     * SPEC §7 — per-source board for one (source, type) pair. Shows every
+     * Per-source board for one (source, type) pair. Shows every
      * account with loot from it, ranked by total value, each with the grid of
      * items they've received (quantities summed across all of their drops).
      */

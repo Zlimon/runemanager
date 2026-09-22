@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Client for the TempleOSRS API — the source for collection log data (SPEC §5.2).
+ * Client for the TempleOSRS API — the source for collection log data.
  */
 class TempleOsrsClient
 {

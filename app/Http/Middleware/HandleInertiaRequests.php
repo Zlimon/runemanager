@@ -61,7 +61,7 @@ class HandleInertiaRequests extends Middleware
                 'name' => config('app.name'),
                 //                'url' => config('app.url'),
             ],
-            // SPEC §12 — drives the admin-only nav entry. The Owner holds every
+            // Drives the admin-only nav entry. The Owner holds every
             // management permission; clan/group elevation comes later.
             'is_admin' => $user !== null && $user->can(Roles::MANAGE_INSTANCE),
             // The viewer's own OSRS accounts, for quick links in the nav dropdown.
@@ -91,7 +91,7 @@ class HandleInertiaRequests extends Middleware
             // Drives the guest-only appearance picker: guests need a way out of
             // Vanilla to reach the untextured, toggleable interface.
             'no_pack' => $pack === null,
-            // Admin display filters for the Live Feed surfaces only (SPEC §8.2).
+            // Admin display filters for the Live Feed surfaces only.
             // Everything is stored; the account Activity feed shows it all.
             'feed_level_milestones' => Instance::feedLevelUpThresholds(),
             'feed_loot_min_value' => Instance::feedLootMinValue(),

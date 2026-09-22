@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreAnnouncementRequest extends FormRequest
 {
     /**
-     * SPEC §9.1 — admins create announcements. Roles aren't modelled yet (§3.4),
+     * Admins create announcements. Roles aren't modelled yet,
      * so for now any authenticated user can create. Swap in a policy when roles
      * land (mirrors StoreCalendarEventRequest).
      */

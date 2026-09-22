@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Models\ResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use Illuminate\Http\JsonResponse;
@@ -32,10 +33,21 @@ class StyleguideController extends Controller
      */
     private const SPRITE_DIRS = ['button', 'dialog', 'options', 'scrollbar', 'equipment', 'skill'];
 
+    /**
+     * Real catalogue items for the item slots, tooltips and loot grids: coins,
+     * an abyssal whip, dragon bones, sharks, a twisted bow and a rune platebody —
+     * stackable and unstackable, cheap and expensive, so every quantity format
+     * the slot knows has a sample.
+     *
+     * @var list<int>
+     */
+    private const SAMPLE_ITEM_IDS = [995, 4151, 536, 385, 20997, 1127];
+
     public function index(): Response
     {
-        return Inertia::render('Styleguide', [
+        return Inertia::render('Styleguide/Index', [
             'packs' => $this->packs(),
+            'items' => array_values(Item::lookupByOsrsIds(self::SAMPLE_ITEM_IDS)),
         ]);
     }
 
@@ -56,12 +68,16 @@ class StyleguideController extends Controller
     }
 
     /**
-     * Every installed pack, with what the switcher needs to repaint the page the
-     * way app.blade.php would have server-side: the stylesheet URL (cache-busted
-     * on the CSS mtime, as the Blade root does, so a template edit is picked up),
-     * the palette variables, and whether it is the fixed-scheme vanilla pack.
+     * Every installed pack in its picker shape ({@see ResourcePack::toPickerArray()}),
+     * so the pack components can be shown with real icons and details, plus
+     * what the switcher needs to repaint the page the way app.blade.php would
+     * have server-side: the stylesheet URL (cache-busted on the CSS mtime, as the
+     * Blade root does, so a template edit is picked up), the contrast-safe
+     * accent, and whether it is the fixed-scheme vanilla pack. The picker
+     * shape's dark_mode doubles as the switcher's hint for which mode to open a
+     * pack in, the same last fallback Instance::resolveDarkMode() uses.
      *
-     * @return list<array{name: string, alias: string, css: ?string, background_color: ?string, accent_color: ?string, accent_ui_color: ?string, is_vanilla: bool, dark_mode: bool}>
+     * @return list<array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool, installed_by_user_id: ?int, author: ?string, version: ?string, tags: list<string>, background_color: ?string, accent_color: ?string, users_count: ?int, css: ?string, accent_ui_color: ?string, is_vanilla: bool}>
      */
     private function packs(): array
     {
@@ -69,21 +85,13 @@ class StyleguideController extends Controller
             ->orderBy('alias')
             ->get()
             ->map(fn (ResourcePack $pack): array => [
-                'name' => $pack->name,
-                'alias' => $pack->alias,
+                ...$pack->toPickerArray(),
                 'css' => $this->stylesheet($pack->name),
-                'background_color' => $pack->background_color,
-                'accent_color' => $pack->accent_color,
                 // Derived on read from the two stored colours — the contrast-safe
                 // accent for controls, which the switcher must repaint alongside
                 // --pack-accent or a switched pack keeps the old one's edges.
                 'accent_ui_color' => $pack->accent_ui_color,
                 'is_vanilla' => $pack->isVanilla(),
-                // The pack's own light/dark hint. Instance::resolveDarkMode()
-                // treats it as the last fallback; the switcher uses it to open a
-                // pack in the mode it was drawn for instead of stranding a dark
-                // pack on the light theme.
-                'dark_mode' => (bool) $pack->dark_mode,
             ])
             ->values()
             ->all();

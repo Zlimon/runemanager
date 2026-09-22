@@ -19,7 +19,7 @@ class LootController extends Controller
      * plugin.account middleware. Accepts a batch (the plugin may flush more
      * than one drop event in a single push) and inserts one document per entry.
      *
-     * Payload (SPEC §5.2 Loot):
+     * Payload:
      *
      *   {
      *     "loot": [
@@ -97,7 +97,7 @@ class LootController extends Controller
 
         broadcast(new AccountDataUpdated($account, 'loot'));
 
-        // SPEC §8 — emit a LOOT_DROP for each entry the plugin marked as
+        // Emit a LOOT_DROP for each entry the plugin marked as
         // feed-worthy (its "Feed loot value" setting; absent = older plugin,
         // treat as worthy). The admin's minimum value only filters the Live
         // Feed display, so these all reach the account Activity feed.

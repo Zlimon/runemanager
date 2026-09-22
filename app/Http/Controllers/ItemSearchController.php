@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 /**
  * Typeahead over the static OSRS item catalogue, backing the calendar's item
- * picker (SPEC §10). Read-only and members-only — the catalogue is large, so
+ * picker. Read-only and members-only — the catalogue is large, so
  * results are capped rather than paginated.
  */
 class ItemSearchController extends Controller

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->cascadeOnDelete()->unique();
             // Total Combat Achievement points (CA_POINTS), the leaderboard metric.
             $table->unsignedInteger('points')->default(0);
-            // {tier: status} — per-tier locked/in_progress/completed (SPEC §7.1).
+            // {tier: status} — per-tier locked/in_progress/completed.
             $table->jsonb('tiers');
             $table->timestamps();
         });

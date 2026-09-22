@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Broadcast when a new live-feed event is recorded (SPEC §8.3), so connected
+ * Broadcast when a new live-feed event is recorded, so connected
  * browsers prepend it without polling. The feed is public, so this rides a
  * public channel — unauthenticated visitors receive it too.
  */

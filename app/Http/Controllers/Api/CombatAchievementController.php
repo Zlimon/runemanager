@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 /**
- * SPEC §5.2/§7.1/§8.1 — Combat Achievements push from the plugin.
+ * Combat Achievements push from the plugin.
  *
  * Two entry points: a snapshot upsert of total points + per-tier status, and a
  * live task-unlock that records a feed event (the plugin parses the in-game

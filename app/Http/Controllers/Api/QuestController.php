@@ -15,7 +15,7 @@ class QuestController extends Controller
     /**
      * Snapshot upsert from the RuneLite plugin. Account resolved by plugin.account middleware.
      *
-     * NB: SPEC §5.2 calls for quests in PostgreSQL; the current Quest model lives in
+     * NB: the design calls for quests in PostgreSQL; the current Quest model lives in
      * MongoDB. Keeping the existing model for now — moving it is a separate wedge.
      */
     public function update(Request $request): JsonResponse
@@ -37,7 +37,7 @@ class QuestController extends Controller
         $quests->quests = $request->input('quests');
         $quests->save();
 
-        // SPEC §8 — emit QUEST_COMPLETE for every quest that flipped to
+        // Emit QUEST_COMPLETE for every quest that flipped to
         // finished. The first-ever snapshot is a baseline only: with no
         // previous state, every already-finished quest would flood the feed.
         if ($existing !== null) {

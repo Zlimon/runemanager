@@ -443,7 +443,7 @@ class InstallResourcePack
     }
 
     /**
-     * SPEC §6 — ensure the bundled "Vanilla" pack has a DB row so it's
+     * Ensure the bundled "Vanilla" pack has a DB row so it's
      * always selectable alongside "Default" (no pack). The assets ship with the
      * app, so this builds the row from disk (palette only) with no download.
      * Idempotent and cheap after the first call.

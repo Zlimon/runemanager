@@ -22,7 +22,7 @@ it('renders the dashboard with the digest props', function () {
         ->get(route('dashboard'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Dashboard')
+            ->component('Dashboard/Index')
             ->has('stats', fn ($stats) => $stats
                 ->where('accounts', 0)
                 ->where('members', 0)

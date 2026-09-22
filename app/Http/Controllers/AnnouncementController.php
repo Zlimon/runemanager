@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class AnnouncementController extends Controller
 {
     /**
-     * SPEC §9 — viewing is public (available in all modes). Lists active
+     * Viewing is public (available in all modes). Lists active
      * (non-expired) announcements, newest first.
      */
     public function index(): Response

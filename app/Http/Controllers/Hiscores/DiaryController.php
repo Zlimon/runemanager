@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Hiscores;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountResource;
 use App\Models\AccountDiary;
 use App\Support\Diaries;
@@ -9,10 +10,10 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * SPEC §7 — Achievement Diaries leaderboard: total diary tiers completed
+ * Achievement Diaries leaderboard: total diary tiers completed
  * (out of 48), with a per-tier breakdown, ranked highest first.
  */
-class DiaryHiscoreController extends Controller
+class DiaryController extends Controller
 {
     public function index(): Response
     {

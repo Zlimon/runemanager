@@ -23,7 +23,7 @@ class DashboardController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Dashboard/Index', [
             'stats' => [
                 'accounts' => Account::count(),
                 'members' => Account::query()->whereNotNull('user_id')->distinct()->count('user_id'),

@@ -95,10 +95,10 @@ class AccountController extends Controller
 
             'quests' => fn () => $account->quests,
 
-            // SPEC §5.2 — Achievement Diary completion ({area: {tier: bool}}).
+            // Achievement Diary completion ({area: {tier: bool}}).
             'diaries' => fn () => $account->diary?->diaries ?? [],
 
-            // SPEC §5.2/§7.1 — Combat Achievement points + per-tier status, or
+            // Combat Achievement points + per-tier status, or
             // null until the plugin has pushed a snapshot.
             'combatAchievements' => fn () => $account->combatAchievement
                 ? ['points' => $account->combatAchievement->points, 'tiers' => $account->combatAchievement->tiers]
@@ -106,17 +106,17 @@ class AccountController extends Controller
 
             'avatar' => fn () => $account->avatarPayload(),
 
-            // SPEC §5.2 Loot — append-only history. Latest 25 drops with hydrated
+            // Loot — append-only history. Latest 25 drops with hydrated
             // item details for the recent-loot panel.
             'recentLoot' => fn () => LootResource::collectionWith($account->recentLoot(25))->resolve(),
 
-            // SPEC §8 — this account's slice of the live feed.
+            // This account's slice of the live feed.
             'feed' => fn () => FeedEventResource::collectionWith(
                 FeedEvent::query()->with('account:id,user_id,username,account_type')
                     ->where('account_id', $account->id)->recent(20)->get(),
             )->resolve(),
 
-            // SPEC §8 — owner-pinned events shown as the achievement gallery.
+            // Owner-pinned events shown as the achievement gallery.
             'pinnedFeed' => fn () => FeedEventResource::collectionWith(
                 FeedEvent::query()->with('account:id,user_id,username,account_type')
                     ->where('account_id', $account->id)->pinned()->get(),
@@ -126,7 +126,7 @@ class AccountController extends Controller
             // pulls this in via a follow-up partial reload.
             'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request, app(CollectionLogStructure::class))),
 
-            // Per SPEC §5.3 — one timestamp per data type, plus the staleness
+            // One timestamp per data type, plus the staleness
             // threshold the UI uses to flag old data.
             'freshness' => fn () => [
                 'hiscores' => optional($account->hiscore)->fetched_at?->toIso8601String(),
@@ -145,7 +145,7 @@ class AccountController extends Controller
     }
 
     /**
-     * SPEC §5.2 — build the collection log view from the stored TempleOSRS data.
+     * Build the collection log view from the stored TempleOSRS data.
      * The player sync only returns *obtained* items per category, so we overlay
      * it on the full TempleOSRS structure (every category's complete item list,
      * grouped) to show missing items and real per-category totals — mirroring the

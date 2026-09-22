@@ -10,8 +10,8 @@ use Illuminate\Validation\Rule;
 class StoreCalendarEventRequest extends FormRequest
 {
     /**
-     * SPEC §10.2 — admins / clan leaders / discretionary members create events.
-     * Roles aren't modelled yet (§3.4 + §12), so for now any authenticated user
+     * Admins / clan leaders / discretionary members create events.
+     * Roles aren't modelled yet, so for now any authenticated user
      * can create. Swap in a real policy when those land.
      */
     public function authorize(): bool

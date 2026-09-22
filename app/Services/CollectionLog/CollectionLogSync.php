@@ -7,7 +7,7 @@ use App\Models\CollectionLog;
 use App\Services\TempleOsrs\TempleOsrsClient;
 
 /**
- * SPEC §5.2 — pull an account's collection log from TempleOSRS and upsert it.
+ * Pull an account's collection log from TempleOSRS and upsert it.
  * TempleOSRS returns overall progress counts plus the obtained items keyed by
  * category slug; we store that as the single source for the profile view and
  * the leaderboard.

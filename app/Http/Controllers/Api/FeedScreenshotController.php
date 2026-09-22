@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 /**
- * SPEC §8 — a clean screenshot of the moment, uploaded by the plugin and
+ * A clean screenshot of the moment, uploaded by the plugin and
  * attached to the matching feed event. Because feed events are created
  * server-side a beat earlier (from the loot/CA/collection-log push), we attach
  * to the most recent event of this account + type that doesn't already have one.

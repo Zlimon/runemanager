@@ -10,7 +10,7 @@ use Inertia\Testing\AssertableInertia;
 uses(RefreshDatabase::class);
 
 /**
- * Appearance rules (SPEC §6.2):
+ * Appearance rules:
  *   - no resource pack  → untextured, light + dark, toggle shown
  *   - Vanilla   → textured, one fixed scheme, toggle hidden
  *   - any other pack    → unchanged for now; rides the light/dark pair

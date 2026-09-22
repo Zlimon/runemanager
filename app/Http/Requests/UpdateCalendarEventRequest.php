@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 class UpdateCalendarEventRequest extends FormRequest
 {
     /**
-     * SPEC §10.2 — who may edit which event is ownership-dependent, so the
+     * Who may edit which event is ownership-dependent, so the
      * controller decides (creator or `manage calendar`); the route already keeps
      * everyone else out.
      */

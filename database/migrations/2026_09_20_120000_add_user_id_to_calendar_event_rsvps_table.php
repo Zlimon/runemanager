@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * SPEC §10 — a member attends an event as exactly one of their accounts.
+     * A member attends an event as exactly one of their accounts.
      *
      * Attendance is still recorded per account, but "one per member" cannot be
      * expressed as a constraint over `account_id` alone, since a member owns

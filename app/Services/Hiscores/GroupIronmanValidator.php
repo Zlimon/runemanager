@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
 /**
- * SPEC §2.2 — validates a Group Ironman group name against the official OSRS
+ * Validates a Group Ironman group name against the official OSRS
  * group page. The page responds 200 for both states; a missing group renders an
  * explicit "Unable to find group with name" notice, which is the only reliable
  * signal (there's no JSON endpoint).

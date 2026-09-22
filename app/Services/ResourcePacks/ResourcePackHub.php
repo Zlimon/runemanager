@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
- * SPEC §6 — browse the RuneLite community resource-pack hub. Packs live as
+ * Browse the RuneLite community resource-pack hub. Packs live as
  * branches (named `pack-*`) on the melkypie/resource-packs repo, each shipping
  * an icon.png; this lists them (cached) and flags which are already installed.
  */

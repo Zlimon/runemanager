@@ -9,7 +9,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-// SPEC §12.4 — admin-configurable hiscores refresh cadence. console.php is
+// Admin-configurable hiscores refresh cadence. console.php is
 // re-evaluated each `schedule:run`, so a changed setting takes effect next tick.
 Schedule::command('hiscores:sync')
     ->cron(Instance::hiscoreRefreshCron())

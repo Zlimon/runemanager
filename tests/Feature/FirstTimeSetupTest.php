@@ -36,10 +36,10 @@ it('also gates the public pages for an authenticated user during setup', functio
 it('shows guests a setup-in-progress page during setup', function () {
     $this->get(route('announcements.index'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('SetupInProgress'));
+        ->assertInertia(fn ($page) => $page->component('SetupInProgress/Index'));
 
     $this->get(route('calendar.index'))
-        ->assertInertia(fn ($page) => $page->component('SetupInProgress'));
+        ->assertInertia(fn ($page) => $page->component('SetupInProgress/Index'));
 });
 
 it('shows authenticated non-admins a setup-in-progress page during setup', function () {
@@ -49,7 +49,7 @@ it('shows authenticated non-admins a setup-in-progress page during setup', funct
     $this->actingAs($member)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('SetupInProgress'));
+        ->assertInertia(fn ($page) => $page->component('SetupInProgress/Index'));
 });
 
 it('keeps the auth routes open during setup', function () {
@@ -62,7 +62,7 @@ it('lets the owner reach the setup page while unconfigured', function () {
         ->get(route('admin.settings'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('Admin/Settings/General')
+            ->component('Admin/Settings/General/Index')
             ->where('configured', false),
         );
 });

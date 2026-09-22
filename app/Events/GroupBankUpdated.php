@@ -8,7 +8,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 
 /**
- * SPEC §5.2 — broadcast when any member's plugin pushes the shared group bank,
+ * Broadcast when any member's plugin pushes the shared group bank,
  * so an open Group Bank page reloads its data live. Public channel (the shared
  * bank view is visible to instance members); carries no payload — the page
  * refetches through its Inertia props.

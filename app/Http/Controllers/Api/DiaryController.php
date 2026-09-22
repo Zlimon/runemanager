@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * SPEC §5.2 — Achievement Diary completion push from the plugin. Snapshot upsert
+ * Achievement Diary completion push from the plugin. Snapshot upsert
  * of the {area: {tier: bool}} map, normalised against the canonical diary set.
  *
  * The Account is resolved by the plugin.account middleware.

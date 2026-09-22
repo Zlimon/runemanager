@@ -28,7 +28,7 @@ it('renders the admin calendar page grouped into upcoming and past for a manage-
         ->get(route('admin.calendar'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Admin/Calendar')
+            ->component('Admin/Calendar/Index')
             ->has('upcoming', 1)
             ->has('past', 1)
             ->where('upcoming.0.title', 'Upcoming Raid')

@@ -8,7 +8,7 @@ use App\Models\Loot;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * One loot-drop document (SPEC §5.2). Items are pulled from the live item store
+ * One loot-drop document. Items are pulled from the live item store
  * so they hydrate with real names/icons on the website.
  *
  * @extends Factory<Loot>

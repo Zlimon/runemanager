@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Hiscores;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use App\Models\CollectionLog;
@@ -9,10 +10,10 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * SPEC §7 — Collection Log leaderboard: total unique slots unlocked, sourced
+ * Collection Log leaderboard: total unique slots unlocked, sourced
  * from the TempleOSRS-synced CollectionLog documents.
  */
-class CollectionLogHiscoreController extends Controller
+class CollectionLogController extends Controller
 {
     public function index(): Response
     {

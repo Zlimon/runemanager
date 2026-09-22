@@ -8,7 +8,7 @@ use App\Models\FeedEvent;
 use Illuminate\Support\Carbon;
 
 /**
- * Single entry point for SPEC §8 live feed event generation.
+ * Single entry point for live feed event generation.
  *
  * Each push controller/service that produces qualifying events instantiates
  * this and calls the matching record*() helper. Every helper takes an optional
@@ -125,7 +125,7 @@ class RecordFeedEvent
     }
 
     /**
-     * Record a COMBAT_ACHIEVEMENT unlock (SPEC §8.1). Unlike level-ups/quests
+     * Record a COMBAT_ACHIEVEMENT unlock. Unlike level-ups/quests
      * these aren't derived from a snapshot diff — the plugin parses the in-game
      * completion message and pushes the task name + tier directly.
      *
@@ -146,7 +146,7 @@ class RecordFeedEvent
     }
 
     /**
-     * Record a COLLECTION_LOG slot unlock (SPEC §8.1). Like combat achievements,
+     * Record a COLLECTION_LOG slot unlock. Like combat achievements,
      * the plugin parses the in-game "new item" notice and pushes the item name.
      *
      * @param  ?array<string, mixed>  $position
@@ -189,7 +189,7 @@ class RecordFeedEvent
     }
 
     /**
-     * Persist a feed event and broadcast it to connected browsers (SPEC §8.3).
+     * Persist a feed event and broadcast it to connected browsers.
      *
      * @param  array<string, mixed>  $attributes
      */

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * SPEC §5.2 — refresh an account's collection log from TempleOSRS. Queued (hits
+ * Refresh an account's collection log from TempleOSRS. Queued (hits
  * an external API); triggered by the plugin's login snapshot and a daily sweep.
  */
 class SyncAccountCollectionLogJob implements ShouldQueue

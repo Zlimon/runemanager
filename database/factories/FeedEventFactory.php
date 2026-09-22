@@ -7,7 +7,7 @@ use App\Models\FeedEvent;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * SPEC §8 live-feed events. Defaults to a level-up; use the type states for the
+ * Live-feed events. Defaults to a level-up; use the type states for the
  * others. Item-bearing loot drops are best built with real item ids — see
  * DemoContentSeeder, which hydrates loot from the live feed it generates.
  *

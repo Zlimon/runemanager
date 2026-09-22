@@ -13,7 +13,7 @@ it('renders the public landing page for guests with the digest props', function 
     $this->get(route('home'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Welcome')
+            ->component('Welcome/Index')
             ->where('canLogin', true)
             ->where('canRegister', true)
             ->where('anonymized', false)

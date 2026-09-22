@@ -24,7 +24,7 @@ class CreateResourcePacksTable extends Migration
             $table->boolean('dark_mode')->default(false);
             // The member who installed this pack from the hub (null = instance-managed).
             $table->foreignId('installed_by_user_id')->nullable()->constrained('users')->nullOnDelete();
-            // SPEC §6 — sampled from the pack assets at install time and emitted
+            // Sampled from the pack assets at install time and emitted
             // as CSS variables (var(--pack-bg) / var(--pack-accent)) so flat
             // panels can pick up the pack's palette without textured tiles.
             // Nullable: extraction can fall through for an exotic pack and we

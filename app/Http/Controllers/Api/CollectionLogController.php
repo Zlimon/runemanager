@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * SPEC §8.1 — a collection-log slot unlock pushed by the plugin (parsed from the
+ * A collection-log slot unlock pushed by the plugin (parsed from the
  * in-game "new item added to your collection log" notice). Records a feed event.
  * The full collection log itself is pulled from TempleOSRS, not pushed here.
  *

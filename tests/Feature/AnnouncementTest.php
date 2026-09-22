@@ -14,7 +14,7 @@ it('renders the announcements index publicly with only active announcements newe
     Announcement::factory()->for($author)->create(['title' => 'Newer']);
     Announcement::factory()->expired()->for($author)->create(['title' => 'Expired']);
 
-    // No actingAs — viewing is public per SPEC §9.3.
+    // No actingAs — viewing is public.
     $this->get(route('announcements.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page

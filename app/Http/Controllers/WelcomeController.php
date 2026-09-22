@@ -24,7 +24,7 @@ class WelcomeController extends Controller
     {
         $anonymize = Instance::publicAnonymizeAccounts();
 
-        return Inertia::render('Welcome', [
+        return Inertia::render('Welcome/Index', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
             'anonymized' => $anonymize,

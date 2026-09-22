@@ -8,9 +8,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Instance-level configuration (SPEC §2 Modes, §12.4). Mode, names, branding,
- * sync cadence and feed thresholds are stored as settings and editable from the
- * admin panel; readers here fall back to config defaults.
+ * Instance-level configuration. Mode, names, branding, sync cadence and feed
+ * thresholds are stored as settings and editable from the admin panel; readers
+ * here fall back to config defaults.
  */
 class Instance
 {
@@ -101,7 +101,7 @@ class Instance
     }
 
     /**
-     * Admin-set instance description (SPEC §12.4), or null when unset.
+     * Admin-set instance description, or null when unset.
      */
     public static function description(): ?string
     {
@@ -141,7 +141,7 @@ class Instance
 
     /**
      * How often the hiscores sweep runs (minutes); the scheduler maps this to a
-     * cron cadence. SPEC §12.4.
+     * cron cadence.
      */
     public static function hiscoreRefreshMinutes(): int
     {
@@ -177,7 +177,7 @@ class Instance
     }
 
     /**
-     * Notable level-up thresholds for the live feed (SPEC §8.2/§12.4). Falls
+     * Notable level-up thresholds for the live feed. Falls
      * back to the config defaults when unset.
      *
      * @return list<int>
@@ -201,7 +201,7 @@ class Instance
     }
 
     /**
-     * Minimum loot GP value for a feed LOOT_DROP (SPEC §8.2/§12.4).
+     * Minimum loot GP value for a feed LOOT_DROP.
      */
     public static function feedLootMinValue(): int
     {
@@ -213,7 +213,7 @@ class Instance
     }
 
     /**
-     * Palette colour names that mark a calendar event as important (SPEC §10) —
+     * Palette colour names that mark a calendar event as important —
      * an event whose colour is in this list is highlighted on the calendar. The
      * setting holds a JSON array of palette colour names (the same list as
      * StoreCalendarEventRequest::COLORS); a stored empty array means "highlight
@@ -248,7 +248,7 @@ class Instance
     }
 
     /**
-     * Whether usernames are hidden on the public landing page (SPEC §12.4) —
+     * Whether usernames are hidden on the public landing page —
      * the showcase of top accounts then masks names so the leaderboard can be
      * shown to logged-out visitors without exposing who's who.
      */

@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class CalendarEventController extends Controller
 {
     /**
-     * SPEC §10.3 — viewing is public; the calendar renders as a month grid
+     * Viewing is public; the calendar renders as a month grid
      * (V-Calendar). The visible week range is sent as ?from/?to as the user
      * navigates; we return every event overlapping it (so multi-day events show
      * on each day they span) plus a short upcoming list for the side widget.
@@ -97,7 +97,7 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * SPEC §10 — sign one of your accounts up for an event. RSVP is per account,
+     * Sign one of your accounts up for an event. RSVP is per account,
      * so the payload names which one; it has to be yours.
      *
      * A member attends as exactly one account, so naming a different one moves
@@ -163,7 +163,7 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * SPEC §10.2 — an event is managed by its creator or by anyone holding
+     * An event is managed by its creator or by anyone holding
      * `manage calendar`, so an admin can clean up someone else's event.
      */
     private function abortUnlessManages(CalendarEvent $calendarEvent, ?User $user): void

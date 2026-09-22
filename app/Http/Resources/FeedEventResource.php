@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Plain wire shape for SPEC §8 feed events. Account is included slim — the
+ * Plain wire shape for live feed events. Account is included slim — the
  * UI links back to the account page, so we just need username + type for
  * the ironman badge. Loot-drop items are hydrated with their name + icon so
  * the feed can name the drop.
