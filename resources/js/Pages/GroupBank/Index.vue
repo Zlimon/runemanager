@@ -14,7 +14,7 @@ const props = defineProps({
 // Any member's plugin push updates the shared bank; reload the data
 // live when the server broadcasts a change.
 onMounted(() => {
-    window.Echo.channel("group-bank").listen(".GroupBankUpdated", () => {
+    window.Echo.private("group-bank").listen(".GroupBankUpdated", () => {
         router.reload({ only: ["groupBank"] });
     });
 });

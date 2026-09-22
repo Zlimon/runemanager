@@ -3,6 +3,13 @@
 use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\AccountHiscore;
+use App\Models\Bank;
+use App\Models\CollectionLog;
+use App\Models\GroupBank;
+use App\Models\Inventory;
+use App\Models\Loot;
+use App\Models\LootingBag;
+use App\Models\Quest;
 use App\Models\User;
 use App\Services\Hiscores\GroupIronmanValidator;
 use App\Support\Instance;
@@ -201,4 +208,43 @@ it('flashes a plain update when nothing was wiped', function () {
     $this->actingAs(owner())
         ->put(route('admin.settings.update'), ['instance_mode' => Instance::MODE_CLAN])
         ->assertSessionHas('status', 'Instance settings updated.');
+});
+
+it('wipes every MongoDB collection, including the shared group bank, on a confirmed mode change', function () {
+    SettingHelper::setSetting('instance_mode', Instance::MODE_GROUP);
+    SettingHelper::setSetting('instance_configured', true, 'bool');
+
+    $admin = owner();
+    $account = Account::factory()->for($admin)->create(['username' => 'Wipeme']);
+
+    Inventory::forceCreate(['account_id' => $account->id, 'inventory' => []]);
+    Bank::forceCreate(['account_id' => $account->id, 'bank' => []]);
+    LootingBag::forceCreate(['account_id' => $account->id, 'looting_bag' => []]);
+    Quest::forceCreate(['account_id' => $account->id, 'quests' => []]);
+    CollectionLog::forceCreate(['account_id' => $account->id, 'items' => []]);
+    Loot::forceCreate([
+        'account_id' => $account->id,
+        'source' => 'Zulrah',
+        'type' => 'npc',
+        'items' => [],
+        'total_value' => 0,
+    ]);
+    // Instance-wide, not account-scoped — the new group must not inherit it.
+    GroupBank::forceCreate(['items' => [[995, 1000]]]);
+
+    $this->actingAs($admin)
+        ->put(route('admin.settings.update'), [
+            'instance_mode' => Instance::MODE_CLAN,
+            'confirm' => Instance::MODE_CLAN,
+        ])
+        ->assertRedirect();
+
+    expect(Account::count())->toBe(0);
+    expect(Inventory::count())->toBe(0);
+    expect(Bank::count())->toBe(0);
+    expect(LootingBag::count())->toBe(0);
+    expect(Quest::count())->toBe(0);
+    expect(CollectionLog::count())->toBe(0);
+    expect(Loot::count())->toBe(0);
+    expect(GroupBank::count())->toBe(0);
 });

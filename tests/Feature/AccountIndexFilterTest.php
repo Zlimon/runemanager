@@ -59,6 +59,28 @@ it('filters accounts by username substring', function () {
         );
 });
 
+it('accepts a search term that the removed placeholder word list used to reject', function () {
+    // "Jenny" sat in a placeholder profanity list, so any search containing it
+    // 422'd on a real OSRS name fragment.
+    Account::factory()->for($this->user)->create(['username' => 'Jennyfer', 'account_type' => 'normal']);
+    Account::factory()->for($this->user)->create(['username' => 'Bar', 'account_type' => 'normal']);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.index', ['username' => 'jenny']))
+        ->assertOk()
+        ->assertSessionHasNoErrors()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('accounts.data', 1)
+            ->where('accounts.data.0.username', 'Jennyfer'),
+        );
+});
+
+it('still rejects a username filter with disallowed characters', function () {
+    $this->actingAs($this->user)
+        ->get(route('accounts.index', ['username' => 'bad@name!']))
+        ->assertSessionHasErrors('username');
+});
+
 it('filters accounts by username case-insensitively', function () {
     Account::factory()->for($this->user)->create(['username' => 'ZezimA', 'account_type' => 'normal']);
     Account::factory()->for($this->user)->create(['username' => 'Bar', 'account_type' => 'normal']);

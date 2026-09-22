@@ -63,18 +63,38 @@ it('rejects non-admins from publishing', function () {
         ->assertForbidden();
 });
 
-it('lets the author delete but forbids other admins', function () {
+it('lets any announcements manager delete, not only the author', function () {
     $author = adminUser();
     $other = adminUser();
     $announcement = Announcement::factory()->for($author)->create();
 
     $this->actingAs($other)
         ->delete(route('announcements.destroy', $announcement))
-        ->assertForbidden();
+        ->assertRedirect(route('announcements.index'));
+
+    expect(Announcement::count())->toBe(0);
+});
+
+it('lets the author delete their own announcement', function () {
+    $author = adminUser();
+    $announcement = Announcement::factory()->for($author)->create();
 
     $this->actingAs($author)
         ->delete(route('announcements.destroy', $announcement))
         ->assertRedirect(route('announcements.index'));
 
     expect(Announcement::count())->toBe(0);
+});
+
+it('forbids deleting an announcement without the manage permission', function () {
+    Roles::sync();
+    $author = adminUser();
+    $member = tap(User::factory()->withPersonalTeam()->create())->assignRole(Roles::USER);
+    $announcement = Announcement::factory()->for($author)->create();
+
+    $this->actingAs($member)
+        ->delete(route('announcements.destroy', $announcement))
+        ->assertForbidden();
+
+    expect(Announcement::count())->toBe(1);
 });

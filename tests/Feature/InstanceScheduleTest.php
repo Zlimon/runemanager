@@ -2,6 +2,7 @@
 
 use App\Helpers\SettingHelper;
 use App\Support\Instance;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 
@@ -26,4 +27,33 @@ it('falls back to the default when the settings table is unavailable', function 
 
     expect(Instance::hiscoreRefreshMinutes())->toBe(60);
     expect(Instance::hiscoreRefreshCron())->toBe('0 * * * *');
+});
+
+it('schedules exactly the four expected commands and nothing else', function () {
+    // Guards against scaffold leftovers (the stock `inspire` closure used to run
+    // hourly in production) and against a new command being scheduled unnoticed.
+    $events = collect(app(Schedule::class)->events());
+
+    $scheduled = $events
+        ->map(function ($event): string {
+            // A scheduled closure has no $command at all — surface it by name so
+            // the comparison below fails loudly instead of silently skipping it.
+            if (! is_string($event->command) || $event->command === '') {
+                return 'closure: '.$event->getSummaryForDisplay();
+            }
+
+            preg_match("/'artisan'\s+(\S+)/", $event->command, $matches);
+
+            return $matches[1] ?? $event->command;
+        })
+        ->sort()
+        ->values()
+        ->all();
+
+    expect($scheduled)->toBe([
+        'collection-log:sync',
+        'hiscores:sync',
+        'items:sync',
+        'resourcepack:update',
+    ]);
 });

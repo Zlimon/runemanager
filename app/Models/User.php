@@ -65,10 +65,17 @@ class User extends Authenticatable
 
     /**
      * The icon image of the OSRS item the user picked as their avatar icon.
+     *
+     * `users.icon_id` is NOT NULL today, so the null branch is a guard rather
+     * than a stored state: `lookupByOsrsId(null)` would otherwise still run its
+     * Mongo aggregation (matching `id: ''`) before returning nothing. Account
+     * lists resolve the rest of the rows in one batch, in AccountResource.
      */
     protected function icon(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => data_get(Item::lookupByOsrsId($this->icon_id), 'icon'))->shouldCache();
+        return Attribute::make(get: fn (): ?string => $this->icon_id === null
+            ? null
+            : data_get(Item::lookupByOsrsId($this->icon_id), 'icon'))->shouldCache();
     }
 
     public function resourcePack(): BelongsTo
@@ -81,7 +88,7 @@ class User extends Authenticatable
      *
      * Hierarchy (first non-null wins):
      *   1. The user's own override (users.resource_pack_id)
-     *   2. The instance-global default (settings.resource_pack_id, set by `resourcepack:switch`)
+     *   2. The instance-global default (settings.resource_pack_id, set from Settings → General)
      *   3. null — render with no pack
      */
     public function effectiveResourcePackId(): ?int

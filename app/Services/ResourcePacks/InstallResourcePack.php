@@ -33,7 +33,7 @@ class InstallResourcePack
      * doesn't ship falls back to this one's version (see {@see completeFromVanilla}),
      * so a partial pack never leaves a textured element blank.
      */
-    public const VANILLA_PACK = 'sample-vanilla';
+    public const VANILLA_PACK = ResourcePack::VANILLA;
 
     /**
      * Canonical pixel size for each textured border edge sprite. Packs ship these

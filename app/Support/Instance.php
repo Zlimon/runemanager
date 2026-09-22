@@ -258,8 +258,8 @@ class Instance
     }
 
     /**
-     * The instance-wide default resource pack (set from the admin panel or
-     * `resourcepack:switch`), or null when unset. Stored as 0 when cleared.
+     * The instance-wide default resource pack (set from Settings → General),
+     * or null when unset. Stored as 0 when cleared.
      */
     public static function defaultResourcePackId(): ?int
     {

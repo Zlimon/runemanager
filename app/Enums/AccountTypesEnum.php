@@ -10,16 +10,19 @@ enum AccountTypesEnum: string
     case ULTIMATE_IRONMAN = 'ultimate_ironman';
     case GROUP_IRONMAN = 'group_ironman';
 
-    public static function returnAllAccountTypes($flip = false): array
+    /**
+     * Every account type keyed by case name, in display order.
+     *
+     * @return array<string, string>
+     */
+    public static function returnAllAccountTypes(): array
     {
-        $allAccountTypes = [
-            AccountTypesEnum::NORMAL->name => AccountTypesEnum::NORMAL->value,
-            AccountTypesEnum::IRONMAN->name => AccountTypesEnum::IRONMAN->value,
-            AccountTypesEnum::HARDCORE_IRONMAN->name => AccountTypesEnum::HARDCORE_IRONMAN->value,
-            AccountTypesEnum::ULTIMATE_IRONMAN->name => AccountTypesEnum::ULTIMATE_IRONMAN->value,
-            AccountTypesEnum::GROUP_IRONMAN->name => AccountTypesEnum::GROUP_IRONMAN->value,
+        return [
+            self::NORMAL->name => self::NORMAL->value,
+            self::IRONMAN->name => self::IRONMAN->value,
+            self::HARDCORE_IRONMAN->name => self::HARDCORE_IRONMAN->value,
+            self::ULTIMATE_IRONMAN->name => self::ULTIMATE_IRONMAN->value,
+            self::GROUP_IRONMAN->name => self::GROUP_IRONMAN->value,
         ];
-
-        return $flip ? array_flip($allAccountTypes) : $allAccountTypes;
     }
 }

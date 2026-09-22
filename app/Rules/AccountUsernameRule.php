@@ -4,13 +4,14 @@ namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class AccountUsernameRule implements ValidationRule
 {
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string): PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -42,26 +43,6 @@ class AccountUsernameRule implements ValidationRule
         // Check for leading or trailing spaces
         if (preg_match('/^ | $/', $value)) {
             $fail('The :attribute may not start or end with a space.');
-
-            return;
-        }
-
-        // Check for inappropriate or offensive content
-        $offensiveWords = [
-            'badword1',
-            'badword2',
-            'badword3',
-            'Jenny',
-            // Add more words as needed
-        ];
-
-        $usernameLower = strtolower($username);
-        foreach ($offensiveWords as $word) {
-            if (strpos($usernameLower, strtolower($word)) !== false) {
-                $fail('The :attribute contains inappropriate language.');
-
-                return;
-            }
         }
     }
 }

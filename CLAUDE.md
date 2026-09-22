@@ -159,7 +159,7 @@ All models in `app/Models` follow these rules. Match them when you add or edit a
 ## Deliberate exceptions (do not "fix")
 
 - `Item` keeps `protected $keyType = 'int'`. The Mongo base model declares a string key type, and the `Table` attribute cannot override it.
-- `Membership` keeps `public $incrementing = true`. A `#[Table]` attribute would also reset the `team_user` table name that the Jetstream parent declares.
+- `Membership` keeps `public $incrementing = true`. A `#[Table]` attribute would also reset the `team_user` table name that the Jetstream parent declares. The class looks unused but is not: Jetstream's `$membershipModel` defaults to `App\Models\Membership`, and `$user->teams()` resolves the pivot table through it. Deleting it breaks every team query.
 - `Team` keeps its `$dispatchesEvents` map for the Jetstream team events.
 
 === .ai/resource-packs rules ===
@@ -171,7 +171,7 @@ CLAUDE.md ("Theming & resource packs") covers the storage layout, the Vanilla ba
 ## Files and commands
 
 - Pack logic lives in `app/Services/ResourcePacks/`. `InstallResourcePack` downloads, extracts and prepares a pack. `ResourcePackHub` lists the `melkypie/resource-packs` branches and is cached. `PackPalette` extracts the background and accent colours. `DeleteResourcePack` removes a pack. `SelectResourcePack` applies a user's pack choice (and installs-then-selects for both the website hub install and the plugin push). `PackInstallQuota` enforces the member install cap. `PackSpriteInventory` lists which sprites a pack borrowed from Vanilla (for the styleguide). Reuse these services; do not write a second download or extract path.
-- Artisan: `resourcepack:fetch {name}` installs a pack. `resourcepack:switch {name}` sets the instance default. `resourcepack:ensure-vanilla` restores Vanilla. `resourcepack:sync-css` re-copies the template into every installed pack, re-borrows missing sprites from Vanilla and re-runs the sprite normalisers. Both `ensure-vanilla` and `sync-css` run on every deploy (`before-activation.sh`).
+- Artisan: `resourcepack:fetch {name}` installs a pack. `resourcepack:ensure-vanilla` restores Vanilla. `resourcepack:sync-css` re-copies the template into every installed pack, re-borrows missing sprites from Vanilla and re-runs the sprite normalisers. Both `ensure-vanilla` and `sync-css` run on every deploy (`before-activation.sh`). The instance-wide default pack is set from Settings → General.
 - A pack counts as installed when `public/resource-packs/{name}/resource-pack.css` exists (`InstallResourcePack::isInstalled()`) and its row's `version` is not `'pending'`. Check this with `InstallResourcePack::isReady()`.
 
 ## per-pack.css template
@@ -346,7 +346,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Always use curly braces for control structures, even for single-line bodies.
 - Use PHP 8 constructor property promotion: `public function __construct(public GitHub $github) { }`. Do not leave empty zero-parameter `__construct()` methods unless the constructor is private.
 - Use explicit return type declarations and type hints for all method parameters: `function isAccessible(User $user, ?string $path = null): bool`
-- Follow existing application Enum naming conventions.
+- Use TitleCase for Enum keys: `FavoritePerson`, `BestLake`, `Monthly`.
 - Prefer PHPDoc blocks over inline comments. Only add inline comments for exceptionally complex logic.
 - Use array shape type definitions in PHPDoc blocks.
 

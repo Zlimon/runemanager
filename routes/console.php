@@ -1,13 +1,7 @@
 <?php
 
 use App\Support\Instance;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
-
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote')->hourly();
 
 // Admin-configurable hiscores refresh cadence. console.php is
 // re-evaluated each `schedule:run`, so a changed setting takes effect next tick.

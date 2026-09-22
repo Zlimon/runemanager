@@ -17,5 +17,5 @@ All models in `app/Models` follow these rules. Match them when you add or edit a
 ## Deliberate exceptions (do not "fix")
 
 - `Item` keeps `protected $keyType = 'int'`. The Mongo base model declares a string key type, and the `Table` attribute cannot override it.
-- `Membership` keeps `public $incrementing = true`. A `#[Table]` attribute would also reset the `team_user` table name that the Jetstream parent declares.
+- `Membership` keeps `public $incrementing = true`. A `#[Table]` attribute would also reset the `team_user` table name that the Jetstream parent declares. The class looks unused but is not: Jetstream's `$membershipModel` defaults to `App\Models\Membership`, and `$user->teams()` resolves the pivot table through it. Deleting it breaks every team query.
 - `Team` keeps its `$dispatchesEvents` map for the Jetstream team events.

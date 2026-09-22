@@ -6,6 +6,7 @@ use App\Enums\AccountTypesEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMemberRequest;
 use App\Models\Account;
+use App\Services\Accounts\DeleteAccount;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -49,11 +50,11 @@ class MemberController extends Controller
         return back()->with('status', 'Member added.');
     }
 
-    public function destroy(int $account): RedirectResponse
+    public function destroy(int $account, DeleteAccount $deleter): RedirectResponse
     {
         abort_unless(Instance::requiresRosterClaim(), 403, 'Members are only managed in clan or group mode.');
 
-        Account::findOrFail($account)->delete();
+        $deleter->run(Account::findOrFail($account));
 
         return back()->with('status', 'Member removed.');
     }

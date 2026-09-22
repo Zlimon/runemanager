@@ -78,3 +78,41 @@ it('/api/logout deletes the personal access token row used for the call', functi
     expect($user->fresh()->tokens()->count())->toBe(0);
     expect(PersonalAccessToken::findToken($token))->toBeNull();
 });
+
+it('throttles repeated login attempts for the same email', function () {
+    makeUser();
+
+    foreach (range(1, 5) as $ignored) {
+        $this->postJson('/api/login', [
+            'email' => 'plugin@test.local',
+            'password' => 'wrong',
+        ])->assertUnauthorized();
+    }
+
+    // The sixth attempt is refused before the credentials are read, so even the
+    // correct password gets a 429.
+    $this->postJson('/api/login', [
+        'email' => 'plugin@test.local',
+        'password' => 'correct-horse',
+    ])
+        ->assertStatus(429)
+        ->assertHeader('Retry-After')
+        ->assertJsonStructure(['message']);
+});
+
+it('keys the login throttle per email, so one target does not lock out the rest', function () {
+    makeUser();
+    makeUser('other@test.local', 'other-password');
+
+    foreach (range(1, 5) as $ignored) {
+        $this->postJson('/api/login', [
+            'email' => 'plugin@test.local',
+            'password' => 'wrong',
+        ])->assertUnauthorized();
+    }
+
+    $this->postJson('/api/login', [
+        'email' => 'other@test.local',
+        'password' => 'other-password',
+    ])->assertSuccessful();
+});

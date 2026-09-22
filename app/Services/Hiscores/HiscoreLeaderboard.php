@@ -4,6 +4,8 @@ namespace App\Services\Hiscores;
 
 use App\Http\Resources\AccountResource;
 use App\Models\AccountHiscore;
+use App\Models\Item;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Instance leaderboards built from the synced OSRS hiscore entries. Rows are
@@ -24,13 +26,15 @@ class HiscoreLeaderboard
      */
     public function skill(string $slug, int $unrankedLevel = 1): array
     {
-        return AccountHiscore::with('account.user')
-            ->get()
-            ->map(function (AccountHiscore $row) use ($slug, $unrankedLevel): array {
+        $rows = AccountHiscore::with('account.user')->get();
+        $icons = $this->iconsFor($rows);
+
+        return $rows
+            ->map(function (AccountHiscore $row) use ($slug, $unrankedLevel, $icons): array {
                 $entry = $row->entries['skills'][$slug] ?? null;
 
                 return [
-                    'account' => (new AccountResource($row->account))->resolve(),
+                    'account' => (new AccountResource($row->account))->withIcons($icons)->resolve(),
                     'rank' => max(0, $entry['rank'] ?? 0),
                     'level' => $entry['level'] ?? $unrankedLevel,
                     'xp' => max(0, $entry['xp'] ?? 0),
@@ -50,13 +54,15 @@ class HiscoreLeaderboard
      */
     public function activity(string $key): array
     {
-        return AccountHiscore::with('account.user')
-            ->get()
-            ->map(function (AccountHiscore $row) use ($key): array {
+        $rows = AccountHiscore::with('account.user')->get();
+        $icons = $this->iconsFor($rows);
+
+        return $rows
+            ->map(function (AccountHiscore $row) use ($key, $icons): array {
                 $entry = $row->entries['activities'][$key] ?? null;
 
                 return [
-                    'account' => (new AccountResource($row->account))->resolve(),
+                    'account' => (new AccountResource($row->account))->withIcons($icons)->resolve(),
                     'rank' => max(0, $entry['rank'] ?? 0),
                     'kill_count' => max(0, $entry['score'] ?? 0),
                 ];
@@ -65,6 +71,25 @@ class HiscoreLeaderboard
                 ?: $b['kill_count'] <=> $a['kill_count'])
             ->values()
             ->all();
+    }
+
+    /**
+     * Avatar icons for a whole board in one Mongo query. Every row is wrapped
+     * on its own here, so without this each one would resolve its owner's icon
+     * with an aggregation of its own.
+     *
+     * @param  Collection<int, AccountHiscore>  $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function iconsFor(Collection $rows): array
+    {
+        return Item::lookupByOsrsIds(
+            $rows->map(fn (AccountHiscore $row): ?int => $row->account?->user?->icon_id)
+                ->filter()
+                ->unique()
+                ->values()
+                ->all(),
+        );
     }
 
     /**

@@ -24,7 +24,13 @@ use App\Http\Controllers\Api\VitalsController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+// Throttled with Fortify's named `login` limiter (5/min per email + IP, defined
+// in FortifyServiceProvider). The api middleware group carries no throttle of
+// its own, and sharing the limiter with the web login means one credential has
+// one budget across both surfaces.
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:login')
+    ->name('api.login');
 
 Route::middleware([
     'auth:sanctum',

@@ -526,3 +526,40 @@ it('plugin push: does not touch the global setting', function () {
 
     expect(SettingHelper::getSetting('resource_pack_id'))->toEqual($globalPack->id);
 });
+
+it('plugin push: refuses a brand-new pack once the member is at the install quota', function () {
+    config(['runemanager.resource_packs.user_install_limit' => 1]);
+    $user = freshPackUser();
+    makePack('pack-already-mine', ['installed_by_user_id' => $user->id]);
+
+    Sanctum::actingAs($user);
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'brand-new-pack'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['name'])
+        ->assertJsonPath(
+            'errors.name.0',
+            "You've reached your limit of 1 installed packs. Delete one to add another.",
+        );
+
+    // No stub row, no outbound fetch — the whole point of the cap.
+    expect(ResourcePack::where('name', 'brand-new-pack')->exists())->toBeFalse();
+    expect($user->fresh()->resource_pack_id)->toBeNull();
+    Queue::assertNothingPushed();
+});
+
+it('plugin push: lets a member at the quota select a pack the instance already has', function () {
+    config(['runemanager.resource_packs.user_install_limit' => 1]);
+    $user = freshPackUser();
+    makePack('pack-already-mine', ['installed_by_user_id' => $user->id]);
+    $shared = makePack('pack-shared');
+
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isReady')->andReturn(true));
+
+    Sanctum::actingAs($user);
+
+    $this->putJson('/api/plugin/resource-pack', ['name' => 'pack-shared'])
+        ->assertSuccessful();
+
+    expect($user->fresh()->resource_pack_id)->toBe($shared->id);
+});

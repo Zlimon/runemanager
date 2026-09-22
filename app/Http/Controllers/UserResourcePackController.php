@@ -22,7 +22,7 @@ use Illuminate\Validation\ValidationException;
  * Manage the authenticated user's per-user resource pack override.
  *
  * This is the user's own preference only — never touches the instance-global
- * pack (settings.resource_pack_id, managed by the resourcepack:switch artisan).
+ * pack (settings.resource_pack_id, managed from Settings → General).
  * The resolution hierarchy lives in {@see User::effectiveResourcePackId()}.
  */
 class UserResourcePackController extends Controller
@@ -180,11 +180,23 @@ class UserResourcePackController extends Controller
      *   row if needed, queue a {@see FetchResourcePackJob}, record the user's
      *   preference, return 202. Once the job lands, the user's next page load
      *   (or focus-refresh) picks up the assets.
+     * - A pack the instance has never seen counts against the member's install
+     *   quota, exactly as {@see install()} does — otherwise the plugin is a way
+     *   around the cap, creating unbounded stub rows and hub fetches.
      */
-    public function updateFromPlugin(UpdatePluginResourcePackRequest $request, SelectResourcePack $selector): JsonResponse
+    public function updateFromPlugin(UpdatePluginResourcePackRequest $request, SelectResourcePack $selector, PackInstallQuota $quota): JsonResponse
     {
+        $name = $request->validated('name');
+
         $user = $request->user();
-        $installed = $selector->installAndSelect($user, $request->validated('name'));
+
+        if (! ResourcePack::where('name', $name)->exists() && ! $quota->allows($user)) {
+            throw ValidationException::withMessages([
+                'name' => "You've reached your limit of {$quota->limit()} installed packs. Delete one to add another.",
+            ]);
+        }
+
+        $installed = $selector->installAndSelect($user, $name);
 
         return response()->json([
             'resource_pack_id' => $user->resource_pack_id,

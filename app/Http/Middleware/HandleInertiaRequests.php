@@ -9,6 +9,7 @@ use App\Models\Skill;
 use App\Support\Instance;
 use App\Support\Roles;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Middleware;
 
@@ -99,18 +100,33 @@ class HandleInertiaRequests extends Middleware
                 'name' => $pack->name,
                 'version' => $pack->updated_at?->timestamp,
             ] : null,
-            'skills' => fn () => Skill::distinct()->select('name', 'slug', 'order')->ordered()->get()->toArray() ?? [],
+            // Both nav lists are near-static — the skills only change with a
+            // migration, the bosses only when Jagex adds one — and both are
+            // plain closures, which Inertia evaluates on every single response.
+            // Cached rather than re-queried. Both entries are dropped by the
+            // deploy's cache:clear and by ResetInstanceData, so a migration or
+            // a mode switch shows up at once rather than when the TTL expires.
+            'skills' => fn (): array => Cache::remember(
+                'nav.skills',
+                now()->addDay(),
+                fn (): array => Skill::distinct()->select('name', 'slug', 'order')->ordered()->get()->toArray(),
+            ),
 
-            // Boss list for the Hiscores nav — derived from a representative
-            // account's hiscore activities (the OSRS API returns the full set on
-            // every account), reusing the Account boss filter. Empty until at
-            // least one account has synced.
-            'bosses' => function () {
-                $account = Account::query()->whereHas('hiscore')->with('hiscore')->first();
+            'bosses' => function (): array {
+                // Deliberately not cached while empty: a fresh instance would
+                // otherwise keep an empty Hiscores nav until the entry expired
+                // instead of until its first account synced.
+                $bosses = Cache::get('nav.bosses');
 
-                return $account
-                    ? $account->bosses->map(fn ($boss) => ['name' => $boss['name'], 'slug' => $boss['slug']])->all()
-                    : [];
+                if ($bosses === null) {
+                    $bosses = $this->bossNav();
+
+                    if ($bosses !== []) {
+                        Cache::put('nav.bosses', $bosses, now()->addDay());
+                    }
+                }
+
+                return $bosses;
             },
 
             // Clues are the fixed seven tiers regardless of synced data.
@@ -137,5 +153,21 @@ class HandleInertiaRequests extends Middleware
                 )->resolve();
             }),
         ]);
+    }
+
+    /**
+     * Boss list for the Hiscores nav — derived from a representative account's
+     * hiscore activities (the OSRS API returns the full set on every account),
+     * reusing the Account boss filter. Empty until at least one account synced.
+     *
+     * @return array<int, array{name: string, slug: string}>
+     */
+    private function bossNav(): array
+    {
+        $account = Account::query()->whereHas('hiscore')->with('hiscore')->first();
+
+        return $account
+            ? $account->bosses->map(fn ($boss) => ['name' => $boss['name'], 'slug' => $boss['slug']])->all()
+            : [];
     }
 }
