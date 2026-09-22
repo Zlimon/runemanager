@@ -38,9 +38,10 @@ class WelcomeController extends Controller
     }
 
     /**
-     * Top five accounts by total level. When anonymising, real usernames never
-     * leave the server — each is replaced with a masked label, and the ids that
-     * would link a row back to its account or owner are dropped.
+     * Top five accounts by total level. When anonymising, only what the
+     * showcase draws leaves the server: a masked username, the account type and
+     * the total level. Everything else (ids, exact XP, ranks, clan titles, dates)
+     * is left out, since exact XP alone can be looked up on the OSRS hiscores.
      *
      * @return list<array<string, mixed>>
      */
@@ -54,12 +55,11 @@ class WelcomeController extends Controller
             return $accounts;
         }
 
-        return array_map(function (array $account): array {
-            $account['username'] = $this->maskUsername((string) $account['username']);
-            unset($account['id'], $account['user_id']);
-
-            return $account;
-        }, $accounts);
+        return array_map(fn (array $account): array => [
+            'username' => $this->maskUsername((string) $account['username']),
+            'account_type' => $account['account_type'],
+            'level' => $account['level'],
+        ], $accounts);
     }
 
     /** Keep the first letter, mask the rest — e.g. "Zezima" → "Z•••••". */
