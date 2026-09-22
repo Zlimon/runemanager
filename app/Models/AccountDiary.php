@@ -3,27 +3,32 @@
 namespace App\Models;
 
 use App\Support\Diaries;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * SPEC §5.2 — an account's Achievement Diary completion, stored as a
+ * An account's Achievement Diary completion, stored as a
  * {area: {tier: bool}} map (PostgreSQL jsonb), upserted on each plugin push.
- *
- * @property int $account_id
- * @property array<string, array<string, bool>> $diaries
  */
+#[Unguarded]
 class AccountDiary extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
-
-    protected $casts = [
-        'account_id' => 'int',
-        'diaries' => 'array',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'account_id' => 'int',
+            'diaries' => 'array',
+        ];
+    }
 
     public function account(): BelongsTo
     {

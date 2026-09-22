@@ -118,7 +118,7 @@ class FetchBossIcons extends Command
     /**
      * Union of every distinct activity slug across all AccountHiscore rows that
      * is shaped like a boss — drops clue tiers and the misc activity list that
-     * Account::getBossesAttribute() also rejects.
+     * the Account `bosses` accessor also rejects.
      *
      * @return list<string>
      */

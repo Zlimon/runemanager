@@ -3,31 +3,35 @@
 namespace App\Models;
 
 use App\Support\CombatAchievements;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * SPEC §5.2/§7.1 — an account's Combat Achievement progress: total points and
+ * An account's Combat Achievement progress: total points and
  * the count of completed tasks per tier ({tier: int}), upserted on each plugin
  * snapshot push. Individual task unlocks are not stored here; they reach the
  * live feed via a separate push.
- *
- * @property int $account_id
- * @property int $points
- * @property array<string, int> $tiers
  */
+#[Unguarded]
 class AccountCombatAchievement extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
-
-    protected $casts = [
-        'account_id' => 'int',
-        'points' => 'int',
-        'tiers' => 'array',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'account_id' => 'int',
+            'points' => 'int',
+            'tiers' => 'array',
+        ];
+    }
 
     public function account(): BelongsTo
     {

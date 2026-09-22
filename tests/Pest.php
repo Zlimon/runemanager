@@ -6,7 +6,6 @@ use App\Models\GroupBank;
 use App\Models\Inventory;
 use App\Models\Loot;
 use App\Models\LootingBag;
-use App\Models\Npc;
 use App\Models\Quest;
 use App\Models\User;
 use App\Support\Roles;
@@ -32,12 +31,12 @@ uses(TestCase::class)->in('Feature', 'Unit');
 | testing database) keeps this cheap and avoids racing the unique-index
 | migrations that run against these same collections.
 |
-| Extend this list if a new model adds `protected $connection = 'mongodb'`.
+| Extend this list if a new model adds `#[Connection('mongodb')]`.
 */
 
 pest()->beforeEach(function () {
     try {
-        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Npc::class, Quest::class] as $model) {
+        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class] as $model) {
             $model::query()->delete();
         }
     } catch (Throwable) {

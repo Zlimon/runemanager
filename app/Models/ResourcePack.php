@@ -5,45 +5,13 @@ namespace App\Models;
 use App\Helpers\SettingHelper;
 use App\Services\ResourcePacks\PackPalette;
 use App\Support\Instance;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 
-/**
- * @property int $id
- * @property string $name
- * @property string $alias
- * @property string $version
- * @property string $author
- * @property string $url
- * @property string $tags
- * @property int $dark_mode
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property-read string|null $accent_ui_color
- *
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack query()
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereAlias($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereAuthor($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereDarkMode($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereTags($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ResourcePack whereVersion($value)
- *
- * @mixin \Eloquent
- */
 class ResourcePack extends Model
 {
-    use HasFactory;
-
     /** The bundled vanilla template pack, always offered as "Vanilla". */
     public const VANILLA = 'sample-vanilla';
 
@@ -70,9 +38,9 @@ class ResourcePack extends Model
 
     /**
      * The pack to actually render for a viewer: their personal pick, then the
-     * instance-global default, and finally the bundled Vanilla — so a
-     * pack is always in effect and there's no separate "no resource pack"
-     * rendering path. Null only if even the vanilla row is absent.
+     * instance-global default, and finally the bundled Vanilla. Null when the
+     * viewer has opted out of resource packs, or if even the vanilla row is
+     * absent.
      */
     public static function effectiveFor(?User $user): ?self
     {
@@ -117,9 +85,10 @@ class ResourcePack extends Model
     }
 
     /**
-     * Installed packs for the picker, vanilla pinned first then alphabetical.
+     * Installed packs for the picker, each shaped by {@see self::toPickerArray()},
+     * vanilla pinned first then alphabetical.
      *
-     * @return list<array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool}>
+     * @return list<array<string, mixed>>
      */
     public static function pickerList(): array
     {
@@ -134,11 +103,13 @@ class ResourcePack extends Model
      * Public URL to the pack's icon.png thumbnail (shipped in every pack), or
      * null when the file isn't on disk.
      */
-    public function getIconUrlAttribute(): ?string
+    protected function iconUrl(): Attribute
     {
-        $relative = "resource-packs/{$this->name}/icon.png";
+        return Attribute::make(get: function (): ?string {
+            $relative = "resource-packs/{$this->name}/icon.png";
 
-        return is_file(public_path($relative)) ? '/'.$relative : null;
+            return is_file(public_path($relative)) ? '/'.$relative : null;
+        });
     }
 
     /**
@@ -153,13 +124,15 @@ class ResourcePack extends Model
      * the row already carries, so there is nothing to migrate or keep in sync.
      * Null unless both of those are present.
      */
-    public function getAccentUiColorAttribute(): ?string
+    protected function accentUiColor(): Attribute
     {
-        if ($this->background_color === null || $this->accent_color === null) {
-            return null;
-        }
+        return Attribute::make(get: function (): ?string {
+            if ($this->background_color === null || $this->accent_color === null) {
+                return null;
+            }
 
-        return (new PackPalette)->uiAccent($this->accent_color, $this->background_color);
+            return (new PackPalette)->uiAccent($this->accent_color, $this->background_color);
+        });
     }
 
     /**
@@ -171,7 +144,7 @@ class ResourcePack extends Model
      * icon — picking a pack repaints every surface from that palette and moves
      * the whole interface between the light and dark themes.
      *
-     * @return array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool, author: ?string, version: ?string, tags: list<string>, background_color: ?string, accent_color: ?string, users_count: ?int}
+     * @return array{id: int, name: string, alias: string, icon_url: ?string, dark_mode: bool, installed_by_user_id: ?int, author: ?string, version: ?string, tags: list<string>, background_color: ?string, accent_color: ?string, users_count: ?int}
      */
     public function toPickerArray(): array
     {
