@@ -258,6 +258,15 @@ class Instance
     }
 
     /**
+     * The instance-wide default resource pack (set from the admin panel or
+     * `resourcepack:switch`), or null when unset. Stored as 0 when cleared.
+     */
+    public static function defaultResourcePackId(): ?int
+    {
+        return ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null;
+    }
+
+    /**
      * The owner's instance-wide default appearance, overriding a resource pack's
      * own (often unreliable) dark_mode flag. Null means "follow the pack".
      */
@@ -276,7 +285,7 @@ class Instance
      * then the owner's instance default, and finally the resource pack's flag.
      *
      * Selecting a resource pack clears that explicit toggle (member row and
-     * guest cookie alike — see UserResourcePackController::applySelection), so
+     * guest cookie alike — see SelectResourcePack::select()), so
      * the new pack's flag governs from here rather than a stale preference left
      * over from the previous pack. The order below is unchanged by that: the
      * rung is simply empty again.

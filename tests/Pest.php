@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use App\Models\Loot;
 use App\Models\LootingBag;
 use App\Models\Quest;
+use App\Models\ResourcePack;
 use App\Models\User;
 use App\Support\Roles;
 use Tests\TestCase;
@@ -54,4 +55,20 @@ function adminUser(string $role = Roles::OWNER): User
     Roles::sync();
 
     return tap(User::factory()->withPersonalTeam()->create())->assignRole($role);
+}
+
+/**
+ * A dark-drawn resource pack row, shared by the dark-mode and appearance tests.
+ */
+function darkPack(string $name = 'pack-darkish'): ResourcePack
+{
+    return ResourcePack::query()->forceCreate([
+        'name' => $name,
+        'alias' => 'Darkish',
+        'version' => '1.0.0',
+        'author' => 'test',
+        'url' => "https://example.test/{$name}.zip",
+        'tags' => '',
+        'dark_mode' => true,
+    ]);
 }

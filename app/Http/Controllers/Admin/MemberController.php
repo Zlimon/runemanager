@@ -47,19 +47,10 @@ class MemberController extends Controller
             'username' => ['required', 'string', 'max:12', 'regex:/^[A-Za-z0-9 _-]+$/', 'unique:accounts,username'],
         ]);
 
-        // The account type is a placeholder until the member's first plugin
-        // login confirms it (and, in GROUP mode, that they're a Group Ironman).
-        $account = new Account;
-        $account->username = trim($validated['username']);
-        $account->user_id = null;
-        $account->account_hash = null;
-        $account->account_type = Instance::isGroup()
-            ? AccountTypesEnum::GROUP_IRONMAN
-            : AccountTypesEnum::NORMAL;
-        $account->rank = 0;
-        $account->level = 0;
-        $account->xp = 0;
-        $account->save();
+        Account::rosterPlaceholder(
+            trim($validated['username']),
+            Instance::isGroup() ? AccountTypesEnum::GROUP_IRONMAN : AccountTypesEnum::NORMAL,
+        )->save();
 
         return back()->with('status', 'Member added.');
     }

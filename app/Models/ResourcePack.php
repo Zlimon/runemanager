@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Helpers\SettingHelper;
 use App\Services\ResourcePacks\PackPalette;
 use App\Support\Instance;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\File;
 
 class ResourcePack extends Model
 {
@@ -58,7 +58,7 @@ class ResourcePack extends Model
             return null;
         }
 
-        $id = $guestChoice ?? $user?->effectiveResourcePackId() ?? SettingHelper::getSetting('resource_pack_id');
+        $id = $guestChoice ?? $user?->effectiveResourcePackId() ?? Instance::defaultResourcePackId();
         $pack = $id ? self::find($id) : null;
 
         return $pack ?? self::where('name', self::VANILLA)->first();
@@ -110,6 +110,25 @@ class ResourcePack extends Model
 
             return is_file(public_path($relative)) ? '/'.$relative : null;
         });
+    }
+
+    /**
+     * The pack's stylesheet URL, cache-busted on the CSS file's mtime so a
+     * template edit (which does not touch updated_at) is picked up without a
+     * hard refresh. Null when the row exists but its files do not, a state the
+     * admin packs screen surfaces and callers must survive rather than render a
+     * dead <link> for.
+     */
+    public function stylesheetUrl(): ?string
+    {
+        $relative = "resource-packs/{$this->name}/resource-pack.css";
+        $path = public_path($relative);
+
+        if (! File::exists($path)) {
+            return null;
+        }
+
+        return asset($relative).'?v='.filemtime($path);
     }
 
     /**

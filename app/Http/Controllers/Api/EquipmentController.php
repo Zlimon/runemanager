@@ -26,22 +26,14 @@ class EquipmentController extends Controller
             'equipment.*.0' => ['required', 'integer'],
         ]);
 
-        $eq = $request->input('equipment');
-        $itemAt = fn (int $slot) => isset($eq[$slot][0]) && $eq[$slot][0] !== -1 ? $eq[$slot][0] : null;
+        $slots = $request->input('equipment');
 
         $equipment = Equipment::where('account_id', $account->id)->first() ?? new Equipment;
         $equipment->account_id = $account->id;
-        $equipment->head = $itemAt(0);
-        $equipment->cape = $itemAt(1);
-        $equipment->neck = $itemAt(2);
-        $equipment->weapon = $itemAt(3);
-        $equipment->body = $itemAt(4);
-        $equipment->shield = $itemAt(5);
-        $equipment->legs = $itemAt(7);
-        $equipment->hands = $itemAt(9);
-        $equipment->feet = $itemAt(10);
-        $equipment->ring = $itemAt(12);
-        $equipment->ammo = $itemAt(13);
+        foreach (Equipment::PLUGIN_SLOTS as $column => $slot) {
+            $itemId = $slots[$slot][0] ?? null;
+            $equipment->{$column} = $itemId !== -1 ? $itemId : null;
+        }
         $equipment->save();
 
         broadcast(new AccountDataUpdated($account, 'equipment'));

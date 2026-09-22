@@ -32,18 +32,8 @@ class SyncClanRoster
                 continue;
             }
 
-            $account = Account::query()->where('username', $username)->first();
-
-            if ($account === null) {
-                $account = new Account;
-                $account->username = $username;
-                $account->user_id = null;
-                $account->account_hash = null;
-                $account->account_type = AccountTypesEnum::NORMAL;
-                $account->rank = 0;
-                $account->level = 0;
-                $account->xp = 0;
-            }
+            $account = Account::query()->where('username', $username)->first()
+                ?? Account::rosterPlaceholder($username, AccountTypesEnum::NORMAL);
 
             $account->clan_rank = $member['rank'] ?? null;
             $account->clan_title = $member['title'] ?? null;

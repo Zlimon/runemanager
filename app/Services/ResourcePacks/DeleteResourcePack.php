@@ -5,6 +5,7 @@ namespace App\Services\ResourcePacks;
 use App\Helpers\SettingHelper;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Support\Instance;
 use Illuminate\Support\Facades\File;
 
 /**
@@ -18,7 +19,7 @@ class DeleteResourcePack
 {
     public function isInstanceDefault(ResourcePack $pack): bool
     {
-        return (int) SettingHelper::getSetting('resource_pack_id', 0) === $pack->id;
+        return Instance::defaultResourcePackId() === $pack->id;
     }
 
     public function run(ResourcePack $pack): void

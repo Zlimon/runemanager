@@ -198,7 +198,7 @@ it('does not touch the global setting when a user updates their override', funct
 it('website install: stub-creates the row, selects it and queues a fetch when not installed', function () {
     $user = freshPackUser();
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
 
     expect(ResourcePack::count())->toBe(0);
 
@@ -223,7 +223,7 @@ it('website install: selects without re-queuing when the pack is already install
         'accent_color' => '#9e8a6f',
     ]);
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     $this->actingAs($user)
         ->postJson(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
@@ -253,7 +253,7 @@ it('website install: rejects guests', function () {
 
 it('website install: attributes a newly installed pack to the member', function () {
     $user = freshPackUser();
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
 
     $this->actingAs($user)
         ->postJson(route('user.resource-pack.install'), ['name' => 'pack-sakurascape'])
@@ -283,7 +283,7 @@ it('website install: re-adding a pack already in the pool ignores the limit', fu
     makePack('pack-a', ['installed_by_user_id' => $user->id]);
     // Installed by someone else, already in the shared pool.
     $shared = makePack('pack-shared', ['version' => '1.0.0', 'background_color' => '#111111']);
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     $this->actingAs($user)
         ->postJson(route('user.resource-pack.install'), ['name' => 'pack-shared'])
@@ -296,7 +296,7 @@ it('website install: the owner is exempt from the install limit', function () {
     config(['runemanager.resource_packs.user_install_limit' => 1]);
     $owner = adminUser();
     makePack('pack-a', ['installed_by_user_id' => $owner->id]);
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
 
     $this->actingAs($owner)
         ->postJson(route('user.resource-pack.install'), ['name' => 'pack-b'])
@@ -355,7 +355,7 @@ it('delete: a member cannot delete the current instance default', function () {
 
 it('install status: reports not-installed for a pending stub even with assets on disk', function () {
     makePack('pack-sakurascape', ['version' => 'pending']);
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     $this->actingAs(freshPackUser())
         ->getJson(route('user.resource-pack.status', ['name' => 'pack-sakurascape']))
@@ -365,7 +365,7 @@ it('install status: reports not-installed for a pending stub even with assets on
 
 it('install status: reports installed once the row is populated and assets exist', function () {
     makePack('pack-sakurascape', ['version' => '1.0.0']);
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     $this->actingAs(freshPackUser())
         ->getJson(route('user.resource-pack.status', ['name' => 'pack-sakurascape']))
@@ -378,7 +378,7 @@ it('plugin push: 200 + no job queued when pack is already installed', function (
     $pack = makePack('sample-vanilla');
 
     // Pretend the assets are on disk.
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     Sanctum::actingAs($user);
 
@@ -396,7 +396,7 @@ it('plugin push: 202 + queues install when DB row exists but assets are missing'
     $user = freshPackUser();
     $pack = makePack('sample-vanilla');
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
 
     Sanctum::actingAs($user);
 
@@ -420,7 +420,7 @@ it('plugin push: 202 + queues install when DB row is a pending stub (even with a
         'accent_color' => null,
     ]);
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     Sanctum::actingAs($user);
 
@@ -443,7 +443,7 @@ it('plugin push: 200 + does not re-queue when pack row is fully populated', func
         'accent_color' => '#9e8a6f',
     ]);
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
 
     Sanctum::actingAs($user);
 
@@ -459,7 +459,7 @@ it('plugin push: 200 + does not re-queue when pack row is fully populated', func
 it('plugin push: 202 + stub-creates row + queues install for an unknown pack', function () {
     $user = freshPackUser();
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(false));
 
     Sanctum::actingAs($user);
 

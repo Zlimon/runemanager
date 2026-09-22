@@ -6,6 +6,7 @@ use App\Http\Resources\AccountResource;
 use App\Http\Resources\CalendarEventResource;
 use App\Models\Account;
 use App\Models\CalendarEvent;
+use App\Services\Instance\InstanceStats;
 use App\Support\Instance;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ class WelcomeController extends Controller
      * When the owner enables it, usernames in the showcase are masked so the
      * leaderboard can be shown publicly without revealing who's who.
      */
-    public function index(): Response
+    public function index(InstanceStats $stats): Response
     {
         $anonymize = Instance::publicAnonymizeAccounts();
 
@@ -28,13 +29,7 @@ class WelcomeController extends Controller
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
             'anonymized' => $anonymize,
-            'stats' => [
-                'accounts' => Account::count(),
-                'members' => Account::query()->whereNotNull('user_id')->distinct()->count('user_id'),
-                'online' => Account::query()
-                    ->where('last_seen_at', '>=', now()->subMinutes((int) config('runemanager.presence.online_within_minutes')))
-                    ->count(),
-            ],
+            'stats' => $stats->counts(),
             'upcoming' => CalendarEventResource::collection(
                 CalendarEvent::with('user:id,name')->upcoming()->limit(5)->get(),
             )->resolve(),
@@ -51,12 +46,7 @@ class WelcomeController extends Controller
     private function topAccounts(bool $anonymize): array
     {
         $accounts = AccountResource::collection(
-            Account::query()->with('user')
-                ->where('level', '>', 0)
-                ->orderByDesc('level')
-                ->orderByDesc('xp')
-                ->limit(5)
-                ->get(),
+            Account::query()->with('user')->topByLevel(5)->get(),
         )->resolve();
 
         if (! $anonymize) {

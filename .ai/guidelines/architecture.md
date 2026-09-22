@@ -11,6 +11,14 @@ The product overview, data flow and storage split are covered in the hand-writte
 - `routes/web.php` imports controller namespaces (`use App\Http\Controllers\Admin;`) and refers to `Admin\DashboardController::class`. Why: several classes share a short name (for example, the root `DashboardController` and `Admin\DashboardController`).
 - Management routes are gated by permission middleware. Under `/admin`, `can:manage instance` covers settings, packs and the admin calendar, and `can:manage members` covers the member roster. `can:manage calendar` and `can:manage announcements` gate the create, update and delete routes of the public calendar and announcements pages. The permission names are constants in `App\Support\Roles`. `Owner` passes every check through `Gate::before`. Use these permissions for new management surfaces; do not add checks on role names.
 
+## Controllers stay thin
+
+- A controller method validates (a Form Request in `app/Http/Requests`), authorizes (permission middleware or `abort_unless`), calls one model method or service, and returns a response. Why: the same rule then serves web, plugin and artisan callers, and can be tested without HTTP.
+- Move code into `app/Services/<Domain>/` once it has domain rules, filesystem or Mongo aggregation work, or a second caller. Leave single-use prop shaping and 1–3 line Eloquent calls in the controller. Do not add interfaces or repositories.
+- Naming: a class that performs one change is a verb phrase (`ResetInstanceData::run()`, `ApplyInstanceSettings::run()`, `RecordLoot::record()`, `SelectResourcePack::select()`). A read or query service is a noun (`ResourcePackHub`, `HiscoreLeaderboard`, `LootLeaderboard`, `CollectionLogView`, `InstanceStats`). Inject services as method or constructor parameters.
+- Reusable query constraints are model scopes. Instance settings are typed accessors on `Instance` (for example `Instance::defaultResourcePackId()`). Response shapes shared by more than one caller are API Resources in `app/Http/Resources`.
+- Controller traits are not a place for business logic; use a service.
+
 ## Pages and components (resources/js)
 
 - Every page is a directory: `Pages/<Page>/Index.vue` for a list or single view, `Show.vue` for a record. Components used by only that page go in `Pages/<Page>/Partials/`. The render name matches the path (`Inertia::render('Admin/Calendar/Index')`).

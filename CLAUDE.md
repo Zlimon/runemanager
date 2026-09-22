@@ -95,6 +95,14 @@ The product overview, data flow and storage split are covered in the hand-writte
 - `routes/web.php` imports controller namespaces (`use App\Http\Controllers\Admin;`) and refers to `Admin\DashboardController::class`. Why: several classes share a short name (for example, the root `DashboardController` and `Admin\DashboardController`).
 - Management routes are gated by permission middleware. Under `/admin`, `can:manage instance` covers settings, packs and the admin calendar, and `can:manage members` covers the member roster. `can:manage calendar` and `can:manage announcements` gate the create, update and delete routes of the public calendar and announcements pages. The permission names are constants in `App\Support\Roles`. `Owner` passes every check through `Gate::before`. Use these permissions for new management surfaces; do not add checks on role names.
 
+## Controllers stay thin
+
+- A controller method validates (a Form Request in `app/Http/Requests`), authorizes (permission middleware or `abort_unless`), calls one model method or service, and returns a response. Why: the same rule then serves web, plugin and artisan callers, and can be tested without HTTP.
+- Move code into `app/Services/<Domain>/` once it has domain rules, filesystem or Mongo aggregation work, or a second caller. Leave single-use prop shaping and 1–3 line Eloquent calls in the controller. Do not add interfaces or repositories.
+- Naming: a class that performs one change is a verb phrase (`ResetInstanceData::run()`, `ApplyInstanceSettings::run()`, `RecordLoot::record()`, `SelectResourcePack::select()`). A read or query service is a noun (`ResourcePackHub`, `HiscoreLeaderboard`, `LootLeaderboard`, `CollectionLogView`, `InstanceStats`). Inject services as method or constructor parameters.
+- Reusable query constraints are model scopes. Instance settings are typed accessors on `Instance` (for example `Instance::defaultResourcePackId()`). Response shapes shared by more than one caller are API Resources in `app/Http/Resources`.
+- Controller traits are not a place for business logic; use a service.
+
 ## Pages and components (resources/js)
 
 - Every page is a directory: `Pages/<Page>/Index.vue` for a list or single view, `Show.vue` for a record. Components used by only that page go in `Pages/<Page>/Partials/`. The render name matches the path (`Inertia::render('Admin/Calendar/Index')`).
@@ -155,9 +163,9 @@ CLAUDE.md ("Theming & resource packs") covers the storage layout, the Vanilla ba
 
 ## Files and commands
 
-- Pack logic lives in `app/Services/ResourcePacks/`. `InstallResourcePack` downloads, extracts and prepares a pack. `ResourcePackHub` lists the `melkypie/resource-packs` branches and is cached. `PackPalette` extracts the background and accent colours. `DeleteResourcePack` removes a pack. Reuse these services; do not write a second download or extract path.
+- Pack logic lives in `app/Services/ResourcePacks/`. `InstallResourcePack` downloads, extracts and prepares a pack. `ResourcePackHub` lists the `melkypie/resource-packs` branches and is cached. `PackPalette` extracts the background and accent colours. `DeleteResourcePack` removes a pack. `SelectResourcePack` applies a user's pack choice (and installs-then-selects for both the website hub install and the plugin push). `PackInstallQuota` enforces the member install cap. `PackSpriteInventory` lists which sprites a pack borrowed from Vanilla (for the styleguide). Reuse these services; do not write a second download or extract path.
 - Artisan: `resourcepack:fetch {name}` installs a pack. `resourcepack:switch {name}` sets the instance default. `resourcepack:ensure-vanilla` restores Vanilla. `resourcepack:sync-css` re-copies the template into every installed pack, re-borrows missing sprites from Vanilla and re-runs the sprite normalisers. Both `ensure-vanilla` and `sync-css` run on every deploy (`before-activation.sh`).
-- A pack counts as installed when `public/resource-packs/{name}/resource-pack.css` exists (`InstallResourcePack::isInstalled()`) and its row's `version` is not `'pending'`.
+- A pack counts as installed when `public/resource-packs/{name}/resource-pack.css` exists (`InstallResourcePack::isInstalled()`) and its row's `version` is not `'pending'`. Check this with `InstallResourcePack::isReady()`.
 
 ## per-pack.css template
 
@@ -181,12 +189,12 @@ CLAUDE.md ("Theming & resource packs") covers the storage layout, the Vanilla ba
 ## Dark mode
 
 - `Instance::resolveDarkMode($user, $pack)` resolves in this order: the user's own toggle, then the guest `dark_mode` cookie, then the owner's `default_dark_mode`, then the pack's `dark_mode` flag. Vanilla is always light and hides the toggle (`canToggleDarkMode()`). `Instance::themeFor()` picks the DaisyUI theme (`runemanager`, `runemanager-dark`, `runemanager-vanilla`).
-- Picking a different pack clears the stored dark-mode choice (`UserResourcePackController::applySelection()` for users; the guest path forgets the cookie). Why: a toggle set while an earlier pack was active would otherwise win forever and put a dark-drawn pack under the light theme. Re-saving the same pack must not clear it.
+- Picking a different pack clears the stored dark-mode choice (`App\Services\ResourcePacks\SelectResourcePack::select()` for users; the guest path in `UserResourcePackController` forgets the cookie). Why: a toggle set while an earlier pack was active would otherwise win forever and put a dark-drawn pack under the light theme. Re-saving the same pack must not clear it.
 
 ## Installing and deleting
 
 - Hub installs from the website (`UserResourcePackController::install`, `Admin\ResourcePackController::store`) queue `FetchResourcePackJob` and answer with JSON. The page then polls `user.resource-pack.status` until the pack counts as installed.
-- A member's installs are capped by `config('runemanager.resource_packs.user_install_limit')`. Holders of `manage instance` are exempt. Only a pack new to the instance counts toward the cap. The quota logic lives in the `Concerns\LimitsResourcePackInstalls` trait, which both the Themes page and the install endpoint use.
+- A member's installs are capped by `config('runemanager.resource_packs.user_install_limit')`. Holders of `manage instance` are exempt. Only a pack new to the instance counts toward the cap. The quota logic lives in `App\Services\ResourcePacks\PackInstallQuota`, which both the Themes page and the install endpoint use.
 - The plugin reports the pack that is active in-game through `PUT /api/plugin/resource-pack` (a pack name, outside `plugin.account`). An unknown name gets a stub row (`version`/`author` = `'pending'`, `installed_by_user_id` set), is selected for the user and queues the fetch. The endpoint returns 202 while queued and 200 once installed.
 - Deleting goes through `DeleteResourcePack::run()`, which resets affected users' picks, clears the instance default when needed, and removes the files and the row. Vanilla can never be deleted. Members may delete only their own installs, and never the current instance default.
 

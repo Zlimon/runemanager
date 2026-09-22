@@ -1,0 +1,154 @@
+<?php
+
+use App\Models\Account;
+use App\Models\AccountHiscore;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
+
+uses(RefreshDatabase::class);
+
+/**
+ * @param  array<string, array<string, int>>  $skills
+ * @param  array<string, array<string, int>>  $activities
+ */
+function leaderboardHiscore(Account $account, array $skills = [], array $activities = []): void
+{
+    AccountHiscore::create([
+        'account_id' => $account->id,
+        'entries' => ['skills' => $skills, 'activities' => $activities],
+        'fetched_at' => now(),
+    ]);
+}
+
+it('ranks a skill board by rank with unranked accounts last, then level and XP', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $unranked = Account::factory()->for($user)->create(['username' => 'Unranked']);
+    $lowXp = Account::factory()->for($user)->create(['username' => 'LowXp']);
+    $highXp = Account::factory()->for($user)->create(['username' => 'HighXp']);
+    $highLevel = Account::factory()->for($user)->create(['username' => 'HighLevel']);
+    $best = Account::factory()->for($user)->create(['username' => 'Best']);
+    $missing = Account::factory()->for($user)->create(['username' => 'Missing']);
+
+    leaderboardHiscore($unranked, ['attack' => ['rank' => 0, 'level' => 99, 'xp' => 13_034_431]]);
+    leaderboardHiscore($lowXp, ['attack' => ['rank' => 500, 'level' => 80, 'xp' => 2_000_000]]);
+    leaderboardHiscore($highXp, ['attack' => ['rank' => 500, 'level' => 80, 'xp' => 2_100_000]]);
+    leaderboardHiscore($highLevel, ['attack' => ['rank' => 500, 'level' => 85, 'xp' => 1_000_000]]);
+    leaderboardHiscore($best, ['attack' => ['rank' => 10, 'level' => 70, 'xp' => 800_000]]);
+    leaderboardHiscore($missing);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.skills.index', 'attack'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Hiscores/Skills/Show')
+            ->where('recordType', 'skill')
+            ->where('skillName', 'Attack')
+            ->where('skillSlug', 'attack')
+            ->has('hiscores', 6)
+            ->where('hiscores.0.account.username', 'Best')
+            ->where('hiscores.1.account.username', 'HighLevel')
+            ->where('hiscores.2.account.username', 'HighXp')
+            ->where('hiscores.3.account.username', 'LowXp')
+            ->where('hiscores.3.rank', 500)
+            ->where('hiscores.3.level', 80)
+            ->where('hiscores.3.xp', 2000000)
+            // Both unranked accounts sort after every ranked one, higher level first.
+            ->where('hiscores.4.account.username', 'Unranked')
+            ->where('hiscores.5.account.username', 'Missing')
+            // A skill missing from the entries defaults to level 1.
+            ->where('hiscores.5.rank', 0)
+            ->where('hiscores.5.level', 1)
+            ->where('hiscores.5.xp', 0),
+        );
+});
+
+it('defaults a missing overall entry to level 0', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user)->create(['username' => 'Missing']);
+    leaderboardHiscore($account);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.overall.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Hiscores/Skills/Show')
+            ->where('recordType', 'overall')
+            ->has('hiscores', 1)
+            ->where('hiscores.0.rank', 0)
+            ->where('hiscores.0.level', 0)
+            ->where('hiscores.0.xp', 0),
+        );
+});
+
+it('returns 404 for an unknown skill', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+
+    $this->actingAs($user)
+        ->get(route('hiscores.skills.index', 'not-a-skill'))
+        ->assertNotFound();
+});
+
+it('ranks a boss board by rank with unranked accounts last, then kill count', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $unranked = Account::factory()->for($user)->create(['username' => 'Unranked']);
+    $fewer = Account::factory()->for($user)->create(['username' => 'Fewer']);
+    $more = Account::factory()->for($user)->create(['username' => 'More']);
+    $best = Account::factory()->for($user)->create(['username' => 'Best']);
+    $missing = Account::factory()->for($user)->create(['username' => 'Missing']);
+
+    leaderboardHiscore($unranked, activities: ['general_graardor' => ['rank' => 0, 'score' => 9_000]]);
+    leaderboardHiscore($fewer, activities: ['general_graardor' => ['rank' => 700, 'score' => 50]]);
+    leaderboardHiscore($more, activities: ['general_graardor' => ['rank' => 700, 'score' => 60]]);
+    leaderboardHiscore($best, activities: ['general_graardor' => ['rank' => 20, 'score' => 10]]);
+    leaderboardHiscore($missing);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.bosses.index', 'general-graardor'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Hiscores/Bosses/Show')
+            ->where('recordType', 'boss')
+            ->where('collectionName', 'General Graardor')
+            ->where('collectionSlug', 'general-graardor')
+            ->has('hiscores', 5)
+            ->where('hiscores.0.account.username', 'Best')
+            ->where('hiscores.1.account.username', 'More')
+            ->where('hiscores.1.rank', 700)
+            ->where('hiscores.1.kill_count', 60)
+            ->where('hiscores.2.account.username', 'Fewer')
+            ->where('hiscores.3.account.username', 'Unranked')
+            ->where('hiscores.4.account.username', 'Missing')
+            ->where('hiscores.4.rank', 0)
+            ->where('hiscores.4.kill_count', 0),
+        );
+});
+
+it('ranks a clue board from the clue activity', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $low = Account::factory()->for($user)->create(['username' => 'Low']);
+    $high = Account::factory()->for($user)->create(['username' => 'High']);
+
+    leaderboardHiscore($low, activities: ['clue_scrolls_elite' => ['rank' => 900, 'score' => 5]]);
+    leaderboardHiscore($high, activities: ['clue_scrolls_elite' => ['rank' => 100, 'score' => 40]]);
+
+    $this->actingAs($user)
+        ->get(route('hiscores.clues.index', 'clue-scrolls-elite'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Hiscores/Bosses/Show')
+            ->where('recordType', 'clue')
+            ->where('collectionName', 'Clue Scrolls Elite')
+            ->where('collectionSlug', 'clue-scrolls-elite')
+            ->has('hiscores', 2)
+            ->where('hiscores.0.account.username', 'High')
+            ->where('hiscores.0.kill_count', 40)
+            ->where('hiscores.1.account.username', 'Low'),
+        );
+});
+
+it('requires authentication for the skill and activity boards', function () {
+    $this->get(route('hiscores.skills.index', 'attack'))->assertRedirect(route('login'));
+    $this->get(route('hiscores.bosses.index', 'zulrah'))->assertRedirect(route('login'));
+    $this->get(route('hiscores.clues.index', 'clue-scrolls-all'))->assertRedirect(route('login'));
+});

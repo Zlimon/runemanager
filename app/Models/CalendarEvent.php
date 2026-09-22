@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CalendarEventType;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -60,6 +61,21 @@ class CalendarEvent extends Model
     public function hasPassed(): bool
     {
         return ($this->ends_at ?? $this->starts_at)?->isPast() ?? false;
+    }
+
+    /**
+     * Events that fall on any day in the range, so a multi-day event shows on
+     * each day it spans. A single-point event (no end) overlaps when it starts
+     * inside the range.
+     */
+    #[Scope]
+    protected function overlapping(Builder $query, CarbonInterface $from, CarbonInterface $to): void
+    {
+        $query->where('starts_at', '<=', $to)
+            ->where(function (Builder $query) use ($from): void {
+                $query->where('ends_at', '>=', $from)
+                    ->orWhere(fn (Builder $query) => $query->whereNull('ends_at')->where('starts_at', '>=', $from));
+            });
     }
 
     #[Scope]

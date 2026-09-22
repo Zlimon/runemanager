@@ -33,10 +33,9 @@
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/app.css', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
 
-        @if ($pack && file_exists(public_path("resource-packs/{$pack->name}/resource-pack.css")))
-            {{-- Cache-bust on the CSS file's mtime so template tweaks (which don't
-                 touch the pack's updated_at) are picked up without a hard refresh. --}}
-            <link rel="stylesheet" href="{{ asset("resource-packs/{$pack->name}/resource-pack.css") }}?v={{ filemtime(public_path("resource-packs/{$pack->name}/resource-pack.css")) }}">
+        @if ($stylesheetUrl = $pack?->stylesheetUrl())
+            {{-- Cache-busted on the CSS file's mtime (see ResourcePack::stylesheetUrl). --}}
+            <link rel="stylesheet" href="{{ $stylesheetUrl }}">
             @if ($pack->background_color || $pack->accent_color)
                 {{-- Pack palette extracted at install time — emitted as CSS variables so
                      flat container backgrounds can pick up the pack's colour without

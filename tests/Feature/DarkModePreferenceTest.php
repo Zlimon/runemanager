@@ -1,26 +1,12 @@
 <?php
 
 use App\Helpers\SettingHelper;
-use App\Models\ResourcePack;
 use App\Models\User;
 use App\Support\Instance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
-
-function darkPack(string $name = 'pack-darkish'): ResourcePack
-{
-    return ResourcePack::query()->forceCreate([
-        'name' => $name,
-        'alias' => 'Darkish',
-        'version' => '1.0.0',
-        'author' => 'test',
-        'url' => "https://example.test/{$name}.zip",
-        'tags' => '',
-        'dark_mode' => true,
-    ]);
-}
 
 it('persists the authenticated user dark-mode preference', function () {
     $user = User::factory()->create(['dark_mode' => false]);

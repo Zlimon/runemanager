@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\ResourcePack;
-use App\Services\ResourcePacks\InstallResourcePack;
+use App\Services\ResourcePacks\PackSpriteInventory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,15 +23,6 @@ use Inertia\Response;
  */
 class StyleguideController extends Controller
 {
-    /**
-     * Pack sprite directories the page reports on. Kept to the ones per-pack.css
-     * and the frontend actually address, so a gap here means a visibly broken
-     * component rather than an unused file.
-     *
-     * @var list<string>
-     */
-    private const SPRITE_DIRS = ['button', 'dialog', 'options', 'scrollbar', 'equipment', 'skill'];
-
     /**
      * Real catalogue items for the item slots, tooltips and loot grids: coins,
      * an abyssal whip, dragon bones, sharks, a twisted bow and a rune platebody —
@@ -60,10 +50,10 @@ class StyleguideController extends Controller
      * the switcher is previewing. It is also only wanted on demand, so keeping
      * it off the page payload saves reading six directories per visit.
      */
-    public function sprites(Request $request): JsonResponse
+    public function sprites(Request $request, PackSpriteInventory $inventory): JsonResponse
     {
         return response()->json(
-            $this->inventory((string) $request->query('pack', '')),
+            $inventory->for((string) $request->query('pack', '')),
         );
     }
 
@@ -86,7 +76,7 @@ class StyleguideController extends Controller
             ->get()
             ->map(fn (ResourcePack $pack): array => [
                 ...$pack->toPickerArray(),
-                'css' => $this->stylesheet($pack->name),
+                'css' => $pack->stylesheetUrl(),
                 // Derived on read from the two stored colours — the contrast-safe
                 // accent for controls, which the switcher must repaint alongside
                 // --pack-accent or a switched pack keeps the old one's edges.
@@ -95,89 +85,5 @@ class StyleguideController extends Controller
             ])
             ->values()
             ->all();
-    }
-
-    /**
-     * The pack's stylesheet URL, or null when the pack row exists but its files
-     * don't — a state the admin packs screen already surfaces, and one the
-     * switcher has to survive rather than render a dead <link> for.
-     */
-    private function stylesheet(string $name): ?string
-    {
-        $path = public_path("resource-packs/{$name}/resource-pack.css");
-
-        if (! File::exists($path)) {
-            return null;
-        }
-
-        return asset("resource-packs/{$name}/resource-pack.css").'?v='.filemtime($path);
-    }
-
-    /**
-     * Which sprites the given pack ships itself and which are Vanilla's,
-     * copied in at install time by {@see InstallResourcePack::completeFromVanilla()}.
-     *
-     * Packs only override what they change, so "the pack has this file" is not
-     * the same as "the pack drew this file" — Knight's Fortress ships 16 button
-     * sprites and inherits the rest. Comparing bytes against vanilla is what
-     * separates the two, and it is the fact that explains why two packs can put
-     * a different frame around an identical face.
-     *
-     * @return array{pack: ?string, own: int, borrowed: int, files: list<array{path: string, width: int, height: int, own: bool}>}
-     */
-    private function inventory(string $name): array
-    {
-        $empty = ['pack' => null, 'own' => 0, 'borrowed' => 0, 'files' => []];
-
-        if ($name === '') {
-            return $empty;
-        }
-
-        $packDir = public_path("resource-packs/{$name}");
-        if (! File::isDirectory($packDir)) {
-            return $empty;
-        }
-
-        $vanillaDir = public_path('resource-packs/'.InstallResourcePack::VANILLA_PACK);
-        $isVanilla = $name === InstallResourcePack::VANILLA_PACK;
-
-        $files = [];
-        $own = 0;
-
-        foreach (self::SPRITE_DIRS as $dir) {
-            if (! File::isDirectory("{$packDir}/{$dir}")) {
-                continue;
-            }
-
-            foreach (File::files("{$packDir}/{$dir}") as $file) {
-                $relative = $dir.'/'.$file->getFilename();
-                $vanillaCopy = "{$vanillaDir}/{$relative}";
-
-                // Vanilla is the baseline, so it owns everything it ships; for any
-                // other pack a byte-identical file is one it borrowed.
-                $isOwn = $isVanilla || ! File::exists($vanillaCopy)
-                    || File::get($file->getPathname()) !== File::get($vanillaCopy);
-
-                $size = @getimagesize($file->getPathname());
-
-                $files[] = [
-                    'path' => $relative,
-                    'width' => $size[0] ?? 0,
-                    'height' => $size[1] ?? 0,
-                    'own' => $isOwn,
-                ];
-
-                $own += $isOwn ? 1 : 0;
-            }
-        }
-
-        usort($files, fn (array $a, array $b): int => strcmp($a['path'], $b['path']));
-
-        return [
-            'pack' => $name,
-            'own' => $own,
-            'borrowed' => count($files) - $own,
-            'files' => $files,
-        ];
     }
 }

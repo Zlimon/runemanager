@@ -5,6 +5,7 @@ namespace App\Services\Feed;
 use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\FeedEvent;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 
 /**
@@ -19,6 +20,20 @@ class RecordFeedEvent
 {
     /** Plugin quest status code for a finished quest (0/1/2 scale). */
     private const QUEST_FINISHED = 2;
+
+    /** How recent a matching event must be to receive a screenshot. */
+    public const MATCH_WINDOW_SECONDS = 120;
+
+    /** Event types the plugin may upload a screenshot for. */
+    public const SCREENSHOT_TYPES = [
+        FeedEvent::TYPE_LOOT_DROP,
+        FeedEvent::TYPE_COMBAT_ACHIEVEMENT,
+        FeedEvent::TYPE_COLLECTION_LOG,
+        FeedEvent::TYPE_PET,
+        FeedEvent::TYPE_DEATH,
+        FeedEvent::TYPE_REWARD,
+        FeedEvent::TYPE_LEVEL_UP,
+    ];
 
     /**
      * Validation rules for an optional plugin-supplied event position, keyed
@@ -159,6 +174,34 @@ class RecordFeedEvent
             'payload' => $this->withPosition(['item' => $item], $position),
             'occurred_at' => now(),
         ]);
+    }
+
+    /**
+     * Attach a plugin screenshot to the account's most recent event of $type
+     * that has none yet. Feed events are created server-side a beat earlier
+     * (from the loot/CA/collection-log push), so only events from the last
+     * MATCH_WINDOW_SECONDS qualify. Returns false, storing nothing, when no
+     * event qualifies (e.g. the drop was below the plugin's feed value floor).
+     */
+    public function attachScreenshot(Account $account, string $type, UploadedFile $image): bool
+    {
+        $event = FeedEvent::query()
+            ->where('account_id', $account->id)
+            ->where('type', $type)
+            ->whereNull('screenshot_path')
+            ->where('created_at', '>=', now()->subSeconds(self::MATCH_WINDOW_SECONDS))
+            ->latest('id')
+            ->first();
+
+        if ($event === null) {
+            return false;
+        }
+
+        $path = $image->storeAs('feed-screenshots', $event->id.'.'.$image->extension(), 'public');
+
+        $event->update(['screenshot_path' => $path]);
+
+        return true;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Helpers\SettingHelper;
+use App\Support\Instance;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -90,8 +90,6 @@ class User extends Authenticatable
             return $this->resource_pack_id;
         }
 
-        $global = SettingHelper::getSetting('resource_pack_id');
-
-        return $global ? (int) $global : null;
+        return Instance::defaultResourcePackId();
     }
 }

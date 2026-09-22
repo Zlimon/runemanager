@@ -443,6 +443,18 @@ class InstallResourcePack
     }
 
     /**
+     * Whether the pack is fully installed: assets on disk and a populated row.
+     * A stub row (version `pending`), whether just created for a queued install
+     * or left over from a migrate:fresh while the CSS survived on disk, still
+     * needs the pipeline to fetch its metadata and extract the palette.
+     */
+    public function isReady(string $name): bool
+    {
+        return $this->isInstalled($name)
+            && ResourcePack::where('name', $name)->where('version', '!=', 'pending')->exists();
+    }
+
+    /**
      * Ensure the bundled "Vanilla" pack has a DB row so it's
      * always selectable alongside "Default" (no pack). The assets ship with the
      * app, so this builds the row from disk (palette only) with no download.

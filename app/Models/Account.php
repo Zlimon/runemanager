@@ -104,6 +104,49 @@ class Account extends Model
     }
 
     /**
+     * Accounts whose most recent plugin heartbeat is within the presence window.
+     * The query form of {@see isOnline()}, except that it includes the window's
+     * start instant, where isOnline() is strict.
+     */
+    #[Scope]
+    protected function online(Builder $query): void
+    {
+        $query->where('last_seen_at', '>=', self::onlineSince());
+    }
+
+    /**
+     * The highest total levels first, ties broken by XP. Accounts whose
+     * hiscores have not synced yet (level 0) are left out.
+     */
+    #[Scope]
+    protected function topByLevel(Builder $query, int $limit): void
+    {
+        $query->where('level', '>', 0)
+            ->orderByDesc('level')
+            ->orderByDesc('xp')
+            ->limit($limit);
+    }
+
+    /**
+     * An unsaved, unclaimed roster account: username only, no user and no hash,
+     * linked by the owning player on their first plugin login. The account
+     * type is a placeholder until that login confirms it.
+     */
+    public static function rosterPlaceholder(string $username, AccountTypesEnum $type): self
+    {
+        $account = new self;
+        $account->username = $username;
+        $account->user_id = null;
+        $account->account_hash = null;
+        $account->account_type = $type;
+        $account->rank = 0;
+        $account->level = 0;
+        $account->xp = 0;
+
+        return $account;
+    }
+
+    /**
      * Accounts currently sharing a recent enough position to appear on the map.
      */
     #[Scope]
@@ -184,7 +227,13 @@ class Account extends Model
     public function isOnline(): bool
     {
         return $this->last_seen_at !== null
-            && $this->last_seen_at->gt(now()->subMinutes((int) config('runemanager.presence.online_within_minutes')));
+            && $this->last_seen_at->gt(self::onlineSince());
+    }
+
+    /** The start of the presence window (see config/runemanager.php). */
+    private static function onlineSince(): Carbon
+    {
+        return now()->subMinutes((int) config('runemanager.presence.online_within_minutes'));
     }
 
     /**

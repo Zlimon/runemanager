@@ -78,6 +78,25 @@ it('does not attach to an event that already has a screenshot', function () {
     expect($event->refresh()->screenshot_path)->toBe('feed-screenshots/old.png');
 });
 
+it('matches on the validated body type, not an unvalidated query-string type', function () {
+    Storage::fake('public');
+    $account = screenshotAccount();
+    Sanctum::actingAs($account->user);
+
+    $quest = FeedEvent::factory()->for($account)->questComplete()->create();
+    $loot = FeedEvent::factory()->for($account)->lootDrop()->create();
+
+    $this->post(route('api.plugin.feed.screenshot', ['type' => 'quest_complete']), [
+        'type' => 'loot_drop',
+        'image' => UploadedFile::fake()->image('shot.png'),
+    ], screenshotHeaders())
+        ->assertSuccessful()
+        ->assertJsonPath('data.attached', true);
+
+    expect($loot->refresh()->screenshot_path)->not->toBeNull()
+        ->and($quest->refresh()->screenshot_path)->toBeNull();
+});
+
 it('rejects a non-image upload and an unknown type', function () {
     Storage::fake('public');
     $account = screenshotAccount();

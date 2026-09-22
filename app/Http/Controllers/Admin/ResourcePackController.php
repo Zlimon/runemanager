@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UserResourcePackController;
+use App\Http\Requests\HubPackNameRequest;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Services\ResourcePacks\DeleteResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Services\ResourcePacks\ResourcePackHub;
+use App\Support\Instance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,7 +24,7 @@ class ResourcePackController extends Controller
      */
     public function index(ResourcePackHub $hub): Response
     {
-        $defaultId = ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null;
+        $defaultId = Instance::defaultResourcePackId();
 
         $installed = ResourcePack::query()
             ->with('installedBy:id,name')
@@ -73,15 +73,10 @@ class ResourcePackController extends Controller
      * polls {@see UserResourcePackController::status()} until the assets land),
      * and falls back to a redirect for plain requests.
      */
-    public function store(Request $request, InstallResourcePack $installer): JsonResponse|RedirectResponse
+    public function store(HubPackNameRequest $request, InstallResourcePack $installer): JsonResponse|RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
-        ]);
-
-        $name = $validated['name'];
-        $installed = $installer->isInstalled($name)
-            && ResourcePack::where('name', $name)->where('version', '!=', 'pending')->exists();
+        $name = $request->validated('name');
+        $installed = $installer->isReady($name);
 
         if (! $installed) {
             FetchResourcePackJob::dispatch($name);
