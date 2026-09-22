@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Card from "@/Components/Card.vue";
-import ClickableCard from "@/Components/ClickableCard.vue";
+import Card from "@/Components/Cards/Card.vue";
+import ClickableCard from "@/Components/Cards/ClickableCard.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 import { lootIcon } from "@/feed";
 

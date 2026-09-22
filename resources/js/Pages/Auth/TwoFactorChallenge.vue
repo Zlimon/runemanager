@@ -1,12 +1,12 @@
 <script setup>
 import { nextTick, ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import AuthenticationCard from '@/Components/Auth/AuthenticationCard.vue';
+import AuthenticationCardLogo from '@/Components/Auth/AuthenticationCardLogo.vue';
+import InputError from '@/Components/Form/InputError.vue';
+import InputLabel from '@/Components/Form/InputLabel.vue';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton.vue';
+import TextInput from '@/Components/Form/TextInput.vue';
 
 const recovery = ref(false);
 

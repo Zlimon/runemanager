@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from "vue";
-import ItemTooltip from "@/Components/Game/ItemTooltip.vue";
+import ItemTooltip from "@/Components/Game/Items/ItemTooltip.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
 const props = defineProps({

@@ -596,7 +596,7 @@ html.has-pack .file-input:not(.file-input-error):focus-within {
  */
 /*
  * The shared chrome for a clickable card — the account grid, the resource-pack
- * picker, the loot board. Applied by Components/ClickableCard.vue; nothing
+ * picker, the loot board. Applied by Components/Cards/ClickableCard.vue; nothing
  * should hand-roll a card hover again.
  *
  * Hover reads as a lift: the surface brightens a step and the card rises 2px.

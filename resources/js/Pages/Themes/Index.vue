@@ -2,13 +2,13 @@
 import { computed, ref } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import SettingsLayout from "@/Layouts/SettingsLayout.vue";
-import Card from "@/Components/Card.vue";
-import DangerButton from "@/Components/DangerButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import ResourcePackPicker from "@/Components/ResourcePackPicker.vue";
-import ResourcePackTile from "@/Components/ResourcePackTile.vue";
-import ResourcePackInstallModal from "@/Components/ResourcePackInstallModal.vue";
-import ResourcePackConfirmModal from "@/Components/ResourcePackConfirmModal.vue";
+import Card from "@/Components/Cards/Card.vue";
+import DangerButton from "@/Components/Buttons/DangerButton.vue";
+import TextInput from "@/Components/Form/TextInput.vue";
+import ResourcePackPicker from "@/Components/ResourcePacks/ResourcePackPicker.vue";
+import ResourcePackTile from "@/Components/ResourcePacks/ResourcePackTile.vue";
+import ResourcePackInstallModal from "@/Components/ResourcePacks/ResourcePackInstallModal.vue";
+import ResourcePackConfirmModal from "@/Components/ResourcePacks/ResourcePackConfirmModal.vue";
 
 const props = defineProps({
     packs: { type: Array, default: () => [] },

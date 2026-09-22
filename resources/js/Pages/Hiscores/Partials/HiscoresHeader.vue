@@ -1,5 +1,5 @@
 <script setup>
-import Search from "@/Components/Search.vue";
+import Search from "@/Components/Form/Search.vue";
 
 defineProps({
     title: {

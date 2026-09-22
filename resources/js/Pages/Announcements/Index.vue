@@ -3,14 +3,14 @@ import { computed, ref } from "vue";
 import { router, useForm, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Card from "@/Components/Card.vue";
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DangerButton from "@/Components/DangerButton.vue";
-import TextInput from "@/Components/TextInput.vue";
+import Card from "@/Components/Cards/Card.vue";
+import DialogModal from "@/Components/Modals/DialogModal.vue";
+import InputError from "@/Components/Form/InputError.vue";
+import InputLabel from "@/Components/Form/InputLabel.vue";
+import PrimaryButton from "@/Components/Buttons/PrimaryButton.vue";
+import SecondaryButton from "@/Components/Buttons/SecondaryButton.vue";
+import DangerButton from "@/Components/Buttons/DangerButton.vue";
+import TextInput from "@/Components/Form/TextInput.vue";
 
 const props = defineProps({
     announcements: { type: Array, default: () => [] },

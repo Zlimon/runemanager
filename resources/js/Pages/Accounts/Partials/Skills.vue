@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { Link } from '@inertiajs/vue3';
-import TabbedCard from "@/Components/TabbedCard.vue";
+import TabbedCard from "@/Components/Cards/TabbedCard.vue";
 import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
 
 const props = defineProps({

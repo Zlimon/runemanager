@@ -3,7 +3,7 @@ import { createApp, onMounted, onBeforeUnmount, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import L from "leaflet";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import AccountCard from "@/Components/AccountCard.vue";
+import AccountCard from "@/Components/Cards/AccountCard.vue";
 import { createOsrsMap, gameToLatLng } from "@/composables/useOsrsMap";
 
 const props = defineProps({

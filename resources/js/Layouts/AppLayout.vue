@@ -1,13 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import Banner from '@/Components/Banner.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import HiscoresMenu from '@/Components/HiscoresMenu.vue';
-import NavDropdown from '@/Components/NavDropdown.vue';
-import NavDropdownLink from '@/Components/NavDropdownLink.vue';
-import DarkModeToggle from '@/Components/DarkModeToggle.vue';
-import GuestPackPicker from '@/Components/GuestPackPicker.vue';
+import Banner from '@/Layouts/Partials/Banner.vue';
+import ResponsiveNavLink from '@/Layouts/Partials/ResponsiveNavLink.vue';
+import HiscoresMenu from '@/Layouts/Partials/HiscoresMenu.vue';
+import NavDropdown from '@/Layouts/Partials/NavDropdown.vue';
+import NavDropdownLink from '@/Layouts/Partials/NavDropdownLink.vue';
+import DarkModeToggle from '@/Components/Buttons/DarkModeToggle.vue';
+import GuestPackPicker from '@/Components/ResourcePacks/GuestPackPicker.vue';
 
 defineProps({
     title: String,

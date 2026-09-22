@@ -1,5 +1,5 @@
 /**
- * Admin display filters for the Live Feed surfaces (SPEC §8.2). Everything is
+ * Admin display filters for the Live Feed surfaces. Everything is
  * stored; the Live Feed shows only milestone level-ups and loot at or above
  * the minimum value. The account Activity feed doesn't use this — it shows
  * every event the plugin posted.

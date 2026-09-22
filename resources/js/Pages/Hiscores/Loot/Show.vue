@@ -2,11 +2,11 @@
 import { computed, ref } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Card from "@/Components/Card.vue";
-import ClickableCard from "@/Components/ClickableCard.vue";
-import Search from "@/Components/Search.vue";
-import ItemSlot from "@/Components/Game/ItemSlot.vue";
-import Badge from "@/Components/Badge.vue";
+import Card from "@/Components/Cards/Card.vue";
+import ClickableCard from "@/Components/Cards/ClickableCard.vue";
+import Search from "@/Components/Form/Search.vue";
+import ItemSlot from "@/Components/Game/Items/ItemSlot.vue";
+import Badge from "@/Components/Display/Badge.vue";
 
 const props = defineProps({
     source: {

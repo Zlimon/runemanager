@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
-import InputLabel from "@/Components/InputLabel.vue";
-import Freshness from "@/Components/Freshness.vue";
+import InputLabel from "@/Components/Form/InputLabel.vue";
+import Freshness from "@/Pages/Accounts/Partials/Freshness.vue";
 import dayjs from "dayjs";
 
 const props = defineProps({

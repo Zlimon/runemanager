@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import HiscoresHeader from "@/Pages/Hiscores/Partials/HiscoresHeader.vue";
-import LeaderboardTable from "@/Components/LeaderboardTable.vue";
+import LeaderboardTable from "@/Components/Tables/LeaderboardTable.vue";
 
 const props = defineProps({
     collectionName: {

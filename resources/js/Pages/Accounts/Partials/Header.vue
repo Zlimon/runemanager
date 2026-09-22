@@ -1,6 +1,6 @@
 <script setup>
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import OnlineStatus from "@/Components/OnlineStatus.vue";
+import PrimaryButton from "@/Components/Buttons/PrimaryButton.vue";
+import OnlineStatus from "@/Pages/Accounts/Partials/OnlineStatus.vue";
 import dayjs from "dayjs";
 import Icon from "@/Pages/Accounts/Partials/Icon.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
