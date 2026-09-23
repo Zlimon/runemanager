@@ -4,7 +4,9 @@ namespace Database\Factories;
 
 use App\Models\Account;
 use App\Models\FeedEvent;
+use Database\Seeders\Support\ItemPool;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Live-feed events. Defaults to a level-up; use the type states for the
@@ -24,6 +26,15 @@ class FeedEventFactory extends Factory
     private const CA_TASKS = ["Ghommal's Hilt 6", 'Peach Conjurer', 'Whack-a-Mole', 'A Frozen Foe'];
 
     private const CA_TIERS = ['easy', 'medium', 'hard', 'elite', 'master', 'grandmaster'];
+
+    /** Draconic visage — stands in for a drop when the item catalogue is empty. */
+    private const PLACEHOLDER_ITEM_ID = 11286;
+
+    /** Bundled image copied onto the public disk to stand in for a plugin screenshot. */
+    private const SCREENSHOT_SOURCE = 'images/newspost_default.png';
+
+    /** Where that copy lives, alongside the screenshots the plugin uploads. */
+    private const SCREENSHOT_PATH = 'feed-screenshots/demo.png';
 
     /**
      * @return array<string, mixed>
@@ -50,7 +61,10 @@ class FeedEventFactory extends Factory
             'type' => FeedEvent::TYPE_LOOT_DROP,
             'payload' => [
                 'source' => $this->faker->randomElement(self::SOURCES),
-                'items' => [['id' => 11286, 'quantity' => 1]], // Draconic visage placeholder
+                'items' => [[
+                    'id' => ItemPool::id($this->faker) ?: self::PLACEHOLDER_ITEM_ID,
+                    'quantity' => $this->faker->numberBetween(1, 5),
+                ]],
                 'total_value' => $this->faker->numberBetween(100_000, 5_000_000),
             ],
         ]);
@@ -99,5 +113,51 @@ class FeedEventFactory extends Factory
             'type' => FeedEvent::TYPE_REWARD,
             'payload' => ['source' => $this->faker->randomElement(['Barrows', 'Chambers of Xeric', 'Clue scroll'])],
         ]);
+    }
+
+    /**
+     * Kept by its owner in the account's achievement gallery. The gallery is
+     * built around the screenshot, so pin something that has one.
+     */
+    public function pinned(): static
+    {
+        return $this->state(fn () => [
+            'pinned_at' => now()->subDays($this->faker->numberBetween(0, 30)),
+        ]);
+    }
+
+    /**
+     * A screenshot of the moment, as the plugin would have uploaded one.
+     */
+    public function withScreenshot(): static
+    {
+        return $this->state(fn () => ['screenshot_path' => self::demoScreenshotPath()]);
+    }
+
+    /**
+     * The demo screenshot's path on the public disk, copying the bundled image
+     * there on first use.
+     *
+     * Returns null when the bundled image is missing: FeedEventResource turns a
+     * stored path into a URL without checking the file, so a path pointing at
+     * nothing renders as a broken image in the feed and the gallery.
+     */
+    private static function demoScreenshotPath(): ?string
+    {
+        $disk = Storage::disk('public');
+
+        if ($disk->exists(self::SCREENSHOT_PATH)) {
+            return self::SCREENSHOT_PATH;
+        }
+
+        $source = public_path(self::SCREENSHOT_SOURCE);
+
+        if (! is_file($source)) {
+            return null;
+        }
+
+        return $disk->put(self::SCREENSHOT_PATH, (string) file_get_contents($source))
+            ? self::SCREENSHOT_PATH
+            : null;
     }
 }

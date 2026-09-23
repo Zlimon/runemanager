@@ -68,6 +68,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Seeding
+    |--------------------------------------------------------------------------
+    |
+    | `in_container` is true whenever artisan runs inside the Sail app
+    | container, where `docker compose` is not reachable. The static game data
+    | seeder uses it to decide between populating the catalogue itself and
+    | telling the operator which host command to run. It is read here rather
+    | than through env() in the seeder so it survives `config:cache`.
+    |
+    | `demo_mode` picks the instance mode a fresh demo seed configures
+    | (clan|group|casual). An instance already carrying an `instance_mode`
+    | setting keeps it; this only decides what an unconfigured one becomes.
+    |
+    */
+
+    'seeding' => [
+        'in_container' => env('LARAVEL_SAIL') === '1',
+        'demo_mode' => env('DEMO_INSTANCE_MODE'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Live Feed
     |--------------------------------------------------------------------------
     |

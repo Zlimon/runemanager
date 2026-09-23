@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Account;
 use App\Models\Inventory;
-use App\Models\Item;
+use Database\Seeders\Support\ItemPool;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ class InventoryFactory extends Factory
     public function definition(): array
     {
         $filled = $this->faker->numberBetween(8, 28);
-        $ids = Item::randomItemIds($filled);
+        $ids = ItemPool::ids($filled, $this->faker);
 
         $slots = [];
         for ($i = 0; $i < 28; $i++) {

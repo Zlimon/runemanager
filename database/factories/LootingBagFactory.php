@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Account;
-use App\Models\Item;
 use App\Models\LootingBag;
+use Database\Seeders\Support\ItemPool;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +19,7 @@ class LootingBagFactory extends Factory
      */
     public function definition(): array
     {
-        $ids = Item::randomItemIds($this->faker->numberBetween(2, 12));
+        $ids = ItemPool::ids($this->faker->numberBetween(2, 12), $this->faker);
 
         $slots = array_map(fn (int $id) => [$id, $this->faker->numberBetween(1, 500)], $ids);
 
