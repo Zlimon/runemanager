@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Hiscores;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FilterHiscoresRequest;
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use App\Models\CollectionLog;
+use App\Services\Hiscores\LeaderboardPage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,7 +17,7 @@ use Inertia\Response;
  */
 class CollectionLogController extends Controller
 {
-    public function index(): Response
+    public function index(FilterHiscoresRequest $request, LeaderboardPage $page): Response
     {
         $logs = CollectionLog::all();
 
@@ -24,26 +26,28 @@ class CollectionLogController extends Controller
             ->get()
             ->keyBy('id');
 
-        $hiscores = $logs
-            ->map(function (CollectionLog $log) use ($accounts): ?array {
-                $account = $accounts->get($log->account_id);
-                if ($account === null) {
-                    return null;
-                }
+        $hiscores = $page->rankedBy(
+            $logs
+                ->map(function (CollectionLog $log) use ($accounts): ?array {
+                    $account = $accounts->get($log->account_id);
+                    if ($account === null) {
+                        return null;
+                    }
 
-                return [
-                    'account' => (new AccountResource($account))->resolve(),
-                    'obtained' => (int) $log->obtained,
-                    'total' => (int) $log->total,
-                ];
-            })
-            ->filter()
-            ->sortByDesc('obtained')
-            ->values()
-            ->all();
+                    return [
+                        'account' => (new AccountResource($account))->resolve(),
+                        'obtained' => (int) $log->obtained,
+                        'total' => (int) $log->total,
+                    ];
+                })
+                ->filter()
+                ->all(),
+            'obtained',
+        );
 
         return Inertia::render('Hiscores/CollectionLog/Show', [
-            'hiscores' => $hiscores,
+            'hiscores' => $page->of($hiscores, $request),
+            'filters' => $request->filters(),
         ]);
     }
 }

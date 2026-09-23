@@ -165,11 +165,11 @@ Route::middleware([
         // Combat Achievements (total points).
         Route::get('/combat-achievements', [Hiscores\CombatAchievementController::class, 'index'])->name('hiscores.combat-achievements.index');
         Route::get('/skills/{skill}', [Hiscores\SkillController::class, 'index'])->name('hiscores.skills.index');
+        // Bosses and clues render the same board from the same activity
+        // entries; only the URL differs, so neither passes a category.
         Route::get('/bosses/{collection}', [Hiscores\CollectionController::class, 'index'])
-            ->defaults('category', 'boss')
             ->name('hiscores.bosses.index');
         Route::get('/clues/{collection}', [Hiscores\CollectionController::class, 'index'])
-            ->defaults('category', 'clue')
             ->name('hiscores.clues.index');
         // Loot directory (grouped sources) + per-source board.
         Route::get('/loot', [Hiscores\LootController::class, 'index'])->name('hiscores.loot.index');

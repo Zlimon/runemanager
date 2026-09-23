@@ -37,6 +37,7 @@ import ResourcePackPicker from "@/Components/ResourcePacks/ResourcePackPicker.vu
 import ResourcePackTile from "@/Components/ResourcePacks/ResourcePackTile.vue";
 import DataTable from "@/Components/Tables/DataTable.vue";
 import LeaderboardTable from "@/Components/Tables/LeaderboardTable.vue";
+import SortChips from "@/Components/Tables/SortChips.vue";
 import PaginationItem from "@/Components/Tables/PaginationItem.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
@@ -369,6 +370,52 @@ const LEADERBOARD_COLUMNS = [
     { key: "level", label: "Level", format: "number", align: "right" },
     { key: "xp", label: "Experience", format: "number", align: "right" },
 ];
+
+/*
+ * A hiscore board's `filters`: the server sorted it on Level, descending, and
+ * will sort on either metric. The Name column is absent from `sortable`, so it
+ * stays a plain header while the two metrics are clickable.
+ */
+const LEADERBOARD_FILTERS = {
+    username: "",
+    per_page: 25,
+    sort: "level",
+    direction: "desc",
+    sortable: ["level", "xp"],
+};
+
+// A search that matched nobody, so the empty state names the reason.
+const LEADERBOARD_NO_MATCH = { username: "zezima" };
+
+// The loot board's sort control: that board renders cards, so it has no headers.
+const LOOT_SORT = {
+    columns: ["rank", "total_value", "drops"],
+    labels: { rank: "Rank", total_value: "Total value", drops: "Drops" },
+    sort: "total_value",
+    direction: "desc",
+};
+
+/*
+ * A hiscore board as the server sends one: one page of a longer list, plus the
+ * pager described by the paginator's `meta.links`. The links point back at the
+ * styleguide so the pager can be clicked without landing on a real board.
+ */
+const leaderboardPaginator = computed(() => ({
+    data: leaderboardRows.value,
+    meta: {
+        current_page: 2,
+        last_page: 3,
+        per_page: 25,
+        total: 54,
+        links: [
+            { url: route("styleguide"), label: "&laquo; Previous", active: false },
+            { url: route("styleguide"), label: "1", active: false },
+            { url: route("styleguide"), label: "2", active: true },
+            { url: route("styleguide"), label: "3", active: false },
+            { url: route("styleguide"), label: "Next &raquo;", active: false },
+        ],
+    },
+}));
 
 // --- Modals --------------------------------------------------------------
 
@@ -743,6 +790,37 @@ const showConfirm = (action) => {
                         <div class="space-y-2">
                             <h4 class="text-sm uppercase tracking-wide opacity-70">LeaderboardTable — own account highlighted</h4>
                             <LeaderboardTable :columns="LEADERBOARD_COLUMNS" :rows="leaderboardRows" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">LeaderboardTable — server-paginated, server-sorted board</h4>
+                            <LeaderboardTable :columns="LEADERBOARD_COLUMNS" :hiscores="leaderboardPaginator"
+                                              :filters="LEADERBOARD_FILTERS" />
+                            <p class="text-xs opacity-60">
+                                How every hiscore board renders. The server owns the ranking, the sort and
+                                the page slice: Level and Experience are clickable because the filters list
+                                them, Level carries the active arrow, and Name does not sort. A metric
+                                opens descending, as Level has here, so the best players come first; a
+                                rank opens ascending, for the same reason. Here the clicks go nowhere
+                                and the pager's links lead back to the styleguide.
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">LeaderboardTable — search with no match</h4>
+                            <LeaderboardTable :columns="LEADERBOARD_COLUMNS" :rows="[]"
+                                              :filters="LEADERBOARD_NO_MATCH" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">SortChips — a card list's column headers</h4>
+                            <SortChips :columns="LOOT_SORT.columns" :labels="LOOT_SORT.labels"
+                                       :sort="LOOT_SORT.sort" :direction="LOOT_SORT.direction" />
+                            <p class="text-xs opacity-60">
+                                How the loot board sorts: it renders cards, so its headers become buttons
+                                beside the search. The sorted column is filled in and carries the arrow.
+                                Here the clicks go nowhere.
+                            </p>
                         </div>
 
                         <div class="space-y-2">

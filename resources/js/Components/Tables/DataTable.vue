@@ -9,11 +9,27 @@ import PaginationItem from '@/Components/Tables/PaginationItem.vue';
  *     align?: 'left'|'right'|'center' }
  * Cells render row[key] (number-formatted when format==='number'); override any
  * cell with a `#cell-<key>` scoped slot exposing { row, value }.
+ *
+ * Pass `paginator` instead of `rows` when the server owns the ordering and the
+ * page slice. The table then renders `paginator.data` untouched and its pager
+ * navigates `meta.links` with Inertia. Sorting moves to the server with it: a
+ * header is clickable only when `sortable` lists its key, and clicking emits
+ * `sort` for the owner to act on rather than reordering the rows on screen —
+ * which would look like a ranking of the board but only be one of the page.
  */
 const props = defineProps({
     columns: { type: Array, required: true },
     rows: { type: Array, default: () => [] },
     perPage: { type: Number, default: 25 },
+    // A resolved Laravel paginator: { data, links, meta: { current_page, last_page, links } }.
+    paginator: { type: Object, default: null },
+    // Props the paginator's links reload, for an Inertia partial visit.
+    only: { type: Array, default: null },
+    // Paginator mode: the column key the server sorted on, and its direction.
+    sort: { type: String, default: null },
+    direction: { type: String, default: 'asc' },
+    // Paginator mode: the column keys the server will sort on. Nothing else clicks.
+    sortable: { type: Array, default: null },
     // Key each row for v-for; string path or fn. Falls back to the index.
     rowKey: { type: [String, Function], default: null },
     // Optional per-row class (e.g. highlight the viewer's own row).
@@ -21,22 +37,34 @@ const props = defineProps({
     zebra: { type: Boolean, default: true },
 });
 
+const emit = defineEmits(['sort']);
+
 const sortKey = ref(null);
 const sortDir = ref('asc');
 const currentPage = ref(1);
 
 const sortAccessor = (row, column) => (column.sort ? column.sort(row) : row[column.key]);
 
+const sourceRows = computed(() => (props.paginator ? props.paginator.data : props.rows));
+
+const isSortable = (column) => (props.paginator
+    ? Array.isArray(props.sortable) && props.sortable.includes(column.key)
+    : column.sortable !== false);
+
+// Which header carries the arrow — the server's answer, or this table's own.
+const activeSort = computed(() => (props.paginator ? props.sort : sortKey.value));
+const activeDirection = computed(() => (props.paginator ? props.direction : sortDir.value));
+
 const sortedRows = computed(() => {
     if (!sortKey.value) {
-        return props.rows;
+        return sourceRows.value;
     }
     const column = props.columns.find((c) => c.key === sortKey.value);
     if (!column) {
-        return props.rows;
+        return sourceRows.value;
     }
     const dir = sortDir.value === 'asc' ? 1 : -1;
-    return [...props.rows].sort((a, b) => {
+    return [...sourceRows.value].sort((a, b) => {
         const av = sortAccessor(a, column);
         const bv = sortAccessor(b, column);
         if (av == null && bv == null) return 0;
@@ -51,9 +79,15 @@ const totalPages = computed(() => Math.max(1, Math.ceil(sortedRows.value.length 
 const page = computed(() => Math.min(currentPage.value, totalPages.value));
 
 const pagedRows = computed(() => {
+    if (props.paginator) {
+        return sourceRows.value;
+    }
     const start = (page.value - 1) * props.perPage;
     return sortedRows.value.slice(start, start + props.perPage);
 });
+
+// The server pager only earns its place once there is a second page.
+const serverPages = computed(() => (props.paginator?.meta?.last_page ?? 1) > 1);
 
 // Windowed page numbers (±2 around the current page).
 const pageNumbers = computed(() => {
@@ -68,10 +102,14 @@ const pageNumbers = computed(() => {
 });
 
 // Reset to the first page when the underlying data changes (e.g. search).
-watch(() => props.rows, () => { currentPage.value = 1; });
+watch(sourceRows, () => { currentPage.value = 1; });
 
 const toggleSort = (column) => {
-    if (column.sortable === false) {
+    if (!isSortable(column)) {
+        return;
+    }
+    if (props.paginator) {
+        emit('sort', column.key);
         return;
     }
     if (sortKey.value === column.key) {
@@ -110,13 +148,13 @@ const formatValue = (value, format) => {
                 <thead>
                     <tr class="text-base-content/70">
                         <th v-for="column in columns" :key="column.key" :class="alignClass(column)">
-                            <button v-if="column.sortable !== false"
+                            <button v-if="isSortable(column)"
                                     type="button"
                                     class="inline-flex items-center gap-1 hover:text-base-content"
                                     @click="toggleSort(column)">
                                 {{ column.label }}
-                                <span v-if="sortKey === column.key" class="text-xs">
-                                    {{ sortDir === 'asc' ? '▲' : '▼' }}
+                                <span v-if="activeSort === column.key" class="text-xs">
+                                    {{ activeDirection === 'asc' ? '▲' : '▼' }}
                                 </span>
                             </button>
                             <span v-else>{{ column.label }}</span>
@@ -141,7 +179,23 @@ const formatValue = (value, format) => {
             </table>
         </div>
 
-        <nav v-if="totalPages > 1" class="mt-4 flex items-center justify-between" aria-label="Pagination">
+        <nav v-if="paginator && serverPages" class="mt-4 flex items-center justify-between"
+             aria-label="Pagination">
+            <p class="text-xs text-base-content/60">
+                Page {{ paginator.meta.current_page }} of {{ paginator.meta.last_page }}
+            </p>
+            <div class="join border border-base-300">
+                <PaginationItem v-for="(link, index) in paginator.meta.links" :key="index"
+                                :href="link.url"
+                                :only="link.url && only ? only : undefined"
+                                :active="link.active"
+                                :disabled="!link.url">
+                    <span v-html="link.label" />
+                </PaginationItem>
+            </div>
+        </nav>
+
+        <nav v-if="!paginator && totalPages > 1" class="mt-4 flex items-center justify-between" aria-label="Pagination">
             <p class="text-xs text-base-content/60">
                 Page {{ page }} of {{ totalPages }}
             </p>

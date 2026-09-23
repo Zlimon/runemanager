@@ -2,11 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Helpers\SettingHelper;
 use App\Models\NewsPost;
-use App\Models\ResourcePack;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,30 +20,6 @@ class DatabaseSeeder extends Seeder
         if (NewsPost::count() === 0) {
             NewsPost::factory(15)->create();
             $this->command->info('DatabaseSeeder: created 15 news posts.');
-        }
-
-        //        $this->tryFetchDefaultResourcePack();
-    }
-
-    /**
-     * Best-effort: install the sample resource pack and set it as the instance
-     * default so unauthenticated visitors and users with no override see it.
-     * Wrapped in try/catch so a network blip doesn't kill the whole seed.
-     */
-    private function tryFetchDefaultResourcePack(): void
-    {
-        try {
-            Artisan::call('resourcepack:fetch', ['name' => 'sample-vanilla']);
-
-            $pack = ResourcePack::query()->where('name', ResourcePack::VANILLA)->first();
-
-            if ($pack) {
-                SettingHelper::setSetting('resource_pack_id', $pack->id, 'int');
-            }
-
-            $this->command->info('DatabaseSeeder: installed sample-vanilla as the instance default.');
-        } catch (\Throwable $e) {
-            $this->command->warn(sprintf('DatabaseSeeder: resource pack install failed (continuing): %s', $e->getMessage()));
         }
     }
 }

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Hiscores;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FilterHiscoresRequest;
 use App\Http\Resources\AccountResource;
 use App\Models\AccountCombatAchievement;
+use App\Services\Hiscores\LeaderboardPage;
 use App\Support\CombatAchievements;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,24 +17,26 @@ use Inertia\Response;
  */
 class CombatAchievementController extends Controller
 {
-    public function index(): Response
+    public function index(FilterHiscoresRequest $request, LeaderboardPage $page): Response
     {
-        $hiscores = AccountCombatAchievement::with('account.user')
-            ->get()
-            ->map(function (AccountCombatAchievement $row): array {
-                return [
-                    'account' => (new AccountResource($row->account))->resolve(),
-                    'points' => $row->points,
-                    'tasks_completed' => CombatAchievements::completedTaskCount($row->tiers ?? []),
-                    'tiers' => $row->tiers ?? [],
-                ];
-            })
-            ->sortByDesc('points')
-            ->values()
-            ->all();
+        $hiscores = $page->rankedBy(
+            AccountCombatAchievement::with('account.user')
+                ->get()
+                ->map(function (AccountCombatAchievement $row): array {
+                    return [
+                        'account' => (new AccountResource($row->account))->resolve(),
+                        'points' => $row->points,
+                        'tasks_completed' => CombatAchievements::completedTaskCount($row->tiers ?? []),
+                        'tiers' => $row->tiers ?? [],
+                    ];
+                })
+                ->all(),
+            'points',
+        );
 
         return Inertia::render('Hiscores/CombatAchievements/Show', [
-            'hiscores' => $hiscores,
+            'hiscores' => $page->of($hiscores, $request),
+            'filters' => $request->filters(),
         ]);
     }
 }

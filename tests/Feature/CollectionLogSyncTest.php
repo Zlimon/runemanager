@@ -108,10 +108,10 @@ it('ranks the collection-log leaderboard by slots unlocked', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Hiscores/CollectionLog/Show')
-            ->has('hiscores', 2)
-            ->where('hiscores.0.account.username', 'Maxed')
-            ->where('hiscores.0.obtained', 1200)
-            ->where('hiscores.1.account.username', 'Starter'),
+            ->has('hiscores.data', 2)
+            ->where('hiscores.data.0.account.username', 'Maxed')
+            ->where('hiscores.data.0.obtained', 1200)
+            ->where('hiscores.data.1.account.username', 'Starter'),
         );
 });
 

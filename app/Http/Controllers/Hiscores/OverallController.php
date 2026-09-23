@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Hiscores;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FilterHiscoresRequest;
 use App\Services\Hiscores\HiscoreLeaderboard;
+use App\Services\Hiscores\LeaderboardPage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,13 +17,13 @@ class OverallController extends Controller
      * overall board (by rank, then total level, then total XP). Reuses the
      * skill leaderboard page — its Level/XP columns become total level / total XP.
      */
-    public function index(HiscoreLeaderboard $leaderboard): Response
+    public function index(FilterHiscoresRequest $request, HiscoreLeaderboard $leaderboard, LeaderboardPage $page): Response
     {
         return Inertia::render('Hiscores/Skills/Show', [
-            'recordType' => 'overall',
             'skillName' => 'Overall',
             'skillSlug' => 'overall',
-            'hiscores' => $leaderboard->skill('overall', 0),
+            'hiscores' => $page->of($leaderboard->skill('overall', 0), $request),
+            'filters' => $request->filters(),
         ]);
     }
 }

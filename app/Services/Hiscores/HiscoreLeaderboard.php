@@ -14,6 +14,13 @@ use Illuminate\Database\Eloquent\Collection;
  *
  * The OSRS hiscores report an unranked skill or activity as rank -1 (and XP
  * or score -1), which is stored as-is; every row shows it as 0.
+ *
+ * A board is always returned whole and in rank order, down to a final
+ * username tie-break ({@see LeaderboardPage::compareByUsername()}) that gives
+ * it a total order — without one, rows tying on every metric would be ordered
+ * by the database's whim, differently on each request. Narrowing the board to
+ * a search term and slicing it into pages is {@see LeaderboardPage}'s job, and
+ * happens after this, so a row's rank never depends on the page or the filter.
  */
 class HiscoreLeaderboard
 {
@@ -41,7 +48,8 @@ class HiscoreLeaderboard
                 ];
             })
             ->sort(fn (array $a, array $b): int => $this->compareByRank($a, $b)
-                ?: [$b['level'], $b['xp']] <=> [$a['level'], $a['xp']])
+                ?: [$b['level'], $b['xp']] <=> [$a['level'], $a['xp']]
+                ?: LeaderboardPage::compareByUsername($a, $b))
             ->values()
             ->all();
     }
@@ -68,7 +76,8 @@ class HiscoreLeaderboard
                 ];
             })
             ->sort(fn (array $a, array $b): int => $this->compareByRank($a, $b)
-                ?: $b['kill_count'] <=> $a['kill_count'])
+                ?: $b['kill_count'] <=> $a['kill_count']
+                ?: LeaderboardPage::compareByUsername($a, $b))
             ->values()
             ->all();
     }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Hiscores;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FilterHiscoresRequest;
 use App\Services\Hiscores\HiscoreLeaderboard;
+use App\Services\Hiscores\LeaderboardPage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -11,17 +13,19 @@ use Inertia\Response;
 class CollectionController extends Controller
 {
     /**
-     * Boss and clue boards. `$category` comes from the route's defaults, which
-     * Laravel passes after the URL parameters, so it must stay the second
-     * parameter.
+     * Boss and clue boards. Both routes render the same page from the same
+     * activity entries; they differ only in the URL the reader arrived by, so
+     * the route's `category` default is not read here.
      */
-    public function index(string $collection, string $category, HiscoreLeaderboard $leaderboard): Response
+    public function index(FilterHiscoresRequest $request, string $collection, HiscoreLeaderboard $leaderboard, LeaderboardPage $page): Response
     {
+        $hiscores = $leaderboard->activity(str_replace('-', '_', $collection));
+
         return Inertia::render('Hiscores/Bosses/Show', [
-            'recordType' => $category,
             'collectionName' => Str::title(str_replace('-', ' ', $collection)),
             'collectionSlug' => $collection,
-            'hiscores' => $leaderboard->activity(str_replace('-', '_', $collection)),
+            'hiscores' => $page->of($hiscores, $request),
+            'filters' => $request->filters(),
         ]);
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Resources\AccountResource;
 use App\Models\Account;
 use App\Models\Item;
 use App\Models\Loot;
+use App\Services\Hiscores\LeaderboardPage;
 
 /**
  * Loot hiscores aggregated from the plugin's loot log. A source's identity is
@@ -72,11 +73,17 @@ class LootLeaderboard
     }
 
     /**
-     * Board for one (source, type) pair: every account with loot from it,
-     * ranked by total value, each with the items they've received (quantities
-     * summed across all of their drops). Null when the source has no loot.
+     * Board for one (source, type) pair: every account with loot from it, each
+     * with the items they've received (quantities summed across all of their
+     * drops). Null when the source has no loot.
      *
-     * @return ?array<int, array{rank: int, account: array<string, mixed>, total_value: int, drops: int, items: array<int, array{id: int, quantity: int, name: ?string, icon: ?string}>}>
+     * The rows come back unranked and in no particular order — Mongo's `$sort`
+     * has no tie-break of its own, so two accounts on the same total could
+     * come back either way round on the next request. Ordering and ranking the
+     * board is {@see LeaderboardPage::rankedBy()}'s job, as it is for every
+     * other board built from our own data.
+     *
+     * @return ?array<int, array{account: array<string, mixed>, total_value: int, drops: int, items: array<int, array{id: int, quantity: int, name: ?string, icon: ?string}>}>
      */
     public function forSource(?string $type, string $source): ?array
     {
@@ -118,8 +125,7 @@ class LootLeaderboard
         return $totals
             ->filter(fn (array $total): bool => $accounts->has($total['account_id']))
             ->values()
-            ->map(fn (array $total, int $index): array => [
-                'rank' => $index + 1,
+            ->map(fn (array $total): array => [
                 'account' => (new AccountResource($accounts[$total['account_id']]))->resolve(),
                 'total_value' => $total['total_value'],
                 'drops' => $total['drops'],

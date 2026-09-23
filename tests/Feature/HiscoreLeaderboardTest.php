@@ -42,24 +42,23 @@ it('ranks a skill board by rank with unranked accounts last, then level and XP',
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Hiscores/Skills/Show')
-            ->where('recordType', 'skill')
             ->where('skillName', 'Attack')
             ->where('skillSlug', 'attack')
-            ->has('hiscores', 6)
-            ->where('hiscores.0.account.username', 'Best')
-            ->where('hiscores.1.account.username', 'HighLevel')
-            ->where('hiscores.2.account.username', 'HighXp')
-            ->where('hiscores.3.account.username', 'LowXp')
-            ->where('hiscores.3.rank', 500)
-            ->where('hiscores.3.level', 80)
-            ->where('hiscores.3.xp', 2000000)
+            ->has('hiscores.data', 6)
+            ->where('hiscores.data.0.account.username', 'Best')
+            ->where('hiscores.data.1.account.username', 'HighLevel')
+            ->where('hiscores.data.2.account.username', 'HighXp')
+            ->where('hiscores.data.3.account.username', 'LowXp')
+            ->where('hiscores.data.3.rank', 500)
+            ->where('hiscores.data.3.level', 80)
+            ->where('hiscores.data.3.xp', 2000000)
             // Both unranked accounts sort after every ranked one, higher level first.
-            ->where('hiscores.4.account.username', 'Unranked')
-            ->where('hiscores.5.account.username', 'Missing')
+            ->where('hiscores.data.4.account.username', 'Unranked')
+            ->where('hiscores.data.5.account.username', 'Missing')
             // A skill missing from the entries defaults to level 1.
-            ->where('hiscores.5.rank', 0)
-            ->where('hiscores.5.level', 1)
-            ->where('hiscores.5.xp', 0),
+            ->where('hiscores.data.5.rank', 0)
+            ->where('hiscores.data.5.level', 1)
+            ->where('hiscores.data.5.xp', 0),
         );
 });
 
@@ -73,11 +72,10 @@ it('defaults a missing overall entry to level 0', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Hiscores/Skills/Show')
-            ->where('recordType', 'overall')
-            ->has('hiscores', 1)
-            ->where('hiscores.0.rank', 0)
-            ->where('hiscores.0.level', 0)
-            ->where('hiscores.0.xp', 0),
+            ->has('hiscores.data', 1)
+            ->where('hiscores.data.0.rank', 0)
+            ->where('hiscores.data.0.level', 0)
+            ->where('hiscores.data.0.xp', 0),
         );
 });
 
@@ -108,19 +106,18 @@ it('ranks a boss board by rank with unranked accounts last, then kill count', fu
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Hiscores/Bosses/Show')
-            ->where('recordType', 'boss')
             ->where('collectionName', 'General Graardor')
             ->where('collectionSlug', 'general-graardor')
-            ->has('hiscores', 5)
-            ->where('hiscores.0.account.username', 'Best')
-            ->where('hiscores.1.account.username', 'More')
-            ->where('hiscores.1.rank', 700)
-            ->where('hiscores.1.kill_count', 60)
-            ->where('hiscores.2.account.username', 'Fewer')
-            ->where('hiscores.3.account.username', 'Unranked')
-            ->where('hiscores.4.account.username', 'Missing')
-            ->where('hiscores.4.rank', 0)
-            ->where('hiscores.4.kill_count', 0),
+            ->has('hiscores.data', 5)
+            ->where('hiscores.data.0.account.username', 'Best')
+            ->where('hiscores.data.1.account.username', 'More')
+            ->where('hiscores.data.1.rank', 700)
+            ->where('hiscores.data.1.kill_count', 60)
+            ->where('hiscores.data.2.account.username', 'Fewer')
+            ->where('hiscores.data.3.account.username', 'Unranked')
+            ->where('hiscores.data.4.account.username', 'Missing')
+            ->where('hiscores.data.4.rank', 0)
+            ->where('hiscores.data.4.kill_count', 0),
         );
 });
 
@@ -137,13 +134,12 @@ it('ranks a clue board from the clue activity', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Hiscores/Bosses/Show')
-            ->where('recordType', 'clue')
             ->where('collectionName', 'Clue Scrolls Elite')
             ->where('collectionSlug', 'clue-scrolls-elite')
-            ->has('hiscores', 2)
-            ->where('hiscores.0.account.username', 'High')
-            ->where('hiscores.0.kill_count', 40)
-            ->where('hiscores.1.account.username', 'Low'),
+            ->has('hiscores.data', 2)
+            ->where('hiscores.data.0.account.username', 'High')
+            ->where('hiscores.data.0.kill_count', 40)
+            ->where('hiscores.data.1.account.username', 'Low'),
         );
 });
 
@@ -165,11 +161,11 @@ it('sorts accounts the OSRS hiscores report as rank -1 after ranked ones on a bo
         ->get(route('hiscores.bosses.index', 'zulrah'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('hiscores', 2)
-            ->where('hiscores.0.account.username', 'Ranked')
-            ->where('hiscores.1.account.username', 'Unranked')
-            ->where('hiscores.1.rank', 0)
-            ->where('hiscores.1.kill_count', 0),
+            ->has('hiscores.data', 2)
+            ->where('hiscores.data.0.account.username', 'Ranked')
+            ->where('hiscores.data.1.account.username', 'Unranked')
+            ->where('hiscores.data.1.rank', 0)
+            ->where('hiscores.data.1.kill_count', 0),
         );
 });
 
@@ -185,9 +181,9 @@ it('sorts accounts the OSRS hiscores report as rank -1 after ranked ones on a cl
         ->get(route('hiscores.clues.index', 'clue-scrolls-elite'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('hiscores.0.account.username', 'Ranked')
-            ->where('hiscores.1.account.username', 'Unranked')
-            ->where('hiscores.1.kill_count', 0),
+            ->where('hiscores.data.0.account.username', 'Ranked')
+            ->where('hiscores.data.1.account.username', 'Unranked')
+            ->where('hiscores.data.1.kill_count', 0),
         );
 });
 
@@ -203,9 +199,9 @@ it('sorts accounts the OSRS hiscores report as rank -1 after ranked ones on a sk
         ->get(route('hiscores.skills.index', 'attack'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('hiscores.0.account.username', 'Ranked')
-            ->where('hiscores.1.account.username', 'Unranked')
-            ->where('hiscores.1.rank', 0)
-            ->where('hiscores.1.xp', 0),
+            ->where('hiscores.data.0.account.username', 'Ranked')
+            ->where('hiscores.data.1.account.username', 'Unranked')
+            ->where('hiscores.data.1.rank', 0)
+            ->where('hiscores.data.1.xp', 0),
         );
 });
