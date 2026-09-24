@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['user_id', 'title', 'body', 'expires_at'])]
 class Announcement extends Model
@@ -39,6 +40,15 @@ class Announcement extends Model
     public function acknowledgedBy(): BelongsToMany
     {
         return $this->belongsToMany(Account::class, 'announcement_account')->withTimestamps();
+    }
+
+    /**
+     * The news post that raised this announcement, when it came from an
+     * article rather than being written on the announcements page.
+     */
+    public function newsPost(): HasOne
+    {
+        return $this->hasOne(NewsPost::class);
     }
 
     /**

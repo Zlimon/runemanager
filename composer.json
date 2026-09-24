@@ -17,6 +17,7 @@
         "laravel/reverb": "^1.10",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
+        "mews/purifier": "^3.4",
         "mongodb/laravel-mongodb": "^5.7",
         "opcodesio/log-viewer": "^3.24",
         "spatie/laravel-permission": "^8.0",

@@ -80,7 +80,10 @@ const logout = () => {
                             </li>
                             <li>
                                 <NavDropdown label="Community"
-                                             :active="route().current('feed.*') || route().current('calendar.*') || route().current('announcements.*')">
+                                             :active="route().current('feed.*') || route().current('calendar.*') || route().current('announcements.*') || route().current('news.*')">
+                                    <NavDropdownLink :href="route('news.index')" :active="route().current('news.*')">
+                                        News
+                                    </NavDropdownLink>
                                     <NavDropdownLink :href="route('feed.index')" :active="route().current('feed.*')">
                                         Live Feed
                                     </NavDropdownLink>

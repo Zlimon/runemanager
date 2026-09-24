@@ -21,7 +21,8 @@ mode wipes all account data. Production runs at https://runemanager.com.
   log from TempleOSRS (`collection-log:sync`, daily).
 - **Storage split**: PostgreSQL for relational data (users, accounts, hiscores
   as dynamic jsonb key-value maps, equipment, diaries, combat achievements,
-  settings, presence/position/vitals, calendar, announcements); MongoDB
+  settings, presence/position/vitals, calendar, announcements, news posts);
+  MongoDB
   (`mongodb/laravel-mongodb`) for high-volume snapshots (bank, inventory,
   looting bag, loot log, quests, group bank, collection log) plus the static
   item/monster/prayer data (`docker/gamedata`, populated from the `osrsreboxed`
@@ -93,7 +94,7 @@ The product overview, data flow and storage split are covered in the hand-writte
 - JSON and mutation endpoints that are not a page can live on a resource controller for their domain (`UserResourcePackController`: update, install, status, hub, destroy, updateFromPlugin). Why: a JSON endpoint has no page to mirror.
 - Route URLs and route names are a public contract. The Vue code calls Ziggy's `route('admin.settings')`, and the plugin calls fixed URLs. When code is refactored, only the controller target in `routes/web.php` may change. Check with `vendor/bin/sail artisan route:list --except-vendor` before and after.
 - `routes/web.php` imports controller namespaces (`use App\Http\Controllers\Admin;`) and refers to `Admin\DashboardController::class`. Why: several classes share a short name (for example, the root `DashboardController` and `Admin\DashboardController`).
-- Management routes are gated by permission middleware. Under `/admin`, `can:manage instance` covers settings, packs and the admin calendar, and `can:manage members` covers the member roster. `can:manage calendar` and `can:manage announcements` gate the create, update and delete routes of the public calendar and announcements pages. The permission names are constants in `App\Support\Roles`. `Owner` passes every check through `Gate::before`. Use these permissions for new management surfaces; do not add checks on role names.
+- Management routes are gated by permission middleware. Under `/admin`, `can:manage instance` covers settings, packs and the admin calendar, and `can:manage members` covers the member roster. `can:manage calendar`, `can:manage announcements` and `can:manage news` gate the create, update and delete routes of the public calendar, announcements and news pages. The permission names are constants in `App\Support\Roles`. `Owner` passes every check through `Gate::before`. Use these permissions for new management surfaces; do not add checks on role names.
 
 ## Controllers stay thin
 

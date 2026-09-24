@@ -25,6 +25,8 @@ class Roles
 
     public const MANAGE_CALENDAR = 'manage calendar';
 
+    public const MANAGE_NEWS = 'manage news';
+
     /**
      * Every management permission. The Owner holds all of them.
      *
@@ -37,6 +39,7 @@ class Roles
             self::MANAGE_MEMBERS,
             self::MANAGE_ANNOUNCEMENTS,
             self::MANAGE_CALENDAR,
+            self::MANAGE_NEWS,
         ];
     }
 

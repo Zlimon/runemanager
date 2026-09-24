@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Card from '@/Components/Cards/Card.vue';
+import NewsCard from '@/Components/Cards/NewsCard.vue';
 import FeedEventItem from '@/Components/Game/Feed/FeedEventItem.vue';
 import { visibleFeedEvents } from '@/feed';
 import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
@@ -14,6 +15,7 @@ const { eventHex } = useEventColor();
 
 const props = defineProps({
     stats: { type: Object, default: () => ({ accounts: 0, members: 0, online: 0 }) },
+    news: { type: Array, default: () => [] },
     announcements: { type: Array, default: () => [] },
     upcoming: { type: Array, default: () => [] },
     topAccounts: { type: Array, default: () => [] },
@@ -77,6 +79,19 @@ const removeEvent = (id) => {
             <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <!-- Main column: announcements + recent activity -->
                 <div class="space-y-8 lg:col-span-2">
+                    <!-- Latest news -->
+                    <div v-if="news.length">
+                        <div class="flex items-baseline justify-between">
+                            <h2 class="text-xl font-bold">Latest news</h2>
+                            <Link :href="route('news.index')" class="link link-hover text-sm text-base-content/70">
+                                View all
+                            </Link>
+                        </div>
+                        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                            <NewsCard v-for="post in news" :key="post.id" :post="post" />
+                        </div>
+                    </div>
+
                     <!-- Announcements -->
                     <div v-if="announcements.length">
                         <div class="flex items-baseline justify-between">

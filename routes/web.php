@@ -10,6 +10,7 @@ use App\Http\Controllers\GroupBankController;
 use App\Http\Controllers\Hiscores;
 use App\Http\Controllers\ItemSearchController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\News;
 use App\Http\Controllers\StyleguideController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\UserDarkModeController;
@@ -27,6 +28,16 @@ Route::get('/calendar', [CalendarEventController::class, 'index'])->name('calend
 
 // Announcements are viewable in all modes; mutation is auth-gated below.
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+
+// News is readable by anyone in every mode, like announcements above: someone
+// weighing up joining a clan should be able to read its news first. Writing is
+// gated by `can:manage news` in the auth group below.
+//
+// `manage/` sits in the middle of the editor paths on purpose. A post is bound
+// by slug, so a two-segment `/news/create` would be swallowed by the
+// `/news/{newsPost}` route below and resolve as an article called "create".
+Route::get('/news', [News\ArticleController::class, 'index'])->name('news.index');
+Route::get('/news/{newsPost}', [News\ArticleController::class, 'show'])->name('news.show');
 
 // Light/dark preference — public so the on-page toggle works on the auth screens
 // too (guests persist to a cookie; logged-in users to their account).
@@ -141,6 +152,18 @@ Route::middleware([
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
         Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
             ->name('announcements.destroy');
+    });
+
+    Route::middleware('can:manage news')->group(function () {
+        Route::get('/news/manage/new', [News\EditorController::class, 'create'])->name('news.create');
+        Route::get('/news/manage/{newsPost}/edit', [News\EditorController::class, 'edit'])->name('news.edit');
+        Route::post('/news', [News\EditorController::class, 'store'])->name('news.store');
+        // POST, not PUT: the header image makes this a multipart submission, and
+        // Inertia spoofs the method for those.
+        Route::post('/news/{newsPost}', [News\EditorController::class, 'update'])->name('news.update');
+        Route::delete('/news/{newsPost}', [News\EditorController::class, 'destroy'])->name('news.destroy');
+        // Inline images for the editor, answered with JSON rather than a visit.
+        Route::post('/news/manage/images', [News\ImageController::class, 'store'])->name('news.images.store');
     });
 
     // Per-user appearance: browse packs + set a personal override

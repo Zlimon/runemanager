@@ -295,6 +295,36 @@ h6 {
     @apply bg-base-100 border border-base-300 rounded;
 }
 
+/* News article bodies. One class shared by the article page and the editor's
+ * writing surface, so what an author types looks like what a reader gets.
+ *
+ * The `prose-*` colour overrides are needed because the typography plugin sets
+ * its own greys, which ignore the DaisyUI theme and go unreadable on a pack's
+ * parchment surfaces. Only the tags the `news` purifier profile allows are
+ * styled here — anything else never survives the save. */
+.article-body {
+    @apply prose max-w-none
+        prose-headings:text-base-content
+        prose-p:text-base-content/80
+        prose-li:text-base-content/80
+        prose-strong:text-base-content
+        prose-blockquote:text-base-content/70
+        prose-blockquote:border-l-primary
+        prose-code:text-base-content
+        prose-pre:bg-base-300 prose-pre:text-base-content
+        prose-a:text-primary
+        prose-hr:border-base-300
+        prose-img:rounded;
+}
+
+/* The article editor's placeholder. TipTap's Placeholder extension only marks
+ * the empty node with `data-placeholder`; drawing it is the theme's job, so
+ * without this rule the writing surface just sits there blank. */
+.article-body p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    @apply pointer-events-none float-left h-0 text-base-content/40;
+}
+
 /* DaisyUI inputs fill with base-100 and carry only a faint border, so on a
  * base-100 surface (and on the beige theme generally) they vanish. Give the
  * form controls a clear base-300 outline. Packs override the border colour via

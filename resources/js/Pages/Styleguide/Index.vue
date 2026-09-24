@@ -9,6 +9,7 @@ import SecondaryButton from "@/Components/Buttons/SecondaryButton.vue";
 import AccountCard from "@/Components/Cards/AccountCard.vue";
 import Card from "@/Components/Cards/Card.vue";
 import ClickableCard from "@/Components/Cards/ClickableCard.vue";
+import NewsCard from "@/Components/Cards/NewsCard.vue";
 import TabbedCard from "@/Components/Cards/TabbedCard.vue";
 import Badge from "@/Components/Display/Badge.vue";
 import Loader from "@/Components/Display/Loader.vue";
@@ -337,6 +338,39 @@ const QUEST_EVENT = {
     occurred_at: hoursAgo(72),
     screenshot_url: "/images/newspost_default.png",
 };
+
+const NEWS_POSTS = [
+    {
+        id: 1,
+        title: "Nex mass this Friday",
+        slug: "nex-mass-this-friday",
+        excerpt: "We are running a Nex mass on Friday at 19:00 game time. Bring your own brews and an ancient godsword if you have one.",
+        image_url: "/images/newspost_default.png",
+        published_at: hoursAgo(48),
+        is_published: true,
+        created_by: { id: 1, name: "Zezima" },
+    },
+    {
+        id: 2,
+        title: "Clan hiscores reset",
+        slug: "clan-hiscores-reset",
+        excerpt: "The seasonal boards are cleared on the first of the month.",
+        image_url: "/images/newspost_default.png",
+        published_at: null,
+        is_published: false,
+        created_by: { id: 1, name: "Zezima" },
+    },
+    {
+        id: 3,
+        title: "Summer event schedule",
+        slug: "summer-event-schedule",
+        excerpt: "Six weeks of events, one per weekend, with prizes from the clan coffer.",
+        image_url: "/images/newspost_default.png",
+        published_at: hoursAgo(-120),
+        is_published: false,
+        created_by: { id: 1, name: "Iron Lad" },
+    },
+];
 
 const ACCOUNTS = [
     { username: "Zezima", account_type: "normal", level: 2277, online: true, activity: "Woodcutting", activity_icon: "woodcutting", world: 302, icon: null },
@@ -770,6 +804,18 @@ const showConfirm = (action) => {
                                 <AccountCard :account="ACCOUNTS[0]" />
                             </ClickableCard>
                             <p class="text-xs opacity-60">The last one is nested in a surface-less ClickableCard, as on Accounts.</p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">NewsCard — published, draft, scheduled</h4>
+                            <div class="grid gap-3 md:grid-cols-3">
+                                <NewsCard v-for="post in NEWS_POSTS" :key="post.id" :post="post" />
+                            </div>
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">NewsCard — compact, as on the dashboard</h4>
+                            <div class="grid gap-3 md:grid-cols-2">
+                                <NewsCard v-for="post in NEWS_POSTS.slice(0, 2)" :key="`compact-${post.id}`"
+                                          :post="post" compact />
+                            </div>
                         </div>
                     </div>
 

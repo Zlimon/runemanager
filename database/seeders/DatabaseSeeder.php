@@ -49,8 +49,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         if (NewsPost::count() === 0) {
-            NewsPost::factory(15)->create();
-            $this->command->info('DatabaseSeeder: created 15 news posts.');
+            // One draft among them, so the editor's draft handling is visible
+            // in a demo instance without having to write a post first.
+            NewsPost::factory(14)->create();
+            NewsPost::factory()->draft()->create();
+            $this->command->info('DatabaseSeeder: created 15 news posts (1 draft).');
         }
 
         $this->reportResourcePacks();
