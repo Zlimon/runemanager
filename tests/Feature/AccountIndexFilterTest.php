@@ -59,6 +59,28 @@ it('filters accounts by username substring', function () {
         );
 });
 
+it('accepts a search term that the removed placeholder word list used to reject', function () {
+    // "Jenny" sat in a placeholder profanity list, so any search containing it
+    // 422'd on a real OSRS name fragment.
+    Account::factory()->for($this->user)->create(['username' => 'Jennyfer', 'account_type' => 'normal']);
+    Account::factory()->for($this->user)->create(['username' => 'Bar', 'account_type' => 'normal']);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.index', ['username' => 'jenny']))
+        ->assertOk()
+        ->assertSessionHasNoErrors()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('accounts.data', 1)
+            ->where('accounts.data.0.username', 'Jennyfer'),
+        );
+});
+
+it('still rejects a username filter with disallowed characters', function () {
+    $this->actingAs($this->user)
+        ->get(route('accounts.index', ['username' => 'bad@name!']))
+        ->assertSessionHasErrors('username');
+});
+
 it('filters accounts by username case-insensitively', function () {
     Account::factory()->for($this->user)->create(['username' => 'ZezimA', 'account_type' => 'normal']);
     Account::factory()->for($this->user)->create(['username' => 'Bar', 'account_type' => 'normal']);
@@ -262,4 +284,31 @@ it('matches accountSearchResults case-insensitively (shared username search)', f
 
     expect($response->json('props.accountSearchResults'))->toHaveCount(1)
         ->and($response->json('props.accountSearchResults.0.username'))->toBe('IKEA Ocelot');
+});
+
+it('lists an unclaimed roster account on the index and in the header search', function () {
+    Account::factory()->create(['username' => 'Unclaimed One', 'user_id' => null]);
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.index'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('accounts.data.0.username', 'Unclaimed One')
+            ->where('accounts.data.0.user_id', null)
+            ->where('accounts.data.0.icon', null)
+            ->missing('accounts.data.0.user'),
+        );
+
+    $response = $this->actingAs($this->user)
+        ->withHeaders([
+            'X-Inertia' => 'true',
+            'X-Inertia-Version' => currentInertiaVersion(),
+            'X-Inertia-Partial-Data' => 'accountSearchResults',
+            'X-Inertia-Partial-Component' => 'Accounts/Index',
+        ])
+        ->get(route('accounts.index', ['account_search' => 'Unclaimed']))
+        ->assertOk();
+
+    expect($response->json('props.accountSearchResults'))->toHaveCount(1)
+        ->and($response->json('props.accountSearchResults.0.username'))->toBe('Unclaimed One');
 });

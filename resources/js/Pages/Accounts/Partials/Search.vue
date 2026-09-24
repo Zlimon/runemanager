@@ -2,8 +2,8 @@
 import { computed, ref, watch } from "vue";
 import debounce from "lodash/debounce";
 import { Link, router, usePage } from "@inertiajs/vue3";
-import InputLabel from "@/Components/InputLabel.vue";
-import Search from "@/Components/Search.vue";
+import InputLabel from "@/Components/Form/InputLabel.vue";
+import Search from "@/Components/Form/Search.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
 const page = usePage();

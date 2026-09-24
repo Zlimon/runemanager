@@ -22,7 +22,7 @@ class CreateNewUser implements CreatesNewUsers
 
     /**
      * Create a newly registered user. In clan/group mode the user must claim a
-     * pre-created (unclaimed) roster account (SPEC §5.2); in casual mode that
+     * pre-created (unclaimed) roster account; in casual mode that
      * field is ignored.
      *
      * @param  array<string, string>  $input
@@ -76,7 +76,7 @@ class CreateNewUser implements CreatesNewUsers
     }
 
     /**
-     * The first registered user becomes the instance Owner (SPEC §3.4);
+     * The first registered user becomes the instance Owner;
      * everyone after them joins as a plain User.
      */
     protected function assignDefaultRole(User $user): void

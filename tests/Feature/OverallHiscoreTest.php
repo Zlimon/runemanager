@@ -34,12 +34,12 @@ it('ranks accounts by overall (total level then total XP)', function () {
             ->component('Hiscores/Skills/Show')
             ->where('skillName', 'Overall')
             ->where('skillSlug', 'overall')
-            ->has('hiscores', 3)
-            ->where('hiscores.0.account.username', 'Maxed')
-            ->where('hiscores.0.level', 2277)
-            ->where('hiscores.0.xp', 4600000000)
-            ->where('hiscores.1.account.username', 'Mid')
-            ->where('hiscores.2.account.username', 'Fresh'),
+            ->has('hiscores.data', 3)
+            ->where('hiscores.data.0.account.username', 'Maxed')
+            ->where('hiscores.data.0.level', 2277)
+            ->where('hiscores.data.0.xp', 4600000000)
+            ->where('hiscores.data.1.account.username', 'Mid')
+            ->where('hiscores.data.2.account.username', 'Fresh'),
         );
 });
 

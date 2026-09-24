@@ -8,6 +8,7 @@ use App\Models\Bank;
 use App\Models\CollectionLog;
 use App\Models\Equipment;
 use App\Models\FeedEvent;
+use App\Models\GroupBank;
 use App\Models\Inventory;
 use App\Models\Loot;
 use App\Models\LootingBag;
@@ -15,9 +16,10 @@ use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
 use App\Support\Roles;
+use Illuminate\Support\Facades\Cache;
 
 /**
- * SPEC §5/§12 — wipe all account data when the instance mode changes. The site's
+ * Wipe all account data when the instance mode changes. The site's
  * whole context (clan vs group vs casual) differs per mode, so accounts start
  * fresh. Users are kept (they re-claim a roster account) but every non-owner is
  * reset to a plain `member`.
@@ -34,12 +36,21 @@ class ResetInstanceData
         CollectionLog::query()->delete();
         Loot::query()->delete();
 
+        // Instance-scoped, not account-scoped: one shared document for the
+        // Group Ironman group, which the new mode's group must not inherit.
+        GroupBank::query()->delete();
+
         // Account-scoped relational tables (children first, then the accounts).
         AccountHiscore::query()->delete();
         Equipment::query()->delete();
         FeedEvent::query()->delete();
         UsernameHistory::query()->delete();
         Account::query()->delete();
+
+        // The Hiscores nav lists are derived from account data, so they would
+        // otherwise keep naming bosses this instance no longer has any hiscores for.
+        Cache::forget('nav.bosses');
+        Cache::forget('nav.skills');
 
         // Strip any elevated roles back to a plain User, leaving the Owner alone.
         Roles::sync();

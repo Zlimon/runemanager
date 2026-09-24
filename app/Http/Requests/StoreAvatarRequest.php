@@ -8,12 +8,12 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreAvatarRequest extends FormRequest
 {
     /**
-     * Auth is enforced upstream by sanctum + the plugin.account middleware,
-     * which also resolves the target Account onto the request attributes.
+     * Access is enforced by the route middleware (sanctum + plugin.account,
+     * which also resolves the target Account onto the request attributes).
      */
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return true;
     }
 
     /**

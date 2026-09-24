@@ -6,17 +6,17 @@ import { Calendar as VCalendar } from "v-calendar";
 import { useEventColor } from "@/composables/useEventColor";
 import "v-calendar/dist/style.css";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Badge from "@/Components/Badge.vue";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import ItemPicker from "@/Components/ItemPicker.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DangerButton from "@/Components/DangerButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import SelectInput from "@/Components/SelectInput.vue";
+import Badge from "@/Components/Display/Badge.vue";
+import ConfirmationModal from "@/Components/Modals/ConfirmationModal.vue";
+import DialogModal from "@/Components/Modals/DialogModal.vue";
+import InputError from "@/Components/Form/InputError.vue";
+import InputLabel from "@/Components/Form/InputLabel.vue";
+import ItemPicker from "@/Components/Game/Items/ItemPicker.vue";
+import PrimaryButton from "@/Components/Buttons/PrimaryButton.vue";
+import SecondaryButton from "@/Components/Buttons/SecondaryButton.vue";
+import DangerButton from "@/Components/Buttons/DangerButton.vue";
+import TextInput from "@/Components/Form/TextInput.vue";
+import SelectInput from "@/Components/Form/SelectInput.vue";
 
 const props = defineProps({
     events: { type: Array, default: () => [] },

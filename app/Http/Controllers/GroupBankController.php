@@ -9,7 +9,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * SPEC §5.2 — the shared Group Ironman group bank view. GROUP mode only.
+ * The shared Group Ironman group bank view. GROUP mode only.
  */
 class GroupBankController extends Controller
 {

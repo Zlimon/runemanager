@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
-            // SPEC §12 — funnel authenticated users to first-time setup until the
+            // Funnel authenticated users to first-time setup until the
             // instance is configured (covers public pages too, e.g. /feed).
             EnsureInstanceConfigured::class,
         ]);

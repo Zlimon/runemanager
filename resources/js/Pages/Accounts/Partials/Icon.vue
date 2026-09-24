@@ -1,5 +1,5 @@
 <script setup>
-import OnlineStatus from "@/Components/OnlineStatus.vue";
+import OnlineStatus from "@/Pages/Accounts/Partials/OnlineStatus.vue";
 
 defineProps({
     account: {

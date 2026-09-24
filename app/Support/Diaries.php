@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * SPEC §5.2 — the canonical Achievement Diary areas + tiers. 12 areas × 4 tiers
+ * The canonical Achievement Diary areas + tiers. 12 areas × 4 tiers
  * = 48 completable diary tiers. The plugin reports completion per (area, tier);
  * the backend normalises and stores it against this fixed set.
  */

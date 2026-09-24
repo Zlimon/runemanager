@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * SPEC §5.2/§7.1 — Combat Achievements metadata. We track total points and the
+ * Combat Achievements metadata. We track total points and the
  * count of completed tasks per tier (read by the plugin from CA_POINTS +
  * CA_TOTAL_TASKS_COMPLETED_*), mirroring the in-game overview's "27/41" panel.
  * Live task unlocks reach the feed via a separate push, not this snapshot.

@@ -7,7 +7,7 @@ use App\Helpers\SettingHelper;
 use App\Models\Account;
 
 /**
- * SPEC §5.2 — ingest the clan roster pushed by the owner's plugin. Each member
+ * Ingest the clan roster pushed by the owner's plugin. Each member
  * is pre-created as an unclaimed account (username only, no user, no hash) that
  * the owning player links on their first plugin login. Existing accounts keep
  * their link + hash and just have their rank/title refreshed.
@@ -32,24 +32,14 @@ class SyncClanRoster
                 continue;
             }
 
-            $account = Account::query()->where('username', $username)->first();
-
-            if ($account === null) {
-                $account = new Account;
-                $account->username = $username;
-                $account->user_id = null;
-                $account->account_hash = null;
-                $account->account_type = AccountTypesEnum::NORMAL;
-                $account->rank = 0;
-                $account->level = 0;
-                $account->xp = 0;
-            }
+            $account = Account::query()->where('username', $username)->first()
+                ?? Account::rosterPlaceholder($username, AccountTypesEnum::NORMAL);
 
             $account->clan_rank = $member['rank'] ?? null;
             $account->clan_title = $member['title'] ?? null;
             $account->save();
 
-            // Clan-rank → website-role mapping is deferred (SPEC §5.2, later).
+            // Clan-rank → website-role mapping is deferred to later.
 
             $count++;
         }

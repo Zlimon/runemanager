@@ -2,15 +2,13 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\CalendarEventType;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Arr;
 
-class UpdateCalendarEventRequest extends FormRequest
+class UpdateCalendarEventRequest extends StoreCalendarEventRequest
 {
     /**
-     * SPEC §10.2 — who may edit which event is ownership-dependent, so the
+     * Who may edit which event is ownership-dependent, so the
      * controller decides (creator or `manage calendar`); the route already keeps
      * everyone else out.
      */
@@ -20,8 +18,8 @@ class UpdateCalendarEventRequest extends FormRequest
     }
 
     /**
-     * Mirrors {@see StoreCalendarEventRequest} except that `starts_at` may be in
-     * the past — an event that has already started still has to be editable
+     * The same as {@see StoreCalendarEventRequest} except that `starts_at` may be
+     * in the past — an event that has already started still has to be editable
      * (fixing a typo, extending the window).
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -29,13 +27,8 @@ class UpdateCalendarEventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'min:2', 'max:120'],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'event_type' => ['required', Rule::enum(CalendarEventType::class)],
-            'color' => ['nullable', Rule::in(StoreCalendarEventRequest::COLORS)],
-            'item_id' => ['nullable', 'integer', 'min:1'],
+            ...parent::rules(),
             'starts_at' => ['required', 'date'],
-            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
         ];
     }
 
@@ -44,8 +37,6 @@ class UpdateCalendarEventRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
-            'ends_at.after_or_equal' => 'The end time must be at or after the start time.',
-        ];
+        return Arr::except(parent::messages(), 'starts_at.after_or_equal');
     }
 }

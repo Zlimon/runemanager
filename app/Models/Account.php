@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\AccountTypesEnum;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,61 +17,26 @@ use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/**
- * @property int $id
- * @property int|null $user_id
- * @property AccountTypesEnum $account_type
- * @property int|null $clan_rank
- * @property string|null $clan_title
- * @property string $username
- * @property int $rank
- * @property int $level
- * @property int $xp
- * @property Carbon|null $last_seen_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property-read User $user
- *
- * @method static \Database\Factories\AccountFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder|Account newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Account newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Account query()
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereAccountType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereLevel($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereRank($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereUsername($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereXp($value)
- *
- * @mixin \Eloquent
- */
 class Account extends Model
 {
     use HasFactory;
 
+    /**
+     * Standalone activity slugs the OSRS hiscores expose that AREN'T bosses —
+     * minigame rankings, point counters, chest opens, etc. Used to filter the
+     * Bosses tab to only NPC-style entries.
+     */
+    private const NON_BOSS_ACTIVITY_SLUGS = [
+        'lms_rank', 'pvp_arena_rank', 'soul_wars_zeal', 'rifts_closed',
+        'colosseum_glory', 'collections_logged', 'league_points', 'grid_points',
+        'deadman_points', 'lunar_chests', 'barrows_chests',
+        'bounty_hunter_hunter', 'bounty_hunter_rogue',
+        'bounty_hunter_legacy_hunter', 'bounty_hunter_legacy_rogue',
+    ];
+
     public function getRouteKeyName(): string
     {
         return 'username';
-    }
-
-    /**
-     * Case-insensitive username substring search, shared by the account index
-     * filter and the header typeahead. Uses LOWER(...) LIKE so it's portable
-     * across Postgres (case-sensitive LIKE) and SQLite, and a no-op for a blank
-     * term so callers can pass the raw query straight through.
-     */
-    public function scopeSearchUsername(Builder $query, ?string $term): Builder
-    {
-        $term = trim((string) $term);
-
-        if ($term === '') {
-            return $query;
-        }
-
-        return $query->whereRaw('LOWER(username) LIKE ?', ['%'.Str::lower($term).'%']);
     }
 
     /**
@@ -86,6 +53,108 @@ class Account extends Model
             'position_updated_at' => 'datetime',
             'vitals_updated_at' => 'datetime',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function hiscore(): HasOne
+    {
+        return $this->hasOne(AccountHiscore::class);
+    }
+
+    public function diary(): HasOne
+    {
+        return $this->hasOne(AccountDiary::class);
+    }
+
+    public function combatAchievement(): HasOne
+    {
+        return $this->hasOne(AccountCombatAchievement::class);
+    }
+
+    public function equipment(): HasOne
+    {
+        return $this->hasOne(Equipment::class);
+    }
+
+    public function usernameHistory(): HasMany
+    {
+        return $this->hasMany(UsernameHistory::class)->orderByDesc('detected_at');
+    }
+
+    /**
+     * Case-insensitive username substring search, shared by the account index
+     * filter and the header typeahead. Uses LOWER(...) LIKE so it's portable
+     * across Postgres (case-sensitive LIKE) and SQLite, and a no-op for a blank
+     * term so callers can pass the raw query straight through.
+     */
+    #[Scope]
+    protected function searchUsername(Builder $query, ?string $term): void
+    {
+        $term = trim((string) $term);
+
+        if ($term === '') {
+            return;
+        }
+
+        $query->whereRaw('LOWER(username) LIKE ?', ['%'.Str::lower($term).'%']);
+    }
+
+    /**
+     * Accounts whose most recent plugin heartbeat is within the presence window.
+     * The query form of {@see isOnline()}, except that it includes the window's
+     * start instant, where isOnline() is strict.
+     */
+    #[Scope]
+    protected function online(Builder $query): void
+    {
+        $query->where('last_seen_at', '>=', self::onlineSince());
+    }
+
+    /**
+     * The highest total levels first, ties broken by XP. Accounts whose
+     * hiscores have not synced yet (level 0) are left out.
+     */
+    #[Scope]
+    protected function topByLevel(Builder $query, int $limit): void
+    {
+        $query->where('level', '>', 0)
+            ->orderByDesc('level')
+            ->orderByDesc('xp')
+            ->limit($limit);
+    }
+
+    /**
+     * An unsaved, unclaimed roster account: username only, no user and no hash,
+     * linked by the owning player on their first plugin login. The account
+     * type is a placeholder until that login confirms it.
+     */
+    public static function rosterPlaceholder(string $username, AccountTypesEnum $type): self
+    {
+        $account = new self;
+        $account->username = $username;
+        $account->user_id = null;
+        $account->account_hash = null;
+        $account->account_type = $type;
+        $account->rank = 0;
+        $account->level = 0;
+        $account->xp = 0;
+
+        return $account;
+    }
+
+    /**
+     * Accounts currently sharing a recent enough position to appear on the map.
+     */
+    #[Scope]
+    protected function onMap(Builder $query): void
+    {
+        $query
+            ->whereNotNull('world_x')
+            ->where('position_updated_at', '>=', now()->subMinutes((int) config('runemanager.map.visible_within_minutes')));
     }
 
     /**
@@ -151,16 +220,6 @@ class Account extends Model
     }
 
     /**
-     * Accounts currently sharing a recent enough position to appear on the map.
-     */
-    public function scopeOnMap(Builder $query): Builder
-    {
-        return $query
-            ->whereNotNull('world_x')
-            ->where('position_updated_at', '>=', now()->subMinutes((int) config('runemanager.map.visible_within_minutes')));
-    }
-
-    /**
      * Online while the most recent plugin heartbeat is within the configured
      * presence window (see config/runemanager.php). Derived rather than stored
      * so it expires on its own when the plugin stops pinging.
@@ -168,32 +227,13 @@ class Account extends Model
     public function isOnline(): bool
     {
         return $this->last_seen_at !== null
-            && $this->last_seen_at->gt(now()->subMinutes((int) config('runemanager.presence.online_within_minutes')));
+            && $this->last_seen_at->gt(self::onlineSince());
     }
 
-    public function user(): BelongsTo
+    /** The start of the presence window (see config/runemanager.php). */
+    private static function onlineSince(): Carbon
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function getUserIconAttribute(): ?string
-    {
-        return $this->user->icon;
-    }
-
-    public function hiscore(): HasOne
-    {
-        return $this->hasOne(AccountHiscore::class);
-    }
-
-    public function diary(): HasOne
-    {
-        return $this->hasOne(AccountDiary::class);
-    }
-
-    public function combatAchievement(): HasOne
-    {
-        return $this->hasOne(AccountCombatAchievement::class);
+        return now()->subMinutes((int) config('runemanager.presence.online_within_minutes'));
     }
 
     /**
@@ -201,7 +241,7 @@ class Account extends Model
      * or null when no avatar has been pushed yet. The MTL is optional (colour-
      * only exports may omit it). ?v= busts the browser cache on re-upload.
      *
-     * @return array{obj_url: string, mtl_url: ?string, updated_at: string}|null
+     * @return array{obj_url: string, mtl_url: ?string, npc_obj_url: ?string, npc_mtl_url: ?string, updated_at: string}|null
      */
     public function avatarPayload(): ?array
     {
@@ -229,136 +269,114 @@ class Account extends Model
         ];
     }
 
-    public function usernameHistory(): HasMany
+    protected function userIcon(): Attribute
     {
-        return $this->hasMany(UsernameHistory::class)->orderByDesc('detected_at');
-    }
-
-    public function getSkillsAttribute(): SupportCollection
-    {
-        $entries = $this->hiscore?->entries['skills'] ?? [];
-
-        return Skill::all()->map(fn (Skill $skill) => [
-            'name' => $skill->name,
-            'slug' => $skill->slug,
-            'rank' => $entries[$skill->slug]['rank'] ?? 0,
-            'level' => $entries[$skill->slug]['level'] ?? 1,
-            'xp' => $entries[$skill->slug]['xp'] ?? 0,
-        ]);
+        return Attribute::make(get: fn (): ?string => $this->user?->icon);
     }
 
     /**
-     * Standalone activity slugs the OSRS hiscores expose that AREN'T bosses —
-     * minigame rankings, point counters, chest opens, etc. Used to filter the
-     * Bosses tab to only NPC-style entries.
+     * Every skill in display order with this account's rank/level/xp, defaulting
+     * the ones the hiscores have no entry for.
      */
-    private const NON_BOSS_ACTIVITY_SLUGS = [
-        'lms_rank', 'pvp_arena_rank', 'soul_wars_zeal', 'rifts_closed',
-        'colosseum_glory', 'collections_logged', 'league_points', 'grid_points',
-        'deadman_points', 'lunar_chests', 'barrows_chests',
-        'bounty_hunter_hunter', 'bounty_hunter_rogue',
-        'bounty_hunter_legacy_hunter', 'bounty_hunter_legacy_rogue',
-    ];
-
-    public function getBossesAttribute(): SupportCollection
+    protected function skills(): Attribute
     {
-        $entries = $this->hiscore?->entries['activities'] ?? [];
+        return Attribute::make(get: function (): SupportCollection {
+            $entries = $this->hiscore?->entries['skills'] ?? [];
 
-        return collect($entries)
-            ->reject(fn ($_, string $slug) => str_starts_with($slug, 'clue_scrolls_')
-                || in_array($slug, self::NON_BOSS_ACTIVITY_SLUGS, true))
-            ->map(fn ($entry, string $slug) => [
-                'name' => Str::title(str_replace('_', ' ', $slug)),
-                'slug' => $slug,
-                'rank' => $entry['rank'] ?? 0,
-                'score' => $entry['score'] ?? 0,
-            ])
-            ->values();
+            return Skill::all()->map(fn (Skill $skill) => [
+                'name' => $skill->name,
+                'slug' => $skill->slug,
+                'rank' => $entries[$skill->slug]['rank'] ?? 0,
+                'level' => $entries[$skill->slug]['level'] ?? 1,
+                'xp' => $entries[$skill->slug]['xp'] ?? 0,
+            ]);
+        });
+    }
+
+    protected function bosses(): Attribute
+    {
+        return Attribute::make(get: function (): SupportCollection {
+            $entries = $this->hiscore?->entries['activities'] ?? [];
+
+            return collect($entries)
+                ->reject(fn ($_, string $slug) => str_starts_with($slug, 'clue_scrolls_')
+                    || in_array($slug, self::NON_BOSS_ACTIVITY_SLUGS, true))
+                ->map(fn ($entry, string $slug) => [
+                    'name' => Str::title(str_replace('_', ' ', $slug)),
+                    'slug' => $slug,
+                    'rank' => $entry['rank'] ?? 0,
+                    'score' => $entry['score'] ?? 0,
+                ])
+                ->values();
+        });
     }
 
     /**
      * Clue scrolls in tier order — present every tier even if the player has
      * no kc yet so the UI grid is always the same shape.
      */
-    public function getCluesAttribute(): SupportCollection
+    protected function clues(): Attribute
     {
-        $entries = $this->hiscore?->entries['activities'] ?? [];
-        $tiers = ['beginner', 'easy', 'medium', 'hard', 'elite', 'master', 'all'];
+        return Attribute::make(get: function (): SupportCollection {
+            $entries = $this->hiscore?->entries['activities'] ?? [];
+            $tiers = ['beginner', 'easy', 'medium', 'hard', 'elite', 'master', 'all'];
 
-        return collect($tiers)->map(function (string $tier) use ($entries) {
-            $slug = "clue_scrolls_{$tier}";
+            return collect($tiers)->map(function (string $tier) use ($entries) {
+                $slug = "clue_scrolls_{$tier}";
 
-            return [
-                'name' => Str::title($tier),
-                'slug' => $slug,
-                'rank' => $entries[$slug]['rank'] ?? 0,
-                'score' => $entries[$slug]['score'] ?? 0,
-            ];
+                return [
+                    'name' => Str::title($tier),
+                    'slug' => $slug,
+                    'rank' => $entries[$slug]['rank'] ?? 0,
+                    'score' => $entries[$slug]['score'] ?? 0,
+                ];
+            });
         });
     }
 
-    public function inventory(): HasOne
+    /*
+     * The snapshot documents below live in MongoDB, so they can't be Eloquent
+     * relations of this PostgreSQL model; each is a direct lookup instead. The
+     * lookups aren't cached on the instance, so a read after a push is fresh.
+     */
+
+    protected function inventory(): Attribute
     {
-        return $this->hasOne(Inventory::class);
+        return Attribute::make(
+            get: fn (): ?Inventory => Inventory::where('account_id', $this->id)->first(),
+        )->withoutObjectCaching();
     }
 
-    // MongoDB relationship
-    public function getInventoryAttribute(): ?Inventory
+    protected function lootingBag(): Attribute
     {
-        return Inventory::where('account_id', $this->id)->first();
+        return Attribute::make(
+            get: fn (): ?LootingBag => LootingBag::where('account_id', $this->id)->first(),
+        )->withoutObjectCaching();
     }
 
-    public function lootingBag(): HasOne
+    protected function bank(): Attribute
     {
-        return $this->hasOne(LootingBag::class);
+        return Attribute::make(
+            get: fn (): ?Bank => Bank::where('account_id', $this->id)->first(),
+        )->withoutObjectCaching();
     }
 
-    // MongoDB relationship
-    public function getLootingBagAttribute(): ?LootingBag
+    protected function quests(): Attribute
     {
-        return LootingBag::where('account_id', $this->id)->first();
+        return Attribute::make(
+            get: fn (): ?Quest => Quest::where('account_id', $this->id)->first(),
+        )->withoutObjectCaching();
     }
 
-    public function bank(): HasOne
+    protected function collectionLog(): Attribute
     {
-        return $this->hasOne(Bank::class);
-    }
-
-    // MongoDB relationship
-    public function getBankAttribute(): ?Bank
-    {
-        return Bank::where('account_id', $this->id)->first();
-    }
-
-    public function quests(): HasOne
-    {
-        return $this->hasOne(Quest::class);
-    }
-
-    // MongoDB relationship
-    public function getQuestsAttribute(): ?Quest
-    {
-        return Quest::where('account_id', $this->id)->first();
-    }
-
-    public function equipment(): HasOne
-    {
-        return $this->hasOne(Equipment::class);
-    }
-
-    public function collectionLog(): HasOne
-    {
-        return $this->hasOne(CollectionLog::class);
-    }
-
-    // MongoDB relationship
-    public function getCollectionLogAttribute(): ?CollectionLog
-    {
-        return CollectionLog::where('account_id', $this->id)->first();
+        return Attribute::make(
+            get: fn (): ?CollectionLog => CollectionLog::where('account_id', $this->id)->first(),
+        )->withoutObjectCaching();
     }
 
     /**
-     * SPEC §5.2 — append-only loot history. Cross-database (Mongo) so it's a
+     * Append-only loot history. Cross-database (Mongo) so it's a
      * direct query rather than an Eloquent relation. Newest-first because every
      * read path (recent drops panel, future live feed) wants chronological order.
      *
@@ -382,16 +400,4 @@ class Account extends Model
 
         return $row?->killed_at;
     }
-
-    //    public function log() {
-    //        return $this->hasMany(Log::class);
-    //    }
-    //
-    //    public function logBroadcast() {
-    //        return $this->hasManyThrough(Broadcast::class, Log::class);
-    //    }
-    //
-    //    public function group() {
-    //        return $this->belongsToMany(Group::class);
-    //    }
 }

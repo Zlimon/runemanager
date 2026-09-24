@@ -5,10 +5,11 @@ namespace App\Services\Feed;
 use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\FeedEvent;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 
 /**
- * Single entry point for SPEC §8 live feed event generation.
+ * Single entry point for live feed event generation.
  *
  * Each push controller/service that produces qualifying events instantiates
  * this and calls the matching record*() helper. Every helper takes an optional
@@ -19,6 +20,20 @@ class RecordFeedEvent
 {
     /** Plugin quest status code for a finished quest (0/1/2 scale). */
     private const QUEST_FINISHED = 2;
+
+    /** How recent a matching event must be to receive a screenshot. */
+    public const MATCH_WINDOW_SECONDS = 120;
+
+    /** Event types the plugin may upload a screenshot for. */
+    public const SCREENSHOT_TYPES = [
+        FeedEvent::TYPE_LOOT_DROP,
+        FeedEvent::TYPE_COMBAT_ACHIEVEMENT,
+        FeedEvent::TYPE_COLLECTION_LOG,
+        FeedEvent::TYPE_PET,
+        FeedEvent::TYPE_DEATH,
+        FeedEvent::TYPE_REWARD,
+        FeedEvent::TYPE_LEVEL_UP,
+    ];
 
     /**
      * Validation rules for an optional plugin-supplied event position, keyed
@@ -125,7 +140,7 @@ class RecordFeedEvent
     }
 
     /**
-     * Record a COMBAT_ACHIEVEMENT unlock (SPEC §8.1). Unlike level-ups/quests
+     * Record a COMBAT_ACHIEVEMENT unlock. Unlike level-ups/quests
      * these aren't derived from a snapshot diff — the plugin parses the in-game
      * completion message and pushes the task name + tier directly.
      *
@@ -146,7 +161,7 @@ class RecordFeedEvent
     }
 
     /**
-     * Record a COLLECTION_LOG slot unlock (SPEC §8.1). Like combat achievements,
+     * Record a COLLECTION_LOG slot unlock. Like combat achievements,
      * the plugin parses the in-game "new item" notice and pushes the item name.
      *
      * @param  ?array<string, mixed>  $position
@@ -159,6 +174,34 @@ class RecordFeedEvent
             'payload' => $this->withPosition(['item' => $item], $position),
             'occurred_at' => now(),
         ]);
+    }
+
+    /**
+     * Attach a plugin screenshot to the account's most recent event of $type
+     * that has none yet. Feed events are created server-side a beat earlier
+     * (from the loot/CA/collection-log push), so only events from the last
+     * MATCH_WINDOW_SECONDS qualify. Returns false, storing nothing, when no
+     * event qualifies (e.g. the drop was below the plugin's feed value floor).
+     */
+    public function attachScreenshot(Account $account, string $type, UploadedFile $image): bool
+    {
+        $event = FeedEvent::query()
+            ->where('account_id', $account->id)
+            ->where('type', $type)
+            ->whereNull('screenshot_path')
+            ->where('created_at', '>=', now()->subSeconds(self::MATCH_WINDOW_SECONDS))
+            ->latest('id')
+            ->first();
+
+        if ($event === null) {
+            return false;
+        }
+
+        $path = $image->storeAs('feed-screenshots', $event->id.'.'.$image->extension(), 'public');
+
+        $event->update(['screenshot_path' => $path]);
+
+        return true;
     }
 
     /**
@@ -189,7 +232,7 @@ class RecordFeedEvent
     }
 
     /**
-     * Persist a feed event and broadcast it to connected browsers (SPEC §8.3).
+     * Persist a feed event and broadcast it to connected browsers.
      *
      * @param  array<string, mixed>  $attributes
      */

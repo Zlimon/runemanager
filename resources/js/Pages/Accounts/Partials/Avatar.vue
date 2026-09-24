@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import Loader from "@/Components/Loader.vue";
+import Loader from "@/Components/Display/Loader.vue";
 
 /*
  * Player 3D avatar viewer. The model is exported in-game with the Model-Dumper

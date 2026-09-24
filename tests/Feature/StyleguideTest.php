@@ -70,8 +70,9 @@ it('lists every installed pack with what the switcher needs to repaint the page'
         ->get(route('styleguide'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Styleguide')
+            ->component('Styleguide/Index')
             ->has('packs', 2)
+            ->has('items')
             // Ordered by alias: "Pack-styleguidetest" before "Sample-vanilla".
             ->where('packs.0.name', 'pack-styleguidetest')
             ->where('packs.0.dark_mode', true)
@@ -86,6 +87,11 @@ it('lists every installed pack with what the switcher needs to repaint the page'
             // listed — the switcher renders it as the untextured interface
             // rather than pointing <link> at a 404.
             ->where('packs.0.css', null)
+            // The picker shape rides along, so the pack components on the page
+            // render with each pack's own id, icon and details.
+            ->where('packs.0.id', fn (int $id) => $id > 0)
+            ->has('packs.0.icon_url')
+            ->has('packs.0.tags')
             ->where('packs.1.is_vanilla', true)
             ->where('packs.1.css', fn (?string $css) => str_contains((string) $css, 'sample-vanilla/resource-pack.css'))
         );

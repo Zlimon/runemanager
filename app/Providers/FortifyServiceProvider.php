@@ -36,7 +36,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
-        // SPEC §5.2 — in clan/group mode registration is gated on claiming a
+        // In clan/group mode registration is gated on claiming a
         // pre-created roster account, so surface the unclaimed ones to the form.
         Fortify::registerView(function () {
             $rosterRequired = Instance::requiresRosterClaim();

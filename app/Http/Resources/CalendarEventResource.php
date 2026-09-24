@@ -13,7 +13,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Wire shape for SPEC §10 calendar events. Permissions are resolved here rather
+ * Wire shape for calendar events. Permissions are resolved here rather
  * than in Vue, and the event's optional OSRS item icon is hydrated from the
  * static MongoDB catalogue.
  */
@@ -140,7 +140,7 @@ class CalendarEventResource extends JsonResource
     }
 
     /**
-     * SPEC §10.2 — the creator may manage their own event, and anyone holding
+     * The creator may manage their own event, and anyone holding
      * `manage calendar` may manage everyone's.
      */
     private function viewerManages(Request $request): bool

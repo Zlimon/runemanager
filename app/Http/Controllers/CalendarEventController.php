@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CalendarEventType;
+use App\Http\Requests\RsvpCalendarEventRequest;
 use App\Http\Requests\StoreCalendarEventRequest;
 use App\Http\Requests\UpdateCalendarEventRequest;
 use App\Http\Resources\CalendarEventResource;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class CalendarEventController extends Controller
 {
     /**
-     * SPEC §10.3 — viewing is public; the calendar renders as a month grid
+     * Viewing is public; the calendar renders as a month grid
      * (V-Calendar). The visible week range is sent as ?from/?to as the user
      * navigates; we return every event overlapping it (so multi-day events show
      * on each day they span) plus a short upcoming list for the side widget.
@@ -39,14 +40,7 @@ class CalendarEventController extends Controller
 
         return Inertia::render('Calendar/Index', [
             'events' => CalendarEventResource::collection(
-                CalendarEvent::query()
-                    ->where('starts_at', '<=', $to)
-                    ->where(function ($query) use ($from) {
-                        $query->where('ends_at', '>=', $from)
-                            ->orWhere(fn ($q) => $q->whereNull('ends_at')->where('starts_at', '>=', $from));
-                    })
-                    ->orderBy('starts_at')
-                    ->get(),
+                CalendarEvent::query()->overlapping($from, $to)->orderBy('starts_at')->get(),
             )->resolve(),
             'upcoming' => CalendarEventResource::collection(
                 CalendarEvent::query()->upcoming()->limit(5)->get(),
@@ -97,7 +91,7 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * SPEC §10 — sign one of your accounts up for an event. RSVP is per account,
+     * Sign one of your accounts up for an event. RSVP is per account,
      * so the payload names which one; it has to be yours.
      *
      * A member attends as exactly one account, so naming a different one moves
@@ -105,10 +99,8 @@ class CalendarEventController extends Controller
      * inside a transaction keeps it atomic against the unique index the schema
      * carries — two concurrent requests cannot leave the member attending twice.
      */
-    public function rsvp(Request $request, CalendarEvent $calendarEvent): RedirectResponse
+    public function rsvp(RsvpCalendarEventRequest $request, CalendarEvent $calendarEvent): RedirectResponse
     {
-        $this->abortIfPassed($calendarEvent);
-
         $account = $this->ownedAccount($request);
         $userId = $request->user()->id;
 
@@ -125,10 +117,8 @@ class CalendarEventController extends Controller
     }
 
     /** Withdraw an account's attendance; the row's absence *is* "not going". */
-    public function destroyRsvp(Request $request, CalendarEvent $calendarEvent): RedirectResponse
+    public function destroyRsvp(RsvpCalendarEventRequest $request, CalendarEvent $calendarEvent): RedirectResponse
     {
-        $this->abortIfPassed($calendarEvent);
-
         $account = $this->ownedAccount($request);
 
         $calendarEvent->rsvps()->where('account_id', $account->id)->delete();
@@ -137,25 +127,12 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * Attendance on an event that has already happened is a record of who turned
-     * up, so it is closed to further change — both signing up and withdrawing.
-     */
-    private function abortIfPassed(CalendarEvent $calendarEvent): void
-    {
-        abort_if($calendarEvent->hasPassed(), HttpResponse::HTTP_FORBIDDEN, 'This event has already taken place.');
-    }
-
-    /**
      * Resolve the `account_id` in the request, rejecting accounts the caller
      * doesn't own — otherwise anyone could RSVP on someone else's behalf.
      */
-    private function ownedAccount(Request $request): Account
+    private function ownedAccount(RsvpCalendarEventRequest $request): Account
     {
-        $validated = $request->validate([
-            'account_id' => ['required', 'integer', 'exists:accounts,id'],
-        ]);
-
-        $account = Account::findOrFail($validated['account_id']);
+        $account = Account::findOrFail($request->validated('account_id'));
 
         abort_if($account->user_id !== $request->user()?->id, HttpResponse::HTTP_FORBIDDEN);
 
@@ -163,7 +140,7 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * SPEC §10.2 — an event is managed by its creator or by anyone holding
+     * An event is managed by its creator or by anyone holding
      * `manage calendar`, so an admin can clean up someone else's event.
      */
     private function abortUnlessManages(CalendarEvent $calendarEvent, ?User $user): void

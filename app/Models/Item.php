@@ -2,50 +2,64 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Connection;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use MongoDB\Laravel\Eloquent\Model;
 
+/**
+ * Static item data from the osrsreboxed dataset (`docker/gamedata`). The OSRS
+ * item id lives in the document's string `id` field, which the Mongo driver
+ * aliases to `_id` in Eloquent queries — hence the raw aggregations below.
+ */
+#[Connection('mongodb-static')]
+#[Table(key: '_id')]
 class Item extends Model
 {
-    protected $connection = 'mongodb-static';
+    /**
+     * A property rather than part of the Table attribute: the MongoDB base
+     * model declares a string key type, which the attribute cannot override.
+     */
+    protected $keyType = 'int';
 
-    protected $primaryKey = '_id';
-
-    protected $keyType = 'int'; // _id is item id
-
-    protected $casts = [
-        '_id' => 'integer',
-        'name' => 'string',
-        //        'last_updated' => 'date',
-        'incomplete' => 'boolean',
-        'members' => 'boolean',
-        'tradeable' => 'boolean',
-        'tradeable_on_ge' => 'boolean',
-        'stackable' => 'boolean',
-        'stacked' => 'boolean',
-        'noted' => 'boolean',
-        'noteable' => 'boolean',
-        'linked_id_item' => 'integer',
-        'linked_id_noted' => 'integer',
-        'linked_id_placeholder' => 'integer',
-        'placeholder' => 'boolean',
-        'equipable' => 'boolean',
-        'equipable_by_player' => 'boolean',
-        'equipable_weapon' => 'boolean',
-        'cost' => 'integer',
-        'lowalch' => 'integer',
-        'highalch' => 'integer',
-        'weight' => 'integer',
-        'buy_limit' => 'integer',
-        'quest_item' => 'boolean',
-        'release_date' => 'date',
-        'duplicate' => 'boolean',
-        'examine' => 'string',
-        'icon' => 'string',
-        'wiki_name' => 'string',
-        'wiki_url' => 'string',
-        //        'equipment' => 'array',
-        //        'weapon' => 'array',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            '_id' => 'integer',
+            'name' => 'string',
+            'incomplete' => 'boolean',
+            'members' => 'boolean',
+            'tradeable' => 'boolean',
+            'tradeable_on_ge' => 'boolean',
+            'stackable' => 'boolean',
+            'stacked' => 'boolean',
+            'noted' => 'boolean',
+            'noteable' => 'boolean',
+            'linked_id_item' => 'integer',
+            'linked_id_noted' => 'integer',
+            'linked_id_placeholder' => 'integer',
+            'placeholder' => 'boolean',
+            'equipable' => 'boolean',
+            'equipable_by_player' => 'boolean',
+            'equipable_weapon' => 'boolean',
+            'cost' => 'integer',
+            'lowalch' => 'integer',
+            'highalch' => 'integer',
+            'weight' => 'integer',
+            'buy_limit' => 'integer',
+            'quest_item' => 'boolean',
+            'release_date' => 'date',
+            'duplicate' => 'boolean',
+            'examine' => 'string',
+            'icon' => 'string',
+            'wiki_name' => 'string',
+            'wiki_url' => 'string',
+        ];
+    }
 
     /**
      * The Mongo Laravel driver hardcodes an id↔_id alias in projections,
@@ -206,6 +220,12 @@ class Item extends Model
         }, $docs));
     }
 
+    /**
+     * Single-item form of {@see self::lookupByOsrsIds()}; an unknown id yields
+     * the same shape with empty values rather than null.
+     *
+     * @return array{_id: int, name: string, examine: ?string, icon: ?string, lowalch: ?int, highalch: ?int}
+     */
     public static function lookupByOsrsId(int|string $osrsId): array
     {
         $doc = (new static)->getConnection()

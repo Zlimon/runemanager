@@ -28,7 +28,7 @@ it('renders the admin calendar page grouped into upcoming and past for a manage-
         ->get(route('admin.calendar'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Admin/Calendar')
+            ->component('Admin/Calendar/Index')
             ->has('upcoming', 1)
             ->has('past', 1)
             ->where('upcoming.0.title', 'Upcoming Raid')
@@ -61,6 +61,21 @@ it('rejects an unknown highlight colour', function () {
         ])
         ->assertStatus(422)
         ->assertJsonValidationErrors('calendar_highlight_colors.0');
+});
+
+it('requires the highlight colour list to be present', function () {
+    $this->actingAs(adminUser())
+        ->putJson(route('admin.calendar.settings'), [])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('calendar_highlight_colors');
+});
+
+it('accepts an empty highlight colour list', function () {
+    $this->actingAs(adminUser())
+        ->put(route('admin.calendar.settings'), ['calendar_highlight_colors' => []])
+        ->assertRedirect();
+
+    expect(Instance::calendarHighlightColors())->toBe([]);
 });
 
 it('forbids a user without manage instance from updating the highlight setting', function () {

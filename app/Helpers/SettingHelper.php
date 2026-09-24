@@ -12,18 +12,10 @@ class SettingHelper
     }
 
     /**
-     * @return Setting|bool|int|mixed
+     * A setting's value cast to its stored type, or `$default` when it is unset.
      */
-    public static function getSetting($key, $default = null): mixed
+    public static function getSetting(string $key, $default = null): mixed
     {
-        if (is_null($key)) {
-            return new Setting;
-        }
-
-        if (is_array($key)) {
-            return Setting::set($key[0], $key[1]);
-        }
-
         $value = Setting::get($key);
 
         return is_null($value) ? value($default) : $value;

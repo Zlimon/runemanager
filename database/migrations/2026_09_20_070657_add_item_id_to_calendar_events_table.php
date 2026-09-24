@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * SPEC §10 — an event can carry an OSRS item as its icon (the raid it's for,
+     * An event can carry an OSRS item as its icon (the raid it's for,
      * the drop it's hunting). Stores the item id only; name/icon are resolved
      * from the static MongoDB item catalogue at render time.
      */

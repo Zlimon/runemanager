@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Account;
 use App\Models\Bank;
-use App\Models\Item;
+use Database\Seeders\Support\ItemPool;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +24,7 @@ class BankFactory extends Factory
         $tabs = [];
 
         for ($t = 0; $t < $tabCount; $t++) {
-            $ids = Item::randomItemIds($this->faker->numberBetween(5, 25));
+            $ids = ItemPool::ids($this->faker->numberBetween(5, 25), $this->faker);
             $tabs[] = array_map(fn (int $id) => [$id, $this->faker->numberBetween(1, 100_000)], $ids);
         }
 

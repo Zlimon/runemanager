@@ -108,10 +108,10 @@ it('ranks the diaries leaderboard by tiers completed', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Hiscores/Diaries/Show')
-            ->has('hiscores', 2)
-            ->where('hiscores.0.account.username', 'Maxed')
-            ->where('hiscores.0.completed', 4)
-            ->where('hiscores.1.account.username', 'Starter')
-            ->where('hiscores.1.completed', 1),
+            ->has('hiscores.data', 2)
+            ->where('hiscores.data.0.account.username', 'Maxed')
+            ->where('hiscores.data.0.completed', 4)
+            ->where('hiscores.data.1.account.username', 'Starter')
+            ->where('hiscores.data.1.completed', 1),
         );
 });

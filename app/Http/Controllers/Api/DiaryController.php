@@ -4,30 +4,26 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateDiariesRequest;
 use App\Models\Account;
 use App\Models\AccountDiary;
 use App\Support\Diaries;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
- * SPEC §5.2 — Achievement Diary completion push from the plugin. Snapshot upsert
+ * Achievement Diary completion push from the plugin. Snapshot upsert
  * of the {area: {tier: bool}} map, normalised against the canonical diary set.
  *
  * The Account is resolved by the plugin.account middleware.
  */
 class DiaryController extends Controller
 {
-    public function update(Request $request): JsonResponse
+    public function update(UpdateDiariesRequest $request): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        $request->validate([
-            'diaries' => ['present', 'array'],
-        ]);
-
-        $diaries = Diaries::normalise((array) $request->input('diaries'));
+        $diaries = Diaries::normalise((array) $request->validated('diaries'));
 
         AccountDiary::updateOrCreate(
             ['account_id' => $account->id],

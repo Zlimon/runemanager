@@ -2,27 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 /**
- * SPEC §8 Live Feed — one row per qualifying in-game event surfaced by the
+ * A Live Feed entry: one row per qualifying in-game event surfaced by the
  * push pipeline. Event types are open-ended (kept as strings rather than an
  * enum) so adding a new event source — combat achievement, collection log
  * slot, group bank drop — doesn't require a migration.
- *
- * @property int $id
- * @property int $account_id
- * @property string $type
- * @property array<string, mixed> $payload
- * @property Carbon $occurred_at
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property-read Account $account
  */
+#[Fillable(['account_id', 'type', 'payload', 'screenshot_path', 'pinned_at', 'occurred_at'])]
 class FeedEvent extends Model
 {
     use HasFactory;
@@ -43,39 +36,43 @@ class FeedEvent extends Model
 
     public const TYPE_REWARD = 'reward';
 
-    protected $fillable = [
-        'account_id',
-        'type',
-        'payload',
-        'screenshot_path',
-        'pinned_at',
-        'occurred_at',
-    ];
-
-    protected $casts = [
-        'payload' => 'array',
-        'occurred_at' => 'datetime',
-        'pinned_at' => 'datetime',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'payload' => 'array',
+            'occurred_at' => 'datetime',
+            'pinned_at' => 'datetime',
+        ];
+    }
 
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
     }
 
-    public function scopeRecent(Builder $query, int $limit = 50): Builder
+    #[Scope]
+    protected function recent(Builder $query, int $limit = 50): void
     {
-        return $query->orderByDesc('occurred_at')->orderByDesc('id')->limit($limit);
+        $query->orderByDesc('occurred_at')->orderByDesc('id')->limit($limit);
     }
 
-    public function scopeOfType(Builder $query, string $type): Builder
+    #[Scope]
+    protected function ofType(Builder $query, string $type): void
     {
-        return $query->where('type', $type);
+        $query->where('type', $type);
     }
 
-    /** Pinned events, newest pin first — drives the account achievement gallery. */
-    public function scopePinned(Builder $query): Builder
+    /**
+     * Pinned events, newest pin first — drives the account achievement gallery.
+     */
+    #[Scope]
+    protected function pinned(Builder $query): void
     {
-        return $query->whereNotNull('pinned_at')->orderByDesc('pinned_at');
+        $query->whereNotNull('pinned_at')->orderByDesc('pinned_at');
     }
 }

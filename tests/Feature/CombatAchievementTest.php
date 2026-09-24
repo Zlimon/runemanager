@@ -148,11 +148,11 @@ it('ranks the combat achievements leaderboard by points', function () {
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Hiscores/CombatAchievements/Show')
-            ->has('hiscores', 2)
-            ->where('hiscores.0.account.username', 'Maxed')
-            ->where('hiscores.0.points', 1500)
-            ->where('hiscores.0.tasks_completed', 101)
-            ->where('hiscores.1.account.username', 'Starter')
-            ->where('hiscores.1.points', 40),
+            ->has('hiscores.data', 2)
+            ->where('hiscores.data.0.account.username', 'Maxed')
+            ->where('hiscores.data.0.points', 1500)
+            ->where('hiscores.data.0.tasks_completed', 101)
+            ->where('hiscores.data.1.account.username', 'Starter')
+            ->where('hiscores.data.1.points', 40),
         );
 });

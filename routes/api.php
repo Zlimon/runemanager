@@ -24,7 +24,13 @@ use App\Http\Controllers\Api\VitalsController;
 use App\Http\Controllers\UserResourcePackController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+// Throttled with Fortify's named `login` limiter (5/min per email + IP, defined
+// in FortifyServiceProvider). The api middleware group carries no throttle of
+// its own, and sharing the limiter with the web login means one credential has
+// one budget across both surfaces.
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:login')
+    ->name('api.login');
 
 Route::middleware([
     'auth:sanctum',
@@ -40,25 +46,25 @@ Route::middleware([
     Route::middleware('plugin.account')->prefix('/plugin')->group(function () {
         Route::put('/inventory', [InventoryController::class, 'update'])->name('api.plugin.inventory');
         Route::put('/bank', [BankController::class, 'update'])->name('api.plugin.bank');
-        // SPEC §5.2 — shared Group Ironman group bank (GROUP mode); singleton, overwritten.
+        // Shared Group Ironman group bank (GROUP mode); singleton, overwritten.
         Route::put('/group-bank', [GroupBankController::class, 'update'])->name('api.plugin.group-bank');
         Route::put('/equipment', [EquipmentController::class, 'update'])->name('api.plugin.equipment');
         Route::put('/quests', [QuestController::class, 'update'])->name('api.plugin.quests');
-        // SPEC §5.2 — Achievement Diary completion snapshot.
+        // Achievement Diary completion snapshot.
         Route::put('/diaries', [DiaryController::class, 'update'])->name('api.plugin.diaries');
-        // SPEC §5.2/§7.1 — Combat Achievement points + per-tier status snapshot,
-        // plus a live task-unlock that records a feed event (§8.1).
+        // Combat Achievement points + per-tier status snapshot,
+        // plus a live task-unlock that records a feed event.
         Route::put('/combat-achievements', [CombatAchievementController::class, 'update'])
             ->name('api.plugin.combat-achievements');
         Route::post('/combat-achievements/unlock', [CombatAchievementController::class, 'unlock'])
             ->name('api.plugin.combat-achievements.unlock');
-        // SPEC §8.1 — collection-log slot unlock → live feed (the full log is
+        // Collection-log slot unlock → live feed (the full log is
         // pulled from TempleOSRS, not pushed).
         Route::post('/collection-log/unlock', [CollectionLogController::class, 'unlock'])
             ->name('api.plugin.collection-log.unlock');
-        // SPEC §8.1 — simple plugin-detected notable events (pet/death/reward).
+        // Simple plugin-detected notable events (pet/death/reward).
         Route::post('/feed', [PluginFeedController::class, 'store'])->name('api.plugin.feed');
-        // SPEC §8 — a clean screenshot attached to the matching feed event.
+        // A clean screenshot attached to the matching feed event.
         Route::post('/feed/screenshot', [FeedScreenshotController::class, 'store'])
             ->name('api.plugin.feed.screenshot');
         Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
@@ -74,21 +80,21 @@ Route::middleware([
         Route::put('/vitals', [VitalsController::class, 'update'])->name('api.plugin.vitals');
         // Current in-game activity (Discord-plugin style) for the account cards/header.
         Route::put('/status', [StatusController::class, 'update'])->name('api.plugin.status');
-        // SPEC §7 — ask the server to refresh stats (skills/bosses/clues) from
+        // Ask the server to refresh stats (skills/bosses/clues) from
         // the official OSRS hiscores. Part of the login full-account snapshot.
         Route::put('/hiscores', [HiscoreController::class, 'sync'])->name('api.plugin.hiscores');
-        // SPEC §5.2 — in-game clan name + rank; mirrors onto website roles in CLAN mode.
+        // In-game clan name + rank; mirrors onto website roles in CLAN mode.
         Route::put('/clan', [ClanController::class, 'update'])->name('api.plugin.clan');
-        // In-game announcements (SPEC §9.2): pull unacknowledged, then ack each.
+        // In-game announcements: pull unacknowledged, then ack each.
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
         Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])
             ->name('api.plugin.announcements.acknowledge');
     });
 
-    // SPEC §5.2 — the owner's clan roster push. Outside plugin.account: it
+    // The owner's clan roster push. Outside plugin.account: it
     // bootstraps accounts (incl. the owner's own) from nothing, so it must not
-    // require the owner's account to already be resolved. Admin-gated in the
-    // controller.
+    // require the owner's account to already be resolved. Admin-gated in
+    // StoreClanRosterRequest::authorize().
     Route::post('/plugin/clan/roster', [ClanController::class, 'roster'])->name('api.plugin.clan.roster');
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it

@@ -3,13 +3,13 @@ import { ref, watch } from "vue";
 import debounce from 'lodash/debounce';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
-import InputLabel from "@/Components/InputLabel.vue";
-import Search from "@/Components/Search.vue";
-import SelectInput from "@/Components/SelectInput.vue";
-import AccountCard from "@/Components/AccountCard.vue";
-import ClickableCard from "@/Components/ClickableCard.vue";
-import PaginationItem from "@/Components/PaginationItem.vue";
-import Badge from "@/Components/Badge.vue";
+import InputLabel from "@/Components/Form/InputLabel.vue";
+import Search from "@/Components/Form/Search.vue";
+import SelectInput from "@/Components/Form/SelectInput.vue";
+import AccountCard from "@/Components/Cards/AccountCard.vue";
+import ClickableCard from "@/Components/Cards/ClickableCard.vue";
+import PaginationItem from "@/Components/Tables/PaginationItem.vue";
+import Badge from "@/Components/Display/Badge.vue";
 
 const props = defineProps({
     accountTypes: {

@@ -2,34 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Carbon;
 
-/**
- * @property int $id
- * @property int $user_id
- * @property string $title
- * @property string $body
- * @property Carbon|null $expires_at
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property-read User $user
- */
+#[Fillable(['user_id', 'title', 'body', 'expires_at'])]
 class Announcement extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'title',
-        'body',
-        'expires_at',
-    ];
-
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -44,7 +34,7 @@ class Announcement extends Model
 
     /**
      * OSRS accounts that have seen this announcement in-game (so the plugin
-     * doesn't show it again). SPEC §9.2.
+     * doesn't show it again).
      */
     public function acknowledgedBy(): BelongsToMany
     {
@@ -54,9 +44,10 @@ class Announcement extends Model
     /**
      * Not yet expired (no expiry, or expiry in the future), newest first.
      */
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): void
     {
-        return $query
+        $query
             ->where(fn (Builder $q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
             ->latest();
     }

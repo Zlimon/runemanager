@@ -52,20 +52,6 @@ class WebhookPayload
     /**
      * @return array<string, mixed>
      */
-    public static function ping(string $context): array
-    {
-        return self::embed(
-            config('app.name'),
-            "Test message — your {$context} webhook is connected. 🎉",
-            0x4CAF50,
-            null,
-            now()->toIso8601String(),
-        );
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
     private static function embed(string $title, string $description, int $color, ?string $url, ?string $timestamp, ?string $footer = null): array
     {
         $embed = array_filter([

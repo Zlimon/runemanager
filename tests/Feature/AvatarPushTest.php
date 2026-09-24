@@ -3,6 +3,7 @@
 use App\Events\AccountDataUpdated;
 use App\Models\Account;
 use App\Models\User;
+use App\Services\Accounts\StoreAvatar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -172,4 +173,41 @@ it('requires the account headers', function () {
     ], ['Accept' => 'application/json'])
         ->assertStatus(422)
         ->assertJsonValidationErrors(['X-Account-Hash', 'X-Account-Username']);
+});
+
+it('deletes the stale opponent model and material when the upload has no NPC', function () {
+    $account = Account::factory()->create();
+    $directory = "avatars/{$account->id}";
+    Storage::disk('public')->put("{$directory}/avatar_npc.obj", "v 1 0 0\n");
+    Storage::disk('public')->put("{$directory}/avatar_npc.mtl", "newmtl n0\n");
+
+    app(StoreAvatar::class)->store(
+        $account,
+        UploadedFile::fake()->createWithContent('player.obj', "v 0 0 0\n"),
+        null,
+        null,
+        null,
+    );
+
+    Storage::disk('public')->assertExists("{$directory}/avatar.obj");
+    Storage::disk('public')->assertMissing("{$directory}/avatar_npc.obj");
+    Storage::disk('public')->assertMissing("{$directory}/avatar_npc.mtl");
+    expect($account->fresh()->avatar_uploaded_at)->not->toBeNull();
+});
+
+it('deletes a stale opponent material when the NPC model arrives without one', function () {
+    $account = Account::factory()->create();
+    $directory = "avatars/{$account->id}";
+    Storage::disk('public')->put("{$directory}/avatar_npc.mtl", "newmtl n0\n");
+
+    app(StoreAvatar::class)->store(
+        $account,
+        UploadedFile::fake()->createWithContent('player.obj', "v 0 0 0\n"),
+        null,
+        UploadedFile::fake()->createWithContent('npc.obj', "v 1 0 0\n"),
+        null,
+    );
+
+    Storage::disk('public')->assertExists("{$directory}/avatar_npc.obj");
+    Storage::disk('public')->assertMissing("{$directory}/avatar_npc.mtl");
 });

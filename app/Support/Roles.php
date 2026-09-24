@@ -6,7 +6,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 /**
- * SPEC §3.4 — the site's base access-control model, independent of instance
+ * The site's base access-control model, independent of instance
  * mode. There are two base roles: `Owner` (holds every permission) and `User`
  * (the default for new accounts, no management permissions). Clan/group-derived
  * elevation is layered on top of this later.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AccountTypesEnum;
+use App\Http\Requests\FilterAccountsRequest;
 use App\Http\Resources\AccountResource;
 use App\Http\Resources\BankResource;
 use App\Http\Resources\FeedEventResource;
@@ -11,9 +12,7 @@ use App\Http\Resources\LootingBagResource;
 use App\Http\Resources\LootResource;
 use App\Models\Account;
 use App\Models\FeedEvent;
-use App\Models\Item;
-use App\Rules\AccountUsernameRule;
-use App\Services\CollectionLog\CollectionLogStructure;
+use App\Services\CollectionLog\CollectionLogView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -21,18 +20,12 @@ use Inertia\Response;
 
 class AccountController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(FilterAccountsRequest $request): Response
     {
         $allAccountTypes = array_values(AccountTypesEnum::returnAllAccountTypes());
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-            'username' => ['nullable', 'string', new AccountUsernameRule],
-            'account_types' => ['nullable', 'array'],
-            'account_types.*' => ['string', 'in:'.implode(',', $allAccountTypes)],
-            'per_page' => ['nullable', 'integer', 'min:4', 'max:64'],
-        ]);
-
-        $query = Account::query()->searchUsername($validated['username'] ?? null);
+        $query = Account::query()->with('user')->searchUsername($validated['username'] ?? null);
 
         if (! empty($validated['account_types'] ?? [])) {
             $normalized = array_map(
@@ -57,7 +50,7 @@ class AccountController extends Controller
         ]);
     }
 
-    public function show(Request $request, Account $account): Response
+    public function show(Request $request, Account $account, CollectionLogView $collectionLogView): Response
     {
         $account->load('equipment', 'hiscore')->append(['skills', 'bosses', 'clues']);
 
@@ -95,10 +88,10 @@ class AccountController extends Controller
 
             'quests' => fn () => $account->quests,
 
-            // SPEC §5.2 — Achievement Diary completion ({area: {tier: bool}}).
+            // Achievement Diary completion ({area: {tier: bool}}).
             'diaries' => fn () => $account->diary?->diaries ?? [],
 
-            // SPEC §5.2/§7.1 — Combat Achievement points + per-tier status, or
+            // Combat Achievement points + per-tier status, or
             // null until the plugin has pushed a snapshot.
             'combatAchievements' => fn () => $account->combatAchievement
                 ? ['points' => $account->combatAchievement->points, 'tiers' => $account->combatAchievement->tiers]
@@ -106,27 +99,27 @@ class AccountController extends Controller
 
             'avatar' => fn () => $account->avatarPayload(),
 
-            // SPEC §5.2 Loot — append-only history. Latest 25 drops with hydrated
+            // Loot — append-only history. Latest 25 drops with hydrated
             // item details for the recent-loot panel.
             'recentLoot' => fn () => LootResource::collectionWith($account->recentLoot(25))->resolve(),
 
-            // SPEC §8 — this account's slice of the live feed.
+            // This account's slice of the live feed.
             'feed' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,user_id,username,account_type')
+                FeedEvent::query()
                     ->where('account_id', $account->id)->recent(20)->get(),
             )->resolve(),
 
-            // SPEC §8 — owner-pinned events shown as the achievement gallery.
+            // Owner-pinned events shown as the achievement gallery.
             'pinnedFeed' => fn () => FeedEventResource::collectionWith(
-                FeedEvent::query()->with('account:id,user_id,username,account_type')
+                FeedEvent::query()
                     ->where('account_id', $account->id)->pinned()->get(),
             )->resolve(),
 
             // External API — defer so the page paints first, then the client
             // pulls this in via a follow-up partial reload.
-            'collectionLog' => Inertia::defer(fn () => $this->buildCollectionLog($account, $request, app(CollectionLogStructure::class))),
+            'collectionLog' => Inertia::defer(fn () => $collectionLogView->build($account, $request->query('ccollection'))),
 
-            // Per SPEC §5.3 — one timestamp per data type, plus the staleness
+            // One timestamp per data type, plus the staleness
             // threshold the UI uses to flag old data.
             'freshness' => fn () => [
                 'hiscores' => optional($account->hiscore)->fetched_at?->toIso8601String(),
@@ -142,106 +135,5 @@ class AccountController extends Controller
                 'stale_after_minutes' => (int) config('runemanager.freshness.stale_after_minutes'),
             ],
         ]);
-    }
-
-    /**
-     * SPEC §5.2 — build the collection log view from the stored TempleOSRS data.
-     * The player sync only returns *obtained* items per category, so we overlay
-     * it on the full TempleOSRS structure (every category's complete item list,
-     * grouped) to show missing items and real per-category totals — mirroring the
-     * TempleOSRS UI. One category's items are loaded at a time (via ?ccollection)
-     * to keep the payload small.
-     *
-     * @return array<string, mixed>|null
-     */
-    private function buildCollectionLog(Account $account, Request $request, CollectionLogStructure $structure): ?array
-    {
-        $log = $account->collectionLog;
-        if ($log === null) {
-            return null;
-        }
-
-        $obtainedItems = $log->items ?? [];
-        $flat = $structure->flatten();
-        // Fall back to the obtained-only set if the structure can't be fetched, so
-        // the panel still works offline (no missing items / real totals then).
-        $catIds = $flat['ids'] ?: array_map(
-            fn (array $entries): array => array_map(fn (array $e): int => (int) $e['id'], $entries),
-            $obtainedItems,
-        );
-
-        $categories = [];
-        foreach ($catIds as $slug => $ids) {
-            $obtainedCount = count(array_intersect($ids, array_column($obtainedItems[$slug] ?? [], 'id')));
-            $categories[$slug] = [
-                'slug' => $slug,
-                'name' => $this->prettyCategoryName($slug),
-                'group' => $flat['group'][$slug] ?? 'other',
-                'obtained' => $obtainedCount,
-                'total' => count($ids),
-            ];
-        }
-        uasort($categories, fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
-
-        $requested = $request->query('ccollection');
-        $activeSlug = ($requested && isset($categories[$requested]))
-            ? $requested
-            : (array_key_first($categories) ?: null);
-
-        $activeCollection = $activeSlug !== null
-            ? $this->loadCollectionItems($categories[$activeSlug], $catIds[$activeSlug], $obtainedItems[$activeSlug] ?? [])
-            : null;
-
-        return [
-            'categories' => array_values($categories),
-            'activeSlug' => $activeSlug,
-            'activeCollection' => $activeCollection,
-            'obtained' => (int) $log->obtained,
-            'total' => (int) $log->total,
-            'fetchedAt' => $log->fetched_at?->toIso8601String(),
-        ];
-    }
-
-    /**
-     * Hydrate one category's full ordered item list with icon/name/examine, marking
-     * which the player has obtained (with quantity + date) and which are missing.
-     *
-     * @param  array<string, mixed>  $summary
-     * @param  list<int>  $orderedIds  the category's complete item list, in display order
-     * @param  array<int, array<string, mixed>>  $obtained  the player's obtained entries
-     * @return array<string, mixed>
-     */
-    private function loadCollectionItems(array $summary, array $orderedIds, array $obtained): array
-    {
-        // Items store the OSRS id in the `id` field (Mongo `_id` is an ObjectId),
-        // so reuse the shared lookup the inventory/bank/loot panels use.
-        $details = Item::lookupByOsrsIds($orderedIds);
-        $obtainedById = collect($obtained)->keyBy(fn (array $e): int => (int) $e['id']);
-
-        $slots = array_map(function (int $id) use ($details, $obtainedById): array {
-            $entry = $obtainedById->get($id);
-
-            return [
-                'id' => $id,
-                'item' => $details[$id] ?? null,
-                'quantity' => (int) ($entry['count'] ?? 0),
-                'date' => $entry['date'] ?? null,
-                'obtained' => $entry !== null,
-            ];
-        }, $orderedIds);
-
-        return [
-            'slug' => $summary['slug'],
-            'name' => $summary['name'],
-            'group' => $summary['group'],
-            'obtained' => $summary['obtained'],
-            'total' => $summary['total'],
-            'items' => $slots,
-        ];
-    }
-
-    private function prettyCategoryName(string $slug): string
-    {
-        return ucwords(str_replace('_', ' ', $slug));
     }
 }

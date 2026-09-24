@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * SPEC §10 — shared calendar of in-game events for the instance.
+     * Shared calendar of in-game events for the instance.
      */
     public function up(): void
     {

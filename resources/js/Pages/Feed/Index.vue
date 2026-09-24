@@ -2,8 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Card from "@/Components/Card.vue";
-import FeedEventItem from "@/Components/Game/FeedEventItem.vue";
+import Card from "@/Components/Cards/Card.vue";
+import FeedEventItem from "@/Components/Game/Feed/FeedEventItem.vue";
 import { visibleFeedEvents } from "@/feed";
 
 const props = defineProps({
@@ -13,7 +13,7 @@ const props = defineProps({
     },
 });
 
-// SPEC §8.3 — live over websockets. Seed from the server-rendered list, then
+// Live over websockets. Seed from the server-rendered list, then
 // prepend events broadcast on the public `feed` channel.
 const events = ref([...props.events]);
 const MAX_EVENTS = 100;

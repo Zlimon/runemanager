@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // The Owner holds every permission (SPEC §3.4). Management abilities are
+        // The Owner holds every permission. Management abilities are
         // checked via Spatie permissions (manage instance/members/…). Clan/group
         // elevation of other users is layered on later.
         Gate::before(fn (User $user) => $user->hasRole(Roles::OWNER) ? true : null);

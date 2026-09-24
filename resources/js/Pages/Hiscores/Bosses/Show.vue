@@ -1,8 +1,8 @@
 <script setup>
-import { computed, ref } from "vue";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import HiscoresHeader from "@/Pages/Hiscores/Partials/HiscoresHeader.vue";
-import LeaderboardTable from "@/Components/LeaderboardTable.vue";
+import LeaderboardTable from "@/Components/Tables/LeaderboardTable.vue";
+import { useHiscoreBoard } from "@/composables/useHiscoreBoard";
 
 const props = defineProps({
     collectionName: {
@@ -14,7 +14,11 @@ const props = defineProps({
         required: true,
     },
     hiscores: {
-        type: Array,
+        type: Object,
+        required: true,
+    },
+    filters: {
+        type: Object,
         required: true,
     },
 });
@@ -24,17 +28,7 @@ const columns = [
     { label: 'Score', key: 'kill_count', format: 'number' },
 ];
 
-const search = ref('');
-const filteredHiscores = computed(() => {
-    if (!search.value) {
-        return props.hiscores;
-    }
-
-    const needle = search.value.toLowerCase();
-    return props.hiscores.filter((hiscore) =>
-        hiscore.account.username.toLowerCase().includes(needle),
-    );
-});
+const { search, sortBy, error } = useHiscoreBoard(() => props.filters);
 </script>
 
 <template>
@@ -42,8 +36,9 @@ const filteredHiscores = computed(() => {
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="relative overflow-x-auto sm:rounded-lg">
-                    <HiscoresHeader :title="collectionName" v-model:search="search" />
-                    <LeaderboardTable :columns="columns" :rows="filteredHiscores" />
+                    <HiscoresHeader :title="collectionName" v-model:search="search" :error="error" />
+                    <LeaderboardTable :columns="columns" :hiscores="hiscores" :filters="filters"
+                                      @sort="sortBy" />
                 </div>
             </div>
         </div>

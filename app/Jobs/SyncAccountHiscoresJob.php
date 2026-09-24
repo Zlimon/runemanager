@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * SPEC §7 — fetch the account's stats (skills, bosses, clues) from the official
+ * Fetch the account's stats (skills, bosses, clues) from the official
  * OSRS hiscores and upsert its AccountHiscore. Queued because it hits an
  * external API; triggered by the plugin's full-account snapshot on login.
  */

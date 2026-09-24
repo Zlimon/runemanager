@@ -4,13 +4,14 @@ namespace App\Http\Resources;
 
 use App\Models\FeedEvent;
 use App\Models\Item;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Plain wire shape for SPEC §8 feed events. Account is included slim — the
+ * Plain wire shape for live feed events. Account is included slim — the
  * UI links back to the account page, so we just need username + type for
  * the ironman badge. Loot-drop items are hydrated with their name + icon so
  * the feed can name the drop.
@@ -27,9 +28,15 @@ class FeedEventResource extends JsonResource
 
     /**
      * Hydrate loot-item names/icons across a whole feed page in one Mongo query.
+     * The slim account (with `user_id`, which drives the owner's pin/delete
+     * controls) is eager-loaded here, so callers only hand over the events.
+     *
+     * @param  EloquentCollection<int, FeedEvent>  $events
      */
-    public static function collectionWith(iterable $events): ResourceCollection
+    public static function collectionWith(EloquentCollection $events): ResourceCollection
     {
+        $events->loadMissing('account:id,user_id,username,account_type');
+
         $itemIds = [];
         foreach ($events as $event) {
             if ($event->type === FeedEvent::TYPE_LOOT_DROP) {

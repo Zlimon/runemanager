@@ -6,8 +6,8 @@ use App\Models\GroupBank;
 use App\Models\Inventory;
 use App\Models\Loot;
 use App\Models\LootingBag;
-use App\Models\Npc;
 use App\Models\Quest;
+use App\Models\ResourcePack;
 use App\Models\User;
 use App\Support\Roles;
 use Tests\TestCase;
@@ -32,12 +32,12 @@ uses(TestCase::class)->in('Feature', 'Unit');
 | testing database) keeps this cheap and avoids racing the unique-index
 | migrations that run against these same collections.
 |
-| Extend this list if a new model adds `protected $connection = 'mongodb'`.
+| Extend this list if a new model adds `#[Connection('mongodb')]`.
 */
 
 pest()->beforeEach(function () {
     try {
-        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Npc::class, Quest::class] as $model) {
+        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class] as $model) {
             $model::query()->delete();
         }
     } catch (Throwable) {
@@ -55,4 +55,20 @@ function adminUser(string $role = Roles::OWNER): User
     Roles::sync();
 
     return tap(User::factory()->withPersonalTeam()->create())->assignRole($role);
+}
+
+/**
+ * A dark-drawn resource pack row, shared by the dark-mode and appearance tests.
+ */
+function darkPack(string $name = 'pack-darkish'): ResourcePack
+{
+    return ResourcePack::query()->forceCreate([
+        'name' => $name,
+        'alias' => 'Darkish',
+        'version' => '1.0.0',
+        'author' => 'test',
+        'url' => "https://example.test/{$name}.zip",
+        'tags' => '',
+        'dark_mode' => true,
+    ]);
 }

@@ -52,3 +52,13 @@ it('derives online within the presence window and offline past it', function () 
     expect($offline->isOnline())->toBeFalse();
     expect($never->isOnline())->toBeFalse();
 });
+
+it('selects the same accounts with the online scope as isOnline reports', function () {
+    config()->set('runemanager.presence.online_within_minutes', 3);
+
+    $online = Account::factory()->create(['last_seen_at' => now()->subMinute()]);
+    Account::factory()->create(['last_seen_at' => now()->subMinutes(10)]);
+    Account::factory()->create(['last_seen_at' => null]);
+
+    expect(Account::query()->online()->pluck('id')->all())->toBe([$online->id]);
+});

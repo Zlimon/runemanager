@@ -228,7 +228,7 @@ it('does not clear the toggle when the plugin re-pushes the pack already in effe
     $pack = syncPack('pack-dark', true);
     $user = syncUser(['resource_pack_id' => $pack->id, 'dark_mode' => false]);
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
     Sanctum::actingAs($user);
 
     $this->putJson('/api/plugin/resource-pack', ['name' => 'pack-dark'])->assertStatus(200);
@@ -241,7 +241,7 @@ it('clears the toggle when the plugin pushes a different in-game pack', function
     syncPack('pack-dark', true);
     $user = syncUser(['resource_pack_id' => $light->id, 'dark_mode' => false]);
 
-    $this->mock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
+    $this->partialMock(InstallResourcePack::class, fn ($m) => $m->shouldReceive('isInstalled')->andReturn(true));
     Sanctum::actingAs($user);
 
     $this->putJson('/api/plugin/resource-pack', ['name' => 'pack-dark'])->assertStatus(200);

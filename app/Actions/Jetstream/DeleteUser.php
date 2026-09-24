@@ -24,6 +24,12 @@ class DeleteUser implements DeletesUsers
             $this->deleteTeams($user);
             $user->deleteProfilePhoto();
             $user->tokens->each->delete();
+            // An OSRS account outlives the user who claimed it and goes back to
+            // the roster as unclaimed. The foreign key nulls this too, but doing
+            // it here keeps the behaviour the same on a connection where foreign
+            // keys are not enforced — a left-behind id would hide the account
+            // from the "unclaimed accounts" list and strand it.
+            $user->account()->update(['user_id' => null]);
             $user->delete();
         });
     }

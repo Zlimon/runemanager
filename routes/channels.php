@@ -12,3 +12,7 @@ Broadcast::channel('map', fn ($user) => $user !== null);
 // Account Show — any authenticated user may watch an account's live data updates
 // (profiles are viewable by any logged-in user).
 Broadcast::channel('account.{accountId}', fn ($user, $accountId) => $user !== null);
+
+// Group Bank — any authenticated user may watch the shared bank for changes
+// (the page itself is auth-gated and GROUP-only).
+Broadcast::channel('group-bank', fn ($user) => $user !== null);

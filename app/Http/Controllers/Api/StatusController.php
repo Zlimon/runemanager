@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\AccountStatusUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateStatusRequest;
 use App\Models\Account;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class StatusController extends Controller
 {
@@ -17,17 +17,12 @@ class StatusController extends Controller
      *
      * The Account is resolved by the plugin.account middleware.
      */
-    public function update(Request $request): JsonResponse
+    public function update(UpdateStatusRequest $request): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        $validated = $request->validate([
-            'activity' => ['nullable', 'string', 'max:60'],
-            'activity_icon' => ['nullable', 'string', 'max:40'],
-            'location' => ['nullable', 'string', 'max:60'],
-            'world' => ['nullable', 'integer', 'min:1', 'max:1000'],
-        ]);
+        $validated = $request->validated();
 
         $account->forceFill([
             'activity' => $validated['activity'] ?? null,

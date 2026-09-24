@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // Per-user resource pack override. NULL = use the instance default
-            // from settings.resource_pack_id (set by `resourcepack:switch`).
+            // from settings.resource_pack_id (set from Settings → General).
             $table->foreignId('resource_pack_id')
                 ->nullable()
                 ->after('icon_id')

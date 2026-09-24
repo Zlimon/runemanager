@@ -208,6 +208,23 @@ it('refuses to withdraw from an event that has taken place', function () {
     expect(CalendarEventRsvp::count())->toBe(1);
 });
 
+it('refuses an rsvp to a passed event before validating the payload', function () {
+    $event = CalendarEvent::factory()->for(adminUser())->create([
+        'starts_at' => now()->subWeek(),
+        'ends_at' => null,
+    ]);
+
+    $this->actingAs(adminUser(Roles::USER))
+        ->postJson(route('calendar.rsvp', $event), [])
+        ->assertForbidden()
+        ->assertJsonPath('message', 'This event has already taken place.');
+
+    $this->actingAs(adminUser(Roles::USER))
+        ->deleteJson(route('calendar.rsvp.destroy', $event), [])
+        ->assertForbidden()
+        ->assertJsonPath('message', 'This event has already taken place.');
+});
+
 it('treats a multi-day event as open until it ends', function () {
     $member = adminUser(Roles::USER);
     $account = Account::factory()->for($member)->create();

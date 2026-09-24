@@ -64,7 +64,7 @@ it('lets admins view the dashboard', function () {
         ->get(route('admin.dashboard'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Admin/Dashboard')
+            ->component('Admin/Dashboard/Index')
             ->has('stats')
             ->where('mode', Instance::MODE_CASUAL),
         );
@@ -107,7 +107,7 @@ it('validates the instance mode', function () {
         ->assertJsonValidationErrors('instance_mode');
 });
 
-it('rejects a GIM group name the OSRS hiscores does not know (SPEC §2.2)', function () {
+it('rejects a GIM group name the OSRS hiscores does not know', function () {
     fakeGimValidator(false);
 
     $this->actingAs(adminUser())
@@ -211,7 +211,7 @@ it('lists installed packs with installer name and usage count', function () {
         ->get(route('admin.packs'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Admin/Packs')
+            ->component('Admin/Packs/Index')
             ->has('installed', 1)
             ->where('installed.0.installed_by', 'Zezima')
             ->where('installed.0.users_count', 2)

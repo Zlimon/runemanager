@@ -2,61 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\SettingHelper;
+use App\Http\Requests\HubPackNameRequest;
+use App\Http\Requests\UpdatePluginResourcePackRequest;
+use App\Http\Requests\UpdateResourcePackPreferenceRequest;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
-use App\Models\User;
 use App\Services\ResourcePacks\DeleteResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
+use App\Services\ResourcePacks\PackInstallQuota;
 use App\Services\ResourcePacks\ResourcePackHub;
+use App\Services\ResourcePacks\SelectResourcePack;
 use App\Support\Instance;
-use App\Support\Roles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
-use Inertia\Response;
 
 /**
  * Manage the authenticated user's per-user resource pack override.
  *
  * This is the user's own preference only — never touches the instance-global
- * pack (settings.resource_pack_id, managed by the resourcepack:switch artisan).
+ * pack (settings.resource_pack_id, managed from Settings → General).
  * The resolution hierarchy lives in {@see User::effectiveResourcePackId()}.
  */
 class UserResourcePackController extends Controller
 {
     /**
-     * SPEC §6.2 — the user's appearance page: pick a personal override from the
-     * installed packs, and browse the community hub to install new ones (so
-     * members no longer depend on the RuneLite plugin to add a pack).
-     */
-    public function index(Request $request, InstallResourcePack $installer, ResourcePackHub $hub): Response
-    {
-        $installer->ensureVanilla();
-
-        $user = $request->user();
-
-        return Inertia::render('Themes/Index', [
-            'packs' => ResourcePack::pickerList(),
-            'hubPacks' => $hub->available(),
-            'selectedId' => $user->resource_pack_id,
-            'noPack' => $user->disable_resource_pack,
-            'defaultId' => ((int) SettingHelper::getSetting('resource_pack_id', 0)) ?: null,
-            'installLimit' => $this->installLimit(),
-            'installedCount' => $this->userInstallCount($user),
-            'canInstall' => $this->canInstallMore($user),
-        ]);
-    }
-
-    /**
      * Website / API: set the override by id. Inertia requests get a redirect
      * back (the picker full-reloads to swap the server-rendered pack CSS); API
      * callers get JSON.
      */
-    public function update(Request $request): JsonResponse|RedirectResponse
+    public function update(UpdateResourcePackPreferenceRequest $request, SelectResourcePack $selector): JsonResponse|RedirectResponse
     {
         $user = $request->user();
 
@@ -64,18 +40,13 @@ class UserResourcePackController extends Controller
             return $this->updateForGuest($request);
         }
 
-        if ($request->input('resource_pack_id') === ResourcePack::GUEST_NO_PACK) {
+        $choice = $request->validated('resource_pack_id');
+
+        if ($choice === ResourcePack::GUEST_NO_PACK) {
             // Explicit "no resource pack": plain interface, clear any selection.
-            $this->applySelection($user, null, true);
+            $selector->select($user, null, true);
         } else {
-            $validated = $request->validate([
-                'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
-            ]);
-            $this->applySelection(
-                $user,
-                isset($validated['resource_pack_id']) ? (int) $validated['resource_pack_id'] : null,
-                false,
-            );
+            $selector->select($user, $choice !== null ? (int) $choice : null, false);
         }
 
         if ($request->header('X-Inertia')) {
@@ -94,19 +65,12 @@ class UserResourcePackController extends Controller
      * cookie instead of on an account. Guests need this to reach the untextured
      * interface, which is the only one offering a light/dark toggle.
      */
-    private function updateForGuest(Request $request): JsonResponse|RedirectResponse
+    private function updateForGuest(UpdateResourcePackPreferenceRequest $request): JsonResponse|RedirectResponse
     {
-        $choice = $request->input('resource_pack_id');
+        $choice = $request->validated('resource_pack_id');
 
-        if ($choice === ResourcePack::GUEST_NO_PACK) {
-            $value = ResourcePack::GUEST_NO_PACK;
-        } else {
-            $validated = $request->validate([
-                'resource_pack_id' => ['nullable', 'integer', 'exists:resource_packs,id'],
-            ]);
-            // Null clears the cookie back to "follow the instance default".
-            $value = isset($validated['resource_pack_id']) ? (string) $validated['resource_pack_id'] : null;
-        }
+        // Null clears the cookie back to "follow the instance default".
+        $value = $choice !== null ? (string) $choice : null;
 
         $cookie = $value === null
             ? cookie()->forget(Instance::RESOURCE_PACK_COOKIE)
@@ -120,7 +84,7 @@ class UserResourcePackController extends Controller
 
         // A guest's light/dark cookie is the same stale explicit choice a member
         // carries on their row; drop it on a real pack change for the same reason
-        // (see applySelection).
+        // (see SelectResourcePack::select()).
         if ((string) $value !== (string) $request->cookie(Instance::RESOURCE_PACK_COOKIE)) {
             $response = $response->withCookie(cookie()->forget(Instance::DARK_MODE_COOKIE));
         }
@@ -129,61 +93,26 @@ class UserResourcePackController extends Controller
     }
 
     /**
-     * Point the user's appearance at a new pack selection, and let the newly
-     * selected pack's own light/dark flag govern again.
-     *
-     * Picking a pack *is* choosing an appearance. Left alone, a toggle stored
-     * while a previous pack was active keeps winning forever
-     * ({@see Instance::resolveDarkMode()} puts the user's own flag at the top),
-     * so a pack drawn for dark chrome lands under the light theme and reads as
-     * unreadable. Rather than adding a second source of truth that fights that
-     * precedence, the now-stale explicit choice is dropped: resolution falls
-     * through to its next rungs — the owner's instance default, then the pack's
-     * flag — exactly as it does for a member who never touched the toggle. The
-     * toggle still works, and still wins, until the next pack change.
-     *
-     * Only a genuine change clears it, so re-saving the pack already in effect —
-     * or the plugin re-pushing the in-game pack on every login — leaves a
-     * deliberate preference alone.
-     */
-    private function applySelection(User $user, ?int $packId, bool $disabled): void
-    {
-        $changed = $user->resource_pack_id !== $packId
-            || (bool) $user->disable_resource_pack !== $disabled;
-
-        $user->resource_pack_id = $packId;
-        $user->disable_resource_pack = $disabled;
-
-        if ($changed) {
-            $user->dark_mode = null;
-        }
-
-        $user->save();
-    }
-
-    /**
      * Website: install a pack from the community hub and apply it as the user's
      * personal theme. Same pipeline as the plugin push, keyed on a hub branch
      * name (`pack-*`). Answers with JSON so the Appearance page can show a
      * spinner and poll {@see status()} until the download lands.
      */
-    public function install(Request $request, InstallResourcePack $installer): JsonResponse
+    public function install(HubPackNameRequest $request, SelectResourcePack $selector, PackInstallQuota $quota): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
-        ]);
+        $validated = $request->validated();
 
         $user = $request->user();
 
         // Only a brand-new pack counts against the member's quota — re-adding one
         // already in the shared pool just points them at it.
-        if (! ResourcePack::where('name', $validated['name'])->exists() && ! $this->canInstallMore($user)) {
+        if (! ResourcePack::where('name', $validated['name'])->exists() && ! $quota->allows($user)) {
             throw ValidationException::withMessages([
-                'name' => "You've reached your limit of {$this->installLimit()} installed packs. Delete one to add another.",
+                'name' => "You've reached your limit of {$quota->limit()} installed packs. Delete one to add another.",
             ]);
         }
 
-        $installed = $this->installAndSelect($validated['name'], $user, $installer);
+        $installed = $selector->installAndSelect($user, $validated['name']);
 
         return response()->json([
             'name' => $validated['name'],
@@ -217,19 +146,10 @@ class UserResourcePackController extends Controller
      * a fully-populated row). Polled by the Appearance page after an install so
      * it can reload — and apply the new theme — the moment the job lands.
      */
-    public function status(Request $request, InstallResourcePack $installer): JsonResponse
+    public function status(HubPackNameRequest $request, InstallResourcePack $installer): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
-        ]);
-
-        $name = $validated['name'];
-        $pack = ResourcePack::where('name', $name)->first();
-
         return response()->json([
-            'installed' => $pack !== null
-                && $installer->isInstalled($name)
-                && $pack->version !== 'pending',
+            'installed' => $installer->isReady($request->validated('name')),
         ]);
     }
 
@@ -240,13 +160,9 @@ class UserResourcePackController extends Controller
      * every page view. {@see ResourcePackHub::properties()} caches it and refuses
      * any name the hub does not list.
      */
-    public function hub(Request $request, ResourcePackHub $hub): JsonResponse
+    public function hub(HubPackNameRequest $request, ResourcePackHub $hub): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100', 'regex:/^pack-[A-Za-z0-9_-]+$/'],
-        ]);
-
-        $properties = $hub->properties($validated['name']);
+        $properties = $hub->properties($request->validated('name'));
 
         abort_if($properties === null, 404);
 
@@ -264,15 +180,23 @@ class UserResourcePackController extends Controller
      *   row if needed, queue a {@see FetchResourcePackJob}, record the user's
      *   preference, return 202. Once the job lands, the user's next page load
      *   (or focus-refresh) picks up the assets.
+     * - A pack the instance has never seen counts against the member's install
+     *   quota, exactly as {@see install()} does — otherwise the plugin is a way
+     *   around the cap, creating unbounded stub rows and hub fetches.
      */
-    public function updateFromPlugin(Request $request, InstallResourcePack $installer): JsonResponse
+    public function updateFromPlugin(UpdatePluginResourcePackRequest $request, SelectResourcePack $selector, PackInstallQuota $quota): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9_-]+$/'],
-        ]);
+        $name = $request->validated('name');
 
         $user = $request->user();
-        $installed = $this->installAndSelect($validated['name'], $user, $installer);
+
+        if (! ResourcePack::where('name', $name)->exists() && ! $quota->allows($user)) {
+            throw ValidationException::withMessages([
+                'name' => "You've reached your limit of {$quota->limit()} installed packs. Delete one to add another.",
+            ]);
+        }
+
+        $installed = $selector->installAndSelect($user, $name);
 
         return response()->json([
             'resource_pack_id' => $user->resource_pack_id,
@@ -280,62 +204,5 @@ class UserResourcePackController extends Controller
             'installed' => $installed,
             'queued' => ! $installed,
         ], $installed ? 200 : 202);
-    }
-
-    /**
-     * Ensure a ResourcePack row exists for $name, point the user's personal
-     * override at it, and queue a fetch when the assets aren't installed yet.
-     * Shared by the website install and the plugin push.
-     *
-     * Returns whether the pack is already fully installed — i.e. assets on disk
-     * AND a populated DB row. A stub row (version=pending, null colours) — newly
-     * created here or carried over from a migrate:fresh while the CSS survived on
-     * disk — still needs the pipeline to fetch metadata and extract the palette.
-     */
-    private function installAndSelect(string $name, User $user, InstallResourcePack $installer): bool
-    {
-        $pack = ResourcePack::where('name', $name)->first();
-
-        if (! $pack) {
-            $pack = new ResourcePack;
-            $pack->name = $name;
-            $pack->alias = Str::title(str_replace(['pack-', '-'], ' ', $name));
-            $pack->version = 'pending';
-            $pack->author = 'pending';
-            $pack->url = sprintf('https://github.com/melkypie/resource-packs/archive/%s.zip', $name);
-            $pack->tags = '';
-            $pack->dark_mode = false;
-            $pack->installed_by_user_id = $user->id;
-            $pack->save();
-        }
-
-        // Record the preference even before assets arrive — the Blade root falls
-        // through to the default until they do. Applying a pack re-enables textures.
-        $this->applySelection($user, $pack->id, false);
-
-        $installed = $installer->isInstalled($name) && $pack->version !== 'pending';
-
-        if (! $installed) {
-            FetchResourcePackJob::dispatch($name);
-        }
-
-        return $installed;
-    }
-
-    private function installLimit(): int
-    {
-        return (int) config('runemanager.resource_packs.user_install_limit', 5);
-    }
-
-    private function userInstallCount(User $user): int
-    {
-        return ResourcePack::where('installed_by_user_id', $user->id)->count();
-    }
-
-    /** The owner manages packs instance-wide, so the per-member quota doesn't apply. */
-    private function canInstallMore(User $user): bool
-    {
-        return $user->can(Roles::MANAGE_INSTANCE)
-            || $this->userInstallCount($user) < $this->installLimit();
     }
 }

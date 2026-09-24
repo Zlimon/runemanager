@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Tracks which OSRS accounts have seen each announcement in-game, so the
-        // plugin only shows it once (SPEC §9.2).
+        // plugin only shows it once.
         Schema::create('announcement_account', function (Blueprint $table) {
             $table->id();
             $table->foreignId('announcement_id')->constrained()->cascadeOnDelete();

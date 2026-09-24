@@ -23,7 +23,7 @@ class CreateAccountsTable extends Migration
         Schema::create('accounts', function (Blueprint $table) use ($accountTypes) {
             $table->id();
             // Nullable so a clan/group owner can pre-seed roster accounts that are
-            // claimed on the member's first plugin login (SPEC §5.2).
+            // claimed on the member's first plugin login.
             $table->foreignId('user_id')->nullable()->constrained();
             $table->string('account_hash')->nullable()->unique();
             $table->enum('account_type', $accountTypes);

@@ -83,7 +83,7 @@ it('renders the calendar index publicly with an upcoming widget', function () {
         'starts_at' => now()->addDays(2),
     ]);
 
-    // No actingAs — viewing is public per SPEC §10.2.
+    // No actingAs — viewing is public.
     $this->get(route('calendar.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
@@ -441,6 +441,13 @@ it('caps item search results and returns nothing for a blank term', function () 
         ->getJson(route('items.search', ['q' => '']))
         ->assertOk()
         ->assertJsonCount(0);
+});
+
+it('rejects an item search term longer than 64 characters', function () {
+    $this->actingAs(adminUser())
+        ->getJson(route('items.search', ['q' => str_repeat('a', 65)]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('q');
 });
 
 it('requires authentication to search items', function () {

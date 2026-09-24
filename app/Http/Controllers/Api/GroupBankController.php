@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\GroupBankUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateGroupBankRequest;
 use App\Models\GroupBank;
 use App\Support\Instance;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
- * SPEC §5.2 — any GROUP-mode member's plugin pushes the full shared group bank
+ * Any GROUP-mode member's plugin pushes the full shared group bank
  * whenever it changes. Stored as a single overwritten document and broadcast so
  * the shared Group Bank page updates live. No-op outside GROUP mode.
  *
@@ -18,13 +18,9 @@ use Illuminate\Http\Request;
  */
 class GroupBankController extends Controller
 {
-    public function update(Request $request): JsonResponse
+    public function update(UpdateGroupBankRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'group_bank' => ['present', 'array'],
-            'group_bank.*' => ['array', 'size:2'],
-            'group_bank.*.*' => ['integer'],
-        ]);
+        $validated = $request->validated();
 
         if (! Instance::isGroup()) {
             return response()->json(['data' => ['stored' => false]]);

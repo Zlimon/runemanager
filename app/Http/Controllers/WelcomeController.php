@@ -6,6 +6,7 @@ use App\Http\Resources\AccountResource;
 use App\Http\Resources\CalendarEventResource;
 use App\Models\Account;
 use App\Models\CalendarEvent;
+use App\Services\Instance\InstanceStats;
 use App\Support\Instance;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -20,21 +21,15 @@ class WelcomeController extends Controller
      * When the owner enables it, usernames in the showcase are masked so the
      * leaderboard can be shown publicly without revealing who's who.
      */
-    public function index(): Response
+    public function index(InstanceStats $stats): Response
     {
         $anonymize = Instance::publicAnonymizeAccounts();
 
-        return Inertia::render('Welcome', [
+        return Inertia::render('Welcome/Index', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
             'anonymized' => $anonymize,
-            'stats' => [
-                'accounts' => Account::count(),
-                'members' => Account::query()->whereNotNull('user_id')->distinct()->count('user_id'),
-                'online' => Account::query()
-                    ->where('last_seen_at', '>=', now()->subMinutes((int) config('runemanager.presence.online_within_minutes')))
-                    ->count(),
-            ],
+            'stats' => $stats->counts(),
             'upcoming' => CalendarEventResource::collection(
                 CalendarEvent::with('user:id,name')->upcoming()->limit(5)->get(),
             )->resolve(),
@@ -43,31 +38,28 @@ class WelcomeController extends Controller
     }
 
     /**
-     * Top five accounts by total level. When anonymising, real usernames never
-     * leave the server — each is replaced with a masked label.
+     * Top five accounts by total level. When anonymising, only what the
+     * showcase draws leaves the server: a masked username, the account type and
+     * the total level. Everything else (ids, exact XP, ranks, clan titles, dates)
+     * is left out, since exact XP alone can be looked up on the OSRS hiscores.
      *
      * @return list<array<string, mixed>>
      */
     private function topAccounts(bool $anonymize): array
     {
         $accounts = AccountResource::collection(
-            Account::query()->with('user')
-                ->where('level', '>', 0)
-                ->orderByDesc('level')
-                ->orderByDesc('xp')
-                ->limit(5)
-                ->get(),
+            Account::query()->with('user')->topByLevel(5)->get(),
         )->resolve();
 
         if (! $anonymize) {
             return $accounts;
         }
 
-        return array_map(function (array $account): array {
-            $account['username'] = $this->maskUsername((string) $account['username']);
-
-            return $account;
-        }, $accounts);
+        return array_map(fn (array $account): array => [
+            'username' => $this->maskUsername((string) $account['username']),
+            'account_type' => $account['account_type'],
+            'level' => $account['level'],
+        ], $accounts);
     }
 
     /** Keep the first letter, mask the rest — e.g. "Zezima" → "Z•••••". */

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Requests\UpdateDarkModeRequest;
 use App\Support\Instance;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 /**
  * Persist a viewer's light/dark preference.
@@ -18,13 +18,9 @@ use Illuminate\Http\Request;
  */
 class UserDarkModeController extends Controller
 {
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateDarkModeRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'dark_mode' => ['required', 'boolean'],
-        ]);
-
-        $dark = (bool) $validated['dark_mode'];
+        $dark = (bool) $request->validated('dark_mode');
         $user = $request->user();
 
         if ($user !== null) {

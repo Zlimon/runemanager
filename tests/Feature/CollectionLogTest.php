@@ -4,6 +4,8 @@ use App\Models\Account;
 use App\Models\CollectionLog;
 use App\Models\Item;
 use App\Models\User;
+use App\Services\CollectionLog\CollectionLogView;
+use App\Services\TempleOsrs\TempleOsrsClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use MongoDB\Driver\Exception\BulkWriteException;
@@ -143,4 +145,40 @@ it('overlays obtained items on the full category structure (obtained + missing)'
 
     $missing = collect($active['items'])->firstWhere('id', $missingId);
     expect($missing['obtained'])->toBeFalse();
+});
+
+it('falls back to the obtained-only categories when the structure is unavailable', function () {
+    $account = makeAccountForLog('Offline');
+
+    $this->mock(TempleOsrsClient::class)
+        ->shouldReceive('collectionLogStructure')->andReturn(null);
+
+    CollectionLog::create([
+        'account_id' => $account->id,
+        'obtained' => 3,
+        'total' => 1701,
+        'items' => [
+            'vorkath' => [['id' => 999991, 'count' => 1]],
+            'abyssal_sire' => [['id' => 999992, 'count' => 2], ['id' => 999993, 'count' => 1]],
+        ],
+        'fetched_at' => now(),
+    ]);
+
+    $view = app(CollectionLogView::class)->build($account, 'vorkath');
+
+    expect($view['categories'])->toBe([
+        ['slug' => 'abyssal_sire', 'name' => 'Abyssal Sire', 'group' => 'other', 'obtained' => 2, 'total' => 2],
+        ['slug' => 'vorkath', 'name' => 'Vorkath', 'group' => 'other', 'obtained' => 1, 'total' => 1],
+    ])
+        ->and($view['activeSlug'])->toBe('vorkath')
+        ->and($view['activeCollection']['items'])->toHaveCount(1)
+        ->and($view['activeCollection']['items'][0]['obtained'])->toBeTrue()
+        ->and($view['obtained'])->toBe(3)
+        ->and($view['total'])->toBe(1701);
+
+    expect(app(CollectionLogView::class)->build($account, 'unknown')['activeSlug'])->toBe('abyssal_sire');
+});
+
+it('builds no collection log view for an account without a synced log', function () {
+    expect(app(CollectionLogView::class)->build(makeAccountForLog('NoLog'), null))->toBeNull();
 });

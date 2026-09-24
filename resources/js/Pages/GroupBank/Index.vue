@@ -3,18 +3,18 @@ import { onBeforeUnmount, onMounted } from "vue";
 import { router } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Card from "@/Components/Card.vue";
-import ItemSlot from "@/Components/Game/ItemSlot.vue";
+import Card from "@/Components/Cards/Card.vue";
+import ItemSlot from "@/Components/Game/Items/ItemSlot.vue";
 
 const props = defineProps({
     groupName: { type: String, default: null },
     groupBank: { type: Object, default: null },
 });
 
-// SPEC §5.2 — any member's plugin push updates the shared bank; reload the data
+// Any member's plugin push updates the shared bank; reload the data
 // live when the server broadcasts a change.
 onMounted(() => {
-    window.Echo.channel("group-bank").listen(".GroupBankUpdated", () => {
+    window.Echo.private("group-bank").listen(".GroupBankUpdated", () => {
         router.reload({ only: ["groupBank"] });
     });
 });

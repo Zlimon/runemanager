@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * SPEC §7 — the plugin asks the server to refresh the account's server-pulled
+ * The plugin asks the server to refresh the account's server-pulled
  * stats: skills/bosses/clues from the official OSRS hiscores, and the collection
  * log from TempleOSRS. Part of the full-account snapshot pushed on login; both
  * are queued because they hit external APIs.

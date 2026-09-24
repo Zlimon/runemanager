@@ -2,24 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\AccountDataUpdated;
 use App\Http\Controllers\Controller;
-use App\Models\Loot;
-use App\Services\Feed\RecordFeedEvent;
+use App\Http\Requests\StoreLootRequest;
+use App\Services\Loot\RecordLoot;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 
 class LootController extends Controller
 {
-    public function __construct(private RecordFeedEvent $feed) {}
-
     /**
      * Append-only loot push from the RuneLite plugin. Account resolved by the
      * plugin.account middleware. Accepts a batch (the plugin may flush more
      * than one drop event in a single push) and inserts one document per entry.
      *
-     * Payload (SPEC §5.2 Loot):
+     * Payload:
      *
      *   {
      *     "loot": [
@@ -36,88 +31,12 @@ class LootController extends Controller
      *     ]
      *   }
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreLootRequest $request, RecordLoot $recordLoot): JsonResponse
     {
         $account = $request->attributes->get('account');
 
-        $request->validate([
-            'loot' => ['required', 'array', 'min:1', 'max:100'],
-            'loot.*.source' => ['required', 'string', 'max:120'],
-            'loot.*.type' => ['nullable', 'string', 'max:20'],
-            'loot.*.items' => ['required', 'array', 'min:1'],
-            'loot.*.items.*.id' => ['required', 'integer'],
-            'loot.*.items.*.quantity' => ['required', 'integer', 'min:1'],
-            'loot.*.total_value' => ['nullable', 'integer', 'min:0'],
-            'loot.*.killed_at' => ['required', 'date'],
-            'loot.*.feed' => ['nullable', 'boolean'],
-            ...RecordFeedEvent::positionRules('loot.*.position'),
-        ]);
-
-        $docs = [];
-        $events = [];
-        $now = now();
-
-        foreach ($request->input('loot') as $entry) {
-            $items = array_map(
-                fn (array $item): array => [
-                    'id' => (int) $item['id'],
-                    'quantity' => (int) $item['quantity'],
-                ],
-                $entry['items'],
-            );
-            $totalValue = (int) ($entry['total_value'] ?? 0);
-            $killedAt = Carbon::parse($entry['killed_at']);
-
-            $docs[] = [
-                'account_id' => (int) $account->id,
-                'source' => $entry['source'],
-                // RuneLite's LootRecordType is uppercase (NPC, EVENT, PICKPOCKET…),
-                // and the loot hiscores match on it exactly. Normalised here so a
-                // client sending any other casing still lands on the same record
-                // type rather than on a source page that finds nothing.
-                'type' => filled($entry['type'] ?? null) ? strtoupper($entry['type']) : null,
-                'items' => $items,
-                'total_value' => $totalValue,
-                'killed_at' => $killedAt,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
-
-            $events[] = [
-                'source' => $entry['source'],
-                'items' => $items,
-                'total_value' => $totalValue,
-                'killed_at' => $killedAt,
-                'feed' => (bool) ($entry['feed'] ?? true),
-                'position' => $entry['position'] ?? null,
-            ];
-        }
-
-        Loot::insert($docs);
-
-        broadcast(new AccountDataUpdated($account, 'loot'));
-
-        // SPEC §8 — emit a LOOT_DROP for each entry the plugin marked as
-        // feed-worthy (its "Feed loot value" setting; absent = older plugin,
-        // treat as worthy). The admin's minimum value only filters the Live
-        // Feed display, so these all reach the account Activity feed.
-        foreach ($events as $event) {
-            if (! $event['feed']) {
-                continue;
-            }
-
-            $this->feed->recordLootDrop(
-                $account,
-                $event['source'],
-                $event['items'],
-                $event['total_value'],
-                $event['killed_at'],
-                $event['position'],
-            );
-        }
-
         return response()->json([
-            'data' => ['inserted' => count($docs)],
+            'data' => ['inserted' => $recordLoot->record($account, $request->validated('loot'))],
         ], 201);
     }
 }

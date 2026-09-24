@@ -13,7 +13,7 @@ it('renders the public landing page for guests with the digest props', function 
     $this->get(route('home'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Welcome')
+            ->component('Welcome/Index')
             ->where('canLogin', true)
             ->where('canRegister', true)
             ->where('anonymized', false)
@@ -56,6 +56,9 @@ it('masks usernames on the public page when anonymisation is enabled', function 
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('anonymized', true)
-            ->where('topAccounts.0.username', 'Z•••••'),
+            ->has('topAccounts.0', fn (AssertableInertia $row) => $row
+                ->where('username', 'Z•••••')
+                ->where('level', 1500)
+                ->has('account_type')),
         );
 });

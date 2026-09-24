@@ -101,15 +101,15 @@ it('shows each account loot for a source ranked by value', function () {
             ->component('Hiscores/Loot/Show')
             ->where('source', 'Vorkath')
             ->where('category', 'Monsters')
-            ->has('hiscores', 2)
-            ->where('hiscores.0.account.username', 'Rich')
-            ->where('hiscores.0.rank', 1)
-            ->where('hiscores.0.total_value', 1000000)
-            ->where('hiscores.0.drops', 2)
+            ->has('hiscores.data', 2)
+            ->where('hiscores.data.0.account.username', 'Rich')
+            ->where('hiscores.data.0.rank', 1)
+            ->where('hiscores.data.0.total_value', 1000000)
+            ->where('hiscores.data.0.drops', 2)
             // Quantities are summed across the account's drops of this source.
-            ->where('hiscores.0.items.0.id', 536)
-            ->where('hiscores.0.items.0.quantity', 50)
-            ->where('hiscores.1.account.username', 'Poor'),
+            ->where('hiscores.data.0.items.0.id', 536)
+            ->where('hiscores.data.0.items.0.quantity', 50)
+            ->where('hiscores.data.1.account.username', 'Poor'),
         );
 
     Loot::query()->delete();
@@ -129,12 +129,12 @@ it('scopes the per-source board to the requested type', function () {
             ->component('Hiscores/Loot/Show')
             ->where('source', 'Man')
             ->where('category', 'Pickpocketing')
-            ->has('hiscores', 1)
-            ->where('hiscores.0.total_value', 78)
-            ->where('hiscores.0.drops', 1)
+            ->has('hiscores.data', 1)
+            ->where('hiscores.data.0.total_value', 78)
+            ->where('hiscores.data.0.drops', 1)
             // Only the pickpocket loot — the NPC-kill coins are excluded.
-            ->has('hiscores.0.items', 1)
-            ->where('hiscores.0.items.0.id', 995),
+            ->has('hiscores.data.0.items', 1)
+            ->where('hiscores.data.0.items.0.id', 995),
         );
 
     Loot::query()->delete();

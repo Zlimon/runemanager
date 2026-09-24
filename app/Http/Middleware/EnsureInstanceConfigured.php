@@ -11,7 +11,7 @@ use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * SPEC §12 — until the owner completes first-time setup (choosing the instance
+ * Until the owner completes first-time setup (choosing the instance
  * mode), the site is closed: the owner is funnelled to the setup page and
  * everyone else (guests + non-admins) gets a "setup in progress" screen. The
  * auth routes stay open so the owner can register/log in to do the setup.
@@ -30,7 +30,7 @@ class EnsureInstanceConfigured
             return redirect()->route('admin.settings');
         }
 
-        return Inertia::render('SetupInProgress', [
+        return Inertia::render('SetupInProgress/Index', [
             'canRegister' => Route::has('register'),
         ])->toResponse($request);
     }
