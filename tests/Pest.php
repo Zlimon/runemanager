@@ -10,6 +10,7 @@ use App\Models\Quest;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Support\Roles;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 uses(TestCase::class)->in('Feature', 'Unit');
@@ -71,4 +72,36 @@ function darkPack(string $name = 'pack-darkish'): ResourcePack
         'tags' => '',
         'dark_mode' => true,
     ]);
+}
+
+/**
+ * A plain member with no team or roles, for the resource-pack tests. Distinct
+ * from adminUser() above, which exists to hold management permissions.
+ */
+function freshPackUser(string $email = 'pack@test.local'): User
+{
+    return User::query()->forceCreate([
+        'name' => 'Pack Tester',
+        'email' => $email,
+        'email_verified_at' => now(),
+        'password' => Hash::make('pw'),
+        'icon_id' => 0,
+    ]);
+}
+
+/**
+ * An installed pack row. Pass `installed_by_user_id` for a member's own
+ * install, or `version: 'pending'` for one whose files are still being fetched.
+ */
+function makePack(string $name, array $overrides = []): ResourcePack
+{
+    return ResourcePack::query()->forceCreate(array_merge([
+        'name' => $name,
+        'alias' => ucfirst($name),
+        'version' => '1.0.0',
+        'author' => 'test',
+        'url' => "https://example.test/{$name}.zip",
+        'tags' => '',
+        'dark_mode' => false,
+    ], $overrides));
 }

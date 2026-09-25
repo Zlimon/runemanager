@@ -3,11 +3,9 @@
 use App\Helpers\SettingHelper;
 use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
-use App\Models\User;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Support\Instance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 
@@ -16,30 +14,6 @@ beforeEach(function () {
 });
 
 uses(RefreshDatabase::class);
-
-function freshPackUser(string $email = 'pack@test.local'): User
-{
-    return User::query()->forceCreate([
-        'name' => 'Pack Tester',
-        'email' => $email,
-        'email_verified_at' => now(),
-        'password' => Hash::make('pw'),
-        'icon_id' => 0,
-    ]);
-}
-
-function makePack(string $name, array $overrides = []): ResourcePack
-{
-    return ResourcePack::query()->forceCreate(array_merge([
-        'name' => $name,
-        'alias' => ucfirst($name),
-        'version' => '1.0.0',
-        'author' => 'test',
-        'url' => "https://example.test/{$name}.zip",
-        'tags' => '',
-        'dark_mode' => false,
-    ], $overrides));
-}
 
 it('stores an unauthenticated preference as a cookie instead of rejecting it', function () {
     // The route is deliberately public: a guest must be able to opt out of packs

@@ -7,11 +7,22 @@
 defineProps({
     label: { type: String, required: true },
     active: { type: Boolean, default: false },
+    /*
+     * Which edge the panel lines up with. The default drops it from the
+     * trigger's left edge, which is right for the dropdowns in the middle of
+     * the bar. The last one in the nav needs `end`, or a panel wider than the
+     * gap to the window edge is drawn off-screen and its labels are cut.
+     */
+    align: {
+        type: String,
+        default: 'start',
+        validator: (value) => ['start', 'end'].includes(value),
+    },
 });
 </script>
 
 <template>
-    <div class="dropdown">
+    <div class="dropdown" :class="{ 'dropdown-end': align === 'end' }">
         <div tabindex="0" role="button"
              class="flex cursor-pointer items-center gap-1 rounded px-3 py-2 md:p-0"
              :class="active ? 'text-accent font-semibold' : 'text-neutral-content hover:text-accent'">

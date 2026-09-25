@@ -76,6 +76,17 @@ class HandleInertiaRequests extends Middleware
                         'account_type' => $account->account_type?->value ?? $account->account_type,
                     ])->all()
                 : [],
+            // The viewer's own resource packs, for the quick switcher in the
+            // same nav dropdown, plus the selection it marks as active. The
+            // shared `pack` below is the pack in *effect*, which cannot stand in
+            // for this: a member whose pick happens to match the instance
+            // default is a different state from one following that default, and
+            // the switcher has to tell them apart.
+            'my_packs' => $user ? ResourcePack::navListFor($user) : [],
+            'pack_preference' => $user ? [
+                'id' => $user->resource_pack_id,
+                'disabled' => (bool) $user->disable_resource_pack,
+            ] : null,
             'instance' => [
                 'mode' => Instance::mode(),
                 'name' => Instance::name(),

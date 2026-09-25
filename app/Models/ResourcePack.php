@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\ResourcePacks\PackPalette;
 use App\Support\Instance;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -82,6 +83,40 @@ class ResourcePack extends Model
         }
 
         return null;
+    }
+
+    /**
+     * The viewer's own packs, for the quick switcher in the nav dropdown: the
+     * ones they installed themselves, alphabetically.
+     *
+     * The pack they currently have selected is always included, even when
+     * somebody else installed it. Without that the switcher could not show
+     * what is actually in effect, and a member who picked another member's
+     * pack on the Appearance page would have no way back to it from here.
+     *
+     * Packs still being fetched are left out — their row exists before their
+     * files do, so selecting one would strip the interface bare until the job
+     * finished ({@see InstallResourcePack::isReady()}).
+     *
+     * @return list<array{id: int, name: string, alias: string, icon_url: ?string}>
+     */
+    public static function navListFor(User $user): array
+    {
+        return self::query()
+            ->where('version', '!=', 'pending')
+            ->where(fn (Builder $query) => $query
+                ->where('installed_by_user_id', $user->id)
+                ->orWhere('id', $user->resource_pack_id))
+            ->orderByRaw('LOWER(alias)')
+            ->get()
+            ->map(fn (self $pack): array => [
+                'id' => $pack->id,
+                'name' => $pack->name,
+                'alias' => $pack->alias,
+                'icon_url' => $pack->icon_url,
+            ])
+            ->values()
+            ->all();
     }
 
     /**

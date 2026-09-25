@@ -5,6 +5,7 @@ import Banner from '@/Layouts/Partials/Banner.vue';
 import ResponsiveNavLink from '@/Layouts/Partials/ResponsiveNavLink.vue';
 import HiscoresMenu from '@/Layouts/Partials/HiscoresMenu.vue';
 import NavDropdown from '@/Layouts/Partials/NavDropdown.vue';
+import NavPackSwitcher from '@/Layouts/Partials/NavPackSwitcher.vue';
 import NavDropdownLink from '@/Layouts/Partials/NavDropdownLink.vue';
 import DarkModeToggle from '@/Components/Buttons/DarkModeToggle.vue';
 import GuestPackPicker from '@/Components/ResourcePacks/GuestPackPicker.vue';
@@ -103,6 +104,7 @@ const logout = () => {
                             </li>
                             <li>
                                 <NavDropdown :label="page.props.auth?.user?.name ?? 'Account'"
+                                             align="end"
                                              :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*')">
                                     <template v-if="page.props.my_accounts?.length">
                                         <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-base-content/50">
@@ -120,8 +122,9 @@ const logout = () => {
                                         </NavDropdownLink>
                                         <hr class="my-1 border-base-content/10">
                                     </template>
+                                    <NavPackSwitcher />
                                     <NavDropdownLink :href="route('profile.show')"
-                                                     :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*')">
+                                                     :active="route().current('profile.*') || route().current('api-tokens.*')">
                                         Settings
                                     </NavDropdownLink>
                                     <button type="button" @click="logout"
