@@ -13,6 +13,9 @@ use App\Http\Resources\LootResource;
 use App\Models\Account;
 use App\Models\FeedEvent;
 use App\Services\CollectionLog\CollectionLogView;
+use App\Services\WiseOldMan\WomAccountView;
+use App\Services\WiseOldMan\WomSnapshotHistory;
+use App\Support\Instance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -50,7 +53,7 @@ class AccountController extends Controller
         ]);
     }
 
-    public function show(Request $request, Account $account, CollectionLogView $collectionLogView): Response
+    public function show(Request $request, Account $account, CollectionLogView $collectionLogView, WomAccountView $womView): Response
     {
         $account->load('equipment', 'hiscore')->append(['skills', 'bosses', 'clues']);
 
@@ -134,6 +137,30 @@ class AccountController extends Controller
                 'loot' => $account->latestLootKilledAt()?->toIso8601String(),
                 'stale_after_minutes' => (int) config('runemanager.freshness.stale_after_minutes'),
             ],
+
+            ...(Instance::womEnabled() ? $this->womProps($request, $account, $womView) : []),
         ]);
+    }
+
+    /**
+     * The Wise Old Man panel: the stored summary up front, the history chart
+     * and the period gains deferred (the gains may ask WOM live). The range
+     * and period are optional query params that fall back to their default.
+     *
+     * @return array<string, mixed>
+     */
+    private function womProps(Request $request, Account $account, WomAccountView $womView): array
+    {
+        $range = $request->query('wrange');
+        $range = is_string($range) && array_key_exists($range, WomSnapshotHistory::RANGES) ? $range : 'year';
+        $period = $request->query('wperiod');
+        $period = is_string($period) && array_key_exists($period, WomSnapshotHistory::PERIODS) ? $period : 'week';
+
+        return [
+            'wom' => fn () => $womView->summary($account->loadMissing('womPlayer'), $request->user()),
+            'womSeries' => Inertia::defer(fn () => $womView->series($account->loadMissing('womPlayer'), $range), 'wom'),
+            'womGains' => Inertia::defer(fn () => $womView->gains($account->loadMissing('womPlayer'), $period), 'womGains'),
+            'womFilters' => ['range' => $range, 'period' => $period],
+        ];
     }
 }

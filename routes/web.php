@@ -11,11 +11,13 @@ use App\Http\Controllers\Hiscores;
 use App\Http\Controllers\ItemSearchController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\News;
+use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\StyleguideController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\UserDarkModeController;
 use App\Http\Controllers\UserResourcePackController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\WiseOldManSettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
@@ -38,6 +40,11 @@ Route::get('/announcements', [AnnouncementController::class, 'index'])->name('an
 // `/news/{newsPost}` route below and resolve as an article called "create".
 Route::get('/news', [News\ArticleController::class, 'index'])->name('news.index');
 Route::get('/news/{newsPost}', [News\ArticleController::class, 'show'])->name('news.show');
+
+// Wise Old Man progress. Registered outside the auth group because the owner
+// may make it public; the controller 404s while the integration is off and
+// sends guests to login while it is members-only.
+Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
 
 // Light/dark preference — public so the on-page toggle works on the auth screens
 // too (guests persist to a cookie; logged-in users to their account).
@@ -177,6 +184,15 @@ Route::middleware([
         ->name('user.resource-pack.hub');
     Route::delete('/user/resource-pack/{pack}', [UserResourcePackController::class, 'destroy'])
         ->whereNumber('pack')->name('user.resource-pack.destroy');
+
+    // Per-account Wise Old Man preferences; the controller checks ownership and
+    // 404s while the integration is off.
+    Route::get('/settings/wise-old-man', [WiseOldManSettingsController::class, 'index'])->name('wise-old-man.index');
+    // Throttled: tracking queues a WOM update, and both write per click.
+    Route::post('/settings/wise-old-man/{account}/track', [WiseOldManSettingsController::class, 'track'])
+        ->middleware('throttle:6,1')->name('wise-old-man.track');
+    Route::put('/settings/wise-old-man/{account}', [WiseOldManSettingsController::class, 'update'])
+        ->middleware('throttle:6,1')->name('wise-old-man.update');
 
     Route::prefix('/hiscores')->group(function () {
         // Overall (total level + total XP).

@@ -13,6 +13,8 @@ use App\Models\CalendarEvent;
 use App\Models\FeedEvent;
 use App\Models\NewsPost;
 use App\Services\Instance\InstanceStats;
+use App\Services\WiseOldMan\WomLeaderboard;
+use App\Support\Instance;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,10 +23,11 @@ class DashboardController extends Controller
     /**
      * The instance homepage — a digest of what's happening: the latest news,
      * recent feed activity, the latest announcements, upcoming calendar events,
-     * the top accounts by total level, and headline counts. The Mongo-backed feed is
-     * deferred so the hero + relational widgets render without waiting on it.
+     * the top accounts by total level, headline counts and, with Wise Old Man on,
+     * the week's top XP gainers. The Mongo-backed feed is lazy and the gainers
+     * deferred, so the hero + relational widgets render without waiting on them.
      */
-    public function index(InstanceStats $stats): Response
+    public function index(InstanceStats $stats, WomLeaderboard $womLeaderboard): Response
     {
         return Inertia::render('Dashboard/Index', [
             'stats' => $stats->counts(),
@@ -43,6 +46,9 @@ class DashboardController extends Controller
             'feed' => fn () => FeedEventResource::collectionWith(
                 FeedEvent::query()->recent(8)->get(),
             )->resolve(),
+            ...(Instance::womEnabled() ? [
+                'topGainers' => Inertia::defer(fn () => $womLeaderboard->topGainers('week', 'exp', 5)),
+            ] : []),
         ]);
     }
 }

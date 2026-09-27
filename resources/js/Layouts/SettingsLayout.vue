@@ -18,6 +18,9 @@ const page = usePage();
 const accountSections = computed(() => [
     { label: 'Profile', route: 'profile.show', active: 'profile.show' },
     { label: 'Appearance', route: 'themes.index', active: 'themes.*' },
+    ...(page.props.wom_enabled
+        ? [{ label: 'Wise Old Man', route: 'wise-old-man.index', active: 'wise-old-man.*' }]
+        : []),
     ...(page.props.jetstream?.hasApiFeatures
         ? [{ label: 'API tokens', route: 'api-tokens.index', active: 'api-tokens.*' }]
         : []),

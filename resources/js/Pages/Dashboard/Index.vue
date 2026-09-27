@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Deferred, Link, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Card from '@/Components/Cards/Card.vue';
@@ -20,6 +20,8 @@ const props = defineProps({
     upcoming: { type: Array, default: () => [] },
     topAccounts: { type: Array, default: () => [] },
     feed: { type: Array, default: () => [] },
+    // Deferred, and only sent while Wise Old Man is on.
+    topGainers: { type: Array, default: null },
 });
 
 const page = usePage();
@@ -163,6 +165,37 @@ const removeEvent = (id) => {
                             Nothing scheduled.
                         </Card>
                     </div>
+
+                    <!-- This week's top XP gainers (Wise Old Man) -->
+                    <Deferred v-if="page.props.wom_enabled" data="topGainers">
+                        <template #fallback>
+                            <div class="h-40 animate-pulse rounded bg-base-300/40"></div>
+                        </template>
+
+                        <div v-if="topGainers?.length">
+                            <div class="flex items-baseline justify-between">
+                                <h2 class="text-xl font-bold">Top gainers this week</h2>
+                                <Link :href="route('progress.index')" class="link link-hover text-sm text-base-content/70">
+                                    Progress
+                                </Link>
+                            </div>
+                            <Card padding="p-2" class="mt-4">
+                                <ol class="divide-y divide-base-content/10">
+                                    <li v-for="(gainer, index) in topGainers" :key="gainer.account_id">
+                                        <Link :href="route('accounts.show', { account: gainer.username })"
+                                              class="pack-row flex items-center gap-3 rounded px-2 py-2 hover:bg-base-300/40">
+                                            <span class="w-5 text-center text-sm font-bold text-base-content/50">{{ index + 1 }}</span>
+                                            <img v-if="gainer.account_type && gainer.account_type !== 'normal'"
+                                                 :src="`/images/${gainer.account_type}.png`"
+                                                 class="h-5 w-5 object-contain" alt="">
+                                            <span class="min-w-0 flex-1 truncate font-semibold">{{ gainer.username }}</span>
+                                            <span class="text-sm text-success">+{{ Math.round(gainer.gained).toLocaleString('en-US') }} xp</span>
+                                        </Link>
+                                    </li>
+                                </ol>
+                            </Card>
+                        </div>
+                    </Deferred>
 
                     <!-- Top accounts -->
                     <div v-if="topAccounts.length">

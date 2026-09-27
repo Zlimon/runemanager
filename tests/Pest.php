@@ -9,6 +9,7 @@ use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Models\WomDailySnapshot;
 use App\Support\Roles;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -38,7 +39,7 @@ uses(TestCase::class)->in('Feature', 'Unit');
 
 pest()->beforeEach(function () {
     try {
-        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class] as $model) {
+        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class, WomDailySnapshot::class] as $model) {
             $model::query()->delete();
         }
     } catch (Throwable) {
@@ -104,4 +105,14 @@ function makePack(string $name, array $overrides = []): ResourcePack
         'tags' => '',
         'dark_mode' => false,
     ], $overrides));
+}
+
+/**
+ * A trimmed, real Wise Old Man API response from tests/Fixtures/WiseOldMan.
+ *
+ * @return array<mixed>
+ */
+function womFixture(string $name): array
+{
+    return json_decode(file_get_contents(__DIR__."/Fixtures/WiseOldMan/{$name}.json"), true);
 }

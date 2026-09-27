@@ -13,6 +13,7 @@ use App\Models\NewsPost;
 use App\Models\Quest;
 use App\Models\ResourcePack;
 use App\Models\Setting;
+use App\Models\WomDailySnapshot;
 use Illuminate\Database\Seeder;
 use Throwable;
 
@@ -46,6 +47,7 @@ class DatabaseSeeder extends Seeder
             RolesSeeder::class,
             DemoContentSeeder::class,
             DemoSnapshotsSeeder::class,
+            DemoWomSeeder::class,
         ]);
 
         if (NewsPost::count() === 0) {
@@ -77,7 +79,7 @@ class DatabaseSeeder extends Seeder
         }
 
         try {
-            foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class] as $model) {
+            foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class, WomDailySnapshot::class] as $model) {
                 $model::query()->delete();
             }
         } catch (Throwable $e) {

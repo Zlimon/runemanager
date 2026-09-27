@@ -1,0 +1,53 @@
+{
+  "id": 315771,
+  "username": "bartheez",
+  "displayName": "Bartheez",
+  "type": "ironman",
+  "build": "main",
+  "status": "active",
+  "country": "CZ",
+  "patron": false,
+  "exp": 832820305,
+  "ehp": 2513.240699999999,
+  "ehb": 1158.8955,
+  "ttm": 0,
+  "tt200m": 18032.43169699797,
+  "registeredAt": "2021-07-22T20:34:08.018Z",
+  "updatedAt": "2026-09-26T10:48:13.903Z",
+  "lastChangedAt": "2026-09-26T06:19:24.524Z",
+  "lastImportedAt": null,
+  "combatLevel": 126,
+  "archive": null,
+  "annotations": [],
+  "latestSnapshot": {
+    "id": -1,
+    "playerId": 315771,
+    "createdAt": "2026-09-26T10:48:13.903Z",
+    "importedAt": null,
+    "data": {
+      "skills": {
+        "overall": {
+          "metric": "overall",
+          "experience": 832820305,
+          "rank": 3218,
+          "level": 2376,
+          "ehp": 2513.2406999999994
+        }
+      },
+      "bosses": {},
+      "activities": {},
+      "computed": {
+        "ehp": {
+          "metric": "ehp",
+          "value": 2513.240699999999,
+          "rank": 3349
+        },
+        "ehb": {
+          "metric": "ehb",
+          "value": 1158.8955,
+          "rank": 8482
+        }
+      }
+    }
+  }
+}

@@ -3,8 +3,11 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Services\WiseOldMan\WiseOldManClient;
 use App\Support\Roles;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -35,5 +38,8 @@ class AppServiceProvider extends ServiceProvider
         // checked via Spatie permissions (manage instance/members/…). Clan/group
         // elevation of other users is layered on later.
         Gate::before(fn (User $user) => $user->hasRole(Roles::OWNER) ? true : null);
+
+        // Paces the Wise Old Man sync jobs under WOM's own per-minute limit.
+        RateLimiter::for('wiseoldman', fn () => Limit::perMinute(WiseOldManClient::perMinute()));
     }
 }

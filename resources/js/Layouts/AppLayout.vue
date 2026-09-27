@@ -65,6 +65,12 @@ const logout = () => {
                             <li>
                                 <HiscoresMenu :active="route().current('hiscores.*')" />
                             </li>
+                            <li v-if="page.props.wom_enabled && (page.props.auth?.user || page.props.wom_progress_public)">
+                                <ResponsiveNavLink :href="route('progress.index')"
+                                                   :active="route().current('progress.*')">
+                                    Progress
+                                </ResponsiveNavLink>
+                            </li>
                             <li>
                                 <NavDropdown label="Accounts"
                                              :active="route().current('accounts.*') || route().current('map.*') || route().current('group-bank.*')">
@@ -106,7 +112,7 @@ const logout = () => {
                             <li>
                                 <NavDropdown :label="page.props.auth?.user?.name ?? 'Account'"
                                              align="end"
-                                             :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*')">
+                                             :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*') || route().current('wise-old-man.*')">
                                     <NavAccountsMenu />
                                     <NavPackSwitcher />
                                     <hr class="my-1 border-base-content/10">

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Outbound integrations: the instance webhook. */
+/** Outbound integrations: the instance webhook and Wise Old Man. */
 class UpdateIntegrationsRequest extends FormRequest
 {
     /** Access is enforced by the route middleware. */
@@ -21,6 +21,9 @@ class UpdateIntegrationsRequest extends FormRequest
     {
         return [
             'webhook_url' => ['nullable', 'url', 'max:2000'],
+            'wom_enabled' => ['nullable', 'boolean'],
+            'wom_active_within_days' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'wom_progress_public' => ['nullable', 'boolean'],
         ];
     }
 }

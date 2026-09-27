@@ -29,7 +29,7 @@ it('falls back to the default when the settings table is unavailable', function 
     expect(Instance::hiscoreRefreshCron())->toBe('0 * * * *');
 });
 
-it('schedules exactly the four expected commands and nothing else', function () {
+it('schedules exactly the expected commands and nothing else', function () {
     // Guards against scaffold leftovers (the stock `inspire` closure used to run
     // hourly in production) and against a new command being scheduled unnoticed.
     $events = collect(app(Schedule::class)->events());
@@ -55,5 +55,14 @@ it('schedules exactly the four expected commands and nothing else', function () 
         'hiscores:sync',
         'items:sync',
         'resourcepack:update',
+        'wom:sync',
     ]);
+});
+
+it('schedules the Wise Old Man sync daily without reading its toggle', function () {
+    $event = collect(app(Schedule::class)->events())
+        ->first(fn ($event) => str_contains((string) $event->command, 'wom:sync'));
+
+    expect($event)->not->toBeNull()
+        ->and($event->expression)->toBe('0 5 * * *');
 });

@@ -1,0 +1,144 @@
+{
+  "startsAt": "2026-09-19T22:27:08.367Z",
+  "endsAt": "2026-09-26T11:17:46.558Z",
+  "data": {
+    "skills": {
+      "overall": {
+        "metric": "overall",
+        "experience": {
+          "gained": 27473863,
+          "start": 413071656,
+          "end": 440545519
+        },
+        "ehp": {
+          "gained": 68.53958,
+          "start": 763.72213,
+          "end": 832.2617099999999
+        },
+        "rank": {
+          "gained": -5408,
+          "start": 99689,
+          "end": 94281
+        },
+        "level": {
+          "gained": 9,
+          "start": 2309,
+          "end": 2318
+        }
+      },
+      "attack": {
+        "metric": "attack",
+        "experience": {
+          "gained": 42015,
+          "start": 15965596,
+          "end": 16007611
+        },
+        "ehp": {
+          "gained": 0,
+          "start": 0,
+          "end": 0
+        },
+        "rank": {
+          "gained": -1195,
+          "start": 218260,
+          "end": 217065
+        },
+        "level": {
+          "gained": 0,
+          "start": 99,
+          "end": 99
+        }
+      },
+      "slayer": {
+        "metric": "slayer",
+        "experience": {
+          "gained": 5831764,
+          "start": 4432880,
+          "end": 10264644
+        },
+        "ehp": {
+          "gained": 59.85919,
+          "start": 67.93547,
+          "end": 127.79466
+        },
+        "rank": {
+          "gained": -315833,
+          "start": 643360,
+          "end": 327527
+        },
+        "level": {
+          "gained": 8,
+          "start": 88,
+          "end": 96
+        }
+      }
+    },
+    "bosses": {
+      "zulrah": {
+        "metric": "zulrah",
+        "ehb": {
+          "gained": 0,
+          "start": 4.30435,
+          "end": 4.30435
+        },
+        "rank": {
+          "gained": 764,
+          "start": 363039,
+          "end": 363803
+        },
+        "kills": {
+          "gained": 0,
+          "start": 198,
+          "end": 198
+        }
+      },
+      "vorkath": {
+        "metric": "vorkath",
+        "ehb": {
+          "gained": 0,
+          "start": 3.94118,
+          "end": 3.94118
+        },
+        "rank": {
+          "gained": 687,
+          "start": 448912,
+          "end": 449599
+        },
+        "kills": {
+          "gained": 0,
+          "start": 134,
+          "end": 134
+        }
+      }
+    },
+    "activities": {},
+    "computed": {
+      "ehp": {
+        "metric": "ehp",
+        "value": {
+          "gained": 68.53958,
+          "start": 763.72213,
+          "end": 832.2617099999999
+        },
+        "rank": {
+          "gained": -16866,
+          "start": 133419,
+          "end": 116553
+        }
+      },
+      "ehb": {
+        "metric": "ehb",
+        "value": {
+          "gained": 0,
+          "start": 188.73575,
+          "end": 188.73575
+        },
+        "rank": {
+          "gained": 812,
+          "start": 239204,
+          "end": 240016
+        }
+      }
+    }
+  }
+}

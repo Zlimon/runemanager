@@ -19,6 +19,7 @@ import Header from "@/Pages/Accounts/Partials/Header.vue";
 import Equipment from "@/Pages/Accounts/Partials/Equipment.vue";
 import Avatar from "@/Pages/Accounts/Partials/Avatar.vue";
 import Summary from "@/Pages/Accounts/Partials/Summary.vue";
+import Progress from "@/Pages/Accounts/Partials/Progress.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
 import Bank from "@/Pages/Accounts/Partials/Bank.vue";
 import Minimap from "@/Pages/Accounts/Partials/Minimap.vue";
@@ -96,6 +97,24 @@ const props = defineProps({
     freshness: {
         type: Object,
         default: () => ({ stale_after_minutes: 60 }),
+    },
+    // Wise Old Man — only sent while the integration is on. `womSeries` and
+    // `womGains` are deferred.
+    wom: {
+        type: Object,
+        default: null,
+    },
+    womSeries: {
+        type: Array,
+        default: null,
+    },
+    womGains: {
+        type: Object,
+        default: null,
+    },
+    womFilters: {
+        type: Object,
+        default: null,
     },
 });
 
@@ -245,7 +264,7 @@ onBeforeUnmount(() => {
                                     </div>
                                 </div>
 
-                                <Summary :account="account" :freshness="freshness" :instance-rank="instanceRank" />
+                                <Summary :account="account" :freshness="freshness" :instance-rank="instanceRank" :wom="wom" />
                             </div>
 
                             <!-- Vertical Inventory and Looting Bag tabs -->
@@ -291,6 +310,10 @@ onBeforeUnmount(() => {
                                     </TabbedCard>
                                 </div>
                             </div>
+
+                            <!-- Present only while the Wise Old Man integration is on. -->
+                            <Progress v-if="womFilters" class="mt-4" :account="account" :wom="wom"
+                                      :series="womSeries" :gains="womGains" :filters="womFilters" />
 
                             <h3 class="mt-4">Collection Log</h3>
                             <div class="mt-4">

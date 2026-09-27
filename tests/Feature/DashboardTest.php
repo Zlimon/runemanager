@@ -1,10 +1,13 @@
 <?php
 
+use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\Announcement;
 use App\Models\CalendarEvent;
 use App\Models\FeedEvent;
 use App\Models\User;
+use App\Models\WomDailySnapshot;
+use App\Models\WomPlayer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 
@@ -97,5 +100,32 @@ it('includes the owning user id on feed accounts so the owner sees pin/delete', 
             ->has('feed', 1)
             ->where('feed.0.account.user_id', $this->user->id)
             ->where('feed.0.account.username', $account->username),
+        );
+});
+
+it('defers the week\'s top WOM gainers only while Wise Old Man is on', function () {
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (AssertableInertia $page) => $page->missing('topGainers'));
+
+    SettingHelper::setSetting('wom_enabled', true, 'bool');
+    $player = WomPlayer::factory()->create();
+    foreach ([[8, 1_000], [0, 6_000]] as [$daysAgo, $exp]) {
+        WomDailySnapshot::query()->create([
+            'account_id' => $player->account_id,
+            'date' => now('UTC')->subDays($daysAgo)->toDateString(),
+            'exp' => $exp, 'ehp' => 0.0, 'ehb' => 0.0,
+        ]);
+    }
+
+    $this->actingAs($this->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->missing('topGainers')
+            ->loadDeferredProps(fn (AssertableInertia $reload) => $reload
+                ->has('topGainers', 1)
+                ->where('topGainers.0.account_id', $player->account_id)
+                ->where('topGainers.0.gained', 5_000),
+            ),
         );
 });

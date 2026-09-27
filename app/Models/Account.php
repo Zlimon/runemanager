@@ -80,6 +80,11 @@ class Account extends Model
         return $this->hasOne(Equipment::class);
     }
 
+    public function womPlayer(): HasOne
+    {
+        return $this->hasOne(WomPlayer::class);
+    }
+
     public function usernameHistory(): HasMany
     {
         return $this->hasMany(UsernameHistory::class)->orderByDesc('detected_at');

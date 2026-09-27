@@ -15,6 +15,9 @@ use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
+use App\Models\WomDailySnapshot;
+use App\Models\WomPlayer;
+use App\Services\WiseOldMan\WomCache;
 use App\Support\Roles;
 use Illuminate\Support\Facades\Cache;
 
@@ -35,6 +38,7 @@ class ResetInstanceData
         Quest::query()->delete();
         CollectionLog::query()->delete();
         Loot::query()->delete();
+        WomDailySnapshot::query()->delete();
 
         // Instance-scoped, not account-scoped: one shared document for the
         // Group Ironman group, which the new mode's group must not inherit.
@@ -45,12 +49,14 @@ class ResetInstanceData
         Equipment::query()->delete();
         FeedEvent::query()->delete();
         UsernameHistory::query()->delete();
+        WomPlayer::query()->delete();
         Account::query()->delete();
 
         // The Hiscores nav lists are derived from account data, so they would
         // otherwise keep naming bosses this instance no longer has any hiscores for.
         Cache::forget('nav.bosses');
         Cache::forget('nav.skills');
+        WomCache::bump();
 
         // Strip any elevated roles back to a plain User, leaving the Owner alone.
         Roles::sync();

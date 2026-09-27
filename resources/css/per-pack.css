@@ -392,6 +392,21 @@
     filter: brightness(1.12);
 }
 
+/*
+ * The selected chip in a `join` of choice buttons (SortChips, ChoiceChips) is
+ * marked with both btn-primary and btn-active, but under a pack .btn already
+ * strips btn-primary's fill and forces one text colour on every variant (see
+ * above), so btn-active's hover-strength brightness bump was the only signal
+ * left — too subtle to read as "selected" rather than "being pointed at".
+ * This inset ring is the second, persistent signal; three classes beats the
+ * plain `.btn` rule's specificity, so it wins without needing `!important` on
+ * its own to fight `!important` — .btn's `box-shadow: none !important` above
+ * still loses because the two now differ in specificity, not just importance.
+ */
+.join-item.btn.btn-primary {
+    box-shadow: inset 0 0 0 2px var(--pack-accent, #f0e6d2) !important;
+}
+
 /* Badges — reuse the whole button 9-slice, face included, so small labels like
  * event types match the rest of the UI. */
 .resource-pack-badge {

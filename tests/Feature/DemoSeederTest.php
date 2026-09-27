@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AccountTypesEnum;
 use App\Models\Account;
 use App\Models\AccountCombatAchievement;
 use App\Models\AccountDiary;
@@ -20,6 +21,8 @@ use App\Models\ResourcePack;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UsernameHistory;
+use App\Models\WomDailySnapshot;
+use App\Models\WomPlayer;
 use App\Services\Loot\LootLeaderboard;
 use App\Support\CombatAchievements;
 use App\Support\Diaries;
@@ -27,12 +30,18 @@ use App\Support\Instance;
 use Database\Factories\CollectionLogFactory;
 use Database\Factories\GroupBankFactory;
 use Database\Factories\ResourcePackFactory;
+use Database\Seeders\AccountSeeder;
 use Database\Seeders\DemoContentSeeder;
 use Database\Seeders\DemoSnapshotsSeeder;
+use Database\Seeders\DemoWomSeeder;
+use Database\Seeders\LiveWomSeeder;
 use Database\Seeders\SettingsSeeder;
 use Database\Seeders\Support\ItemPool;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
@@ -339,4 +348,113 @@ it('fills gaps rather than duplicating them on a second run', function () {
 
     expect(CollectionLog::count())->toBe($logs)
         ->and(ResourcePack::count())->toBe($packs);
+});
+
+it('seeds real Wise Old Man accounts with their account types', function () {
+    $this->seed(UserSeeder::class);
+    $this->seed(AccountSeeder::class);
+
+    // These names are live, WOM-tracked players, so a WOM sync of the demo
+    // instance has real history to pull; the types match what WOM reports.
+    $types = Account::query()->pluck('account_type', 'username')
+        ->map(fn (AccountTypesEnum|string $type): string => $type instanceof AccountTypesEnum ? $type->value : $type);
+
+    expect($types)->toHaveCount(14)
+        ->and($types['Habski'])->toBe(AccountTypesEnum::IRONMAN->value)
+        ->and($types['Bartheez'])->toBe(AccountTypesEnum::IRONMAN->value)
+        ->and($types['L apras'])->toBe(AccountTypesEnum::ULTIMATE_IRONMAN->value)
+        ->and($types['Ju1es'])->toBe(AccountTypesEnum::HARDCORE_IRONMAN->value)
+        ->and($types['Meekss'])->toBe(AccountTypesEnum::NORMAL->value);
+
+    // A second run fills gaps instead of duplicating usernames.
+    $this->seed(AccountSeeder::class);
+    expect(Account::count())->toBe(14);
+});
+
+it('enables Wise Old Man with a public progress page', function () {
+    $this->seed(SettingsSeeder::class);
+
+    expect(Instance::womEnabled())->toBeTrue()
+        ->and(Instance::womProgressPublic())->toBeTrue()
+        ->and(Instance::womActiveWithinDays())->toBe(30);
+});
+
+it('seeds a Wise Old Man mix of active, inactive, hidden and unknown accounts with a year of history', function () {
+    Http::preventStrayRequests();
+    Account::factory()->count(14)->create();
+
+    $this->seed(DemoWomSeeder::class);
+
+    expect(WomPlayer::count())->toBe(14)
+        ->and(WomPlayer::active()->count())->toBeGreaterThanOrEqual(8)
+        ->and(WomPlayer::linked()->where('last_changed_at', '<', now()->subDays(30))->count())->toBeGreaterThanOrEqual(1)
+        ->and(WomPlayer::whereNull('wom_player_id')->whereNotNull('not_found_at')->count())->toBe(1)
+        ->and(WomPlayer::where('show_on_progress', false)->count())->toBe(1)
+        ->and(WomPlayer::where('tracking_opt_in', true)->count())->toBe(2);
+
+    // Each linked account ends its series on exactly what its row says.
+    $player = WomPlayer::active()->orderBy('account_id')->first();
+    $series = WomDailySnapshot::where('account_id', $player->account_id)->orderBy('date')->get();
+
+    expect($series)->toHaveCount(DemoWomSeeder::DAYS)
+        ->and($series->last()->date)->toBe(now('UTC')->toDateString())
+        ->and($series->last()->exp)->toBe($player->exp)
+        ->and($series->first()->exp)->toBeLessThanOrEqual($player->exp)
+        ->and($series->pluck('exp')->sort()->values()->all())->toBe($series->pluck('exp')->all());
+
+    // An inactive account is flat since its last change.
+    $inactive = WomPlayer::linked()->where('last_changed_at', '<', now()->subDays(30))->first();
+    $recent = WomDailySnapshot::where('account_id', $inactive->account_id)
+        ->where('date', '>=', now('UTC')->subDays(30)->toDateString())
+        ->pluck('exp')->unique();
+
+    expect($recent->all())->toBe([$inactive->exp])
+        ->and(WomDailySnapshot::whereIn('account_id', WomPlayer::whereNull('wom_player_id')->pluck('account_id'))->count())->toBe(0);
+});
+
+it('fills Wise Old Man gaps rather than duplicating them on a second run', function () {
+    Account::factory()->count(4)->create();
+    $this->seed(DemoWomSeeder::class);
+
+    $players = WomPlayer::count();
+    $points = WomDailySnapshot::count();
+    $first = WomPlayer::linked()->orderBy('account_id')->first();
+    WomDailySnapshot::where('account_id', $first->account_id)->limit(10)->get()->each->delete();
+
+    $this->seed(DemoWomSeeder::class);
+
+    expect(WomPlayer::count())->toBe($players)
+        ->and(WomDailySnapshot::count())->toBe($points);
+});
+
+it('replaces demo Wise Old Man data with live data using GETs only', function () {
+    Http::preventStrayRequests();
+    config(['services.wiseoldman.url' => 'https://api.wiseoldman.net/v2', 'services.wiseoldman.api_key' => null]);
+    Http::fake([
+        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=overall*' => Http::response(womFixture('timeline-bartheez-overall')),
+        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehp*' => Http::response(womFixture('timeline-bartheez-ehp')),
+        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehb*' => Http::response(womFixture('timeline-bartheez-ehb')),
+        'api.wiseoldman.net/v2/players/bartheez' => Http::response(womFixture('player-bartheez')),
+        'api.wiseoldman.net/*' => Http::response(['message' => 'Player not found.'], 404),
+    ]);
+
+    // Opted in and far behind: a real sync would POST here, the seeder must not.
+    $bartheez = Account::factory()->create(['username' => 'Bartheez', 'xp' => 900_000_000, 'last_seen_at' => now()]);
+    $unknown = Account::factory()->create(['username' => 'Nobody Here']);
+    Account::factory()->create();
+    $this->seed(DemoWomSeeder::class);
+    WomPlayer::where('account_id', $bartheez->id)->update(['tracking_opt_in' => true, 'update_requested_at' => null]);
+    $unknownPoints = WomDailySnapshot::where('account_id', $unknown->id)->count();
+
+    $this->seed(LiveWomSeeder::class);
+
+    expect(Http::recorded(fn (Request $request) => $request->method() !== 'GET'))->toBeEmpty();
+
+    $player = WomPlayer::where('account_id', $bartheez->id)->first();
+    expect($player->wom_player_id)->toBe(315771)
+        ->and($player->exp)->toBe(832820305)
+        ->and(WomDailySnapshot::where('account_id', $bartheez->id)->pluck('date')->sort()->values()->all())
+        ->toBe(['2026-09-25', '2026-09-26'])
+        ->and($unknownPoints)->toBe(DemoWomSeeder::DAYS)
+        ->and(WomDailySnapshot::where('account_id', $unknown->id)->count())->toBe($unknownPoints);
 });

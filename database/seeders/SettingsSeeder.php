@@ -55,6 +55,12 @@ class SettingsSeeder extends Seeder
         $this->setUnlessSet('feed_loot_min_value', (int) config('runemanager.feed.loot_min_value', 0), 'int');
         $this->setUnlessSet('calendar_highlight_colors', json_encode(self::HIGHLIGHT_COLORS));
 
+        // Wise Old Man on, with a public /progress page, so the demo shows the
+        // progress surfaces to logged-out visitors too. DemoWomSeeder fills them.
+        $this->setUnlessSet('wom_enabled', true, 'bool');
+        $this->setUnlessSet('wom_progress_public', true, 'bool');
+        $this->setUnlessSet('wom_active_within_days', 30, 'int');
+
         // This seeder runs before any pack is installed, so a fresh run links
         // nothing here; whichever seeder creates the pack rows calls
         // linkDefaultResourcePack() itself once they exist.
