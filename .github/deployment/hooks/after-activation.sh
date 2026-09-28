@@ -21,3 +21,7 @@ fi
 if command -v supervisorctl >/dev/null && supervisorctl status runemanager-reverb >/dev/null 2>&1; then
     supervisorctl restart runemanager-reverb
 fi
+
+# Screenshots the previous release stored on the public disk while this deploy
+# ran (after its migration had moved the rest) go to private storage too.
+"$php_executable" artisan screenshots:move-private

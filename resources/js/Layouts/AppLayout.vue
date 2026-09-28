@@ -112,7 +112,7 @@ const logout = () => {
                             <li>
                                 <NavDropdown :label="page.props.auth?.user?.name ?? 'Account'"
                                              align="end"
-                                             :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*') || route().current('wise-old-man.*')">
+                                             :active="route().current('profile.*') || route().current('themes.*') || route().current('api-tokens.*') || route().current('privacy.*') || route().current('screenshots.*')">
                                     <NavAccountsMenu />
                                     <NavPackSwitcher />
                                     <hr class="my-1 border-base-content/10">

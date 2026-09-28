@@ -11,8 +11,12 @@ use App\Http\Controllers\GroupBankController;
 use App\Http\Controllers\Hiscores;
 use App\Http\Controllers\ItemSearchController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\MapEventsController;
 use App\Http\Controllers\News;
+use App\Http\Controllers\PrivacySettingsController;
 use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\ScreenshotFileController;
+use App\Http\Controllers\ScreenshotsController;
 use App\Http\Controllers\StyleguideController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\UserDarkModeController;
@@ -25,6 +29,12 @@ Route::get('/', [WelcomeController::class, 'index'])->name('home');
 
 // The live feed is intentionally public (no auth middleware).
 Route::get('/feed', [FeedController::class, 'index'])->name('feed.index');
+
+// A feed event's screenshot. Public like the feed, so guests see visible ones;
+// the controller 404s whatever the viewer may not see (a hidden screenshot is
+// only the account owner's and the admins').
+Route::get('/screenshots/{feedEvent}', [ScreenshotFileController::class, 'show'])
+    ->whereNumber('feedEvent')->name('screenshots.file');
 
 // Calendar viewing is public; mutation routes are auth-gated below.
 Route::get('/calendar', [CalendarEventController::class, 'index'])->name('calendar.index');
@@ -86,6 +96,9 @@ Route::middleware([
 
     // Live Map — see where accounts are in real time (positions over websockets).
     Route::get('/map', [MapController::class, 'index'])->name('map.index');
+    // Where the selected accounts' feed events happened, as JSON for the map's
+    // events layer (only accounts the viewer may see; see EventMap).
+    Route::get('/map/events', [MapEventsController::class, 'index'])->name('map.events');
 
     // Shared Group Ironman bank (GROUP mode only; controller 404s otherwise).
     Route::get('/group-bank', [GroupBankController::class, 'index'])->name('group-bank.index');
@@ -190,8 +203,25 @@ Route::middleware([
     Route::delete('/user/resource-pack/{pack}', [UserResourcePackController::class, 'destroy'])
         ->whereNumber('pack')->name('user.resource-pack.destroy');
 
-    // Per-account Wise Old Man preferences; the controller checks ownership and
-    // 404s while the integration is off.
+    // Settings → Privacy: every per-account switch that decides what others
+    // see; the request checks ownership. Its own throttle bucket (the third
+    // argument), so toggling many accounts never eats into another route's limit.
+    Route::get('/settings/privacy', [PrivacySettingsController::class, 'index'])->name('privacy.index');
+    Route::put('/settings/privacy/{account}', [PrivacySettingsController::class, 'update'])
+        ->middleware('throttle:30,1,privacy')->name('privacy.update');
+
+    // Settings → Screenshots: the owner's gallery, where screenshots are hidden
+    // or deleted in bulk (the events stay); the controller skips other
+    // people's events.
+    Route::get('/settings/screenshots', [ScreenshotsController::class, 'index'])->name('screenshots.index');
+    Route::patch('/settings/screenshots', [ScreenshotsController::class, 'update'])
+        ->middleware('throttle:60,1,screenshots')->name('screenshots.update');
+    Route::delete('/settings/screenshots', [ScreenshotsController::class, 'destroy'])
+        ->middleware('throttle:60,1,screenshots')->name('screenshots.destroy');
+
+    // The old Wise Old Man settings page now lives in Settings → Privacy; the
+    // index redirects there and the writes keep working for open tabs. The
+    // controller checks ownership and 404s the writes while the integration is off.
     Route::get('/settings/wise-old-man', [WiseOldManSettingsController::class, 'index'])->name('wise-old-man.index');
     // Throttled: tracking queues a WOM update, and both write per click.
     Route::post('/settings/wise-old-man/{account}/track', [WiseOldManSettingsController::class, 'track'])

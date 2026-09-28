@@ -29,28 +29,35 @@ beforeEach(function () {
     $this->account = Account::factory()->for($this->owner)->create(['username' => 'Bartheez']);
 });
 
-it('lists the user\'s own accounts with their link status', function () {
-    WomPlayer::factory()->for($this->account)->create();
+it('sends the old settings page to Privacy', function () {
+    $this->actingAs($this->owner)
+        ->get(route('wise-old-man.index'))
+        ->assertRedirect(route('privacy.index'));
+});
+
+it('lists the user\'s own accounts with their link status on the Privacy page', function () {
+    WomPlayer::factory()->for($this->account)->create(['tracking_opt_in' => true]);
     $unchecked = Account::factory()->for($this->owner)->create(['username' => 'Zed']);
     Account::factory()->create(['username' => 'SomeoneElse']);
 
     $this->actingAs($this->owner)
-        ->get(route('wise-old-man.index'))
+        ->get(route('privacy.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('WiseOldMan/Index')
+            ->component('Privacy/Index')
+            ->where('wom_enabled', true)
             ->has('accounts', 2)
             ->where('accounts.0.username', 'Bartheez')
-            ->where('accounts.0.wom.linked', true)
+            ->where('accounts.0.wom', ['status' => 'linked', 'show_on_progress' => true, 'tracking_opt_in' => true])
             ->where('accounts.1.id', $unchecked->id)
-            ->where('accounts.1.wom', null),
+            ->where('accounts.1.wom', ['status' => 'unchecked', 'show_on_progress' => true, 'tracking_opt_in' => false]),
         );
 });
 
-it('is not found while Wise Old Man is off', function () {
+it('is not found while Wise Old Man is off, apart from the redirect', function () {
     SettingHelper::setSetting('wom_enabled', false, 'bool');
 
-    $this->actingAs($this->owner)->get(route('wise-old-man.index'))->assertNotFound();
+    $this->actingAs($this->owner)->get(route('wise-old-man.index'))->assertRedirect(route('privacy.index'));
     $this->actingAs($this->owner)
         ->put(route('wise-old-man.update', $this->account), ['show_on_progress' => false])
         ->assertNotFound();
@@ -138,17 +145,6 @@ it('requires at least one choice', function () {
     $this->actingAs($this->owner)
         ->put(route('wise-old-man.update', $this->account), [])
         ->assertSessionHasErrors('show_on_progress');
-});
-
-it('shows the owner their own consent choices', function () {
-    WomPlayer::factory()->for($this->account)->create(['tracking_opt_in' => true]);
-
-    $this->actingAs($this->owner)
-        ->get(route('wise-old-man.index'))
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('accounts.0.wom.tracking_opt_in', true)
-            ->where('accounts.0.wom.show_on_progress', true),
-        );
 });
 
 it('throttles the write endpoints', function () {

@@ -19,6 +19,8 @@ use App\Models\WomAchievement;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
 use App\Models\WomRecord;
+use App\Services\Accounts\StoreAvatar;
+use App\Services\Screenshots\ScreenshotStorage;
 use App\Services\WiseOldMan\WomCache;
 use App\Support\Roles;
 use Illuminate\Support\Facades\Cache;
@@ -31,6 +33,8 @@ use Illuminate\Support\Facades\Cache;
  */
 class ResetInstanceData
 {
+    public function __construct(private ScreenshotStorage $screenshots, private StoreAvatar $avatars) {}
+
     public function run(): void
     {
         // Account-scoped MongoDB collections.
@@ -50,11 +54,15 @@ class ResetInstanceData
         AccountHiscore::query()->delete();
         Equipment::query()->delete();
         FeedEvent::query()->delete();
+        // Their screenshots are files, which deleting the rows would leave behind.
+        $this->screenshots->deleteAll();
         UsernameHistory::query()->delete();
         WomAchievement::query()->delete();
         WomRecord::query()->delete();
         WomPlayer::query()->delete();
         Account::query()->delete();
+        // So are their 3D avatars, on the public disk.
+        $this->avatars->deleteAll();
 
         // The Hiscores nav lists are derived from account data, so they would
         // otherwise keep naming bosses this instance no longer has any hiscores for.

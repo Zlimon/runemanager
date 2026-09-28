@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from "vue";
-import { router, usePage } from "@inertiajs/vue3";
+import { Link, router, usePage } from "@inertiajs/vue3";
 import dayjs from "dayjs";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
 
@@ -42,6 +42,20 @@ const bodyId = computed(() => `recent-event-${props.event.id.replace(':', '-')}`
 
 const date = computed(() => dayjs(props.event.occurred_at));
 
+// Feed events carry where they happened; open the map there with this
+// account's events plotted.
+const mapHref = computed(() => {
+    const position = props.event.position;
+    return position
+        ? route('map.index', {
+            x: position.x,
+            y: position.y,
+            ...(position.plane > 0 ? { plane: position.plane } : {}),
+            events: props.account.id,
+        })
+        : null;
+});
+
 const togglePin = () => {
     router.put(route('feed.pin', props.event.feed_event_id), {}, {
         only: ['pinnedFeed'],
@@ -72,10 +86,18 @@ const togglePin = () => {
         <div v-show="open" :id="bodyId" class="flex items-start gap-3 px-2 pb-3 pl-11 text-sm text-base-content/80">
             <div class="flex-1">
                 <p>{{ event.body }}</p>
-                <a v-if="event.screenshot_url" :href="event.screenshot_url" target="_blank" rel="noopener"
-                   class="link link-hover mt-1 inline-block text-xs text-base-content/60">
-                    Screenshot
-                </a>
+                <div v-if="event.screenshot_url || mapHref" class="mt-1 flex gap-3 text-xs text-base-content/60">
+                    <a v-if="event.screenshot_url" :href="event.screenshot_url" target="_blank" rel="noopener"
+                       class="link link-hover">
+                        Screenshot<span v-if="event.screenshot_hidden"
+                                        class="ms-1 text-base-content/50"
+                                        title="Only you and admins see this screenshot">(hidden)</span>
+                    </a>
+                    <Link v-if="mapHref" :href="mapHref" class="link link-hover"
+                          :title="event.position.location || undefined">
+                        Show on map
+                    </Link>
+                </div>
             </div>
             <button v-if="canPin" type="button" @click="togglePin"
                     class="shrink-0 text-xs"

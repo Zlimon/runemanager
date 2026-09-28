@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import dayjs from "dayjs";
 import Card from "@/Components/Cards/Card.vue";
+import Badge from "@/Components/Display/Badge.vue";
 import ImageLightbox from "@/Components/Modals/ImageLightbox.vue";
 import LootItems from "@/Components/Game/Items/LootItems.vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
@@ -20,6 +21,9 @@ import { feedIcon, feedSentence } from "@/feed";
  *   #header  above the sentence — the feed's account link
  *   #meta    after the sentence — the feed's link to where it happened
  *   #actions the controls, top right of the caption
+ *
+ * `screenshot_hidden` is only sent to the account's owner and admins, who
+ * still see a hidden screenshot; it is badged so they know others do not.
  */
 const props = defineProps({
     event: {
@@ -54,12 +58,16 @@ const isLoot = computed(() => props.event.type === 'loot_drop' && props.event.pa
 
 <template>
     <Card padding="p-0" frame="dialog" class="group relative overflow-hidden">
-        <div v-if="hasMedia" class="p-2">
+        <div v-if="hasMedia" class="relative p-2">
             <ImageLightbox v-if="event.screenshot_url" :src="event.screenshot_url" alt="Event screenshot"
                            thumb-class="h-28 w-full object-cover" class="!w-full" />
             <div v-else class="flex h-28 w-full items-center justify-center bg-base-300/40">
                 <img src="/images/trophy.png" alt="" class="h-14 w-14 object-contain [image-rendering:pixelated]">
             </div>
+            <Badge v-if="event.screenshot_url && event.screenshot_hidden" size="sm"
+                   class="pointer-events-none absolute left-4 top-4">
+                Hidden
+            </Badge>
         </div>
 
         <div class="flex items-start gap-3 px-4" :class="hasMedia ? 'pb-4' : 'py-4'">

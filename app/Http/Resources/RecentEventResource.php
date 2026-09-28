@@ -8,7 +8,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Wire shape of one Adventurer's Log row. Feed rows also carry what the
- * owner needs to pin them and the screenshot.
+ * owner needs to pin them and the screenshot (`screenshot_url` null when the
+ * viewer may not see it; `screenshot_hidden` only for the owner and admins). `position` is where a feed
+ * event happened, for the "Show on map" link; null when unknown and always
+ * null for Wise Old Man rows.
  *
  * @property RecentEvent $resource
  */
@@ -30,10 +33,12 @@ class RecentEventResource extends JsonResource
             'occurred_at' => $event->occurredAt->toIso8601String(),
             'approximate' => $event->approximate,
             'icon' => $event->icon,
+            'position' => $event->position,
             ...($event->source === RecentEvent::SOURCE_FEED ? [
                 'feed_event_id' => $event->feedEventId,
                 'pinned' => (bool) $event->pinned,
                 'screenshot_url' => $event->screenshotUrl,
+                ...($event->screenshotHidden !== null ? ['screenshot_hidden' => $event->screenshotHidden] : []),
             ] : []),
         ];
     }

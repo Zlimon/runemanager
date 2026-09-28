@@ -4,15 +4,15 @@ namespace App\Services\Accounts;
 
 use App\Models\Account;
 use App\Models\FeedEvent;
-use App\Models\Item;
+use App\Models\User;
 use App\Models\WomAchievement;
 use App\Models\WomRecord;
+use App\Services\Map\EventMap;
 use App\Services\WiseOldMan\WomMetrics;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * An account's Adventurer's Log: milestone feed events, Wise Old Man
@@ -32,16 +32,22 @@ class RecentEvents
     /** Record metrics the log leaves out. */
     public const HIDDEN_RECORD_METRICS = ['ehp', 'ehb'];
 
+    public function __construct(private FeedEventItems $feedItems) {}
+
     /**
+     * Feed rows carry where they happened only when $viewer may see it
+     * ({@see EventMap::positionVisibleTo()}); without a viewer, never. Their
+     * screenshot follows {@see FeedEvent::screenshotVisibleTo()} the same way.
+     *
      * @return array{events: list<RecentEvent>, next_cursor: ?string}
      */
-    public function page(Account $account, ?string $before = null, int $limit = 15): array
+    public function page(Account $account, ?string $before = null, int $limit = 15, ?User $viewer = null): array
     {
         $limit = max(1, $limit);
         $cursor = self::decodeCursor($before);
 
         $events = collect()
-            ->concat($this->feedEvents($account, $cursor, $limit + 1))
+            ->concat($this->feedEvents($account, $cursor, $limit + 1, $viewer))
             ->concat($this->achievements($account, $cursor, $limit + 1))
             ->concat($this->records($account, $cursor, $limit + 1))
             ->sort(RecentEvent::compare(...))
@@ -82,8 +88,10 @@ class RecentEvents
      * @param  array{ms: int, rank: int, key: int}|null  $cursor
      * @return Collection<int, RecentEvent>
      */
-    private function feedEvents(Account $account, ?array $cursor, int $take): Collection
+    private function feedEvents(Account $account, ?array $cursor, int $take, ?User $viewer): Collection
     {
+        $withPositions = EventMap::positionVisibleTo($viewer, $account);
+
         $query = FeedEvent::query()
             ->where('account_id', $account->id)
             ->logMilestones()
@@ -95,10 +103,12 @@ class RecentEvents
 
         /** @var EloquentCollection<int, FeedEvent> $rows */
         $rows = $query->get();
-        $items = $this->feedItems($rows);
+        $rows->each->setRelation('account', $account);
+        $items = $this->feedItems->lookup($rows);
+        $managesScreenshots = $rows->isNotEmpty() && $rows->first()->screenshotManagedBy($viewer);
 
-        return $rows->map(function (FeedEvent $event) use ($items): RecentEvent {
-            $item = $this->feedItem($event, $items);
+        return $rows->map(function (FeedEvent $event) use ($items, $withPositions, $viewer, $managesScreenshots): RecentEvent {
+            $item = $this->feedItems->item($event, $items);
             $copy = AdventurersLogCopy::forFeedEvent($event, $item['name'] ?? null);
 
             return new RecentEvent(
@@ -108,10 +118,17 @@ class RecentEvents
                 title: $copy['title'],
                 body: $copy['body'],
                 occurredAt: $event->occurred_at->toImmutable(),
-                icon: $this->feedIcon($event, $item),
+                icon: $this->feedItems->icon($event, $item),
                 feedEventId: $event->id,
                 pinned: $event->pinned_at !== null,
-                screenshotUrl: $event->screenshot_path ? Storage::disk('public')->url($event->screenshot_path) : null,
+                screenshotUrl: $event->screenshotVisibleTo($viewer) ? route('screenshots.file', $event->id) : null,
+                screenshotHidden: $managesScreenshots ? $event->screenshot_path !== null && $event->screenshot_hidden : null,
+                position: $withPositions && $event->world_x !== null ? [
+                    'x' => $event->world_x,
+                    'y' => $event->world_y,
+                    'plane' => $event->world_plane ?? 0,
+                    'location' => $event->location,
+                ] : null,
             );
         })->toBase();
     }
@@ -266,89 +283,5 @@ class RecentEvents
             ->unique()
             ->values()
             ->all();
-    }
-
-    /**
-     * Catalogue entries for the page's loot drops (by id) and collection log
-     * slots (by name), in one Mongo query each.
-     *
-     * @param  EloquentCollection<int, FeedEvent>  $events
-     * @return array{ids: array<int, array<string, mixed>>, names: array<string, array{id: int, name: string, icon: ?string}>}
-     */
-    private function feedItems(EloquentCollection $events): array
-    {
-        $ids = $events->where('type', FeedEvent::TYPE_LOOT_DROP)
-            ->flatMap(fn (FeedEvent $event): array => array_map(fn ($slot): int => (int) ($slot['id'] ?? 0), self::lootSlots($event)))
-            ->unique()
-            ->values()
-            ->all();
-
-        $names = $events->where('type', FeedEvent::TYPE_COLLECTION_LOG)
-            ->map(fn (FeedEvent $event): string => is_string($event->payload['item'] ?? null) ? $event->payload['item'] : '')
-            ->filter()
-            ->unique()
-            ->values()
-            ->all();
-
-        return ['ids' => Item::lookupByOsrsIds($ids), 'names' => Item::lookupByNames($names)];
-    }
-
-    /**
-     * The item an event is about: a loot drop's most valuable slot (by high
-     * alchemy value × quantity, else the first), or a collection log slot.
-     *
-     * @param  array{ids: array<int, array<string, mixed>>, names: array<string, array{id: int, name: string, icon: ?string}>}  $items
-     * @return array{name: string, icon: ?string}|null
-     */
-    private function feedItem(FeedEvent $event, array $items): ?array
-    {
-        if ($event->type === FeedEvent::TYPE_COLLECTION_LOG) {
-            $name = $event->payload['item'] ?? null;
-            $item = is_string($name) ? ($items['names'][$name] ?? null) : null;
-
-            return $item !== null ? ['name' => $item['name'], 'icon' => $item['icon']] : null;
-        }
-
-        if ($event->type !== FeedEvent::TYPE_LOOT_DROP) {
-            return null;
-        }
-
-        $top = collect(self::lootSlots($event))
-            ->map(fn ($slot): ?array => isset($items['ids'][(int) ($slot['id'] ?? 0)])
-                ? [...$items['ids'][(int) $slot['id']], 'worth' => ($items['ids'][(int) $slot['id']]['highalch'] ?? 0) * (int) ($slot['quantity'] ?? 1)]
-                : null)
-            ->filter()
-            ->sortByDesc('worth')
-            ->first();
-
-        return $top !== null && $top['name'] !== '' ? ['name' => $top['name'], 'icon' => $top['icon'] ?? null] : null;
-    }
-
-    /**
-     * @param  array{name: string, icon: ?string}|null  $item
-     * @return array{kind: string, slug: string}|array{src: string}|null
-     */
-    private function feedIcon(FeedEvent $event, ?array $item): ?array
-    {
-        return match ($event->type) {
-            FeedEvent::TYPE_LEVEL_UP => is_string($event->payload['skill'] ?? null)
-                ? WomMetrics::icon(AdventurersLogCopy::skillMetric($event->payload['skill']))
-                : null,
-            FeedEvent::TYPE_QUEST_COMPLETE => ['kind' => 'quests_tab', 'slug' => 'blue_quests_icon'],
-            FeedEvent::TYPE_COMBAT_ACHIEVEMENT => ['kind' => 'quests_tab', 'slug' => 'combat_achievements_icon'],
-            default => filled($item['icon'] ?? null) ? ['src' => 'data:image/jpeg;base64,'.$item['icon']] : null,
-        };
-    }
-
-    /**
-     * A loot drop's item slots, tolerating a malformed payload.
-     *
-     * @return list<array<string, mixed>>
-     */
-    private static function lootSlots(FeedEvent $event): array
-    {
-        $items = is_array($event->payload) ? ($event->payload['items'] ?? []) : [];
-
-        return is_array($items) ? array_values(array_filter($items, 'is_array')) : [];
     }
 }

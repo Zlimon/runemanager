@@ -97,7 +97,7 @@ const pickRange = (value) => {
         <Card v-if="!linked" frame="dialog" padding="p-6" class="text-center text-sm text-base-content/70">
             <p v-if="wom?.not_found">{{ account.username }} is not tracked on Wise Old Man.</p>
             <p v-else>{{ account.username }} has not been checked on Wise Old Man yet.</p>
-            <Link v-if="isOwner" :href="route('wise-old-man.index')" class="link mt-2 inline-block">
+            <Link v-if="isOwner" :href="route('privacy.index')" class="link mt-2 inline-block">
                 Manage Wise Old Man tracking
             </Link>
         </Card>

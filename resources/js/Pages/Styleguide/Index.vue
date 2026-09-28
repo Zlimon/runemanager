@@ -342,6 +342,14 @@ const QUEST_EVENT = {
     screenshot_url: "/images/newspost_default.png",
 };
 
+// The owner's view of a screenshot they hid from everyone else.
+const HIDDEN_SHOT_EVENT = {
+    ...QUEST_EVENT,
+    id: 0,
+    payload: { quest: "Monkey Madness II" },
+    screenshot_hidden: true,
+};
+
 const NEWS_POSTS = [
     {
         id: 1,
@@ -1029,9 +1037,10 @@ const showConfirm = (action) => {
                         </div>
 
                         <div class="space-y-2">
-                            <h4 class="text-sm uppercase tracking-wide opacity-70">FeedEventCard — screenshot, placeholder, plain</h4>
-                            <div class="grid gap-3 md:grid-cols-3">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">FeedEventCard — screenshot, hidden screenshot (owner view), placeholder, plain</h4>
+                            <div class="grid gap-3 md:grid-cols-4">
                                 <FeedEventCard :event="QUEST_EVENT" />
+                                <FeedEventCard :event="HIDDEN_SHOT_EVENT" />
                                 <FeedEventCard :event="LEVEL_EVENT" placeholder />
                                 <FeedEventCard :event="lootEvent" relative-date />
                             </div>

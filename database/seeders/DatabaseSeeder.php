@@ -46,6 +46,8 @@ class DatabaseSeeder extends Seeder
             AccountSeeder::class,
             RolesSeeder::class,
             DemoContentSeeder::class,
+            DemoEventPositionsSeeder::class,
+            DemoScreenshotsSeeder::class,
             DemoSnapshotsSeeder::class,
             DemoWomSeeder::class,
         ]);

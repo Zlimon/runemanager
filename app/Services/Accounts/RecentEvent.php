@@ -26,6 +26,8 @@ readonly class RecentEvent
 
     /**
      * @param  array{kind: string, slug: string}|array{src: string}|null  $icon
+     * @param  array{x: int, y: int, plane: int, location: ?string}|null  $position  Where a feed event happened.
+     * @param  ?bool  $screenshotHidden  Whether the screenshot is hidden; null unless the viewer owns the account or is an admin.
      */
     public function __construct(
         public string $source,
@@ -39,6 +41,8 @@ readonly class RecentEvent
         public ?int $feedEventId = null,
         public ?bool $pinned = null,
         public ?string $screenshotUrl = null,
+        public ?array $position = null,
+        public ?bool $screenshotHidden = null,
     ) {}
 
     /** `feed:123`, `ach:45`, `rec:67`. */
