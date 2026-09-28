@@ -1,143 +1,57 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { Deferred, router } from "@inertiajs/vue3";
+import { computed, ref, watch } from "vue";
 import { useResourcePackIcon } from "@/composables/useResourcePackIcon";
-import AppLayout from '@/Layouts/AppLayout.vue';
-import CollectionLog from "@/Pages/Accounts/Partials/CollectionLog.vue";
-import Loot from "@/Pages/Accounts/Partials/Loot.vue";
+import AccountLayout from "@/Layouts/AccountLayout.vue";
+import TabbedCard from "@/Components/Cards/TabbedCard.vue";
+import Card from "@/Components/Cards/Card.vue";
 import Quests from "@/Pages/Accounts/Partials/Quests.vue";
 import Diaries from "@/Pages/Accounts/Partials/Diaries.vue";
 import CombatAchievements from "@/Pages/Accounts/Partials/CombatAchievements.vue";
-import Inventory from "@/Pages/Accounts/Partials/Inventory.vue";
-import LootingBag from "@/Pages/Accounts/Partials/LootingBag.vue";
-import AccountFeed from "@/Pages/Accounts/Partials/AccountFeed.vue";
 import AchievementGallery from "@/Pages/Accounts/Partials/AchievementGallery.vue";
+import RecentEvents from "@/Pages/Accounts/Partials/RecentEvents.vue";
 import Freshness from "@/Pages/Accounts/Partials/Freshness.vue";
-import Loader from "@/Components/Display/Loader.vue";
-import Search from "@/Pages/Accounts/Partials/Search.vue";
-import Header from "@/Pages/Accounts/Partials/Header.vue";
 import Equipment from "@/Pages/Accounts/Partials/Equipment.vue";
 import Avatar from "@/Pages/Accounts/Partials/Avatar.vue";
 import Summary from "@/Pages/Accounts/Partials/Summary.vue";
-import Progress from "@/Pages/Accounts/Partials/Progress.vue";
 import Skills from "@/Pages/Accounts/Partials/Skills.vue";
-import Bank from "@/Pages/Accounts/Partials/Bank.vue";
-import Minimap from "@/Pages/Accounts/Partials/Minimap.vue";
-import StatusOrbs from "@/Pages/Accounts/Partials/StatusOrbs.vue";
-import TabbedCard from "@/Components/Cards/TabbedCard.vue";
-import Card from "@/Components/Cards/Card.vue";
 
+/*
+ * The Adventurer's Log — the account's landing tab, after the old RuneScape
+ * one: the character panel on the left; Total Level, Recent Events and the
+ * quest journal on the right.
+ */
 const props = defineProps({
-    account: {
-        type: Object,
-        required: true,
-    },
-    inventory: {
-        type: Object,
-        default: null,
-    },
-    bank: {
-        type: Object,
-        default: null,
-    },
-    lootingBag: {
-        type: Object,
-        default: null,
-    },
-    quests: {
-        type: Object,
-        default: null,
-    },
-    diaries: {
-        type: Object,
-        default: () => ({}),
-    },
-    combatAchievements: {
-        type: Object,
-        default: null,
-    },
-    avatar: {
-        type: Object,
-        default: null,
-    },
-    collectionLog: {
-        type: Object,
-        default: null,
-    },
-    recentLoot: {
-        type: Array,
-        default: () => [],
-    },
-    feed: {
-        type: Array,
-        default: () => [],
-    },
-    pinnedFeed: {
-        type: Array,
-        default: () => [],
-    },
+    account: { type: Object, required: true },
+    position: { type: Object, default: null },
+    vitals: { type: Object, default: null },
+    location: { type: String, default: null },
+    quests: { type: Object, default: null },
+    diaries: { type: Object, default: () => ({}) },
+    combatAchievements: { type: Object, default: null },
+    avatar: { type: Object, default: null },
+    pinnedFeed: { type: Array, default: () => [] },
+    // { data, next_cursor } — the first page; RecentEvents fetches the rest.
+    recentEvents: { type: Object, default: () => ({ data: [], next_cursor: null }) },
     // { position, total } among this instance's accounts by total XP, or null
     // while the account has no XP to rank on.
-    instanceRank: {
-        type: Object,
-        default: null,
-    },
-    position: {
-        type: Object,
-        default: null,
-    },
-    location: {
-        type: String,
-        default: null,
-    },
-    vitals: {
-        type: Object,
-        default: null,
-    },
-    freshness: {
-        type: Object,
-        default: () => ({ stale_after_minutes: 60 }),
-    },
-    // Wise Old Man — only sent while the integration is on. `womSeries` and
-    // `womGains` are deferred.
-    wom: {
-        type: Object,
-        default: null,
-    },
-    womSeries: {
-        type: Array,
-        default: null,
-    },
-    womGains: {
-        type: Object,
-        default: null,
-    },
-    womFilters: {
-        type: Object,
-        default: null,
-    },
+    instanceRank: { type: Object, default: null },
+    freshness: { type: Object, default: () => ({ stale_after_minutes: 60 }) },
+    // WomAccountView::summary() — only sent while Wise Old Man is on.
+    wom: { type: Object, default: null },
 });
 
-// Status-orb values update often, so they arrive as their own broadcast (with
-// the values inline) rather than via a prop reload.
-const liveVitals = ref(props.vitals);
+// DataUpdated type ⇒ the props this tab reloads (freshness is added by the layout).
+const RELOAD_PROPS = {
+    equipment: ['account'],
+    avatar: ['avatar'],
+    diaries: ['diaries'],
+    combat_achievements: ['combatAchievements'],
+};
 
-// Current in-game activity + area + world — pushed live on the status broadcast.
-const liveActivity = ref(props.account.activity);
-const liveActivityIcon = ref(props.account.activity_icon);
-const liveLocation = ref(props.location);
-const liveWorld = ref(props.account.world);
-
-// Inventory + Looting bag use the active pack's in-game tab/bank icons (no local
-// fallback exists, so they show only when a pack is installed).
 const { packIcon } = useResourcePackIcon();
 
-const activeTab = ref('inventory');
-
-const inventoryTabs = [
-    { key: 'inventory', label: 'Inventory', icon: packIcon('tab', 'inventory') },
-    { key: 'looting-bag', label: 'Looting bag', icon: packIcon('bank', 'deposit_looting_bag') },
-];
+// Lets the gallery's unpin flip the matching Recent Events row.
+const recentEventsList = ref(null);
 
 const activeJournalTab = ref('quests');
 const journalTabs = [
@@ -148,205 +62,86 @@ const journalTabs = [
 
 const staleAfter = computed(() => props.freshness.stale_after_minutes ?? 60);
 
+const number = (value) => Number(value ?? 0).toLocaleString('en-US');
+
 // When the avatar includes an opponent, give it the whole column and tuck the
 // equipment away (toggleable above the model) so the fight has room to breathe.
 const hasNpc = computed(() => !!props.avatar?.npc_obj_url);
 const showEquipment = ref(true);
 watch(hasNpc, (npc) => { showEquipment.value = !npc; }, { immediate: true });
-
-// Live updates: the backend broadcasts a DataUpdated event on the account's
-// channel whenever a plugin push changes one of these data sets. We reload only
-// the affected Inertia prop (plus freshness) so the open profile updates itself.
-const RELOAD_PROPS = {
-    inventory: ['inventory', 'freshness'],
-    bank: ['bank', 'freshness'],
-    equipment: ['account', 'freshness'],
-    looting_bag: ['lootingBag', 'freshness'],
-    loot: ['recentLoot', 'freshness'],
-    avatar: ['avatar', 'freshness'],
-    diaries: ['diaries', 'freshness'],
-    combat_achievements: ['combatAchievements', 'freshness'],
-};
-
-const pendingProps = new Set();
-let reloadTimer = null;
-
-// Inventory/equipment pushes can arrive in bursts; coalesce them into one reload.
-const scheduleReload = (type) => {
-    const only = RELOAD_PROPS[type];
-    if (!only) {
-        return;
-    }
-    only.forEach((prop) => pendingProps.add(prop));
-    if (reloadTimer) {
-        return;
-    }
-    reloadTimer = window.setTimeout(() => {
-        router.reload({ only: [...pendingProps], preserveScroll: true, preserveState: true });
-        pendingProps.clear();
-        reloadTimer = null;
-    }, 600);
-};
-
-const channel = `account.${props.account.id}`;
-
-onMounted(() => {
-    window.Echo.private(channel)
-        .listen(".DataUpdated", (event) => scheduleReload(event.type))
-        .listen(".VitalsUpdated", (event) => { liveVitals.value = event; })
-        .listen(".StatusUpdated", (event) => {
-            liveActivity.value = event.activity;
-            liveActivityIcon.value = event.activity_icon;
-            liveLocation.value = event.location;
-            liveWorld.value = event.world;
-        });
-});
-
-onBeforeUnmount(() => {
-    if (reloadTimer) {
-        window.clearTimeout(reloadTimer);
-    }
-    window.Echo.leave(channel);
-});
 </script>
 
 <template>
-    <AppLayout :title="account.username">
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="flex justify-end">
-                    <Search />
-                </div>
+    <AccountLayout :account="account" :position="position" :vitals="vitals" :location="location"
+                   :reload-props="RELOAD_PROPS">
+        <!-- Owner-curated achievement gallery -->
+        <div class="mb-4 flex justify-center">
+            <AchievementGallery :account="account" :events="pinnedFeed"
+                                @unpinned="(id) => recentEventsList?.setPinned(id, false)" />
+        </div>
 
-                <Card class="mt-4" padding="p-6 lg:p-8">
-                    <div class="flex items-start justify-between gap-4">
-                        <Header :account="account" :activity="liveActivity" :activity-icon="liveActivityIcon" class="flex-1" />
-                        <div class="hidden shrink-0 items-start gap-3 md:flex">
-                            <StatusOrbs :vitals="liveVitals" />
-                            <div class="flex flex-col items-center gap-1">
-                                <Minimap :username="account.username" :position="position"
-                                         :href="position ? route('map.index', { focus: account.username }) : null" />
-                                <p v-if="liveLocation"
-                                   class="max-w-[12rem] truncate text-xs text-base-content/70" :title="liveLocation">
-                                    <span v-if="!account.online" class="text-base-content/50">Last seen: </span>{{ liveLocation }}<span v-if="account.online && liveWorld" class="text-base-content/50"> · W{{ liveWorld }}</span>
-                                </p>
-                            </div>
-                        </div>
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <!-- Character panel -->
+            <div>
+                <Card frame="dialog" padding="p-4">
+                    <div class="mb-2 flex items-baseline justify-between gap-2">
+                        <h3 class="truncate">{{ account.username }}</h3>
+                        <button type="button"
+                                class="shrink-0 text-xs text-base-content/60 hover:text-base-content"
+                                @click="showEquipment = !showEquipment">
+                            {{ showEquipment ? 'Hide equipment' : 'Show equipment' }}
+                        </button>
                     </div>
 
-                    <!-- Owner-curated achievement gallery -->
-                    <div class="mt-4 flex justify-center">
-                        <AchievementGallery :account="account" :events="pinnedFeed" />
+                    <!-- Side by side when there's no opponent and equipment is shown. -->
+                    <div v-if="!hasNpc && showEquipment" class="grid grid-cols-2 gap-4">
+                        <Avatar :avatar="avatar" />
+                        <Equipment :account="account" />
                     </div>
 
-                    <div class="grid grid-cols-3 gap-6">
-                        <div class="col-span-1">
-                            <div class="flex flex-col items-center">
-                                <div class="my-4 w-full">
-                                    <div class="mb-2 flex justify-end">
-                                        <button type="button"
-                                                class="text-xs text-base-content/60 hover:text-base-content"
-                                                @click="showEquipment = !showEquipment">
-                                            {{ showEquipment ? 'Hide equipment' : 'Show equipment' }}
-                                        </button>
-                                    </div>
-
-                                    <!-- Side by side when there's no opponent and equipment is shown. -->
-                                    <div v-if="!hasNpc && showEquipment" class="grid grid-cols-2 gap-4">
-                                        <Avatar :avatar="avatar" />
-                                        <Equipment :account="account" />
-                                    </div>
-
-                                    <!-- Otherwise the model fills the column; equipment stacks above. -->
-                                    <div v-else>
-                                        <Equipment v-if="showEquipment" :account="account" class="mb-3" />
-                                        <Avatar :avatar="avatar" :expanded="true" />
-                                    </div>
-                                </div>
-
-                                <Summary :account="account" :freshness="freshness" :instance-rank="instanceRank" :wom="wom" />
-                            </div>
-
-                            <!-- Vertical Inventory and Looting Bag tabs -->
-                            <TabbedCard :tabs="inventoryTabs" v-model="activeTab" class="mt-4">
-                                <template #inventory>
-                                    <div class="flex justify-end">
-                                        <Freshness :updated-at="freshness.inventory" :stale-after-minutes="staleAfter" />
-                                    </div>
-                                    <Inventory :inventory="inventory" />
-                                </template>
-                                <template #looting-bag>
-                                    <div class="flex justify-end">
-                                        <Freshness :updated-at="freshness.looting_bag" :stale-after-minutes="staleAfter" />
-                                    </div>
-                                    <LootingBag :looting-bag="lootingBag" />
-                                </template>
-                            </TabbedCard>
-
-                            <!-- This account's live feed -->
-                            <div class="mt-4">
-                                <AccountFeed :account="account" :events="feed" />
-                            </div>
-                        </div>
-
-                        <div class="col-span-2">
-                            <div class="mx-auto mt-6 grid grid-cols-3 gap-2">
-                                <div class="col-span-2">
-                                    <Skills :account="account" class="mt-4" />
-                                </div>
-
-                                <div class="col-span-1">
-                                    <TabbedCard :tabs="journalTabs" v-model="activeJournalTab" class="mt-4">
-                                        <template #quests>
-                                            <Quests :quests="quests" :freshness="freshness.quests" :stale-after="staleAfter" />
-                                        </template>
-                                        <template #diaries>
-                                            <Diaries :diaries="diaries" :freshness="freshness.diaries" :stale-after="staleAfter" />
-                                        </template>
-                                        <template #combat-achievements>
-                                            <CombatAchievements :combat-achievements="combatAchievements"
-                                                                :freshness="freshness.combat_achievements" :stale-after="staleAfter" />
-                                        </template>
-                                    </TabbedCard>
-                                </div>
-                            </div>
-
-                            <!-- Present only while the Wise Old Man integration is on. -->
-                            <Progress v-if="womFilters" class="mt-4" :account="account" :wom="wom"
-                                      :series="womSeries" :gains="womGains" :filters="womFilters" />
-
-                            <h3 class="mt-4">Collection Log</h3>
-                            <div class="mt-4">
-                                <Deferred data="collectionLog">
-                                    <template #fallback>
-                                        <div class="flex h-96 items-center justify-center">
-                                            <Loader :component="true" :loading="true" />
-                                        </div>
-                                    </template>
-
-                                    <CollectionLog :collection-log="collectionLog" />
-                                </Deferred>
-                            </div>
-
-                            <div class="mt-4 flex items-baseline justify-between">
-                                <h3>Bank</h3>
-                                <Freshness :updated-at="freshness.bank" :stale-after-minutes="staleAfter" />
-                            </div>
-                            <div class="mt-4">
-                                <Bank :bank="bank" />
-                            </div>
-
-                            <div class="mt-4 flex items-baseline justify-between">
-                                <h3>Recent Loot</h3>
-                                <Freshness :updated-at="freshness.loot" :stale-after-minutes="staleAfter" />
-                            </div>
-                            <div class="mt-4">
-                                <Loot :entries="recentLoot" />
-                            </div>
-                        </div>
+                    <!-- Otherwise the model fills the column; equipment stacks above. -->
+                    <div v-else>
+                        <Equipment v-if="showEquipment" :account="account" class="mb-3" />
+                        <Avatar :avatar="avatar" :expanded="true" />
                     </div>
+
+                    <hr class="my-4 border border-base-300 bg-base-300">
+
+                    <Summary :account="account" :instance-rank="instanceRank" :wom="wom" />
                 </Card>
             </div>
+
+            <div class="flex flex-col gap-6 lg:col-span-2">
+                <!-- Total Level -->
+                <section>
+                    <div class="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                        <h3>Total Level: {{ number(account.level) }}</h3>
+                        <div class="flex flex-wrap items-baseline gap-x-4 text-xs text-base-content/70">
+                            <span>XP <span class="font-semibold text-base-content">{{ number(account.xp) }}</span></span>
+                            <span>Rank <span class="font-semibold text-base-content">{{ account.rank > 0 ? number(account.rank) : '—' }}</span></span>
+                            <Freshness :updated-at="freshness.hiscores" :stale-after-minutes="staleAfter" />
+                        </div>
+                    </div>
+                    <Skills :account="account" />
+                </section>
+
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-5">
+                    <RecentEvents ref="recentEventsList" class="md:col-span-3" :account="account" :events="recentEvents" />
+
+                    <TabbedCard class="md:col-span-2" :tabs="journalTabs" v-model="activeJournalTab">
+                        <template #quests>
+                            <Quests :quests="quests" :freshness="freshness.quests" :stale-after="staleAfter" />
+                        </template>
+                        <template #diaries>
+                            <Diaries :diaries="diaries" :freshness="freshness.diaries" :stale-after="staleAfter" />
+                        </template>
+                        <template #combat-achievements>
+                            <CombatAchievements :combat-achievements="combatAchievements"
+                                                :freshness="freshness.combat_achievements" :stale-after="staleAfter" />
+                        </template>
+                    </TabbedCard>
+                </div>
+            </div>
         </div>
-    </AppLayout>
+    </AccountLayout>
 </template>

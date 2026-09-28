@@ -127,9 +127,9 @@ it('overlays obtained items on the full category structure (obtained + missing)'
             'X-Inertia' => 'true',
             'X-Inertia-Version' => $version,
             'X-Inertia-Partial-Data' => 'collectionLog',
-            'X-Inertia-Partial-Component' => 'Accounts/Show',
+            'X-Inertia-Partial-Component' => 'Accounts/Collection/Show',
         ])
-        ->get(route('accounts.show', $account))
+        ->get(route('accounts.collection', $account))
         ->assertOk();
 
     $active = $response->json('props.collectionLog.activeCollection');

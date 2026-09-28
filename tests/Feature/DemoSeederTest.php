@@ -21,9 +21,12 @@ use App\Models\ResourcePack;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UsernameHistory;
+use App\Models\WomAchievement;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
+use App\Models\WomRecord;
 use App\Services\Loot\LootLeaderboard;
+use App\Services\WiseOldMan\WomMetrics;
 use App\Support\CombatAchievements;
 use App\Support\Diaries;
 use App\Support\Instance;
@@ -431,9 +434,9 @@ it('replaces demo Wise Old Man data with live data using GETs only', function ()
     Http::preventStrayRequests();
     config(['services.wiseoldman.url' => 'https://api.wiseoldman.net/v2', 'services.wiseoldman.api_key' => null]);
     Http::fake([
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=overall*' => Http::response(womFixture('timeline-bartheez-overall')),
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehp*' => Http::response(womFixture('timeline-bartheez-ehp')),
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehb*' => Http::response(womFixture('timeline-bartheez-ehb')),
+        'api.wiseoldman.net/v2/players/bartheez/snapshots*' => Http::response(womFixture('snapshots-bartheez')),
+        'api.wiseoldman.net/v2/players/bartheez/achievements' => Http::response(womFixture('achievements-bartheez')),
+        'api.wiseoldman.net/v2/players/bartheez/records' => Http::response(womFixture('records-bartheez')),
         'api.wiseoldman.net/v2/players/bartheez' => Http::response(womFixture('player-bartheez')),
         'api.wiseoldman.net/*' => Http::response(['message' => 'Player not found.'], 404),
     ]);
@@ -456,5 +459,65 @@ it('replaces demo Wise Old Man data with live data using GETs only', function ()
         ->and(WomDailySnapshot::where('account_id', $bartheez->id)->pluck('date')->sort()->values()->all())
         ->toBe(['2026-09-25', '2026-09-26'])
         ->and($unknownPoints)->toBe(DemoWomSeeder::DAYS)
-        ->and(WomDailySnapshot::where('account_id', $unknown->id)->count())->toBe($unknownPoints);
+        ->and(WomDailySnapshot::where('account_id', $unknown->id)->count())->toBe($unknownPoints)
+        // WOM's own achievements and records replace the synthetic ones.
+        ->and(WomAchievement::where('account_id', $bartheez->id)->pluck('name')->sort()->values()->all())
+        ->toBe(collect(womFixture('achievements-bartheez'))->pluck('name')->sort()->values()->all())
+        ->and(WomRecord::where('account_id', $bartheez->id)->where('metric', 'zulrah')->where('period', 'week')->count())->toBe(1)
+        ->and($player->milestones_synced_at)->not->toBeNull();
+});
+
+it('draws each demo Wise Old Man history from the seeded hiscores, with milestones', function () {
+    Http::preventStrayRequests();
+    $accounts = Account::factory()->count(4)->create();
+    $accounts->each(fn (Account $account) => AccountHiscore::factory()->create(['account_id' => $account->id]));
+
+    $this->seed(DemoWomSeeder::class);
+
+    $player = WomPlayer::active()->orderBy('account_id')->first();
+    $entries = AccountHiscore::where('account_id', $player->account_id)->first()->entries;
+    $series = WomDailySnapshot::where('account_id', $player->account_id)->orderBy('date')->get();
+    $latest = $series->last();
+
+    $skills = collect($entries['skills'])->except('overall')
+        ->mapWithKeys(fn (array $entry, string $slug) => [WomMetrics::fromLocalSlug($slug) => $entry['xp']])->all();
+    $bosses = collect($entries['activities'])
+        ->filter(fn (array $entry, string $slug) => WomMetrics::group($slug) === 'boss' && $entry['score'] >= DemoWomSeeder::MIN_BOSS_KILLS)
+        ->map(fn (array $entry) => $entry['score'])->all();
+    $clues = collect($entries['activities'])
+        ->filter(fn (array $entry, string $slug) => str_starts_with($slug, 'clue_scrolls_'))
+        ->map(fn (array $entry) => $entry['score'])->all();
+
+    // The newest document is the hiscores, under WOM's metric names.
+    expect($latest->skills)->toEqual($skills)
+        ->and($latest->skills)->toHaveKey('runecrafting')
+        ->and($latest->bosses)->toEqual($bosses)
+        ->and($latest->activities)->toEqual($clues)
+        ->and($latest->exp)->toBe($entries['skills']['overall']['xp'])
+        ->and($player->exp)->toBe($latest->exp);
+
+    // Every day's total is the sum of its skills, and no metric ever grows backwards.
+    foreach ($series as $i => $day) {
+        expect($day->exp)->toBe(array_sum($day->skills));
+
+        if ($i > 0) {
+            foreach ($series[$i - 1]->skills as $skill => $xp) {
+                expect($day->skills[$skill])->toBeGreaterThanOrEqual($xp);
+            }
+        }
+    }
+
+    $achievements = WomAchievement::where('account_id', $player->account_id)->get();
+
+    expect($achievements->where('legacy', true))->toHaveCount(1)
+        ->and($achievements->whereNull('achieved_at'))->toHaveCount(3)
+        ->and($achievements->where('measure', 'kills')->count())->toBeGreaterThan(0)
+        ->and(WomRecord::where('account_id', $player->account_id)->whereIn('period', ['day', 'week', 'month', 'year'])->count())->toBeGreaterThan(0)
+        ->and(WomRecord::where('account_id', $player->account_id)->where('achieved_at', '>', now())->count())->toBe(0)
+        ->and($player->milestones_synced_at)->not->toBeNull();
+
+    // A second run leaves the milestones alone.
+    $this->seed(DemoWomSeeder::class);
+
+    expect(WomAchievement::where('account_id', $player->account_id)->count())->toBe($achievements->count());
 });

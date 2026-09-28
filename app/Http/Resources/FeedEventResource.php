@@ -66,6 +66,8 @@ class FeedEventResource extends JsonResource
                 ? Storage::disk('public')->url($this->screenshot_path)
                 : null,
             'pinned' => $this->pinned_at !== null,
+            // Whether the Adventurer's Log shows it, so a live page knows to refresh its log.
+            'milestone' => $this->resource->isLogMilestone(),
             'occurred_at' => $this->occurred_at?->toIso8601String(),
             'account' => [
                 'user_id' => $this->account?->user_id,

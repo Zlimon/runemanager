@@ -15,8 +15,10 @@ use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
+use App\Models\WomAchievement;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
+use App\Models\WomRecord;
 use App\Services\WiseOldMan\WomCache;
 use App\Support\Roles;
 use Illuminate\Support\Facades\Cache;
@@ -49,6 +51,8 @@ class ResetInstanceData
         Equipment::query()->delete();
         FeedEvent::query()->delete();
         UsernameHistory::query()->delete();
+        WomAchievement::query()->delete();
+        WomRecord::query()->delete();
         WomPlayer::query()->delete();
         Account::query()->delete();
 

@@ -85,32 +85,44 @@ class WiseOldManClient
     }
 
     /**
-     * One metric's value over time, oldest last as WOM returns it:
-     * `[{value, rank, date}]`. Empty when the player is unknown.
+     * One page of the player's snapshots within a period, newest first. WOM
+     * caps `limit` at 200. Each snapshot is `{id, playerId, createdAt,
+     * importedAt, data: {skills, bosses, activities, computed}}`; empty when
+     * the player is unknown.
      *
-     * @return list<array{value: int|float, rank: int, date: string}>
+     * @return list<array<string, mixed>>
      */
-    public function timeline(string $username, string $metric, string $period): array
+    public function snapshots(string $username, string $period, int $limit = 200, int $offset = 0): array
     {
-        $json = $this->json($this->request()->get($this->playerPath($username).'/snapshots/timeline', [
-            'metric' => $metric,
+        return $this->list($this->request()->get($this->playerPath($username).'/snapshots', [
             'period' => $period,
+            'limit' => $limit,
+            'offset' => $offset,
         ]));
-
-        return is_array($json) ? array_values($json) : [];
     }
 
     /**
-     * Everything the player gained over a period (`day`, `week`, `month`,
-     * `year`): `{startsAt, endsAt, data: {skills, bosses, activities, computed}}`.
+     * Every achievement the player has reached: `[{name, metric, measure,
+     * threshold, createdAt, accuracy, legacy}]`. A `createdAt` of 1970-01-01
+     * means WOM does not know the date. Empty when the player is unknown.
      *
-     * @return array<string, mixed>|null
+     * @return list<array<string, mixed>>
      */
-    public function gained(string $username, string $period): ?array
+    public function achievements(string $username): array
     {
-        return $this->json($this->request()->get($this->playerPath($username).'/gained', [
-            'period' => $period,
-        ]));
+        return $this->list($this->request()->get($this->playerPath($username).'/achievements'));
+    }
+
+    /**
+     * The player's current best gain per (period, metric): `[{period, metric,
+     * value, updatedAt}]`, periods `five_min|day|week|month|year`. Empty when
+     * the player is unknown.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function records(string $username): array
+    {
+        return $this->list($this->request()->get($this->playerPath($username).'/records'));
     }
 
     private function request(): PendingRequest
@@ -133,6 +145,16 @@ class WiseOldManClient
     private function playerPath(string $username): string
     {
         return 'players/'.rawurlencode(self::standardise($username));
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    private function list(Response $response): array
+    {
+        $json = $this->json($response);
+
+        return is_array($json) ? array_values($json) : [];
     }
 
     /**

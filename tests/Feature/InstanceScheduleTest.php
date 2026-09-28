@@ -55,6 +55,7 @@ it('schedules exactly the expected commands and nothing else', function () {
         'hiscores:sync',
         'items:sync',
         'resourcepack:update',
+        'wom:compact-snapshots',
         'wom:sync',
     ]);
 });
@@ -65,4 +66,12 @@ it('schedules the Wise Old Man sync daily without reading its toggle', function 
 
     expect($event)->not->toBeNull()
         ->and($event->expression)->toBe('0 5 * * *');
+});
+
+it('compacts Wise Old Man snapshots weekly on Sunday morning', function () {
+    $event = collect(app(Schedule::class)->events())
+        ->first(fn ($event) => str_contains((string) $event->command, 'wom:compact-snapshots'));
+
+    expect($event)->not->toBeNull()
+        ->and($event->expression)->toBe('30 5 * * 0');
 });

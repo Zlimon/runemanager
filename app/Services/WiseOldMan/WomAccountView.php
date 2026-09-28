@@ -4,27 +4,17 @@ namespace App\Services\WiseOldMan;
 
 use App\Models\Account;
 use App\Models\User;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Facades\Cache;
-use Throwable;
+use App\Models\WomAchievement;
+use App\Models\WomRecord;
+use App\Services\Accounts\AdventurersLogCopy;
 
 /**
- * An account's Wise Old Man data as its profile shows it: the stored summary,
- * the daily history chart and what it gained over a period. Only the
- * per-skill/boss breakdown asks WOM live (cached for an hour); everything
- * else reads our own tables.
+ * An account's Wise Old Man data as its pages show it: the stored summary,
+ * its personal records and its achievements. Reads our own tables only;
+ * gains and charts come from {@see WomMetricGains}.
  */
 class WomAccountView
 {
-    /** How long a live `/gained` breakdown is reused. */
-    public const GAINED_CACHE_SECONDS = 3600;
-
-    public function __construct(
-        private WiseOldManClient $client,
-        private WomSnapshotHistory $history,
-    ) {}
-
     /**
      * The stored WOM row, or null when the account has never been looked up.
      * The owner's own choices (`tracking_opt_in`, `show_on_progress`) are only
@@ -71,102 +61,56 @@ class WomAccountView
     }
 
     /**
-     * Daily points over a range (`week`, `month`, `year`, `all`), oldest first,
-     * thinned to {@see WomSnapshotHistory::MAX_POINTS}. Empty for an unlinked account.
+     * The account's personal bests per metric, grouped by metric in catalogue
+     * order (overall, skills, bosses, activities). EHP/EHB records are left out.
      *
-     * @return list<array{t: int, exp: int, ehp: float, ehb: float}>
+     * @return list<array{metric: string, label: string, icon: array<string, string>|null, day?: array{value: int, achieved_at: string}, week?: array{value: int, achieved_at: string}, month?: array{value: int, achieved_at: string}, year?: array{value: int, achieved_at: string}}>
      */
-    public function series(Account $account, string $range): array
+    public function records(Account $account): array
     {
-        if (! $account->womPlayer?->isLinked()) {
-            return [];
-        }
+        $order = array_flip([...WomMetrics::SKILLS, ...WomMetrics::BOSSES, ...WomMetrics::ACTIVITIES]);
 
-        $points = [];
-        foreach ($this->history->points([$account->id], $this->history->rangeStart($range)) as $row) {
-            $points[] = [
-                't' => $this->history->timestamp($row['date']),
-                'exp' => $row['exp'],
-                'ehp' => $row['ehp'],
-                'ehb' => $row['ehb'],
-            ];
-        }
-
-        return $this->history->downsample($points);
-    }
-
-    /**
-     * What the account gained over a period (`day`, `week`, `month`, `year`).
-     * The headline comes from our daily history; the skill and boss breakdown
-     * from WOM live, empty when WOM is unreachable or rate-limited.
-     *
-     * @return array{headline: array{exp: int, ehp: float, ehb: float}, skills: list<array{metric: string, gained: int, level: int}>, bosses: list<array{metric: string, gained: int}>}
-     */
-    public function gains(Account $account, string $period): array
-    {
-        $period = array_key_exists($period, WomSnapshotHistory::PERIODS) ? $period : 'week';
-
-        if (! $account->womPlayer?->isLinked()) {
-            return ['headline' => ['exp' => 0, 'ehp' => 0.0, 'ehb' => 0.0], 'skills' => [], 'bosses' => []];
-        }
-
-        return [
-            'headline' => $this->history->gained([$account->id], $period)[$account->id]
-                ?? ['exp' => 0, 'ehp' => 0.0, 'ehb' => 0.0],
-            ...$this->breakdown($account, $period),
-        ];
-    }
-
-    /**
-     * @return array{skills: list<array{metric: string, gained: int, level: int}>, bosses: list<array{metric: string, gained: int}>}
-     */
-    private function breakdown(Account $account, string $period): array
-    {
-        try {
-            return Cache::remember(
-                "wom:gained:{$account->id}:{$period}",
-                self::GAINED_CACHE_SECONDS,
-                fn (): array => $this->parseGained($this->client->interactive()->gained($account->username, $period)),
-            );
-        } catch (WiseOldManRateLimited|ConnectionException|RequestException) {
-            return ['skills' => [], 'bosses' => []];
-        } catch (Throwable $e) {
-            // Anything else (a malformed payload, say) must not break the
-            // profile page either, but is worth knowing about.
-            report($e);
-
-            return ['skills' => [], 'bosses' => []];
-        }
-    }
-
-    /**
-     * @param  array<string, mixed>|null  $gained
-     * @return array{skills: list<array{metric: string, gained: int, level: int}>, bosses: list<array{metric: string, gained: int}>}
-     */
-    private function parseGained(?array $gained): array
-    {
-        $skills = collect($gained['data']['skills'] ?? [])
-            ->reject(fn (array $skill, string $metric): bool => $metric === 'overall')
-            ->map(fn (array $skill, string $metric): array => [
+        return $account->womRecords()
+            ->get(['metric', 'period', 'value', 'achieved_at'])
+            ->filter(fn (WomRecord $record): bool => WomMetrics::isValid($record->metric))
+            ->groupBy('metric')
+            ->sortBy(fn ($records, string $metric): int => $order[$metric] ?? PHP_INT_MAX)
+            ->map(fn ($records, string $metric): array => [
                 'metric' => $metric,
-                'gained' => (int) ($skill['experience']['gained'] ?? 0),
-                'level' => (int) ($skill['level']['end'] ?? 0),
+                'label' => WomMetrics::label($metric),
+                'icon' => WomMetrics::icon($metric),
+                ...$records->mapWithKeys(fn (WomRecord $record): array => [$record->period => [
+                    'value' => (int) round($record->value),
+                    'achieved_at' => $record->achieved_at->toIso8601String(),
+                ]])->all(),
             ])
-            ->filter(fn (array $row): bool => $row['gained'] > 0)
-            ->sortByDesc('gained')
             ->values()
             ->all();
+    }
 
-        $bosses = collect($gained['data']['bosses'] ?? [])
-            ->map(fn (array $boss, string $metric): array => [
-                'metric' => $metric,
-                'gained' => (int) ($boss['kills']['gained'] ?? 0),
+    /**
+     * The account's WOM achievements, newest first and undated ones last.
+     * `approximate` marks a date WOM only knows to within more than a day.
+     *
+     * @return list<array{name: string, metric: string, measure: string, threshold: int, achieved_at: ?string, approximate: bool, legacy: bool, icon: array<string, string>|null}>
+     */
+    public function achievements(Account $account): array
+    {
+        return $account->womAchievements()
+            ->orderByRaw('achieved_at is null')
+            ->orderByDesc('achieved_at')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (WomAchievement $achievement): array => [
+                'name' => $achievement->name,
+                'metric' => $achievement->metric,
+                'measure' => $achievement->measure,
+                'threshold' => (int) $achievement->threshold,
+                'achieved_at' => $achievement->achieved_at?->toIso8601String(),
+                'approximate' => AdventurersLogCopy::isApproximate($achievement),
+                'legacy' => (bool) $achievement->legacy,
+                'icon' => WomMetrics::icon($achievement->metric),
             ])
-            ->filter(fn (array $row): bool => $row['gained'] > 0)
-            ->sortByDesc('gained')
-            ->values()
             ->all();
-
-        return ['skills' => $skills, 'bosses' => $bosses];
     }
 }

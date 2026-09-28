@@ -1,30 +1,56 @@
 <script setup>
-import { Deferred } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import StatTile from '@/Components/Display/StatTile.vue';
-import Loader from '@/Components/Display/Loader.vue';
+import ChoiceChips from '@/Components/Tables/ChoiceChips.vue';
 import { useResourcePackIcon } from '@/composables/useResourcePackIcon';
-import TotalsChart from '@/Pages/Progress/Partials/TotalsChart.vue';
 import TopGainers from '@/Pages/Progress/Partials/TopGainers.vue';
-import EfficiencyBoard from '@/Pages/Progress/Partials/EfficiencyBoard.vue';
+import SkillLeaders from '@/Pages/Progress/Partials/SkillLeaders.vue';
 
 /*
  * The instance's Wise Old Man progress, over members whose linked profile is
- * active and not hidden by its owner. Everything below the tiles is deferred.
+ * active and not hidden by its owner. Both boards are deferred; the period
+ * applies to both, the metric only to the top gainers.
  */
-defineProps({
-    filters: { type: Object, default: () => ({ range: 'year', period: 'week', metric: 'exp' }) },
-    stats: { type: Object, default: () => ({ active_members: 0, total_ehp: 0, total_ehb: 0, week_exp_gained: 0 }) },
-    series: { type: Array, default: null },
+const props = defineProps({
+    filters: { type: Object, default: () => ({ period: 'week', metric: 'overall' }) },
+    // { skills, bosses, activities: [{ metric, label, icon }] } for the metric picker.
+    metrics: { type: Object, default: () => ({ skills: [], bosses: [], activities: [] }) },
+    stats: {
+        type: Object,
+        default: () => ({ active_members: 0, week_exp_gained: 0, week_levels_gained: 0, week_boss_kills: 0 }),
+    },
     topGainers: { type: Array, default: null },
-    efficiency: { type: Object, default: null },
-    // True when this viewer sees the board anonymized: topGainers/efficiency
-    // rows then carry no account_id and a masked username, so the boards
-    // below never render a profile link for them (see AccountName).
+    skillLeaders: { type: Array, default: null },
+    // True when this viewer sees the boards anonymized: their rows then carry
+    // no account_id and a masked username, so they never render a profile
+    // link (see AccountName).
     anonymized: { type: Boolean, default: false },
 });
 
 const { packIcon } = useResourcePackIcon();
+
+const PERIODS = [
+    { value: 'day', label: 'Day' },
+    { value: 'week', label: 'Week' },
+    { value: 'month', label: 'Month' },
+    { value: 'year', label: 'Year' },
+];
+
+const period = ref(props.filters.period);
+const metric = ref(props.filters.metric);
+
+const reload = (only) => router.reload({
+    only,
+    data: { period: period.value, metric: metric.value },
+    preserveState: true,
+    preserveScroll: true,
+    replace: true,
+});
+
+const pickPeriod = (value) => { period.value = value; reload(['topGainers', 'skillLeaders']); };
+const pickMetric = (value) => { metric.value = value; reload(['topGainers']); };
 </script>
 
 <template>
@@ -44,29 +70,20 @@ const { packIcon } = useResourcePackIcon();
                 <StatTile label="Active members" :value="stats.active_members" />
                 <StatTile label="XP gained this week" :value="stats.week_exp_gained" format="xp"
                           :icon="packIcon('skill', 'overall')" />
-                <StatTile label="Total EHP" :value="stats.total_ehp" format="hours" />
-                <StatTile label="Total EHB" :value="stats.total_ehb" format="hours" />
+                <StatTile label="Levels gained this week" :value="stats.week_levels_gained" />
+                <StatTile label="Boss kills this week" :value="stats.week_boss_kills" />
             </div>
 
-            <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div class="mt-8 flex justify-center">
+                <ChoiceChips :model-value="period" :options="PERIODS" label="Period" @update:model-value="pickPeriod" />
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <TopGainers :gainers="topGainers" :metric="metric" :metrics="metrics" @update:metric="pickMetric" />
                 <div class="lg:col-span-2">
-                    <TotalsChart :series="series" :range="filters.range" />
+                    <SkillLeaders :leaders="skillLeaders" />
                 </div>
-                <TopGainers :gainers="topGainers" :period="filters.period" :metric="filters.metric" />
             </div>
-
-            <Deferred data="efficiency">
-                <template #fallback>
-                    <div class="mt-8 flex h-40 items-center justify-center">
-                        <Loader :component="true" :loading="true" />
-                    </div>
-                </template>
-
-                <div class="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-                    <EfficiencyBoard title="Efficient hours played" :rows="efficiency?.ehp ?? []" />
-                    <EfficiencyBoard title="Efficient hours bossed" :rows="efficiency?.ehb ?? []" />
-                </div>
-            </Deferred>
         </div>
     </AppLayout>
 </template>

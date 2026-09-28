@@ -39,6 +39,7 @@ class WomPlayerFactory extends Factory
             'last_changed_at' => now()->subDays(1),
             'synced_at' => now()->subHours(3),
             'backfilled_at' => now()->subDays(30),
+            'milestones_synced_at' => now()->subHours(3),
         ];
     }
 
@@ -60,6 +61,7 @@ class WomPlayerFactory extends Factory
             'wom_updated_at' => null,
             'last_changed_at' => null,
             'backfilled_at' => null,
+            'milestones_synced_at' => null,
             'not_found_at' => now()->subDay(),
             'synced_at' => now()->subDay(),
         ]);

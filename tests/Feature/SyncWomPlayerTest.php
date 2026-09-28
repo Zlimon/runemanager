@@ -3,7 +3,6 @@
 use App\Models\Account;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
-use App\Services\WiseOldMan\BackfillWomSeries;
 use App\Services\WiseOldMan\SyncWomPlayer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
@@ -18,15 +17,23 @@ beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-09-26 12:00:00', 'UTC'));
 });
 
-/** Bartheez's real responses: the player (GET and POST) and three year timelines. */
+/**
+ * Bartheez's real responses: the player (GET and POST), a page of snapshots,
+ * achievements and records.
+ */
 function fakeBartheezOnWom(): void
 {
     Http::fake([
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=overall*' => Http::response(womFixture('timeline-bartheez-overall')),
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehp*' => Http::response(womFixture('timeline-bartheez-ehp')),
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehb*' => Http::response(womFixture('timeline-bartheez-ehb')),
+        'api.wiseoldman.net/v2/players/bartheez/snapshots*' => Http::response(womFixture('snapshots-bartheez')),
+        'api.wiseoldman.net/v2/players/bartheez/achievements' => Http::response(womFixture('achievements-bartheez')),
+        'api.wiseoldman.net/v2/players/bartheez/records' => Http::response(womFixture('records-bartheez')),
         'api.wiseoldman.net/v2/players/bartheez' => Http::response(womFixture('player-bartheez')),
     ]);
+}
+
+function milestonesFetched(): bool
+{
+    return Http::recorded(fn (Request $request) => str_ends_with($request->url(), '/achievements'))->isNotEmpty();
 }
 
 function wasPosted(): bool
@@ -189,41 +196,81 @@ it('never stores an unranked -1 total as a real value', function () {
         ->and(WomDailySnapshot::where('account_id', $account->id)->count())->toBe(0);
 });
 
-it('skips unranked -1 points in the backfill and carries the day before', function () {
-    $overall = womFixture('timeline-bartheez-overall');
-    $ehb = womFixture('timeline-bartheez-ehb');
-    // The latest point of 2026-09-26 is unranked, and so is every ehb point
-    // that day; earlier valid points and the previous day must fill in.
-    array_unshift($overall, ['value' => -1, 'rank' => -1, 'date' => '2026-09-26T11:00:00.000Z']);
-    $ehb = array_map(fn (array $point) => str_starts_with($point['date'], '2026-09-26') ? ['value' => -1] + $point : $point, $ehb);
-    // A lone unranked day before any valid point is left out entirely.
-    $overall[] = ['value' => -1, 'rank' => -1, 'date' => '2026-09-20T12:00:00.000Z'];
-
-    Http::fake([
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=overall*' => Http::response($overall),
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehp*' => Http::response(womFixture('timeline-bartheez-ehp')),
-        'api.wiseoldman.net/v2/players/bartheez/snapshots/timeline?metric=ehb*' => Http::response($ehb),
-    ]);
-    $account = Account::factory()->create(['username' => 'Bartheez']);
-    $player = WomPlayer::factory()->for($account)->create(['backfilled_at' => null]);
-
-    $written = app(BackfillWomSeries::class)->run($player);
-
-    $days = WomDailySnapshot::where('account_id', $account->id)->orderBy('date')->get()->keyBy('date');
-
-    expect($written)->toBe(2)
-        ->and($days->keys()->all())->toBe(['2026-09-25', '2026-09-26'])
-        ->and($days['2026-09-26']->exp)->toBe(832820305)
-        ->and($days['2026-09-26']->ehb)->toEqualWithDelta(1154.3622, 0.001);
-});
-
-it('writes one point per account and day, even when the backfill runs twice', function () {
-    fakeBartheezOnWom();
+it('stores every ranked metric of the latest snapshot on today\'s document', function () {
+    $details = womFixture('player-bartheez');
+    $details['latestSnapshot']['data']['bosses']['zulrah']['kills'] = -1;
+    $details['latestSnapshot']['data']['activities']['pvp_arena']['score'] = -1;
+    $details['latestSnapshot']['data']['bosses']['bryophyta']['kills'] = 0;
     $account = Account::factory()->create(['username' => 'Bartheez']);
     $player = WomPlayer::factory()->for($account)->create();
 
-    app(BackfillWomSeries::class)->run($player);
-    app(BackfillWomSeries::class)->run($player);
+    app(SyncWomPlayer::class)->apply($player, $details);
 
-    expect(WomDailySnapshot::where('account_id', $account->id)->count())->toBe(2);
+    $day = WomDailySnapshot::where('account_id', $account->id)->sole();
+
+    expect($day->date)->toBe('2026-09-26')
+        ->and($day->exp)->toBe(832820305)
+        ->and($day->skills)->toHaveCount(24)
+        ->and($day->skills)->not->toHaveKey('overall')
+        ->and($day->skills['attack'])->toBe(41239184)
+        ->and($day->skills)->toHaveKey('runecrafting')
+        ->and($day->bosses)->not->toHaveKey('zulrah')
+        ->and($day->bosses['bryophyta'])->toBe(0)
+        ->and($day->bosses['vorkath'])->toBeInt()
+        ->and($day->activities)->not->toHaveKey('pvp_arena')
+        ->and($day->activities['clue_scrolls_all'])->toBe(1684);
+});
+
+it('keeps a day\'s maps when a payload has no latest snapshot', function () {
+    $account = Account::factory()->create(['username' => 'Bartheez']);
+    $player = WomPlayer::factory()->for($account)->create();
+    WomDailySnapshot::query()->insert(['account_id' => $account->id, 'date' => '2026-09-26', 'exp' => 1, 'ehp' => 0.0, 'ehb' => 0.0, 'skills' => ['attack' => 5]]);
+    $details = womFixture('player-bartheez');
+    unset($details['latestSnapshot']);
+
+    app(SyncWomPlayer::class)->apply($player, $details);
+
+    $day = WomDailySnapshot::where('account_id', $account->id)->sole();
+
+    expect($day->exp)->toBe(832820305)
+        ->and($day->skills)->toBe(['attack' => 5]);
+});
+
+it('syncs achievements and records on first link', function () {
+    fakeBartheezOnWom();
+    $account = Account::factory()->create(['username' => 'Bartheez']);
+
+    $player = app(SyncWomPlayer::class)->sync($account);
+
+    expect(milestonesFetched())->toBeTrue()
+        ->and($player->milestones_synced_at->equalTo(now()))->toBeTrue()
+        ->and($account->womAchievements()->count())->toBeGreaterThan(0)
+        ->and($account->womRecords()->count())->toBeGreaterThan(0);
+});
+
+it('syncs achievements and records only when WOM saw a change since the last run', function () {
+    fakeBartheezOnWom();
+    $account = Account::factory()->create(['username' => 'Bartheez']);
+    // The fixture's lastChangedAt is 2026-09-26 06:19.
+    $player = WomPlayer::factory()->for($account)->create(['milestones_synced_at' => '2026-09-26 07:00:00']);
+
+    app(SyncWomPlayer::class)->sync($account->fresh());
+
+    expect(milestonesFetched())->toBeFalse()
+        ->and($player->fresh()->milestones_synced_at->toDateTimeString())->toBe('2026-09-26 07:00:00');
+
+    $player->update(['milestones_synced_at' => '2026-09-26 06:00:00']);
+    app(SyncWomPlayer::class)->sync($account->fresh());
+
+    expect(milestonesFetched())->toBeTrue()
+        ->and($player->fresh()->milestones_synced_at->equalTo(now()))->toBeTrue();
+});
+
+it('never syncs milestones for a player WOM does not know', function () {
+    Http::fake(['api.wiseoldman.net/*' => Http::response(['message' => 'Player not found.'], 404)]);
+    $account = Account::factory()->create(['username' => 'Nobody Here']);
+
+    app(SyncWomPlayer::class)->sync($account);
+
+    Http::assertSentCount(1);
 });

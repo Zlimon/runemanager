@@ -4,24 +4,37 @@ namespace Database\Seeders;
 
 use App\Enums\AccountTypesEnum;
 use App\Models\Account;
+use App\Models\AccountHiscore;
+use App\Models\WomAchievement;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
+use App\Models\WomRecord;
+use App\Services\WiseOldMan\WomMetrics;
+use App\Support\Experience;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Throwable;
 
 /**
- * Offline Wise Old Man data for every seeded account: a `wom_players` row and
- * a year of `WomDailySnapshot` points, so the progress charts, the /progress
- * page and the leaderboards have something to draw without touching the API.
+ * Offline Wise Old Man data for every seeded account: a `wom_players` row, a
+ * year of `WomDailySnapshot` documents with every metric, and the
+ * achievements and personal records that history implies, so the Gains tab,
+ * the Adventurer's Log, /progress and the leaderboards have something to
+ * draw without touching the API.
+ *
+ * Each linked account's newest document is its seeded hiscores (skills,
+ * bosses, clues and minigames under WOM's metric names; `exp` is the sum of
+ * the skills). Walking back a day at a time undoes that day's gains, spread
+ * over a few focus skills and bosses.
  *
  * The mix is deliberate: most accounts are linked and active, a few went
  * quiet more than 30 days ago (inactive), one is unknown to WOM, one is
  * hidden from /progress, and two have opted in to tracking. Run
  * `LiveWomSeeder` to replace the synthetic numbers with real ones.
  *
- * Idempotent: accounts that already have a row keep it, and a series only
- * gets the days it is missing.
+ * Idempotent: accounts that already have a row keep it, a series only gets
+ * the days it is missing (and older documents without metric maps get them),
+ * and an account that already has achievements keeps its milestones.
  */
 class DemoWomSeeder extends Seeder
 {
@@ -31,6 +44,12 @@ class DemoWomSeeder extends Seeder
     /** WOM's highest possible total experience (every skill at 200m). */
     private const MAX_EXP = 4_600_000_000;
 
+    /** A boss below this kill count is unranked, so absent from a document. */
+    public const MIN_BOSS_KILLS = 5;
+
+    /** Record periods and their length in days. */
+    private const RECORD_WINDOWS = ['day' => 1, 'week' => 7, 'month' => 30, 'year' => 365];
+
     public function run(): void
     {
         if (app()->environment('production')) {
@@ -39,12 +58,19 @@ class DemoWomSeeder extends Seeder
 
         fake()->seed(DatabaseSeeder::FAKER_SEED);
 
-        $accounts = Account::query()->orderBy('id')->get(['id', 'username', 'account_type', 'level', 'xp']);
+        $accounts = Account::query()->with('hiscore')->orderBy('id')->get(['id', 'username', 'account_type', 'level', 'xp']);
 
         if ($accounts->isEmpty()) {
             $this->command->warn('DemoWomSeeder: no accounts found; run AccountSeeder first.');
 
             return;
+        }
+
+        /** @var array<int, array{exp: int, skills: array<string, int>, bosses: array<string, int>, activities: array<string, int>}> $latest */
+        $latest = [];
+
+        foreach ($accounts as $account) {
+            $latest[$account->id] = $this->latestFor($account);
         }
 
         $existing = WomPlayer::query()->pluck('account_id')->all();
@@ -55,12 +81,12 @@ class DemoWomSeeder extends Seeder
                 continue;
             }
 
-            $this->createPlayer($account, $this->roleFor($index, $accounts->count()));
+            $this->createPlayer($account, $latest[$account->id]['exp'], $this->roleFor($index, $accounts->count()));
             $created++;
         }
 
         try {
-            $days = $this->seedSeries();
+            [$days, $milestones] = $this->seedHistory($latest);
         } catch (Throwable $e) {
             $this->command->warn('DemoWomSeeder: could not seed the daily series — '.$e->getMessage());
             $this->command->line('  Seeding continues; start the mongodb service and re-run db:seed to fill them in.');
@@ -68,7 +94,54 @@ class DemoWomSeeder extends Seeder
             return;
         }
 
-        $this->command->info(sprintf('DemoWomSeeder: created %d Wise Old Man players and %d daily points.', $created, $days));
+        $this->command->info(sprintf(
+            'DemoWomSeeder: created %d Wise Old Man players, %d daily points and milestones for %d accounts.',
+            $created,
+            $days,
+            $milestones,
+        ));
+    }
+
+    /**
+     * The account's current metrics under WOM's names: its seeded hiscores,
+     * or a synthetic set for an account that has none.
+     *
+     * @return array{exp: int, skills: array<string, int>, bosses: array<string, int>, activities: array<string, int>}
+     */
+    private function latestFor(Account $account): array
+    {
+        $entries = $account->hiscore?->entries
+            ?? AccountHiscore::factory()->raw(['account_id' => $account->id])['entries'];
+
+        $skills = [];
+
+        foreach ((array) ($entries['skills'] ?? []) as $slug => $entry) {
+            $xp = (int) ($entry['xp'] ?? -1);
+
+            if ($slug !== 'overall' && $xp >= 0) {
+                $skills[WomMetrics::fromLocalSlug($slug)] = $xp;
+            }
+        }
+
+        $bosses = [];
+        $activities = [];
+
+        foreach ((array) ($entries['activities'] ?? []) as $slug => $entry) {
+            $metric = WomMetrics::fromLocalSlug($slug);
+            $score = (int) ($entry['score'] ?? -1);
+
+            if ($score < 0) {
+                continue;
+            }
+
+            if (WomMetrics::group($metric) === 'boss') {
+                $bosses[$metric] = $score;
+            } elseif (WomMetrics::group($metric) === 'activity') {
+                $activities[$metric] = $score;
+            }
+        }
+
+        return ['exp' => array_sum($skills), 'skills' => $skills, 'bosses' => $bosses, 'activities' => $activities];
     }
 
     /**
@@ -88,7 +161,7 @@ class DemoWomSeeder extends Seeder
         };
     }
 
-    private function createPlayer(Account $account, string $role): void
+    private function createPlayer(Account $account, int $exp, string $role): void
     {
         if ($role === 'not_found') {
             WomPlayer::factory()->notFound()->create(['account_id' => $account->id]);
@@ -100,7 +173,6 @@ class DemoWomSeeder extends Seeder
             ? $account->account_type
             : AccountTypesEnum::tryFrom((string) $account->account_type);
 
-        $exp = (int) $account->xp > 0 ? (int) $account->xp : fake()->numberBetween(5_000_000, 80_000_000);
         $level = (int) $account->level;
         $ehp = $exp / $this->expPerEhp($type);
 
@@ -132,6 +204,7 @@ class DemoWomSeeder extends Seeder
             'last_changed_at' => $lastChanged,
             'update_requested_at' => $role === 'opted_in' ? $lastChanged : null,
             'backfilled_at' => now(),
+            'milestones_synced_at' => null,
             'not_found_at' => null,
             'synced_at' => now(),
             'tracking_opt_in' => $role === 'opted_in',
@@ -148,54 +221,85 @@ class DemoWomSeeder extends Seeder
     }
 
     /**
-     * Insert each linked account's missing days. Returns the number inserted.
+     * Write each linked account's missing days and, once, its milestones.
+     * Returns [documents written, accounts given milestones].
+     *
+     * @param  array<int, array{exp: int, skills: array<string, int>, bosses: array<string, int>, activities: array<string, int>}>  $latest
+     * @return array{int, int}
      */
-    private function seedSeries(): int
+    private function seedHistory(array $latest): array
     {
-        $inserted = 0;
+        $written = 0;
+        $milestones = 0;
 
         foreach (WomPlayer::query()->linked()->orderBy('account_id')->get() as $player) {
-            $have = WomDailySnapshot::query()
-                ->where('account_id', $player->account_id)
-                ->pluck('date')
-                ->all();
+            $current = $latest[$player->account_id] ?? null;
 
-            if (count($have) >= self::DAYS) {
+            if ($current === null) {
                 continue;
             }
 
-            $have = array_flip($have);
-            $rows = array_values(array_filter(
-                $this->seriesFor($player),
-                fn (array $row): bool => ! isset($have[$row['date']]),
-            ));
+            // The row's total follows the hiscores it is drawn from.
+            if ($player->exp !== $current['exp']) {
+                $player->forceFill(['exp' => $current['exp']])->save();
+            }
 
-            if ($rows !== []) {
-                WomDailySnapshot::query()->insert($rows);
-                $inserted += count($rows);
+            $series = $this->seriesFor($player, $current);
+            $written += $this->writeSeries($player->account_id, $series);
+
+            if (! WomAchievement::query()->where('account_id', $player->account_id)->exists()) {
+                $this->seedMilestones($player, $series);
+                $milestones++;
             }
         }
 
-        return $inserted;
+        return [$written, $milestones];
     }
 
     /**
-     * A year of daily points, walked backwards from the row's current values
-     * so the last point is exactly what the row says. Some days are flat,
-     * the odd one is a big grind, and an inactive account is flat since its
-     * last change.
+     * Insert the days the account lacks and rewrite days that only hold the
+     * headline numbers; days that already have their maps are left alone.
      *
-     * @return list<array{account_id: int, date: string, exp: int, ehp: float, ehb: float}>
+     * @param  list<array<string, mixed>>  $series
      */
-    private function seriesFor(WomPlayer $player): array
+    private function writeSeries(int $accountId, array $series): int
+    {
+        $complete = WomDailySnapshot::query()
+            ->where('account_id', $accountId)
+            ->whereNotNull('skills')
+            ->pluck('date')
+            ->flip();
+
+        $rows = array_values(array_filter($series, fn (array $row): bool => ! isset($complete[$row['date']])));
+
+        // A headline-only day is rewritten whole, so its total stays the sum
+        // of its skills.
+        WomDailySnapshot::query()->upsert($rows, ['account_id', 'date'], ['exp', 'ehp', 'ehb', 'skills', 'bosses', 'activities']);
+
+        return count($rows);
+    }
+
+    /**
+     * A year of daily documents, walked backwards from the current metrics so
+     * the last document is exactly the hiscores. Some days are flat, the odd
+     * one is a big grind, and an inactive account is flat since its last
+     * change. Oldest first.
+     *
+     * @param  array{exp: int, skills: array<string, int>, bosses: array<string, int>, activities: array<string, int>}  $current
+     * @return list<array{account_id: int, date: string, exp: int, ehp: float, ehb: float, skills: array<string, int>, bosses: array<string, int>, activities: array<string, int>}>
+     */
+    private function seriesFor(WomPlayer $player, array $current): array
     {
         $today = Carbon::now('UTC')->startOfDay();
         $quietSince = $player->last_changed_at?->copy()->utc()->startOfDay();
 
-        $exp = $player->exp;
+        $skills = $current['skills'];
+        $bosses = $current['bosses'];
+        $activities = $current['activities'];
+        $exp = $current['exp'];
         $ehp = $player->ehp;
         $ehb = $player->ehb;
-        $expPerEhp = $ehp > 0 ? $exp / $ehp : 400_000;
+        $expPerEhp = $ehp > 0 && $exp > 0 ? $exp / $ehp : 400_000;
         $typicalGain = min(5_000_000, max(50_000, intdiv($exp, 400)));
 
         $rows = [];
@@ -206,12 +310,15 @@ class DemoWomSeeder extends Seeder
             $rows[] = [
                 'account_id' => $player->account_id,
                 'date' => $day->toDateString(),
-                'exp' => $exp,
+                'exp' => array_sum($skills),
                 'ehp' => round($ehp, 4),
                 'ehb' => round($ehb, 4),
+                'skills' => $skills,
+                'bosses' => array_filter($bosses, fn (int $kills): bool => $kills >= self::MIN_BOSS_KILLS),
+                'activities' => $activities,
             ];
 
-            // The gain that produced this day's value; nothing to undo on a
+            // The gain that produced this day's values; nothing to undo on a
             // day after the account went quiet.
             if ($quietSince !== null && $day->gt($quietSince)) {
                 continue;
@@ -225,18 +332,288 @@ class DemoWomSeeder extends Seeder
             };
 
             // Never walk below a tenth of today's total.
-            if ($exp - $gain < $player->exp / 10) {
+            if (array_sum($skills) - $gain < $exp / 10) {
                 $gain = 0;
             }
 
-            $exp -= $gain;
-            $ehp = max(0.0, $ehp - $gain / $expPerEhp);
+            if ($gain === 0) {
+                continue;
+            }
 
-            if ($gain > 0 && fake()->boolean(40)) {
-                $ehb = max(0.0, $ehb - fake()->randomFloat(2, 0.1, 3));
+            $undone = $this->undo($skills, $gain, fake()->numberBetween(1, 3), 1);
+            $ehp = max(0.0, $ehp - $undone / $expPerEhp);
+
+            if (fake()->boolean(40)) {
+                $kills = $this->undo($bosses, fake()->numberBetween(1, 40), fake()->numberBetween(1, 2), 1);
+                $ehb = max(0.0, $ehb - $kills * fake()->randomFloat(3, 0.01, 0.08));
+            }
+
+            // Now and then a clue: its tier and the all-tiers count both drop.
+            $tiers = array_filter(
+                $activities,
+                fn (int $score, string $metric): bool => $score > 0 && str_starts_with($metric, 'clue_scrolls_') && $metric !== 'clue_scrolls_all',
+                ARRAY_FILTER_USE_BOTH,
+            );
+
+            if ($tiers !== [] && ($activities['clue_scrolls_all'] ?? 0) > 0 && fake()->boolean(15)) {
+                $activities[fake()->randomElement(array_keys($tiers))]--;
+                $activities['clue_scrolls_all']--;
             }
         }
 
         return array_reverse($rows);
+    }
+
+    /**
+     * Take up to `$amount` off `$focus` random non-zero entries of `$values`,
+     * never below zero. Returns what was actually taken.
+     *
+     * @param  array<string, int>  $values
+     */
+    private function undo(array &$values, int $amount, int $focus, int $minimum): int
+    {
+        $candidates = array_keys(array_filter($values, fn (int $value): bool => $value >= $minimum));
+
+        if ($candidates === []) {
+            return 0;
+        }
+
+        $picked = fake()->randomElements($candidates, min($focus, count($candidates)));
+        $taken = 0;
+
+        foreach ($picked as $i => $metric) {
+            $share = $i === count($picked) - 1 ? $amount - $taken : (int) ($amount * fake()->randomFloat(2, 0.2, 0.6));
+            $take = min(max(0, $share), $values[$metric]);
+            $values[$metric] -= $take;
+            $taken += $take;
+        }
+
+        return $taken;
+    }
+
+    /**
+     * Achievements and personal records as WOM would report them for this
+     * history. A threshold crossed inside the year is dated on its crossing
+     * day; one already reached on the first day gets an earlier date, except
+     * the two oldest, which WOM cannot date (null). Plus one legacy
+     * pre-Sailing base-stats row.
+     *
+     * @param  list<array<string, mixed>>  $series
+     */
+    private function seedMilestones(WomPlayer $player, array $series): void
+    {
+        $first = Carbon::parse($series[0]['date'], 'UTC');
+        $achievements = [];
+
+        foreach ($this->achievementDefinitions($series[count($series) - 1]) as $definition) {
+            $index = null;
+
+            foreach ($series as $i => $row) {
+                if (($definition['value'])($row) >= $definition['reach']) {
+                    $index = $i;
+
+                    break;
+                }
+            }
+
+            if ($index === null) {
+                continue;
+            }
+
+            $achievements[] = [
+                'index' => $index,
+                'name' => $definition['name'],
+                'metric' => $definition['metric'],
+                'measure' => $definition['measure'],
+                'threshold' => $definition['threshold'],
+                'achieved_at' => $index === 0
+                    ? $first->copy()->subDays(fake()->numberBetween(1, 700))->addMinutes(fake()->numberBetween(0, 1439))
+                    : $this->timeOn($series[$index]['date']),
+                'accuracy' => fake()->boolean(15)
+                    ? fake()->numberBetween(2 * 86_400_000, 10 * 86_400_000)
+                    : fake()->numberBetween(0, 6 * 3_600_000),
+                'legacy' => false,
+            ];
+        }
+
+        usort($achievements, fn (array $a, array $b): int => $a['achieved_at'] <=> $b['achieved_at']);
+
+        foreach (array_slice(array_keys($achievements), 0, 2) as $key) {
+            $achievements[$key]['achieved_at'] = null;
+            $achievements[$key]['accuracy'] = null;
+        }
+
+        $achievements[] = $this->legacyAchievement($series[count($series) - 1]['skills']);
+
+        WomAchievement::query()->upsert(
+            array_map(fn (array $row): array => ['account_id' => $player->account_id] + array_diff_key($row, ['index' => true]), $achievements),
+            ['account_id', 'name'],
+            ['metric', 'measure', 'threshold', 'achieved_at', 'accuracy', 'legacy'],
+        );
+
+        WomRecord::query()->upsert(
+            array_map(fn (array $row): array => ['account_id' => $player->account_id] + $row, $this->records($series)),
+            ['account_id', 'period', 'metric'],
+            ['value', 'achieved_at'],
+        );
+
+        $player->forceFill(['milestones_synced_at' => now()])->save();
+    }
+
+    /**
+     * WOM's achievement thresholds that apply to this account's metrics.
+     *
+     * @param  array<string, mixed>  $latest
+     * @return list<array{name: string, metric: string, measure: string, threshold: int, reach: int, value: callable(array<string, mixed>): int}>
+     */
+    private function achievementDefinitions(array $latest): array
+    {
+        $definitions = [];
+
+        foreach (array_keys($latest['skills']) as $skill) {
+            foreach (['99' => Experience::forLevel(99), '50m' => 50_000_000, '100m' => 100_000_000] as $prefix => $xp) {
+                $definitions[] = [
+                    'name' => $prefix.' '.WomMetrics::label($skill),
+                    'metric' => $skill,
+                    'measure' => 'experience',
+                    'threshold' => $xp,
+                    'reach' => $xp,
+                    'value' => fn (array $row): int => $row['skills'][$skill] ?? 0,
+                ];
+            }
+        }
+
+        foreach ([70, 80, 90] as $level) {
+            $definitions[] = [
+                'name' => "Base {$level} Stats",
+                'metric' => 'overall',
+                'measure' => 'levels',
+                'threshold' => Experience::forLevel($level) * count($latest['skills']),
+                'reach' => Experience::forLevel($level),
+                'value' => fn (array $row): int => $row['skills'] === [] ? 0 : min($row['skills']),
+            ];
+        }
+
+        foreach (array_keys($latest['bosses']) as $boss) {
+            foreach ([50, 100, 500, 1000] as $kills) {
+                $definitions[] = [
+                    'name' => self::shortNumber($kills).' '.WomMetrics::label($boss).' kills',
+                    'metric' => $boss,
+                    'measure' => 'kills',
+                    'threshold' => $kills,
+                    'reach' => $kills,
+                    'value' => fn (array $row): int => $row['bosses'][$boss] ?? 0,
+                ];
+            }
+        }
+
+        foreach (array_keys($latest['activities']) as $activity) {
+            if (! str_starts_with($activity, 'clue_scrolls_')) {
+                continue;
+            }
+
+            foreach ([100, 500] as $score) {
+                $definitions[] = [
+                    'name' => $score.' '.WomMetrics::label($activity),
+                    'metric' => $activity,
+                    'measure' => 'score',
+                    'threshold' => $score,
+                    'reach' => $score,
+                    'value' => fn (array $row): int => $row['activities'][$activity] ?? 0,
+                ];
+            }
+        }
+
+        return $definitions;
+    }
+
+    /**
+     * The highest base level the account had before Sailing, as the retired
+     * achievement WOM still lists (undated).
+     *
+     * @param  array<string, int>  $skills
+     * @return array<string, mixed>
+     */
+    private function legacyAchievement(array $skills): array
+    {
+        $preSailing = array_diff_key($skills, ['sailing' => true]);
+        $lowest = $preSailing === [] ? 0 : min($preSailing);
+        $level = max(10, intdiv(Experience::levelFor($lowest), 10) * 10);
+
+        return [
+            'name' => "Base {$level} Stats (Pre-Sailing)",
+            'metric' => 'overall',
+            'measure' => 'levels',
+            'threshold' => Experience::forLevel($level) * max(1, count($preSailing)),
+            'achieved_at' => null,
+            'accuracy' => null,
+            'legacy' => true,
+        ];
+    }
+
+    /**
+     * The best gain per metric over a rolling day, week, month and year, dated
+     * on the day the window ended.
+     *
+     * @param  list<array<string, mixed>>  $series
+     * @return list<array{period: string, metric: string, value: float, achieved_at: Carbon}>
+     */
+    private function records(array $series): array
+    {
+        $metrics = ['overall' => fn (array $row): ?float => (float) $row['exp']];
+
+        foreach (['skills', 'bosses', 'activities'] as $group) {
+            foreach (array_keys($series[count($series) - 1][$group]) as $metric) {
+                $metrics[$metric] = fn (array $row): ?float => isset($row[$group][$metric]) ? (float) $row[$group][$metric] : null;
+            }
+        }
+
+        $metrics['ehp'] = fn (array $row): ?float => (float) $row['ehp'];
+        $metrics['ehb'] = fn (array $row): ?float => (float) $row['ehb'];
+
+        $records = [];
+
+        foreach ($metrics as $metric => $valueOf) {
+            $values = array_map($valueOf, $series);
+
+            foreach (self::RECORD_WINDOWS as $period => $days) {
+                $best = 0.0;
+                $bestIndex = null;
+
+                for ($i = 1; $i < count($values); $i++) {
+                    $start = $values[max(0, $i - $days)];
+
+                    if ($values[$i] !== null && $start !== null && $best < $values[$i] - $start) {
+                        $best = $values[$i] - $start;
+                        $bestIndex = $i;
+                    }
+                }
+
+                if ($bestIndex !== null) {
+                    $records[] = [
+                        'period' => $period,
+                        'metric' => $metric,
+                        'value' => round($best, 4),
+                        'achieved_at' => $this->timeOn($series[$bestIndex]['date']),
+                    ];
+                }
+            }
+        }
+
+        return $records;
+    }
+
+    /** A random moment on a UTC day, never in the future. */
+    private function timeOn(string $date): Carbon
+    {
+        $at = Carbon::parse($date, 'UTC')->addMinutes(fake()->numberBetween(0, 1439));
+
+        return $at->isFuture() ? now()->utc()->subMinutes(fake()->numberBetween(1, 60)) : $at;
+    }
+
+    /** WOM's short threshold style: 50, 500, 1k. */
+    private static function shortNumber(int $number): string
+    {
+        return $number >= 1000 ? ($number / 1000).'k' : (string) $number;
     }
 }

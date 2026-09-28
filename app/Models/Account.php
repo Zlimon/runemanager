@@ -85,6 +85,16 @@ class Account extends Model
         return $this->hasOne(WomPlayer::class);
     }
 
+    public function womAchievements(): HasMany
+    {
+        return $this->hasMany(WomAchievement::class);
+    }
+
+    public function womRecords(): HasMany
+    {
+        return $this->hasMany(WomRecord::class);
+    }
+
     public function usernameHistory(): HasMany
     {
         return $this->hasMany(UsernameHistory::class)->orderByDesc('detected_at');

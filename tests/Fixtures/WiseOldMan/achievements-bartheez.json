@@ -1,0 +1,162 @@
+[
+  {
+    "playerId": 315771,
+    "name": "99 Sailing",
+    "metric": "sailing",
+    "threshold": 13034431,
+    "accuracy": 24463878,
+    "createdAt": "2025-12-28T05:24:45.124Z",
+    "measure": "experience",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "99 Thieving",
+    "metric": "thieving",
+    "threshold": 13034431,
+    "accuracy": 39750103,
+    "createdAt": "2025-12-25T07:23:24.148Z",
+    "measure": "experience",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "500m Overall Exp.",
+    "metric": "overall",
+    "threshold": 500000000,
+    "accuracy": 81466203,
+    "createdAt": "2024-01-19T18:23:05.465Z",
+    "measure": "experience",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "100m Hitpoints",
+    "metric": "hitpoints",
+    "threshold": 100000000,
+    "accuracy": 21657139,
+    "createdAt": "2026-09-15T20:25:02.071Z",
+    "measure": "experience",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "1k Shellbane Gryphon kills",
+    "metric": "shellbane_gryphon",
+    "threshold": 1000,
+    "accuracy": 9447509,
+    "createdAt": "2026-09-24T10:51:18.032Z",
+    "measure": "kills",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "1k Yama kills",
+    "metric": "yama",
+    "threshold": 1000,
+    "accuracy": 99269,
+    "createdAt": "2026-09-22T02:21:27.163Z",
+    "measure": "kills",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "1k Chaos Fanatic kills",
+    "metric": "chaos_fanatic",
+    "threshold": 1000,
+    "accuracy": 6210800,
+    "createdAt": "2026-09-17T16:25:54.434Z",
+    "measure": "kills",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "1.1k Collections Logged",
+    "metric": "collections_logged",
+    "threshold": 1100,
+    "accuracy": 26839280,
+    "createdAt": "2026-08-02T07:13:56.372Z",
+    "measure": "score",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "500 Clue Scrolls (Hard)",
+    "metric": "clue_scrolls_hard",
+    "threshold": 500,
+    "accuracy": 17140551,
+    "createdAt": "2025-11-02T15:58:52.239Z",
+    "measure": "score",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "Maxed Overall",
+    "metric": "overall",
+    "threshold": 312826344,
+    "accuracy": 24463878,
+    "createdAt": "2025-12-28T05:24:45.124Z",
+    "measure": "levels",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "Base 90 Stats",
+    "metric": "overall",
+    "threshold": 128311968,
+    "accuracy": 2317439,
+    "createdAt": "2025-12-03T12:25:53.402Z",
+    "measure": "levels",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "Base 90 Stats (Pre-Sailing)",
+    "metric": "overall",
+    "threshold": 122965636,
+    "accuracy": 102245516,
+    "createdAt": "2023-03-06T15:28:10.575Z",
+    "measure": "levels",
+    "legacy": true
+  },
+  {
+    "playerId": 315771,
+    "name": "Base 80 Stats (Pre-Sailing)",
+    "metric": "overall",
+    "threshold": 45679564,
+    "accuracy": 1664360,
+    "createdAt": "2021-09-23T04:15:15.169Z",
+    "measure": "levels",
+    "legacy": true
+  },
+  {
+    "playerId": 315771,
+    "name": "100m Overall Exp.",
+    "metric": "overall",
+    "threshold": 100000000,
+    "accuracy": null,
+    "createdAt": "1970-01-01T00:00:00.000Z",
+    "measure": "experience",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "99 Strength",
+    "metric": "strength",
+    "threshold": 13034431,
+    "accuracy": null,
+    "createdAt": "1970-01-01T00:00:00.000Z",
+    "measure": "experience",
+    "legacy": false
+  },
+  {
+    "playerId": 315771,
+    "name": "50m Strength",
+    "metric": "strength",
+    "threshold": 50000000,
+    "accuracy": 87577511,
+    "createdAt": "2024-08-26T18:29:36.449Z",
+    "measure": "experience",
+    "legacy": false
+  }
+]

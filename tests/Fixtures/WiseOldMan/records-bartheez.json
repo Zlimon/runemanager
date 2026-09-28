@@ -1,0 +1,268 @@
+[
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "strength",
+    "value": 46010468,
+    "updatedAt": "2026-09-27T20:03:22.810Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "ehb",
+    "value": 361.8099,
+    "updatedAt": "2026-09-27T20:03:22.810Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "overall",
+    "value": 181318315,
+    "updatedAt": "2026-09-27T20:03:22.810Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "ehb",
+    "value": 91.6973,
+    "updatedAt": "2026-09-27T13:29:04.156Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "overall",
+    "value": 40401525,
+    "updatedAt": "2026-09-27T13:13:00.798Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "overall",
+    "value": 21656266,
+    "updatedAt": "2026-09-27T13:13:00.746Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "strength",
+    "value": 8002523,
+    "updatedAt": "2026-09-27T01:06:31.636Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "overall",
+    "value": 5968370,
+    "updatedAt": "2026-09-27T01:06:31.587Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "strength",
+    "value": 2054609,
+    "updatedAt": "2026-09-27T01:06:31.587Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "slayer",
+    "value": 628297,
+    "updatedAt": "2026-09-25T09:12:49.537Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "five_min",
+    "metric": "strength",
+    "value": 942175,
+    "updatedAt": "2026-09-22T02:21:27.307Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "five_min",
+    "metric": "overall",
+    "value": 1416956,
+    "updatedAt": "2026-09-22T02:21:27.307Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "strength",
+    "value": 12300391,
+    "updatedAt": "2026-08-10T20:30:07.077Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "five_min",
+    "metric": "vorkath",
+    "value": 12,
+    "updatedAt": "2026-07-16T15:38:32.278Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "slayer",
+    "value": 11713218,
+    "updatedAt": "2026-04-04T23:04:23.344Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "zulrah",
+    "value": 454,
+    "updatedAt": "2026-04-04T23:04:23.208Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "zulrah",
+    "value": 176,
+    "updatedAt": "2026-03-14T23:09:10.240Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "slayer",
+    "value": 3346374,
+    "updatedAt": "2025-12-14T17:25:10.691Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "ehb",
+    "value": 63.1027,
+    "updatedAt": "2025-12-14T10:20:28.241Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "slayer",
+    "value": 1839778,
+    "updatedAt": "2025-12-12T19:00:38.669Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "five_min",
+    "metric": "ehb",
+    "value": 5.9062,
+    "updatedAt": "2025-12-07T12:39:28.444Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "five_min",
+    "metric": "ehp",
+    "value": 3.0284,
+    "updatedAt": "2025-12-06T12:20:33.625Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "five_min",
+    "metric": "slayer",
+    "value": 223720,
+    "updatedAt": "2025-12-06T12:20:33.585Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "clue_scrolls_all",
+    "value": 45,
+    "updatedAt": "2025-03-19T22:24:56.014Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "vorkath",
+    "value": 128,
+    "updatedAt": "2024-03-17T19:51:48.664Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "ehp",
+    "value": 547.8227,
+    "updatedAt": "2023-06-03T23:51:41.029Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "clue_scrolls_all",
+    "value": 451,
+    "updatedAt": "2023-04-22T16:22:45.754Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "zulrah",
+    "value": 755,
+    "updatedAt": "2023-04-07T16:30:08.891Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "ehb",
+    "value": 15.3738,
+    "updatedAt": "2023-02-26T11:01:38.547Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "ehp",
+    "value": 188.4511,
+    "updatedAt": "2023-01-01T04:08:29.523Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "ehp",
+    "value": 106.554,
+    "updatedAt": "2022-12-28T23:56:51.106Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "ehp",
+    "value": 43.5604,
+    "updatedAt": "2022-12-27T15:13:53.213Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "year",
+    "metric": "vorkath",
+    "value": 202,
+    "updatedAt": "2022-12-16T22:08:53.211Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "vorkath",
+    "value": 202,
+    "updatedAt": "2022-12-16T22:08:53.210Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "day",
+    "metric": "vorkath",
+    "value": 66,
+    "updatedAt": "2022-12-16T04:45:30.000Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "zulrah",
+    "value": 314,
+    "updatedAt": "2022-10-25T16:48:42.442Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "month",
+    "metric": "clue_scrolls_all",
+    "value": 160,
+    "updatedAt": "2022-06-15T04:41:42.979Z"
+  },
+  {
+    "playerId": 315771,
+    "period": "week",
+    "metric": "clue_scrolls_all",
+    "value": 74,
+    "updatedAt": "2022-05-22T19:00:46.043Z"
+  }
+]

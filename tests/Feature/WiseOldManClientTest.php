@@ -85,25 +85,36 @@ it('posts an update and returns null when the name is not on the hiscores', func
     Http::assertSent(fn (Request $request) => $request->method() === 'POST');
 });
 
-it('requests a metric timeline for a period', function () {
-    Http::fake(['api.wiseoldman.net/v2/players/bartheez/snapshots/timeline*' => Http::response(womFixture('timeline-bartheez-ehp'))]);
+it('pages through a player\'s snapshots', function () {
+    Http::fake(['api.wiseoldman.net/v2/players/bartheez/snapshots*' => Http::response(womFixture('snapshots-bartheez'))]);
 
-    $timeline = app(WiseOldManClient::class)->timeline('Bartheez', 'ehp', 'year');
+    $snapshots = app(WiseOldManClient::class)->snapshots('Bartheez', 'year', 200, 400);
 
-    expect($timeline)->toHaveCount(20)
-        ->and($timeline[0])->toHaveKeys(['value', 'rank', 'date']);
+    expect($snapshots)->toHaveCount(4)
+        ->and($snapshots[0]['data'])->toHaveKeys(['skills', 'bosses', 'activities', 'computed']);
 
-    Http::assertSent(fn (Request $request) => $request['metric'] === 'ehp' && $request['period'] === 'year');
+    Http::assertSent(fn (Request $request) => $request->method() === 'GET'
+        && $request['period'] === 'year' && (int) $request['limit'] === 200 && (int) $request['offset'] === 400);
 });
 
-it('fetches a player\'s gains for a period', function () {
-    Http::fake(['api.wiseoldman.net/v2/players/meekss/gained*' => Http::response(womFixture('gained-meekss-week'))]);
+it('fetches a player\'s achievements and records', function () {
+    Http::fake([
+        'api.wiseoldman.net/v2/players/bartheez/achievements' => Http::response(womFixture('achievements-bartheez')),
+        'api.wiseoldman.net/v2/players/bartheez/records' => Http::response(womFixture('records-bartheez')),
+    ]);
+    $client = app(WiseOldManClient::class);
 
-    $gained = app(WiseOldManClient::class)->gained('Meekss', 'week');
+    expect($client->achievements('Bartheez')[0])->toHaveKeys(['name', 'metric', 'measure', 'threshold', 'createdAt', 'accuracy', 'legacy'])
+        ->and($client->records('Bartheez')[0])->toHaveKeys(['period', 'metric', 'value', 'updatedAt']);
+});
 
-    expect($gained['data']['skills']['overall']['experience']['gained'])->toBeInt();
+it('returns empty lists for a player Wise Old Man does not track', function () {
+    Http::fake(['api.wiseoldman.net/*' => Http::response(['message' => 'Player not found.'], 404)]);
+    $client = app(WiseOldManClient::class);
 
-    Http::assertSent(fn (Request $request) => $request['period'] === 'week');
+    expect($client->snapshots('nobody', 'year'))->toBe([])
+        ->and($client->achievements('nobody'))->toBe([])
+        ->and($client->records('nobody'))->toBe([]);
 });
 
 it('gives interactive callers a shorter timeout without changing the shared client', function () {

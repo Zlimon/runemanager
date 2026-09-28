@@ -32,3 +32,10 @@ Schedule::command('wom:sync')
     ->dailyAt('05:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Thins daily points older than 400 days to one per ISO week. Registered
+// without reading settings, like every schedule here.
+Schedule::command('wom:compact-snapshots')
+    ->weeklyOn(0, '05:30')
+    ->withoutOverlapping()
+    ->runInBackground();

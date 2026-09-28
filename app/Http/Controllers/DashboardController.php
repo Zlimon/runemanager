@@ -47,7 +47,7 @@ class DashboardController extends Controller
                 FeedEvent::query()->recent(8)->get(),
             )->resolve(),
             ...(Instance::womEnabled() ? [
-                'topGainers' => Inertia::defer(fn () => $womLeaderboard->topGainers('week', 'exp', 5)),
+                'topGainers' => Inertia::defer(fn () => $womLeaderboard->topGainers('week', 'overall', 5)),
             ] : []),
         ]);
     }

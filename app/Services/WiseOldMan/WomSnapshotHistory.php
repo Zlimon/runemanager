@@ -6,10 +6,11 @@ use App\Models\WomDailySnapshot;
 use Illuminate\Support\Carbon;
 
 /**
- * Reads over `WomDailySnapshot`, shared by the account, progress and
- * leaderboard views: daily points in a date range, and what a set of accounts
- * gained over a period. Dates are UTC `Y-m-d` strings, so they compare as
- * strings in Mongo.
+ * Reads over `WomDailySnapshot`, shared by the gains, progress and leaderboard
+ * views: each account's latest snapshot, its baseline for a period, and one
+ * field's daily values over a range. Fields are document paths
+ * (`exp`, `skills`, `bosses.zulrah`, …; see {@see WomMetrics::path()}).
+ * Dates are UTC `Y-m-d` strings, so they compare as strings in Mongo.
  */
 class WomSnapshotHistory
 {
@@ -38,85 +39,190 @@ class WomSnapshotHistory
     }
 
     /**
-     * Every snapshot of the given accounts on or after `$from`, oldest first,
-     * streamed from a Mongo cursor so a long range never sits in memory whole.
+     * Each account's newest snapshot, keyed by account id. A path the newest
+     * snapshot lacks is null.
      *
      * @param  list<int>  $accountIds
-     * @return iterable<array{account_id: int, date: string, exp: int, ehp: float, ehb: float}>
+     * @param  list<string>  $paths
+     * @return array<int, array{account_id: int, date: string, values: array<string, mixed>}>
      */
-    public function points(array $accountIds, ?string $from): iterable
+    public function latest(array $accountIds, array $paths): array
     {
-        if ($accountIds === []) {
-            return;
-        }
-
-        $match = ['account_id' => ['$in' => $accountIds]];
-        if ($from !== null) {
-            $match['date'] = ['$gte' => $from];
-        }
-
-        foreach ($this->cursor([
-            ['$match' => $match],
-            ['$sort' => ['date' => 1]],
-            ['$project' => ['_id' => 0, 'account_id' => 1, 'date' => 1, 'exp' => 1, 'ehp' => 1, 'ehb' => 1]],
-        ]) as $row) {
-            yield $this->row($row);
-        }
+        return $this->firstPerAccount($accountIds, null, -1, $paths);
     }
 
     /**
-     * Each account's first snapshot on or after `$date`, keyed by account id.
+     * Each account's snapshot a period's gains are measured from: its last one
+     * on or before the period start or, for an account whose history starts
+     * inside the period, its first one. Keyed by account id. Suits `exp`,
+     * which every snapshot carries; map metrics use {@see self::metricBaselines()}.
      *
      * @param  list<int>  $accountIds
-     * @return array<int, array{account_id: int, date: string, exp: int, ehp: float, ehb: float}>
+     * @param  list<string>  $paths
+     * @return array<int, array{account_id: int, date: string, values: array<string, mixed>}>
      */
-    public function firstOnOrAfter(array $accountIds, ?string $date): array
+    public function baseline(array $accountIds, string $period, array $paths): array
     {
-        return $this->firstPerAccount($accountIds, $date === null ? null : ['$gte' => $date], 1);
+        $start = $this->periodStart($period);
+
+        return $this->firstPerAccount($accountIds, ['$lte' => $start], -1, $paths)
+            + $this->firstPerAccount($accountIds, ['$gt' => $start], 1, $paths);
     }
 
     /**
-     * Each account's last snapshot on or before `$date`, keyed by account id.
+     * Where each metric of one map (`skills`, `bosses`, `activities`) is
+     * measured from, per account: its value in the last snapshot on or before
+     * the period start that carries the map, or, when that snapshot lacks it
+     * (unranked then, or no mapped snapshot that old), its first appearance
+     * after the start. Headline-only snapshots written before the maps were
+     * stored are skipped. Carries each baseline's date, for one account's
+     * Gains tab; population boards use {@see self::metricBaselineValues()}.
      *
      * @param  list<int>  $accountIds
-     * @return array<int, array{account_id: int, date: string, exp: int, ehp: float, ehb: float}>
+     * @return array<int, array<string, array{date: string, value: int|float}>> account id => metric => baseline
      */
-    public function lastOnOrBefore(array $accountIds, string $date): array
-    {
-        return $this->firstPerAccount($accountIds, ['$lte' => $date], -1);
-    }
-
-    /**
-     * What each account gained over a period: its latest snapshot minus its
-     * last one on or before the period's start (or, for an account whose
-     * history starts inside the period, its first one). Keyed by account id;
-     * accounts without snapshots are left out.
-     *
-     * @param  list<int>  $accountIds
-     * @return array<int, array{exp: int, ehp: float, ehb: float}>
-     */
-    public function gained(array $accountIds, string $period): array
+    public function metricBaselines(array $accountIds, string $period, string $field): array
     {
         if ($accountIds === []) {
             return [];
         }
 
         $start = $this->periodStart($period);
-        $latest = $this->firstPerAccount($accountIds, null, -1);
-        $baseline = $this->lastOnOrBefore($accountIds, $start)
-            + $this->firstPerAccount($accountIds, ['$gt' => $start], 1);
+        $baselines = [];
 
-        $gained = [];
-        foreach ($latest as $accountId => $end) {
-            $from = $baseline[$accountId] ?? $end;
-            $gained[$accountId] = [
-                'exp' => max(0, $end['exp'] - $from['exp']),
-                'ehp' => max(0.0, round($end['ehp'] - $from['ehp'], 4)),
-                'ehb' => max(0.0, round($end['ehb'] - $from['ehb'], 4)),
+        // $min over {date, value} compares the date first: the earliest appearance.
+        foreach ($this->cursor([
+            ['$match' => ['account_id' => ['$in' => $accountIds], 'date' => ['$gt' => $start], $field => ['$type' => 'object']]],
+            ['$project' => ['account_id' => 1, 'date' => 1, 'entry' => ['$objectToArray' => '$'.$field]]],
+            ['$unwind' => '$entry'],
+            ['$group' => [
+                '_id' => ['account_id' => '$account_id', 'metric' => '$entry.k'],
+                'first' => ['$min' => ['date' => '$date', 'value' => '$entry.v']],
+            ]],
+        ]) as $row) {
+            $baselines[(int) $row['_id']['account_id']][$row['_id']['metric']] = [
+                'date' => (string) $row['first']['date'],
+                'value' => $row['first']['value'],
             ];
         }
 
-        return $gained;
+        foreach ($this->firstPerAccount($accountIds, ['$lte' => $start], -1, [$field], $field) as $accountId => $row) {
+            foreach ((array) $row['values'][$field] as $metric => $value) {
+                $baselines[$accountId][$metric] = ['date' => $row['date'], 'value' => $value];
+            }
+        }
+
+        return $baselines;
+    }
+
+    /**
+     * The baseline values of {@see self::metricBaselines()} without their
+     * dates, for a whole population: `$latestMaps` is each account's newest
+     * map of `$field`. Only accounts whose newest map has a metric their last
+     * mapped snapshot on or before the start lacks are looked up forward, and
+     * that lookup merges each account's maps newest first, so every metric
+     * ends on its first value after the start.
+     *
+     * @param  array<int, mixed>  $latestMaps  account id => newest map
+     * @return array<int, array<string, int|float>> account id => metric => baseline value
+     */
+    public function metricBaselineValues(array $latestMaps, string $period, string $field): array
+    {
+        if ($latestMaps === []) {
+            return [];
+        }
+
+        $start = $this->periodStart($period);
+        $before = $this->firstPerAccount(array_keys($latestMaps), ['$lte' => $start], -1, [$field], $field);
+
+        $baselines = [];
+        $lookForward = [];
+        foreach ($latestMaps as $accountId => $map) {
+            $known = $before[$accountId]['values'][$field] ?? [];
+            $baselines[$accountId] = is_array($known) ? $known : [];
+
+            if (array_diff_key((array) $map, $baselines[$accountId]) !== []) {
+                $lookForward[] = $accountId;
+            }
+        }
+
+        if ($lookForward === []) {
+            return $baselines;
+        }
+
+        foreach ($this->cursor([
+            ['$match' => ['account_id' => ['$in' => $lookForward], 'date' => ['$gt' => $start], $field => ['$type' => 'object']]],
+            ['$sort' => ['account_id' => -1, 'date' => -1]],
+            ['$group' => ['_id' => '$account_id', 'first' => ['$mergeObjects' => '$'.$field]]],
+        ]) as $row) {
+            $accountId = (int) $row['_id'];
+            $baselines[$accountId] += $row['first'];
+        }
+
+        return $baselines;
+    }
+
+    /**
+     * {@see self::metricBaselines()} for one map metric path (`bosses.zulrah`).
+     *
+     * @param  list<int>  $accountIds
+     * @return array<int, array{date: string, value: int|float}> account id => baseline
+     */
+    public function pathBaselines(array $accountIds, string $period, string $path): array
+    {
+        if ($accountIds === []) {
+            return [];
+        }
+
+        $start = $this->periodStart($period);
+        $field = explode('.', $path)[0];
+        $baselines = [];
+
+        foreach ($this->firstPerAccount($accountIds, ['$lte' => $start], -1, [$path], $field) as $accountId => $row) {
+            if (is_numeric($row['values'][$path])) {
+                $baselines[$accountId] = ['date' => $row['date'], 'value' => $row['values'][$path]];
+            }
+        }
+
+        $lookForward = array_values(array_diff($accountIds, array_keys($baselines)));
+        if ($lookForward === []) {
+            return $baselines;
+        }
+
+        // $min over {date, value} compares the date first: the earliest appearance.
+        foreach ($this->cursor([
+            ['$match' => ['account_id' => ['$in' => $lookForward], 'date' => ['$gt' => $start], $path => ['$exists' => true]]],
+            ['$group' => ['_id' => '$account_id', 'first' => ['$min' => ['date' => '$date', 'value' => '$'.$path]]]],
+        ]) as $row) {
+            $baselines[(int) $row['_id']] = ['date' => (string) $row['first']['date'], 'value' => $row['first']['value']];
+        }
+
+        return $baselines;
+    }
+
+    /**
+     * One account's daily values of a numeric path from `$from` on, oldest
+     * first, skipping days whose snapshot lacks the path.
+     *
+     * @return list<array{date: string, value: int|float}>
+     */
+    public function values(int $accountId, string $path, ?string $from): array
+    {
+        $match = ['account_id' => $accountId, $path => ['$exists' => true, '$ne' => null]];
+        if ($from !== null) {
+            $match['date'] = ['$gte' => $from];
+        }
+
+        $values = [];
+        foreach ($this->cursor([
+            ['$match' => $match],
+            ['$sort' => ['date' => 1]],
+            ['$project' => ['_id' => 0, 'date' => 1, 'value' => '$'.$path]],
+        ]) as $row) {
+            $values[] = ['date' => (string) $row['date'], 'value' => $row['value']];
+        }
+
+        return $values;
     }
 
     /**
@@ -153,13 +259,14 @@ class WomSnapshotHistory
 
     /**
      * One snapshot per account: the first in `$direction` date order among
-     * those matching `$dateMatch`.
+     * those matching `$dateMatch` (and carrying `$requiring`), projected to `$paths`.
      *
      * @param  list<int>  $accountIds
      * @param  array<string, string>|null  $dateMatch
-     * @return array<int, array{account_id: int, date: string, exp: int, ehp: float, ehb: float}>
+     * @param  list<string>  $paths
+     * @return array<int, array{account_id: int, date: string, values: array<string, mixed>}>
      */
-    private function firstPerAccount(array $accountIds, ?array $dateMatch, int $direction): array
+    private function firstPerAccount(array $accountIds, ?array $dateMatch, int $direction, array $paths, ?string $requiring = null): array
     {
         if ($accountIds === []) {
             return [];
@@ -169,51 +276,37 @@ class WomSnapshotHistory
         if ($dateMatch !== null) {
             $match['date'] = $dateMatch;
         }
+        if ($requiring !== null) {
+            $match[$requiring] = ['$exists' => true];
+        }
 
-        $rows = $this->aggregate([
-            ['$match' => $match],
-            ['$sort' => ['date' => $direction]],
-            ['$group' => [
-                '_id' => '$account_id',
-                'account_id' => ['$first' => '$account_id'],
-                'date' => ['$first' => '$date'],
-                'exp' => ['$first' => '$exp'],
-                'ehp' => ['$first' => '$ehp'],
-                'ehb' => ['$first' => '$ehb'],
-            ]],
-        ]);
+        // $group output names cannot contain dots, so paths travel as f0, f1, …
+        $group = ['_id' => '$account_id', 'date' => ['$first' => '$date']];
+        foreach (array_values($paths) as $index => $path) {
+            $group["f{$index}"] = ['$first' => '$'.$path];
+        }
 
+        // Sorting on both keys of the (account_id, date) index lets Mongo walk
+        // the index to each account's first doc instead of sorting everything.
         $byAccount = [];
-        foreach ($rows as $row) {
-            $row = $this->row($row);
-            $byAccount[$row['account_id']] = $row;
+        foreach ($this->cursor([
+            ['$match' => $match],
+            ['$sort' => ['account_id' => $direction, 'date' => $direction]],
+            ['$group' => $group],
+        ]) as $row) {
+            $values = [];
+            foreach (array_values($paths) as $index => $path) {
+                $values[$path] = $row["f{$index}"] ?? null;
+            }
+
+            $byAccount[(int) $row['_id']] = [
+                'account_id' => (int) $row['_id'],
+                'date' => (string) $row['date'],
+                'values' => $values,
+            ];
         }
 
         return $byAccount;
-    }
-
-    /**
-     * @param  array<string, mixed>  $row
-     * @return array{account_id: int, date: string, exp: int, ehp: float, ehb: float}
-     */
-    private function row(array $row): array
-    {
-        return [
-            'account_id' => (int) $row['account_id'],
-            'date' => (string) $row['date'],
-            'exp' => (int) ($row['exp'] ?? 0),
-            'ehp' => (float) ($row['ehp'] ?? 0),
-            'ehb' => (float) ($row['ehb'] ?? 0),
-        ];
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $pipeline
-     * @return array<int, array<string, mixed>>
-     */
-    private function aggregate(array $pipeline): array
-    {
-        return iterator_to_array($this->cursor($pipeline), false);
     }
 
     /**

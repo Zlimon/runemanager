@@ -34,33 +34,66 @@ it('lets guests in once the page is public', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page->component('Progress/Index'));
 });
 
-it('renders stats up front and defers the chart and boards', function () {
-    $player = WomPlayer::factory()->create(['ehp' => 50, 'ehb' => 5]);
-    foreach ([[8, 1_000], [0, 4_000]] as [$daysAgo, $exp]) {
-        WomDailySnapshot::query()->create([
+/**
+ * @param  array{0: array<string, int>, 1: array<string, int>}  $skills
+ */
+function womProgressPagePlayer(WomPlayer $player, array $exp, array $skills = [[], []]): void
+{
+    foreach ([8, 0] as $index => $daysAgo) {
+        WomDailySnapshot::query()->insert([
             'account_id' => $player->account_id,
             'date' => now('UTC')->subDays($daysAgo)->toDateString(),
-            'exp' => $exp, 'ehp' => 50.0, 'ehb' => 5.0,
+            'exp' => $exp[$index],
+            'ehp' => 0.0,
+            'ehb' => 0.0,
+            'skills' => $skills[$index],
+            'bosses' => [],
+            'activities' => [],
         ]);
     }
+}
+
+it('renders stats and the metric catalogue up front and defers both boards', function () {
+    $player = WomPlayer::factory()->create();
+    womProgressPagePlayer($player, [1_000, 4_000], [['attack' => 0], ['attack' => 3_000]]);
 
     $this->actingAs(User::factory()->withPersonalTeam()->create())
         ->get(route('progress.index', ['period' => 'month', 'metric' => 'nope']))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Progress/Index')
-            ->where('filters', ['range' => 'year', 'period' => 'month', 'metric' => 'exp'])
+            ->where('filters', ['period' => 'month', 'metric' => 'overall'])
             ->where('stats.active_members', 1)
             ->where('stats.week_exp_gained', 3_000)
+            ->where('stats.week_levels_gained', 15)
+            ->where('stats.week_boss_kills', 0)
+            ->where('metrics.skills.0', ['metric' => 'overall', 'label' => 'Overall', 'icon' => ['kind' => 'skill', 'slug' => 'overall']])
+            ->has('metrics.bosses')
+            ->has('metrics.activities')
             ->missing('series')
-            ->missing('topGainers')
             ->missing('efficiency')
-            ->loadDeferredProps(['series', 'gainers', 'efficiency'], fn (AssertableInertia $reload) => $reload
-                ->has('series', 2)
-                ->where('series.1.exp', 3_000)
+            ->missing('topGainers')
+            ->missing('skillLeaders')
+            ->loadDeferredProps(['gainers', 'leaders'], fn (AssertableInertia $reload) => $reload
                 ->where('topGainers.0.gained', 3_000)
-                ->where('efficiency.ehp.0.value', 50)
-                ->has('efficiency.ehb', 1),
+                ->has('skillLeaders', 1)
+                ->where('skillLeaders.0.metric', 'attack')
+                ->where('skillLeaders.0.gained', 3_000),
+            ),
+        );
+});
+
+it('ranks the top gainers on the metric asked for', function () {
+    $player = WomPlayer::factory()->create();
+    womProgressPagePlayer($player, [0, 50], [['cooking' => 100], ['cooking' => 150]]);
+
+    $this->actingAs(User::factory()->withPersonalTeam()->create())
+        ->get(route('progress.index', ['metric' => 'cooking']))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('filters.metric', 'cooking')
+            ->loadDeferredProps('gainers', fn (AssertableInertia $reload) => $reload
+                ->where('topGainers.0.account_id', $player->account_id)
+                ->where('topGainers.0.gained', 50),
             ),
         );
 });
@@ -69,25 +102,18 @@ it('masks names and drops account ids for guests when account names are hidden',
     SettingHelper::setSetting('wom_progress_public', true, 'bool');
     SettingHelper::setSetting('public_anonymize_accounts', true, 'bool');
 
-    $player = WomPlayer::factory()->for(Account::factory()->state(['username' => 'Zezima']))->create(['ehp' => 10, 'ehb' => 1]);
-    foreach ([[8, 1_000], [0, 2_000]] as [$daysAgo, $exp]) {
-        WomDailySnapshot::query()->create([
-            'account_id' => $player->account_id,
-            'date' => now('UTC')->subDays($daysAgo)->toDateString(),
-            'exp' => $exp, 'ehp' => 10.0, 'ehb' => 1.0,
-        ]);
-    }
+    $player = WomPlayer::factory()->for(Account::factory()->state(['username' => 'Zezima']))->create();
+    womProgressPagePlayer($player, [1_000, 2_000], [['attack' => 0], ['attack' => 1_000]]);
 
     $this->get(route('progress.index'))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('anonymized', true)
-            ->loadDeferredProps(['gainers', 'efficiency'], fn (AssertableInertia $reload) => $reload
+            ->loadDeferredProps(['gainers', 'leaders'], fn (AssertableInertia $reload) => $reload
                 ->where('topGainers.0.username', 'Z•••••')
                 ->missing('topGainers.0.account_id')
-                ->where('efficiency.ehp.0.username', 'Z•••••')
-                ->missing('efficiency.ehp.0.account_id')
-                ->missing('efficiency.ehb.0.account_id'),
+                ->where('skillLeaders.0.username', 'Z•••••')
+                ->missing('skillLeaders.0.account_id'),
             ),
         );
 
@@ -95,9 +121,10 @@ it('masks names and drops account ids for guests when account names are hidden',
         ->get(route('progress.index'))
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->where('anonymized', false)
-            ->loadDeferredProps('gainers', fn (AssertableInertia $reload) => $reload
+            ->loadDeferredProps(['gainers', 'leaders'], fn (AssertableInertia $reload) => $reload
                 ->where('topGainers.0.username', 'Zezima')
-                ->where('topGainers.0.account_id', $player->account_id),
+                ->where('topGainers.0.account_id', $player->account_id)
+                ->where('skillLeaders.0.account_id', $player->account_id),
             ),
         );
 });

@@ -3,94 +3,110 @@
 namespace App\Services\WiseOldMan;
 
 use App\Models\Account;
-use App\Models\WomPlayer;
 use Illuminate\Support\Facades\Cache;
 
 /**
  * Wise Old Man boards over the /progress population (active, linked and not
- * hidden by the owner): who gained the most over a period, and who has the
- * most efficient hours.
+ * hidden by the owner): who gained the most of one skill, boss or activity
+ * over a period, and who gained the most of each skill.
  */
 class WomLeaderboard
 {
-    /** Metrics a board can rank on. */
-    public const GAIN_METRICS = ['exp', 'ehp', 'ehb'];
-
     /** Top gainers back the dashboard, every member's landing page. */
     public const GAINERS_CACHE_SECONDS = 600;
 
-    public function __construct(private WomSnapshotHistory $history) {}
+    public function __construct(private WomMetricGains $gains) {}
 
     /**
-     * The biggest gainers of `$metric` (`exp`, `ehp`, `ehb`) over `$period`
-     * (`day`, `week`, `month`, `year`); accounts that gained nothing are left
-     * out. Cached for {@see self::GAINERS_CACHE_SECONDS} seconds.
+     * The biggest gainers of `$metric` (any {@see WomMetrics::isValid()}
+     * metric, else `overall`) over `$period` (`day`, `week`, `month`,
+     * `year`); accounts that gained nothing are left out. Cached for
+     * {@see self::GAINERS_CACHE_SECONDS} seconds.
      *
-     * @return list<array{account_id: int, username: string, account_type: ?string, gained: int|float}>
+     * @return list<array{account_id: int, username: string, account_type: ?string, gained: int}>
      */
     public function topGainers(string $period, string $metric, int $limit = 10): array
     {
-        $metric = in_array($metric, self::GAIN_METRICS, true) ? $metric : 'exp';
-        $period = array_key_exists($period, WomSnapshotHistory::PERIODS) ? $period : 'week';
+        $metric = WomMetrics::isValid($metric) ? $metric : 'overall';
+        $period = WomMetricGains::period($period);
 
         return Cache::remember(
             WomCache::key("gainers:{$period}:{$metric}:{$limit}"),
             self::GAINERS_CACHE_SECONDS,
-            fn (): array => $this->rankGainers($period, $metric, $limit),
+            function () use ($period, $metric, $limit): array {
+                $gains = array_slice($this->gains->forPopulation(WomProgress::population(), $period, $metric), 0, $limit, true);
+                $accounts = $this->accounts(array_keys($gains));
+
+                $rows = [];
+                foreach ($gains as $accountId => $gained) {
+                    if (isset($accounts[$accountId])) {
+                        $rows[] = [...$accounts[$accountId], 'gained' => $gained];
+                    }
+                }
+
+                return $rows;
+            },
         );
     }
 
     /**
-     * @return list<array{account_id: int, username: string, account_type: ?string, gained: int|float}>
+     * The top gainer of every skill over `$period`, in skill order; skills
+     * nobody trained are left out. Cached like the top gainers.
+     *
+     * @return list<array{metric: string, label: string, icon: array<string, string>|null, account_id: int, username: string, account_type: ?string, gained: int}>
      */
-    private function rankGainers(string $period, string $metric, int $limit): array
+    public function skillLeaders(string $period): array
     {
-        $gains = collect($this->history->gained(WomProgress::population(), $period))
-            ->map(fn (array $gained): int|float => $gained[$metric])
-            ->filter(fn (int|float $gained): bool => $gained > 0)
-            ->sortDesc()
-            ->take($limit);
+        $period = WomMetricGains::period($period);
 
-        $accounts = Account::query()
-            ->whereIn('id', $gains->keys())
-            ->get(['id', 'username', 'account_type'])
-            ->keyBy('id');
+        return Cache::remember(
+            WomCache::key("skill-leaders:{$period}"),
+            self::GAINERS_CACHE_SECONDS,
+            function () use ($period): array {
+                $best = [];
+                foreach ($this->gains->forPopulationGroup(WomProgress::population(), $period, 'skill') as $accountId => $skills) {
+                    foreach ($skills as $metric => $gained) {
+                        if ($gained > ($best[$metric]['gained'] ?? 0)) {
+                            $best[$metric] = ['account_id' => $accountId, 'gained' => $gained];
+                        }
+                    }
+                }
 
-        return $gains
-            ->filter(fn (int|float $gained, int $accountId): bool => $accounts->has($accountId))
-            ->map(fn (int|float $gained, int $accountId): array => [
-                'account_id' => $accountId,
-                'username' => $accounts[$accountId]->username,
-                'account_type' => $accounts[$accountId]->account_type,
-                'gained' => $gained,
-            ])
-            ->values()
-            ->all();
+                $accounts = $this->accounts(array_column($best, 'account_id'));
+
+                $rows = [];
+                foreach (WomMetrics::SKILLS as $metric) {
+                    $leader = $best[$metric] ?? null;
+                    if ($leader !== null && isset($accounts[$leader['account_id']])) {
+                        $rows[] = [
+                            'metric' => $metric,
+                            'label' => WomMetrics::label($metric),
+                            'icon' => WomMetrics::icon($metric),
+                            ...$accounts[$leader['account_id']],
+                            'gained' => $leader['gained'],
+                        ];
+                    }
+                }
+
+                return $rows;
+            },
+        );
     }
 
     /**
-     * Members ranked by their current EHP or EHB.
-     *
-     * @return list<array{account_id: int, username: string, account_type: ?string, value: float}>
+     * @param  list<int>  $accountIds
+     * @return array<int, array{account_id: int, username: string, account_type: ?string}>
      */
-    public function efficiency(string $metric, int $limit = 25): array
+    private function accounts(array $accountIds): array
     {
-        $metric = $metric === 'ehb' ? 'ehb' : 'ehp';
-
-        return WomPlayer::active()->visibleOnProgress()
-            ->with('account:id,username,account_type')
-            ->where($metric, '>', 0)
-            ->orderByDesc($metric)
-            ->limit($limit)
-            ->get()
-            ->filter(fn (WomPlayer $player): bool => $player->account !== null)
-            ->map(fn (WomPlayer $player): array => [
-                'account_id' => $player->account_id,
-                'username' => $player->account->username,
-                'account_type' => $player->account->account_type,
-                'value' => round((float) $player->{$metric}, 2),
-            ])
-            ->values()
+        return Account::query()
+            ->whereIn('id', $accountIds)
+            ->get(['id', 'username', 'account_type'])
+            ->mapWithKeys(fn (Account $account): array => [$account->id => [
+                'account_id' => $account->id,
+                'username' => $account->username,
+                'account_type' => $account->account_type,
+            ]])
             ->all();
     }
 }

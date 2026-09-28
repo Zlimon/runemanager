@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Accounts;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CalendarEventController;
@@ -91,7 +92,11 @@ Route::middleware([
 
     Route::prefix('/accounts')->group(function () {
         Route::get('/', [AccountController::class, 'index'])->name('accounts.index');
-        Route::get('/{account}', [AccountController::class, 'show'])->name('accounts.show');
+        Route::get('/{account}', [Accounts\LogController::class, 'show'])->name('accounts.show');
+        Route::get('/{account}/gains', [Accounts\GainsController::class, 'show'])->name('accounts.gains');
+        Route::get('/{account}/items', [Accounts\ItemsController::class, 'show'])->name('accounts.items');
+        Route::get('/{account}/collection', [Accounts\CollectionController::class, 'show'])->name('accounts.collection');
+        Route::get('/{account}/events', [Accounts\RecentEventsController::class, 'index'])->name('accounts.events');
     });
 
     // Management surfaces, each behind its own permission

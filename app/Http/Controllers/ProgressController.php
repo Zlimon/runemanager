@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\WiseOldMan\WomLeaderboard;
+use App\Services\WiseOldMan\WomMetrics;
 use App\Services\WiseOldMan\WomProgress;
 use App\Services\WiseOldMan\WomSnapshotHistory;
 use App\Support\AccountNames;
@@ -15,9 +16,9 @@ use Inertia\Response;
 class ProgressController extends Controller
 {
     /**
-     * The instance's Wise Old Man progress: headline tiles, the members'
-     * summed history, the period's top gainers and the EHP/EHB boards. Open
-     * to guests only when the owner made it public. `range`, `period` and
+     * The instance's Wise Old Man progress: headline tiles, the period's top
+     * gainers of one skill, boss or activity, and the top gainer of every
+     * skill. Open to guests only when the owner made it public. `period` and
      * `metric` are optional query params that fall back to their default.
      */
     public function index(Request $request, WomProgress $progress, WomLeaderboard $leaderboard): Response|RedirectResponse
@@ -28,10 +29,10 @@ class ProgressController extends Controller
             return redirect()->guest(route('login'));
         }
 
+        $metric = $request->query('metric');
         $filters = [
-            'range' => $this->option($request, 'range', array_keys(WomSnapshotHistory::RANGES), 'year'),
             'period' => $this->option($request, 'period', array_keys(WomSnapshotHistory::PERIODS), 'week'),
-            'metric' => $this->option($request, 'metric', WomLeaderboard::GAIN_METRICS, 'exp'),
+            'metric' => is_string($metric) && WomMetrics::isValid($metric) ? $metric : 'overall',
         ];
 
         $masked = AccountNames::maskedFor($request->user());
@@ -39,16 +40,35 @@ class ProgressController extends Controller
         return Inertia::render('Progress/Index', [
             'filters' => $filters,
             'anonymized' => $masked,
+            'metrics' => fn () => $this->metricOptions(),
             'stats' => fn () => $progress->stats(),
-            'series' => Inertia::defer(fn () => $progress->instanceSeries($filters['range']), 'series'),
             'topGainers' => Inertia::defer(fn () => $this->forViewer(
                 $leaderboard->topGainers($filters['period'], $filters['metric']), $masked,
             ), 'gainers'),
-            'efficiency' => Inertia::defer(fn () => [
-                'ehp' => $this->forViewer($leaderboard->efficiency('ehp'), $masked),
-                'ehb' => $this->forViewer($leaderboard->efficiency('ehb'), $masked),
-            ], 'efficiency'),
+            'skillLeaders' => Inertia::defer(fn () => $this->forViewer(
+                $leaderboard->skillLeaders($filters['period']), $masked,
+            ), 'leaders'),
         ]);
+    }
+
+    /**
+     * The metric picker's options, grouped as WOM groups them.
+     *
+     * @return array{skills: list<array{metric: string, label: string, icon: array<string, string>|null}>, bosses: list<array{metric: string, label: string, icon: array<string, string>|null}>, activities: list<array{metric: string, label: string, icon: array<string, string>|null}>}
+     */
+    private function metricOptions(): array
+    {
+        $options = fn (array $metrics): array => array_map(fn (string $metric): array => [
+            'metric' => $metric,
+            'label' => WomMetrics::label($metric),
+            'icon' => WomMetrics::icon($metric),
+        ], $metrics);
+
+        return [
+            'skills' => $options(WomMetrics::SKILLS),
+            'bosses' => $options(WomMetrics::BOSSES),
+            'activities' => $options(WomMetrics::ACTIVITIES),
+        ];
     }
 
     /**

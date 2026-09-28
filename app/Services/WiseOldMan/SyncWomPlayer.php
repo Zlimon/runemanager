@@ -8,7 +8,8 @@ use App\Models\WomPlayer;
 use Illuminate\Support\Carbon;
 
 /**
- * Refresh one account's Wise Old Man row and today's daily point.
+ * Refresh one account's Wise Old Man row, today's daily point and, when
+ * WOM saw a change, its achievements and records.
  *
  * WOM is only ever asked to update (POST) a player whose owner opted in
  * (`tracking_opt_in`), and then at most every {@see self::UPDATE_MIN_HOURS}
@@ -24,7 +25,8 @@ class SyncWomPlayer
 
     public function __construct(
         private WiseOldManClient $client,
-        private BackfillWomSeries $backfill,
+        private BackfillWomSnapshots $backfill,
+        private SyncWomMilestones $milestones,
     ) {}
 
     /**
@@ -69,11 +71,16 @@ class SyncWomPlayer
             $this->backfill->run($player, $account->username);
         }
 
+        if ($this->milestonesAreBehind($player)) {
+            $this->milestones->sync($player, $account->username);
+        }
+
         return $player;
     }
 
     /**
-     * Store a PlayerDetails payload on the row and upsert the day it describes.
+     * Store a PlayerDetails payload on the row and upsert the day it describes,
+     * with every metric of its `latestSnapshot`.
      * Public for callers that fetched the details themselves (`LiveWomSeeder`).
      *
      * @param  array<string, mixed>  $details
@@ -110,12 +117,25 @@ class SyncWomPlayer
         }
 
         $day = Carbon::parse($details['updatedAt'] ?? now())->utc()->toDateString();
+        $row = ['account_id' => $player->account_id, 'date' => $day, 'exp' => $exp, 'ehp' => (float) $player->ehp, 'ehb' => (float) $player->ehb];
 
-        WomDailySnapshot::query()->upsert(
-            [['account_id' => $player->account_id, 'date' => $day, 'exp' => $exp, 'ehp' => (float) $player->ehp, 'ehb' => (float) $player->ehb]],
-            ['account_id', 'date'],
-            ['exp', 'ehp', 'ehb'],
-        );
+        // The latest snapshot carries every metric; without it the day keeps
+        // whatever maps it already has.
+        $data = $details['latestSnapshot']['data'] ?? null;
+        $maps = is_array($data) ? WomMetrics::snapshotMaps($data) : [];
+
+        WomDailySnapshot::query()->upsert([$row + $maps], ['account_id', 'date'], ['exp', 'ehp', 'ehb', ...array_keys($maps)]);
+    }
+
+    /**
+     * Whether WOM saw the player change since achievements and records were
+     * last read; an unchanged account costs no extra calls.
+     */
+    private function milestonesAreBehind(WomPlayer $player): bool
+    {
+        return $player->isLinked()
+            && ($player->milestones_synced_at === null
+                || ($player->last_changed_at !== null && $player->last_changed_at->gt($player->milestones_synced_at)));
     }
 
     /** An unlinked row whose last lookup 404'd recently, and no opt-in to POST. */

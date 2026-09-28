@@ -11,8 +11,10 @@ use App\Models\Loot;
 use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\User;
+use App\Models\WomAchievement;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
+use App\Models\WomRecord;
 use App\Services\Hiscores\GroupIronmanValidator;
 use App\Services\Instance\ResetInstanceData;
 use App\Services\WiseOldMan\WomCache;
@@ -237,6 +239,8 @@ it('wipes every MongoDB collection, including the shared group bank, on a confir
     GroupBank::forceCreate(['items' => [[995, 1000]]]);
     WomPlayer::factory()->for($account)->create();
     WomDailySnapshot::forceCreate(['account_id' => $account->id, 'date' => '2026-09-26', 'exp' => 1, 'ehp' => 0.0, 'ehb' => 0.0]);
+    WomAchievement::factory()->for($account)->create();
+    WomRecord::factory()->for($account)->create();
 
     $this->actingAs($admin)
         ->put(route('admin.settings.update'), [
@@ -255,6 +259,8 @@ it('wipes every MongoDB collection, including the shared group bank, on a confir
     expect(GroupBank::count())->toBe(0);
     expect(WomPlayer::count())->toBe(0);
     expect(WomDailySnapshot::count())->toBe(0);
+    expect(WomAchievement::count())->toBe(0);
+    expect(WomRecord::count())->toBe(0);
 });
 
 it('retires the cached Wise Old Man boards when the instance is reset', function () {

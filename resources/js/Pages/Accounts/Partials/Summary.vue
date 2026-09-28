@@ -1,17 +1,12 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
 import InputLabel from "@/Components/Form/InputLabel.vue";
-import Freshness from "@/Pages/Accounts/Partials/Freshness.vue";
 import dayjs from "dayjs";
 
-const props = defineProps({
+defineProps({
     account: {
         type: Object,
         required: true,
-    },
-    freshness: {
-        type: Object,
-        default: () => ({ stale_after_minutes: 60 }),
     },
     // Rank among this instance's accounts by total XP. Null until the account
     // has hiscores to rank on.
@@ -26,7 +21,7 @@ const props = defineProps({
     },
 });
 
-const hours = (value) => `${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 1 })} h`;
+const hours = (value) => `${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })} h`;
 
 const page = usePage();
 </script>
@@ -55,67 +50,10 @@ const page = usePage();
             </div>
         </div>
 
-        <hr class="my-6 border border-base-300 bg-base-300">
-
-        <div class="mb-2 flex items-baseline justify-between">
-            <InputLabel class="text-sm" value="Hiscores" />
-            <Freshness :updated-at="freshness.hiscores"
-                       :stale-after-minutes="freshness.stale_after_minutes ?? 60" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
-            <div class="col-span-1">
-                <InputLabel class="text-sm" value="Total level"/>
-                <p class="text-xl font-bold text-base-content">
-                    {{ account.level }}
-                </p>
-            </div>
-
-            <div class="col-span-1">
-                <InputLabel class="text-sm" value="Total XP"/>
-                <p class="text-xl font-bold text-base-content">
-                    {{ account.xp.toLocaleString('en-US') }}
-                </p>
-            </div>
-
-            <div class="col-span-1">
-                <InputLabel class="text-sm" value="Rank"/>
-                <p class="text-xl font-bold text-base-content">
-                    {{ account.rank.toLocaleString('en-US') }}
-                </p>
-            </div>
-
-        </div>
-
-        <template v-if="wom?.linked">
-            <hr class="my-6 border border-base-300 bg-base-300">
-
-            <div class="mb-2 flex items-baseline justify-between">
-                <InputLabel class="text-sm" value="Wise Old Man" />
-                <a :href="wom.url" target="_blank" rel="noopener"
-                   class="link link-hover text-xs text-base-content/60">
-                    Profile
-                </a>
-            </div>
-
-            <div class="grid grid-cols-2 gap-6">
-                <div class="col-span-1">
-                    <InputLabel class="text-sm" value="EHP"/>
-                    <p class="text-xl font-bold text-base-content">{{ hours(wom.ehp) }}</p>
-                </div>
-
-                <div class="col-span-1">
-                    <InputLabel class="text-sm" value="EHB"/>
-                    <p class="text-xl font-bold text-base-content">{{ hours(wom.ehb) }}</p>
-                </div>
-
-                <div class="col-span-1">
-                    <InputLabel class="text-sm" value="Time to max"/>
-                    <p class="text-xl font-bold text-base-content">
-                        {{ wom.ttm > 0 ? hours(wom.ttm) : 'Maxed' }}
-                    </p>
-                </div>
-            </div>
-        </template>
+        <!-- Wise Old Man efficiency, kept deliberately small (gains live on their own tab). -->
+        <p v-if="wom?.linked" class="mt-4 text-xs text-base-content/60">
+            EHP {{ hours(wom.ehp) }} · EHB {{ hours(wom.ehb) }} ·
+            <a :href="wom.url" target="_blank" rel="noopener" class="link link-hover">Wise Old Man ↗</a>
+        </p>
     </div>
 </template>

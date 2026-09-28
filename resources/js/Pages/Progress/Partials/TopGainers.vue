@@ -1,60 +1,40 @@
 <script setup>
-import { ref } from 'vue';
-import { Deferred, router } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Deferred } from '@inertiajs/vue3';
 import Card from '@/Components/Cards/Card.vue';
 import Loader from '@/Components/Display/Loader.vue';
-import ChoiceChips from '@/Components/Tables/ChoiceChips.vue';
 import AccountName from '@/Pages/Progress/Partials/AccountName.vue';
+import MetricPicker from '@/Pages/Progress/Partials/MetricPicker.vue';
 
 /*
- * The period's biggest gainers (the deferred `topGainers` prop). Period and
- * metric changes reload only that prop.
+ * The period's biggest gainers of one skill, boss or activity (the deferred
+ * `topGainers` prop). The page owns the filters and reloads the prop.
  */
 const props = defineProps({
     gainers: { type: Array, default: null },
-    period: { type: String, default: 'week' },
-    metric: { type: String, default: 'exp' },
+    metric: { type: String, default: 'overall' },
+    metrics: { type: Object, required: true },
 });
 
-const PERIODS = [
-    { value: 'day', label: 'Day' },
-    { value: 'week', label: 'Week' },
-    { value: 'month', label: 'Month' },
-    { value: 'year', label: 'Year' },
-];
-const METRICS = [
-    { value: 'exp', label: 'XP' },
-    { value: 'ehp', label: 'EHP' },
-    { value: 'ehb', label: 'EHB' },
-];
+defineEmits(['update:metric']);
 
-const period = ref(props.period);
-const metric = ref(props.metric);
+// What a gain counts: xp for skills, kills for bosses, a score otherwise.
+const unit = computed(() => {
+    if ((props.metrics.skills ?? []).some((option) => option.metric === props.metric)) {
+        return ' xp';
+    }
 
-const reload = () => router.reload({
-    only: ['topGainers'],
-    data: { period: period.value, metric: metric.value },
-    preserveState: true,
-    preserveScroll: true,
-    replace: true,
+    return (props.metrics.bosses ?? []).some((option) => option.metric === props.metric) ? ' kills' : '';
 });
 
-const pickPeriod = (key) => { period.value = key; reload(); };
-const pickMetric = (key) => { metric.value = key; reload(); };
-
-const format = (value) => (metric.value === 'exp'
-    ? Math.round(value).toLocaleString('en-US')
-    : `${Number(value).toLocaleString('en-US', { maximumFractionDigits: 1 })} h`);
+const format = (value) => `+${Math.round(value).toLocaleString('en-US')}${unit.value}`;
 </script>
 
 <template>
     <Card padding="p-4">
         <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 class="text-xl font-bold">Top gainers</h2>
-            <div class="flex flex-wrap gap-2">
-                <ChoiceChips :model-value="metric" :options="METRICS" label="Metric" @update:model-value="pickMetric" />
-                <ChoiceChips :model-value="period" :options="PERIODS" label="Period" @update:model-value="pickPeriod" />
-            </div>
+            <MetricPicker :model-value="metric" :metrics="metrics" @update:model-value="$emit('update:metric', $event)" />
         </div>
 
         <Deferred data="topGainers">
@@ -71,7 +51,7 @@ const format = (value) => (metric.value === 'exp'
                         <span class="w-6 text-center text-sm font-bold text-base-content/50">{{ index + 1 }}</span>
                         <AccountName class="flex-1" :username="row.username" :account-type="row.account_type"
                                      :account-id="row.account_id" />
-                        <span class="text-sm font-semibold text-success">+{{ format(row.gained) }}</span>
+                        <span class="text-sm font-semibold text-success">{{ format(row.gained) }}</span>
                     </li>
                 </ol>
                 <p v-else class="py-8 text-center text-sm text-base-content/60">
