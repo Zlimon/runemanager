@@ -28,7 +28,7 @@ class GainsController extends Controller
         $filters = $this->filters($request);
 
         return Inertia::render('Accounts/Gains/Show', [
-            ...$profile->header($account),
+            ...$profile->header($account, $request->user()),
 
             'wom' => fn () => $womView->summary($account, $request->user()),
 

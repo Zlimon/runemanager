@@ -157,6 +157,7 @@ it('shapes feed rows with pin data and WOM rows without', function () {
         'occurred_at' => $pinned->occurred_at->toIso8601String(),
         'approximate' => false,
         'icon' => ['kind' => 'quests_tab', 'slug' => 'blue_quests_icon'],
+        'position' => null,
         'feed_event_id' => $pinned->id,
         'pinned' => true,
         'screenshot_url' => null,
@@ -169,5 +170,6 @@ it('shapes feed rows with pin data and WOM rows without', function () {
         'occurred_at' => $achievement->achieved_at->toIso8601String(),
         'approximate' => true,
         'icon' => ['kind' => 'skill', 'slug' => 'cooking'],
+        'position' => null,
     ]);
 });

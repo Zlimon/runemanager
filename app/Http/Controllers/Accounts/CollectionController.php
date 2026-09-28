@@ -16,7 +16,7 @@ class CollectionController extends Controller
     public function show(Request $request, Account $account, AccountProfile $profile, CollectionLogView $collectionLogView): Response
     {
         return Inertia::render('Accounts/Collection/Show', [
-            ...$profile->header($account),
+            ...$profile->header($account, $request->user()),
 
             // External API — defer so the page paints first, then the client
             // pulls this in via a follow-up partial reload.

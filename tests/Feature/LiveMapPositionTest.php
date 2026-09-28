@@ -118,3 +118,70 @@ it('derives map presence within the window and drops stale positions', function 
 
     expect(Account::onMap()->pluck('id')->all())->toBe([$onMap->id]);
 });
+
+it('only reveals another member\'s last position through ?focus while they are sharing', function (bool $sharing, bool $isOwner, bool $visible) {
+    config()->set('runemanager.map.visible_within_minutes', 2);
+    $owner = User::factory()->withPersonalTeam()->create();
+    $viewer = $isOwner ? $owner : User::factory()->withPersonalTeam()->create();
+
+    Account::factory()->for($owner)->create([
+        'username' => 'Wanderer',
+        'world_x' => 3222,
+        'world_y' => 3218,
+        'world_plane' => 1,
+        'position_updated_at' => $sharing ? now() : now()->subHours(3),
+    ]);
+
+    $this->actingAs($viewer)
+        ->get(route('map.index', ['focus' => 'Wanderer']))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('focus', $visible ? ['x' => 3222, 'y' => 3218, 'plane' => 1] : null),
+        );
+})->with([
+    'another member, still sharing' => [true, false, true],
+    'another member, stopped sharing' => [false, false, false],
+    'the owner, stopped sharing' => [false, true, true],
+]);
+
+it('hides a stale position from the account header for everyone but the owner', function (bool $sharing, bool $isOwner, bool $visible) {
+    config()->set('runemanager.map.visible_within_minutes', 2);
+    $owner = User::factory()->withPersonalTeam()->create();
+    $viewer = $isOwner ? $owner : User::factory()->withPersonalTeam()->create();
+
+    $account = Account::factory()->for($owner)->create([
+        'username' => 'Wanderer',
+        'world_x' => 3222,
+        'world_y' => 3218,
+        'world_plane' => 0,
+        'position_updated_at' => $sharing ? now() : now()->subHours(3),
+    ]);
+
+    foreach (['accounts.show', 'accounts.items', 'accounts.collection'] as $routeName) {
+        $this->actingAs($viewer)
+            ->get(route($routeName, $account))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('position', $visible ? ['x' => 3222, 'y' => 3218, 'plane' => 0] : null),
+            );
+    }
+})->with([
+    'another member, still sharing' => [true, false, true],
+    'another member, stopped sharing' => [false, false, false],
+    'the owner, stopped sharing' => [false, true, true],
+]);
+
+it('never reveals the position of an account nobody has claimed once it stops sharing', function () {
+    config()->set('runemanager.map.visible_within_minutes', 2);
+
+    $account = Account::factory()->create([
+        'user_id' => null,
+        'world_x' => 3222,
+        'world_y' => 3218,
+        'world_plane' => 0,
+        'position_updated_at' => now()->subHours(3),
+    ]);
+
+    expect($account->livePositionFor(null))->toBeNull()
+        ->and($account->livePositionFor(User::factory()->create()))->toBeNull();
+});

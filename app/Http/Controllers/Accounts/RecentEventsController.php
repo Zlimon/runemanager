@@ -20,7 +20,7 @@ class RecentEventsController extends Controller
         $before = $request->query('before');
 
         return response()->json(
-            RecentEventResource::page($recentEvents->page($account, is_string($before) ? $before : null), $request),
+            RecentEventResource::page($recentEvents->page($account, is_string($before) ? $before : null, viewer: $request->user()), $request),
         );
     }
 }

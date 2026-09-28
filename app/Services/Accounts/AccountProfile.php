@@ -4,6 +4,7 @@ namespace App\Services\Accounts;
 
 use App\Http\Resources\AccountResource;
 use App\Models\Account;
+use App\Models\User;
 
 /**
  * The props every account tab shares: the header card (identity, live status
@@ -14,7 +15,7 @@ class AccountProfile
     /**
      * @return array{account: array<string, mixed>, position: ?array{x: int, y: int, plane: int}, vitals: ?array<string, mixed>, location: ?string}
      */
-    public function header(Account $account): array
+    public function header(Account $account, ?User $viewer): array
     {
         $account->loadMissing('equipment');
 
@@ -22,10 +23,9 @@ class AccountProfile
             'account' => (new AccountResource($account))->resolve(),
 
             // Last known in-game position for the minimap; live updates arrive
-            // over the shared map broadcast channel. Null when never shared.
-            'position' => $account->world_x !== null
-                ? ['x' => $account->world_x, 'y' => $account->world_y, 'plane' => $account->world_plane]
-                : null,
+            // over the shared map broadcast channel. Null when never shared,
+            // and for anyone but the owner once the account stops sharing.
+            'position' => $account->livePositionFor($viewer),
 
             // Live status-orb values; updated over the account channel
             // (VitalsUpdated). Null until the plugin first pushes them.

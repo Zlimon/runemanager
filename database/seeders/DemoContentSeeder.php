@@ -304,11 +304,12 @@ class DemoContentSeeder extends Seeder
 
             $attributes = ['account_id' => $account->id];
 
-            // The everyday events, on everyone.
-            FeedEvent::factory()->count(fake()->numberBetween(1, 3))->create($attributes);
-            FeedEvent::factory()->questComplete()->create($attributes);
-            FeedEvent::factory()->combatAchievement()->create($attributes);
-            FeedEvent::factory()->lootDrop()->create($attributes);
+            // The everyday events, on everyone, with where they happened for
+            // the event map. DemoEventPositionsSeeder places most of the rest.
+            FeedEvent::factory()->positioned()->count(fake()->numberBetween(1, 3))->create($attributes);
+            FeedEvent::factory()->questComplete()->positioned()->create($attributes);
+            FeedEvent::factory()->combatAchievement()->positioned()->create($attributes);
+            FeedEvent::factory()->lootDrop()->positioned()->create($attributes);
 
             $this->seedRareFeedEvent($index, $attributes);
 

@@ -25,7 +25,7 @@ class LogController extends Controller
         $account->load('equipment', 'hiscore')->append(['skills', 'bosses', 'clues']);
 
         return Inertia::render('Accounts/Show', [
-            ...$profile->header($account),
+            ...$profile->header($account, $request->user()),
 
             // Kept off AccountResource: that also serves the account lists, where
             // a count query per account would be one query per row.
@@ -52,7 +52,7 @@ class LogController extends Controller
 
             // First page of milestones merged with Wise Old Man records and
             // achievements; later pages come from accounts.events.
-            'recentEvents' => fn () => RecentEventResource::page($recentEvents->page($account), $request),
+            'recentEvents' => fn () => RecentEventResource::page($recentEvents->page($account, viewer: $request->user()), $request),
 
             'freshness' => fn () => $profile->freshness($account, ['hiscores', 'quests', 'diaries', 'combat_achievements', 'equipment', 'avatar']),
 

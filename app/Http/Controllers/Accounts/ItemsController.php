@@ -8,15 +8,16 @@ use App\Http\Resources\InventoryResource;
 use App\Http\Resources\LootingBagResource;
 use App\Models\Account;
 use App\Services\Accounts\AccountProfile;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ItemsController extends Controller
 {
-    public function show(Account $account, AccountProfile $profile): Response
+    public function show(Request $request, Account $account, AccountProfile $profile): Response
     {
         return Inertia::render('Accounts/Items/Show', [
-            ...$profile->header($account),
+            ...$profile->header($account, $request->user()),
 
             'inventory' => fn () => $account->inventory
                 ? (new InventoryResource($account->inventory))->resolve()
