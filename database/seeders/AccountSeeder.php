@@ -27,14 +27,26 @@ class AccountSeeder extends Seeder
     ];
 
     /**
-     * Demo OSRS usernames distributed across the demo users. Realistic-looking
-     * names for browsing the UI. Their stats are synthetic unless
-     * `LiveHiscoresSeeder` is run explicitly.
+     * Real, active OSRS accounts tracked on Wise Old Man, distributed across
+     * the demo users so a live WOM sync has genuine history to pull. Nine of
+     * them belong to WOM group 145 ("Iron Clan"), which makes group-level data
+     * demoable too. Verified active on 2026-09-26; their stats stay synthetic
+     * unless `LiveHiscoresSeeder` is run explicitly.
      *
-     * @var list<string>
+     * @var array<int, array{name: string, type: AccountTypesEnum}>
      */
     private array $demoAccounts = [
-        'Matilizo', 'wewantrings', 'Nex What', 'Far89', 'CinnaBawns',
+        ['name' => 'Bartheez', 'type' => AccountTypesEnum::IRONMAN],
+        ['name' => 'kill the ge', 'type' => AccountTypesEnum::IRONMAN],
+        ['name' => '768lb man', 'type' => AccountTypesEnum::IRONMAN],
+        ['name' => 'viking piggi', 'type' => AccountTypesEnum::IRONMAN],
+        ['name' => 'Musandam', 'type' => AccountTypesEnum::ULTIMATE_IRONMAN],
+        ['name' => 'L apras', 'type' => AccountTypesEnum::ULTIMATE_IRONMAN],
+        ['name' => 'Ju1es', 'type' => AccountTypesEnum::HARDCORE_IRONMAN],
+        ['name' => 'Pewws Peon', 'type' => AccountTypesEnum::NORMAL],
+        ['name' => 'Huisbaas Ali', 'type' => AccountTypesEnum::NORMAL],
+        ['name' => 'Meekss', 'type' => AccountTypesEnum::NORMAL],
+        ['name' => 'santi osrs', 'type' => AccountTypesEnum::NORMAL],
     ];
 
     public function run(): void
@@ -57,8 +69,8 @@ class AccountSeeder extends Seeder
         if ($demoUsers->isEmpty()) {
             $this->command->warn('AccountSeeder: no demo users found; only Zlimon accounts seeded.');
         } else {
-            foreach ($this->demoAccounts as $name) {
-                $created += (int) $this->ensureAccount($demoUsers->random(), $name, AccountTypesEnum::NORMAL);
+            foreach ($this->demoAccounts as $spec) {
+                $created += (int) $this->ensureAccount($demoUsers->random(), $spec['name'], $spec['type']);
             }
         }
 

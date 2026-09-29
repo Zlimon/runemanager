@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\FeedEventResource;
 use App\Models\FeedEvent;
+use App\Services\Screenshots\ScreenshotStorage;
 use App\Support\Roles;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -34,7 +34,7 @@ class FeedController extends Controller
      * Delete a feed entry. Allowed for an instance admin or the owner of the
      * account the entry belongs to. Removes its screenshot too.
      */
-    public function destroy(Request $request, FeedEvent $feedEvent): RedirectResponse
+    public function destroy(Request $request, FeedEvent $feedEvent, ScreenshotStorage $screenshots): RedirectResponse
     {
         $user = $request->user();
         $canDelete = $user !== null
@@ -42,11 +42,8 @@ class FeedController extends Controller
 
         abort_unless($canDelete, HttpResponse::HTTP_FORBIDDEN);
 
-        if ($feedEvent->screenshot_path) {
-            Storage::disk('public')->delete($feedEvent->screenshot_path);
-        }
-
         $feedEvent->delete();
+        $screenshots->delete($feedEvent->screenshot_path);
 
         return back();
     }

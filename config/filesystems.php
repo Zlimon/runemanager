@@ -30,13 +30,21 @@ return [
 
     'disks' => [
 
+        // Private to the web: storage/app is not under public/, so "public"
+        // visibility here only means the deploy user and the web user (one
+        // group, see set-file-permissions.sh) can both read and write what the
+        // other created. Feed screenshots live here and are served through a
+        // route that checks who may see them. Without it new directories are
+        // 0700 and files 0600, which the other user cannot open.
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
             'throw' => false,
+            'visibility' => 'public',
+            'directory_visibility' => 'public',
             'permissions' => [
                 'file' => [
-                    'public' => 0775,
+                    'public' => 0664,
                     'private' => 0600,
                 ],
                 'dir' => [

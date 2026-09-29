@@ -53,7 +53,19 @@ const togglePin = () => {
 
 // Where the event happened (plugin-supplied). Links to the live map centred
 // on the spot; the area name falls back to raw coordinates for unmapped regions.
-const position = computed(() => props.event.payload?.position ?? null);
+// The server leaves it out unless the viewer may see it (their own account, or
+// one whose owner shares its events on the map), so a missing position hides both.
+const position = computed(() => {
+    const position = props.event.payload?.position;
+    return position?.x != null && position?.y != null ? position : null;
+});
+const mapHref = computed(() => position.value
+    ? route('map.index', {
+        x: position.value.x,
+        y: position.value.y,
+        ...(position.value.plane > 0 ? { plane: position.value.plane } : {}),
+    })
+    : null);
 const positionLabel = computed(() => position.value
     ? (position.value.location ?? `${position.value.x}, ${position.value.y}`)
     : null);
@@ -77,9 +89,9 @@ const positionLabel = computed(() => position.value
         </template>
 
         <template v-if="position" #meta>
-            <Link :href="route('map.index', { x: position.x, y: position.y })"
+            <Link :href="mapHref"
                   class="ms-1 inline-flex items-center gap-0.5 align-baseline text-xs font-normal text-base-content/50 hover:text-base-content hover:underline"
-                  :title="`${position.x}, ${position.y} (plane ${position.plane})`">
+                  :title="`${position.x}, ${position.y} (plane ${position.plane ?? 0})`">
                 <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                      stroke-width="2" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round"

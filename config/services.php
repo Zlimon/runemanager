@@ -40,6 +40,14 @@ return [
         'url' => env('TEMPLEOSRS_API_URL', 'https://templeosrs.com/api'),
     ],
 
+    // Wise Old Man — EHP/EHB and progress history. The API key is optional;
+    // it raises the rate limit from 20 to 100 requests per minute.
+    'wiseoldman' => [
+        'url' => env('WOM_API_URL', 'https://api.wiseoldman.net/v2'),
+        'api_key' => env('WOM_API_KEY'),
+        'user_agent' => env('WOM_USER_AGENT', 'RuneManager (+https://runemanager.com)'),
+    ],
+
     // Official OSRS Group Ironman group page — used to validate a group name at
     // setup. The page returns 200 for both states; a missing group
     // shows an "Unable to find group with name" notice.

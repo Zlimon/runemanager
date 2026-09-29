@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AccountTypesEnum;
+use App\Services\Screenshots\DeleteScreenshots;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -34,6 +35,29 @@ class Account extends Model
         'bounty_hunter_legacy_hunter', 'bounty_hunter_legacy_rogue',
     ];
 
+    /**
+     * The event-map opt-in, the screenshot default and the screenshots
+     * themselves are the owner's, so they do not pass to whoever holds the
+     * account next: a change of owner (a claim, a release) turns the choices
+     * off and deletes the screenshots (the events stay). Mass updates skip
+     * these hooks and do the same themselves (DeleteUser).
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Account $account): void {
+            if ($account->exists && $account->isDirty('user_id')) {
+                $account->show_events_on_map = false;
+                $account->hide_new_screenshots = false;
+            }
+        });
+
+        static::updated(function (Account $account): void {
+            if ($account->wasChanged('user_id')) {
+                app(DeleteScreenshots::class)->forAccounts([$account->id]);
+            }
+        });
+    }
+
     public function getRouteKeyName(): string
     {
         return 'username';
@@ -52,6 +76,8 @@ class Account extends Model
             'last_seen_at' => 'datetime',
             'position_updated_at' => 'datetime',
             'vitals_updated_at' => 'datetime',
+            'show_events_on_map' => 'bool',
+            'hide_new_screenshots' => 'bool',
         ];
     }
 
@@ -78,6 +104,26 @@ class Account extends Model
     public function equipment(): HasOne
     {
         return $this->hasOne(Equipment::class);
+    }
+
+    public function womPlayer(): HasOne
+    {
+        return $this->hasOne(WomPlayer::class);
+    }
+
+    public function feedEvents(): HasMany
+    {
+        return $this->hasMany(FeedEvent::class);
+    }
+
+    public function womAchievements(): HasMany
+    {
+        return $this->hasMany(WomAchievement::class);
+    }
+
+    public function womRecords(): HasMany
+    {
+        return $this->hasMany(WomRecord::class);
     }
 
     public function usernameHistory(): HasMany
@@ -220,6 +266,30 @@ class Account extends Model
     }
 
     /**
+     * The last known in-game position as `{x, y, plane}`, for the viewer's eyes
+     * only. The stored position is never cleared when sharing stops, so anyone
+     * but the owner sees it only while the account is on the Live Map;
+     * otherwise a player who turned sharing off would keep broadcasting where
+     * they last stood.
+     *
+     * @return ?array{x: int, y: int, plane: int}
+     */
+    public function livePositionFor(?User $viewer): ?array
+    {
+        if ($this->world_x === null) {
+            return null;
+        }
+
+        $isOwner = $viewer !== null && $this->user_id !== null && $this->user_id === $viewer->id;
+
+        if (! $isOwner && ! $this->isOnMap()) {
+            return null;
+        }
+
+        return ['x' => $this->world_x, 'y' => $this->world_y, 'plane' => $this->world_plane ?? 0];
+    }
+
+    /**
      * Online while the most recent plugin heartbeat is within the configured
      * presence window (see config/runemanager.php). Derived rather than stored
      * so it expires on its own when the plugin stops pinging.
@@ -239,31 +309,31 @@ class Account extends Model
     /**
      * Public URLs for the player 3D model uploaded by the RuneLite plugin,
      * or null when no avatar has been pushed yet. The MTL is optional (colour-
-     * only exports may omit it). ?v= busts the browser cache on re-upload.
+     * only exports may omit it). Every upload lives in its own random folder
+     * (StoreAvatar), so a re-upload gets new URLs and no cache-buster is needed.
      *
      * @return array{obj_url: string, mtl_url: ?string, npc_obj_url: ?string, npc_mtl_url: ?string, updated_at: string}|null
      */
     public function avatarPayload(): ?array
     {
-        if (! $this->avatar_uploaded_at) {
+        if (! $this->avatar_uploaded_at || ! $this->avatar_directory) {
             return null;
         }
 
         $disk = Storage::disk('public');
-        $directory = "avatars/{$this->id}";
-        $version = $this->avatar_uploaded_at->timestamp;
+        $directory = $this->avatar_directory;
 
         return [
-            'obj_url' => $disk->url("{$directory}/avatar.obj")."?v={$version}",
+            'obj_url' => $disk->url("{$directory}/avatar.obj"),
             'mtl_url' => $disk->exists("{$directory}/avatar.mtl")
-                ? $disk->url("{$directory}/avatar.mtl")."?v={$version}"
+                ? $disk->url("{$directory}/avatar.mtl")
                 : null,
             // The opponent model, present only when the last snapshot was mid-combat.
             'npc_obj_url' => $disk->exists("{$directory}/avatar_npc.obj")
-                ? $disk->url("{$directory}/avatar_npc.obj")."?v={$version}"
+                ? $disk->url("{$directory}/avatar_npc.obj")
                 : null,
             'npc_mtl_url' => $disk->exists("{$directory}/avatar_npc.mtl")
-                ? $disk->url("{$directory}/avatar_npc.mtl")."?v={$version}"
+                ? $disk->url("{$directory}/avatar_npc.mtl")
                 : null,
             'updated_at' => $this->avatar_uploaded_at->toIso8601String(),
         ];

@@ -12,7 +12,9 @@ import ClickableCard from "@/Components/Cards/ClickableCard.vue";
 import NewsCard from "@/Components/Cards/NewsCard.vue";
 import TabbedCard from "@/Components/Cards/TabbedCard.vue";
 import Badge from "@/Components/Display/Badge.vue";
+import LineChart from "@/Components/Display/LineChart.vue";
 import Loader from "@/Components/Display/Loader.vue";
+import StatTile from "@/Components/Display/StatTile.vue";
 import ActionMessage from "@/Components/Form/ActionMessage.vue";
 import ActionSection from "@/Components/Form/ActionSection.vue";
 import Checkbox from "@/Components/Form/Checkbox.vue";
@@ -36,6 +38,7 @@ import Modal from "@/Components/Modals/Modal.vue";
 import ResourcePackConfirmModal from "@/Components/ResourcePacks/ResourcePackConfirmModal.vue";
 import ResourcePackPicker from "@/Components/ResourcePacks/ResourcePackPicker.vue";
 import ResourcePackTile from "@/Components/ResourcePacks/ResourcePackTile.vue";
+import ChoiceChips from "@/Components/Tables/ChoiceChips.vue";
 import DataTable from "@/Components/Tables/DataTable.vue";
 import LeaderboardTable from "@/Components/Tables/LeaderboardTable.vue";
 import SortChips from "@/Components/Tables/SortChips.vue";
@@ -339,6 +342,14 @@ const QUEST_EVENT = {
     screenshot_url: "/images/newspost_default.png",
 };
 
+// The owner's view of a screenshot they hid from everyone else.
+const HIDDEN_SHOT_EVENT = {
+    ...QUEST_EVENT,
+    id: 0,
+    payload: { quest: "Monkey Madness II" },
+    screenshot_hidden: true,
+};
+
 const NEWS_POSTS = [
     {
         id: 1,
@@ -376,6 +387,43 @@ const ACCOUNTS = [
     { username: "Zezima", account_type: "normal", level: 2277, online: true, activity: "Woodcutting", activity_icon: "woodcutting", world: 302, icon: null },
     { username: "Iron Lad", account_type: "ironman", level: 1850, online: false, icon: null },
     { username: "Hardcore Hal", account_type: "hardcore_ironman", level: 1432, online: true, world: 416, icon: null },
+];
+
+// A year of daily points, oldest first — the same shape WomAccountView::series()
+// returns. `wiggle` gives each day a small deterministic up/down so the line
+// doesn't read as a perfectly straight ramp, without pulling in a seeded RNG.
+const daysAgo = (days) => Date.now() - days * 86_400_000;
+const wiggle = (day, amplitude) => Math.sin(day * 0.9) * amplitude;
+
+const yearSeries = (start, end, amplitude) => Array.from({ length: 365 }, (_, day) => {
+    const progressed = start + ((end - start) * day) / 364;
+    return { t: daysAgo(364 - day), v: Math.max(0, Math.round(progressed + wiggle(day, amplitude))) };
+});
+
+// An ironman's overall XP, ~800M growing to 832M over the year.
+const XP_SERIES = [{ label: "Overall XP", points: yearSeries(800_000_000, 832_000_000, 400_000) }];
+
+// EHP/EHB over the same year — two series, so the chart's legend shows.
+const EHP_EHB_SERIES = [
+    { label: "EHP", points: yearSeries(860, 912.8, 3) },
+    { label: "EHB", points: yearSeries(48, 61.9, 1.5) },
+];
+
+// A week range — WomAccountView::series('week') — to check the x-axis
+// clamps to the last real point instead of Chart.js's own tick rounding,
+// and that a short span gets one tick a day rather than repeated labels.
+const WEEK_SERIES = [{
+    label: "Overall XP",
+    points: Array.from({ length: 7 }, (_, day) => ({
+        t: daysAgo(6 - day),
+        v: 831_200_000 + day * 115_000 + Math.round(wiggle(day, 20_000)),
+    })),
+}];
+
+const STAT_TILES = [
+    { label: "Efficient hours played", value: 912.8, delta: 14.2, format: "hours" },
+    { label: "Efficient hours bossed", value: 61.9, delta: -2.1, format: "hours" },
+    { label: "Time to max", value: 867.4, delta: null, format: "hours" },
 ];
 
 const TABLE_COLUMNS = [
@@ -428,6 +476,16 @@ const LOOT_SORT = {
     sort: "total_value",
     direction: "desc",
 };
+
+// A single-choice filter row, as /progress and the account WOM panel use for
+// range/period/metric — clickable here, unlike SortChips' demo above.
+const CHIP_RANGES = [
+    { value: "week", label: "Week" },
+    { value: "month", label: "Month" },
+    { value: "year", label: "Year" },
+    { value: "all", label: "All" },
+];
+const chipRange = ref("year");
 
 /*
  * A hiscore board as the server sends one: one page of a longer list, plus the
@@ -634,6 +692,35 @@ const showConfirm = (action) => {
                                     </Loader>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">StatTile</h4>
+                            <div class="grid gap-3 sm:grid-cols-3">
+                                <StatTile v-for="tile in STAT_TILES" :key="tile.label"
+                                          :label="tile.label" :value="tile.value" :delta="tile.delta"
+                                          :format="tile.format" :icon="packIcon('skill', 'overall')" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">LineChart — one series (XP)</h4>
+                            <LineChart :series="XP_SERIES" format="xp" :height="220" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">LineChart — two series (EHP / EHB)</h4>
+                            <LineChart :series="EHP_EHB_SERIES" format="hours" :height="220" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">LineChart — week range (day ticks, clamped to the last point)</h4>
+                            <LineChart :series="WEEK_SERIES" format="xp" :height="180" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">LineChart — empty state</h4>
+                            <LineChart :series="[{ label: 'Overall XP', points: [] }]" format="xp" :height="160" />
                         </div>
                     </div>
 
@@ -870,6 +957,16 @@ const showConfirm = (action) => {
                         </div>
 
                         <div class="space-y-2">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">ChoiceChips — a single-value filter (range/period/metric)</h4>
+                            <ChoiceChips v-model="chipRange" :options="CHIP_RANGES" label="Range" />
+                            <p class="text-xs opacity-60">
+                                Live — click a chip. Under a pack the selected chip carries both the
+                                brightened btn-active face and an inset accent ring, since the pack strips
+                                btn-primary's own fill.
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
                             <h4 class="text-sm uppercase tracking-wide opacity-70">PaginationItem — active, idle, disabled</h4>
                             <div class="join">
                                 <PaginationItem disabled aria-label="Previous">«</PaginationItem>
@@ -940,9 +1037,10 @@ const showConfirm = (action) => {
                         </div>
 
                         <div class="space-y-2">
-                            <h4 class="text-sm uppercase tracking-wide opacity-70">FeedEventCard — screenshot, placeholder, plain</h4>
-                            <div class="grid gap-3 md:grid-cols-3">
+                            <h4 class="text-sm uppercase tracking-wide opacity-70">FeedEventCard — screenshot, hidden screenshot (owner view), placeholder, plain</h4>
+                            <div class="grid gap-3 md:grid-cols-4">
                                 <FeedEventCard :event="QUEST_EVENT" />
+                                <FeedEventCard :event="HIDDEN_SHOT_EVENT" />
                                 <FeedEventCard :event="LEVEL_EVENT" placeholder />
                                 <FeedEventCard :event="lootEvent" relative-date />
                             </div>

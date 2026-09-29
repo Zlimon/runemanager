@@ -9,8 +9,11 @@ use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\ResourcePack;
 use App\Models\User;
+use App\Models\WomDailySnapshot;
+use App\Services\Screenshots\ScreenshotStorage;
 use App\Support\Roles;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 uses(TestCase::class)->in('Feature', 'Unit');
@@ -38,13 +41,22 @@ uses(TestCase::class)->in('Feature', 'Unit');
 
 pest()->beforeEach(function () {
     try {
-        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class] as $model) {
+        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class, WomDailySnapshot::class] as $model) {
             $model::query()->delete();
         }
     } catch (Throwable) {
         // No Mongo available in this test context (pure unit tests).
     }
 })->in('Feature', 'Unit');
+
+// Screenshots live on the private `local` disk and 3D avatars on the `public`
+// one, and an instance reset wipes both whole. Faking them for every feature
+// test keeps a test that resets, seeds or deletes from ever touching the
+// development screenshots and avatars.
+pest()->beforeEach(function () {
+    Storage::fake(ScreenshotStorage::DISK);
+    Storage::fake('public');
+})->in('Feature');
 
 /**
  * Create a user with the given base role (defaults to Owner, which holds every
@@ -104,4 +116,14 @@ function makePack(string $name, array $overrides = []): ResourcePack
         'tags' => '',
         'dark_mode' => false,
     ], $overrides));
+}
+
+/**
+ * A trimmed, real Wise Old Man API response from tests/Fixtures/WiseOldMan.
+ *
+ * @return array<mixed>
+ */
+function womFixture(string $name): array
+{
+    return json_decode(file_get_contents(__DIR__."/Fixtures/WiseOldMan/{$name}.json"), true);
 }

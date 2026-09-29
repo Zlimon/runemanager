@@ -258,6 +258,45 @@ class Instance
     }
 
     /**
+     * Whether the Wise Old Man integration is on: `wom:sync`, the plugin's
+     * login trigger and the /progress page all no-op or 404 while it is off.
+     */
+    public static function womEnabled(): bool
+    {
+        try {
+            return (bool) SettingHelper::getSetting('wom_enabled', false);
+        } catch (\Throwable) {
+            // Never require the settings table during artisan boot (see hiscoreRefreshMinutes).
+            return false;
+        }
+    }
+
+    /**
+     * How recently (days) a linked WOM profile must have gained something to
+     * count as an active member on /progress.
+     */
+    public static function womActiveWithinDays(): int
+    {
+        try {
+            $days = (int) SettingHelper::getSetting('wom_active_within_days', 0);
+        } catch (\Throwable) {
+            return 30;
+        }
+
+        return $days > 0 ? $days : 30;
+    }
+
+    /** Whether logged-out visitors may see the /progress page. */
+    public static function womProgressPublic(): bool
+    {
+        try {
+            return (bool) SettingHelper::getSetting('wom_progress_public', false);
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
      * The instance-wide default resource pack (set from Settings → General),
      * or null when unset. Stored as 0 when cleared.
      */

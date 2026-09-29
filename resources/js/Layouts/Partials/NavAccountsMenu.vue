@@ -25,7 +25,7 @@ const accounts = computed(() => page.props.my_accounts ?? []);
  * re-evaluated on each render, the same way the links below are.
  */
 const viewingOwnAccount = () => accounts.value.some(
-    (account) => route().current('accounts.show', { account: account.username }),
+    (account) => route().current('accounts.*', { account: account.username }),
 );
 </script>
 
@@ -33,7 +33,7 @@ const viewingOwnAccount = () => accounts.value.some(
     <NavSubmenu v-if="accounts.length" label="My accounts" :active="viewingOwnAccount()">
         <NavDropdownLink v-for="account in accounts" :key="account.username"
                          :href="route('accounts.show', { account: account.username })"
-                         :active="route().current('accounts.show', { account: account.username })">
+                         :active="route().current('accounts.*', { account: account.username })">
             <span class="flex items-center gap-2">
                 <!-- Account-type marks have no pack equivalent, so they stay as
                      plain images from public/images. -->

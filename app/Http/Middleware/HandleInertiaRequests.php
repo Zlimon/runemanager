@@ -107,6 +107,9 @@ class HandleInertiaRequests extends Middleware
             // Everything is stored; the account Activity feed shows it all.
             'feed_level_milestones' => Instance::feedLevelUpThresholds(),
             'feed_loot_min_value' => Instance::feedLootMinValue(),
+            // Wise Old Man nav entry: shown when enabled, to guests only when public.
+            'wom_enabled' => Instance::womEnabled(),
+            'wom_progress_public' => Instance::womProgressPublic(),
             'pack' => $pack ? [
                 'name' => $pack->name,
                 'version' => $pack->updated_at?->timestamp,

@@ -13,7 +13,9 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Broadcast when a new live-feed event is recorded, so connected
  * browsers prepend it without polling. The feed is public, so this rides a
- * public channel — unauthenticated visitors receive it too.
+ * public channel — unauthenticated visitors receive it too, which is why
+ * the payload is resolved for nobody: the position is only included when the
+ * account opted in to showing it (the owner sees it after a reload).
  */
 class FeedEventCreated implements ShouldBroadcastNow
 {
@@ -39,6 +41,6 @@ class FeedEventCreated implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
-        return (new FeedEventResource($this->feedEvent->loadMissing('account')))->resolve();
+        return (new FeedEventResource($this->feedEvent->loadMissing('account'), anonymous: true))->resolve();
     }
 }

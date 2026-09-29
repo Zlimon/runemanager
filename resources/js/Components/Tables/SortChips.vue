@@ -28,7 +28,7 @@ defineEmits(['sort']);
         <button v-for="column in columns" :key="column"
                 type="button"
                 class="btn btn-sm join-item"
-                :class="column === sort ? 'btn-primary' : 'btn-ghost'"
+                :class="column === sort ? 'btn-primary btn-active' : 'btn-ghost'"
                 :aria-pressed="column === sort"
                 @click="$emit('sort', column)">
             {{ labels[column] ?? column }}

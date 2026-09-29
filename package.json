@@ -23,6 +23,7 @@
         "@tiptap/extension-placeholder": "^3.31.3",
         "@tiptap/starter-kit": "^3.31.3",
         "@tiptap/vue-3": "^3.31.3",
+        "chart.js": "^4.5.1",
         "dayjs": "^1.11.21",
         "laravel-echo": "^2.3.7",
         "laravel-vue-pagination": "^4.1.3",

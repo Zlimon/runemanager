@@ -127,7 +127,7 @@ it('rejects an account_type not in the enum', function () {
         ->assertSessionHasErrors(['account_types.0']);
 });
 
-it('show renders the Inertia component with the `account` prop and per-tab data slots', function () {
+it('show renders the Log component with the `account` prop, and the item and collection tabs their data slots', function () {
     $account = Account::factory()->for($this->user)->create(['username' => 'Solo']);
 
     $this->actingAs($this->user)
@@ -136,13 +136,27 @@ it('show renders the Inertia component with the `account` prop and per-tab data 
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Accounts/Show')
             ->where('account.username', 'Solo')
+            ->where('quests', null)
+            // No position shared yet → null (drives the minimap empty state).
+            ->where('position', null),
+        );
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.items', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Accounts/Items/Show')
             ->where('inventory', null)
             ->where('bank', null)
-            ->where('lootingBag', null)
-            ->where('quests', null)
+            ->where('lootingBag', null),
+        );
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.collection', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Accounts/Collection/Show')
             ->where('recentLoot', [])
-            // No position shared yet → null (drives the minimap empty state).
-            ->where('position', null)
             // collectionLog is deferred — not present on the initial render
             ->missing('collectionLog'),
         );
@@ -186,7 +200,7 @@ it('exposes recentLoot newest-first with hydrated item names where available', f
     ]);
 
     $this->actingAs($this->user)
-        ->get(route('accounts.show', $account))
+        ->get(route('accounts.collection', $account))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->has('recentLoot', 2)
@@ -197,7 +211,7 @@ it('exposes recentLoot newest-first with hydrated item names where available', f
     Loot::query()->delete();
 });
 
-it('exposes a freshness prop with per-data-type timestamps and the staleness threshold', function () {
+it('exposes a freshness prop per tab with its own data types and the staleness threshold', function () {
     config()->set('runemanager.freshness.stale_after_minutes', 90);
     $account = Account::factory()->for($this->user)->create(['username' => 'Fresh']);
 
@@ -208,14 +222,33 @@ it('exposes a freshness prop with per-data-type timestamps and the staleness thr
             ->has('freshness', fn ($freshness) => $freshness
                 ->where('stale_after_minutes', 90)
                 ->where('hiscores', null)
-                ->where('inventory', null)
-                ->where('bank', null)
-                ->where('looting_bag', null)
                 ->where('quests', null)
                 ->where('diaries', null)
                 ->where('combat_achievements', null)
                 ->where('equipment', null)
-                ->where('avatar', null)
+                ->where('avatar', null),
+            ),
+        );
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.items', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('freshness', fn ($freshness) => $freshness
+                ->where('stale_after_minutes', 90)
+                ->where('inventory', null)
+                ->where('bank', null)
+                ->where('looting_bag', null)
+                ->where('equipment', null),
+            ),
+        );
+
+    $this->actingAs($this->user)
+        ->get(route('accounts.collection', $account))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('freshness', fn ($freshness) => $freshness
+                ->where('stale_after_minutes', 90)
                 ->where('loot', null),
             ),
         );

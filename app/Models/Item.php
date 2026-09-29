@@ -221,6 +221,49 @@ class Item extends Model
     }
 
     /**
+     * Bulk lookup by exact item name, keyed by name, skipping the noted,
+     * placeholder and duplicate variants. The first match wins when several
+     * catalogue entries share a name.
+     *
+     * @param  list<string>  $names
+     * @return array<string, array{id: int, name: string, icon: ?string}>
+     */
+    public static function lookupByNames(array $names): array
+    {
+        $names = array_values(array_unique(array_filter($names, fn ($name): bool => $name !== '')));
+
+        if ($names === []) {
+            return [];
+        }
+
+        $docs = (new static)->getConnection()
+            ->getDatabase()
+            ->selectCollection((new static)->getTable())
+            ->aggregate([
+                ['$match' => [
+                    'name' => ['$in' => $names],
+                    'noted' => ['$ne' => true],
+                    'placeholder' => ['$ne' => true],
+                    'duplicate' => ['$ne' => true],
+                ]],
+                ['$project' => ['_id' => 0, 'id' => 1, 'name' => 1, 'icon' => 1]],
+            ])
+            ->toArray();
+
+        $out = [];
+        foreach ($docs as $doc) {
+            $arr = (array) $doc;
+            $out[(string) $arr['name']] ??= [
+                'id' => (int) ($arr['id'] ?? 0),
+                'name' => (string) $arr['name'],
+                'icon' => $arr['icon'] ?? null,
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
      * Single-item form of {@see self::lookupByOsrsIds()}; an unknown id yields
      * the same shape with empty values rather than null.
      *

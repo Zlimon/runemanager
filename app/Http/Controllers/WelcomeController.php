@@ -7,9 +7,9 @@ use App\Http\Resources\CalendarEventResource;
 use App\Models\Account;
 use App\Models\CalendarEvent;
 use App\Services\Instance\InstanceStats;
+use App\Support\AccountNames;
 use App\Support\Instance;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -56,19 +56,9 @@ class WelcomeController extends Controller
         }
 
         return array_map(fn (array $account): array => [
-            'username' => $this->maskUsername((string) $account['username']),
+            'username' => AccountNames::mask((string) $account['username']),
             'account_type' => $account['account_type'],
             'level' => $account['level'],
         ], $accounts);
-    }
-
-    /** Keep the first letter, mask the rest — e.g. "Zezima" → "Z•••••". */
-    private function maskUsername(string $username): string
-    {
-        if ($username === '') {
-            return 'Anonymous';
-        }
-
-        return Str::substr($username, 0, 1).str_repeat('•', max(2, Str::length($username) - 1));
     }
 }

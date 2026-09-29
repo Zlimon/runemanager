@@ -242,9 +242,10 @@ it('exposes only this account\'s events on the account show page', function () {
         ->get(route('accounts.show', $account))
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('feed', 1)
-            ->where('feed.0.type', 'pet')
-            ->where('feed.0.account.username', 'Mine'),
+            // The account page lists its milestones as Recent Events.
+            ->has('recentEvents.data', 1)
+            ->where('recentEvents.data.0.type', 'pet')
+            ->where('recentEvents.data.0.source', 'feed'),
         );
 });
 

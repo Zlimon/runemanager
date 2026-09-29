@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Services\Map\EventMap;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,19 +16,26 @@ class MapController extends Controller
      * (AccountMoved). The payload shape matches the broadcast so the client can
      * upsert markers uniformly.
      *
-     * An optional `?focus=username` centres the map on that account's last known
-     * position (e.g. from the Account Show minimap), even if they aren't
-     * currently sharing. `?x=&y=` centres on a fixed point instead — used by
-     * feed events that carry the position where they happened.
+     * An optional `?focus=username` centres the map on that account's position
+     * (e.g. from the account header's minimap): the owner's own last known
+     * position, or anyone else's only while that account is still sharing
+     * (Account::livePositionFor). `?x=&y=` (optional `&plane=`, 0-3) centres on a fixed
+     * point instead — used by feed events that carry the position where they
+     * happened. `focus` is `{x, y, plane}`.
+     *
+     * The events layer: `eventAccounts` are the accounts whose events the
+     * viewer may show, and `?events=1,2` preselects some of them (ids the
+     * viewer cannot pick are dropped). The events themselves come from
+     * `map.events`.
      */
-    public function index(Request $request): Response
+    public function index(Request $request, EventMap $eventMap): Response
     {
         $focus = null;
         if ($username = $request->string('focus')->trim()->value()) {
-            $account = Account::whereNotNull('world_x')->where('username', $username)->first();
-            $focus = $account ? ['x' => $account->world_x, 'y' => $account->world_y] : null;
+            $focus = Account::query()->where('username', $username)->first()?->livePositionFor($request->user());
         } elseif ($request->filled('x') && $request->filled('y')) {
-            $focus = ['x' => (int) $request->input('x'), 'y' => (int) $request->input('y')];
+            $plane = (int) $request->input('plane', 0);
+            $focus = ['x' => (int) $request->input('x'), 'y' => (int) $request->input('y'), 'plane' => $plane >= 0 && $plane <= 3 ? $plane : 0];
         }
 
         $accounts = Account::onMap()
@@ -46,9 +54,14 @@ class MapController extends Controller
             ])
             ->all();
 
+        $eventAccounts = $eventMap->selectableAccounts($request->user());
+        $events = $request->query('events');
+
         return Inertia::render('Map/Index', [
             'accounts' => $accounts,
             'focus' => $focus,
+            'eventAccounts' => $eventAccounts,
+            'eventAccountIds' => $eventMap->preselection($eventAccounts, is_string($events) ? $events : null),
         ]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Services\Feed;
 use App\Events\FeedEventCreated;
 use App\Models\Account;
 use App\Models\FeedEvent;
+use App\Services\Screenshots\ScreenshotStorage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 
@@ -35,6 +36,8 @@ class RecordFeedEvent
         FeedEvent::TYPE_LEVEL_UP,
     ];
 
+    public function __construct(private ScreenshotStorage $screenshots = new ScreenshotStorage) {}
+
     /**
      * Validation rules for an optional plugin-supplied event position, keyed
      * under $attribute so controllers can splice them into their own rules.
@@ -45,8 +48,8 @@ class RecordFeedEvent
     {
         return [
             $attribute => ['nullable', 'array'],
-            $attribute.'.x' => ['required_with:'.$attribute, 'integer'],
-            $attribute.'.y' => ['required_with:'.$attribute, 'integer'],
+            $attribute.'.x' => ['required_with:'.$attribute, 'integer', 'between:0,'.FeedEvent::MAX_COORDINATE],
+            $attribute.'.y' => ['required_with:'.$attribute, 'integer', 'between:0,'.FeedEvent::MAX_COORDINATE],
             $attribute.'.plane' => ['nullable', 'integer', 'between:0,3'],
             $attribute.'.location' => ['nullable', 'string', 'max:60'],
         ];
@@ -181,7 +184,11 @@ class RecordFeedEvent
      * that has none yet. Feed events are created server-side a beat earlier
      * (from the loot/CA/collection-log push), so only events from the last
      * MATCH_WINDOW_SECONDS qualify. Returns false, storing nothing, when no
-     * event qualifies (e.g. the drop was below the plugin's feed value floor).
+     * event qualifies (e.g. the drop was below the plugin's feed value floor)
+     * or the file could not be written, so the event can take a retry.
+     *
+     * The file goes to the private disk under a random name, and arrives
+     * hidden when the owner turned on "Hide new screenshots" for the account.
      */
     public function attachScreenshot(Account $account, string $type, UploadedFile $image): bool
     {
@@ -197,9 +204,16 @@ class RecordFeedEvent
             return false;
         }
 
-        $path = $image->storeAs('feed-screenshots', $event->id.'.'.$image->extension(), 'public');
+        $path = $this->screenshots->store($image);
 
-        $event->update(['screenshot_path' => $path]);
+        if ($path === null) {
+            return false;
+        }
+
+        $event->update([
+            'screenshot_path' => $path,
+            'screenshot_hidden' => (bool) $account->hide_new_screenshots,
+        ]);
 
         return true;
     }
