@@ -4,6 +4,7 @@ use App\Helpers\SettingHelper;
 use App\Http\Resources\RecentEventResource;
 use App\Models\Account;
 use App\Models\FeedEvent;
+use App\Models\User;
 use App\Models\WomAchievement;
 use App\Models\WomRecord;
 use App\Services\Accounts\RecentEvent;
@@ -172,4 +173,47 @@ it('shapes feed rows with pin data and WOM rows without', function () {
         'icon' => ['kind' => 'skill', 'slug' => 'cooking'],
         'position' => null,
     ]);
+});
+
+it('narrows the list to game events or to Wise Old Man records, and pages within the filter', function () {
+    $quests = collect(range(1, 3))->map(fn (int $day) => FeedEvent::factory()->for($this->account)->questComplete()
+        ->create(['occurred_at' => now()->subDays($day)]));
+    $achievement = WomAchievement::factory()->for($this->account)->kills('vorkath', 500)->create(['achieved_at' => now()->subHours(1)]);
+    $record = WomRecord::factory()->for($this->account)->create(['period' => 'week', 'metric' => 'slayer', 'achieved_at' => now()->subHours(2)]);
+
+    $ids = fn (array $page): array => array_map(fn (RecentEvent $event): string => $event->id(), $page['events']);
+    $log = app(RecentEvents::class);
+
+    $game = $log->page($this->account, limit: 2, filter: RecentEvents::FILTER_GAME);
+    expect($ids($game))->toBe(["feed:{$quests[0]->id}", "feed:{$quests[1]->id}"])
+        ->and($game['next_cursor'])->not->toBeNull();
+
+    // The next page stays within the filter.
+    expect($ids($log->page($this->account, $game['next_cursor'], 2, filter: RecentEvents::FILTER_GAME)))
+        ->toBe(["feed:{$quests[2]->id}"]);
+
+    expect($ids($log->page($this->account, filter: RecentEvents::FILTER_RECORDS)))
+        ->toBe(["ach:{$achievement->id}", "rec:{$record->id}"]);
+
+    // No filter, or one it doesn't know, is everything.
+    expect($ids($log->page($this->account, filter: 'bogus')))->toHaveCount(5)
+        ->and($ids($log->page($this->account)))->toHaveCount(5);
+});
+
+it('filters the accounts.events JSON by ?filter=', function () {
+    $user = User::factory()->create();
+    $quest = FeedEvent::factory()->for($this->account)->questComplete()->create(['occurred_at' => now()->subDay()]);
+    $record = WomRecord::factory()->for($this->account)->create(['period' => 'week', 'metric' => 'slayer', 'achieved_at' => now()->subHours(2)]);
+
+    $this->actingAs($user)
+        ->getJson(route('accounts.events', ['account' => $this->account->username, 'filter' => 'game']))
+        ->assertOk()
+        ->assertJsonPath('data.0.id', "feed:{$quest->id}")
+        ->assertJsonCount(1, 'data');
+
+    $this->actingAs($user)
+        ->getJson(route('accounts.events', ['account' => $this->account->username, 'filter' => 'records']))
+        ->assertOk()
+        ->assertJsonPath('data.0.id', "rec:{$record->id}")
+        ->assertJsonCount(1, 'data');
 });

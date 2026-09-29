@@ -32,6 +32,12 @@ class RecentEvents
     /** Record metrics the log leaves out. */
     public const HIDDEN_RECORD_METRICS = ['ehp', 'ehb'];
 
+    /** Only the in-game milestones recorded by the plugin. */
+    public const FILTER_GAME = 'game';
+
+    /** Only Wise Old Man achievements and personal bests. */
+    public const FILTER_RECORDS = 'records';
+
     public function __construct(private FeedEventItems $feedItems) {}
 
     /**
@@ -39,17 +45,24 @@ class RecentEvents
      * ({@see EventMap::positionVisibleTo()}); without a viewer, never. Their
      * screenshot follows {@see FeedEvent::screenshotVisibleTo()} the same way.
      *
+     * $filter narrows the list to one kind of event: FILTER_GAME is the
+     * in-game milestones from the feed (the ones that can be pinned),
+     * FILTER_RECORDS is Wise Old Man achievements and personal bests. Null or
+     * anything else is everything. The cursor stays valid within one filter.
+     *
      * @return array{events: list<RecentEvent>, next_cursor: ?string}
      */
-    public function page(Account $account, ?string $before = null, int $limit = 15, ?User $viewer = null): array
+    public function page(Account $account, ?string $before = null, int $limit = 15, ?User $viewer = null, ?string $filter = null): array
     {
         $limit = max(1, $limit);
         $cursor = self::decodeCursor($before);
+        $game = $filter !== self::FILTER_RECORDS;
+        $records = $filter !== self::FILTER_GAME;
 
         $events = collect()
-            ->concat($this->feedEvents($account, $cursor, $limit + 1, $viewer))
-            ->concat($this->achievements($account, $cursor, $limit + 1))
-            ->concat($this->records($account, $cursor, $limit + 1))
+            ->concat($game ? $this->feedEvents($account, $cursor, $limit + 1, $viewer) : [])
+            ->concat($records ? $this->achievements($account, $cursor, $limit + 1) : [])
+            ->concat($records ? $this->records($account, $cursor, $limit + 1) : [])
             ->sort(RecentEvent::compare(...))
             ->values();
 
