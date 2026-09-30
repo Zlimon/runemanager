@@ -42,6 +42,14 @@ class PluginTraffic
     /** More account hashes than this behind one login is unusual (alts are few). */
     public const MAX_HASHES_PER_USER = 5;
 
+    /**
+     * Rate-limited, account-conflict or oversized requests a user needs
+     * before each counts as a reason. One of these happens to real players
+     * now and then (a burst of loot, a friend's character), so a single hit
+     * is not enough.
+     */
+    public const MIN_FLAGGED_EVENTS = 5;
+
     /** Unauthenticated requests from one IP, with no user, before it is listed. */
     public const MAX_ANONYMOUS_FAILURES = 10;
 
@@ -268,13 +276,13 @@ class PluginTraffic
             if ($row['requests'] >= self::MIN_REQUESTS_FOR_ERROR_RATE && $errorRate >= self::ERROR_RATE_THRESHOLD) {
                 $reasons[$id][] = sprintf('%d%% of %d requests failed with a 4xx', round($errorRate * 100), $row['requests']);
             }
-            if ($row['throttled'] > 0) {
+            if ($row['throttled'] >= self::MIN_FLAGGED_EVENTS) {
                 $reasons[$id][] = sprintf('Rate limited %d %s', $row['throttled'], $row['throttled'] === 1 ? 'time' : 'times');
             }
-            if ($row['conflicts'] > 0) {
+            if ($row['conflicts'] >= self::MIN_FLAGGED_EVENTS) {
                 $reasons[$id][] = sprintf('%d %s to push for an account linked to another user', $row['conflicts'], $row['conflicts'] === 1 ? 'attempt' : 'attempts');
             }
-            if ($row['oversized'] > 0) {
+            if ($row['oversized'] >= self::MIN_FLAGGED_EVENTS) {
                 $reasons[$id][] = sprintf('%d oversized %s', $row['oversized'], $row['oversized'] === 1 ? 'request' : 'requests');
             }
             if ($hashes > self::MAX_HASHES_PER_USER) {

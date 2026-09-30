@@ -371,8 +371,17 @@ it('lists suspicious users and anonymous IPs with their reasons', function () {
     $sharer = trafficUser('share@test.local');
     $clean = trafficUser('clean@test.local');
 
-    trafficLog(['user_id' => $hijacker->id, 'account_hash' => 'hash-x', 'status' => 403, 'flags' => ['account_conflict']]);
+    foreach (range(1, PluginTraffic::MIN_FLAGGED_EVENTS) as $i) {
+        trafficLog(['user_id' => $hijacker->id, 'account_hash' => 'hash-x', 'status' => 403, 'flags' => ['account_conflict']]);
+    }
     trafficLog(['user_id' => $sharer->id, 'account_hash' => 'hash-x']);
+    // One short of the threshold for each single-event rule: not listed.
+    $unlucky = trafficUser('unlucky@test.local');
+    foreach (range(1, PluginTraffic::MIN_FLAGGED_EVENTS - 1) as $i) {
+        trafficLog(['user_id' => $unlucky->id, 'account_hash' => 'hash-unlucky', 'status' => 429, 'flags' => ['throttled']]);
+        trafficLog(['user_id' => $unlucky->id, 'account_hash' => 'hash-unlucky', 'flags' => ['oversized']]);
+        trafficLog(['user_id' => $unlucky->id, 'account_hash' => 'hash-unlucky', 'status' => 403, 'flags' => ['account_conflict']]);
+    }
     foreach (range(1, 6) as $i) {
         trafficLog(['user_id' => $sharer->id, 'account_hash' => "hash-{$i}"]);
     }
@@ -385,9 +394,9 @@ it('lists suspicious users and anonymous IPs with their reasons', function () {
 
     $suspicious = collect(app(PluginTraffic::class)->suspiciousUsers('1h'));
 
-    expect($suspicious->pluck('user_id')->all())->not->toContain($clean->id)
+    expect($suspicious->pluck('user_id')->all())->not->toContain($clean->id)->not->toContain($unlucky->id)
         ->and($suspicious->firstWhere('user_id', $hijacker->id)['reasons'])->toBe([
-            '1 attempt to push for an account linked to another user',
+            '5 attempts to push for an account linked to another user',
             'Shares account hash hash-x… with 1 other user',
         ])
         ->and($suspicious->firstWhere('user_id', $sharer->id)['reasons'])->toBe([
@@ -412,7 +421,9 @@ it('keeps the traffic monitor from members without manage instance', function ()
 it('shows the traffic monitor to instance managers', function () {
     SettingHelper::setSetting('instance_configured', true, 'bool');
     $admin = adminUser();
-    trafficLog(['user_id' => $admin->id, 'status' => 429, 'flags' => ['throttled']]);
+    foreach (range(1, PluginTraffic::MIN_FLAGGED_EVENTS) as $i) {
+        trafficLog(['user_id' => $admin->id, 'status' => 429, 'flags' => ['throttled']]);
+    }
 
     $this->actingAs($admin)->get(route('admin.traffic', ['window' => '1h', 'flag' => 'throttled']))
         ->assertOk()
@@ -420,12 +431,12 @@ it('shows the traffic monitor to instance managers', function () {
             ->component('Admin/Traffic/Index')
             ->where('window', '1h')
             ->where('filters.flag', 'throttled')
-            ->where('summary.requests', 1)
+            ->where('summary.requests', PluginTraffic::MIN_FLAGGED_EVENTS)
             ->has('timeline', 12)
             ->has('routes', 1)
             ->has('topUsers', 1)
             ->has('suspicious', 1)
-            ->has('flagged.data', 1));
+            ->has('flagged.data', PluginTraffic::MIN_FLAGGED_EVENTS));
 
     $this->actingAs($admin)->get(route('admin.traffic', ['window' => 'forever', 'flag' => 'nonsense']))
         ->assertInertia(fn (Assert $page) => $page->where('window', '24h')->where('filters.flag', null));
