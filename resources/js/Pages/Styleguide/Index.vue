@@ -959,8 +959,10 @@ const showConfirm = (action) => {
                         <div class="space-y-2">
                             <h4 class="text-sm uppercase tracking-wide opacity-70">ChoiceChips — a single-value filter (range/period/metric)</h4>
                             <ChoiceChips v-model="chipRange" :options="CHIP_RANGES" label="Range" />
+                            <ChoiceChips v-model="chipRange" :options="CHIP_RANGES" label="Range (extra small)" size="xs" />
                             <p class="text-xs opacity-60">
-                                Live — click a chip. Under a pack the selected chip carries both the
+                                Live — click a chip; the second row is size="xs", for narrow cards such as
+                                the quest journal. Under a pack the selected chip carries both the
                                 brightened btn-active face and an inset accent ring, since the pack strips
                                 btn-primary's own fill.
                             </p>

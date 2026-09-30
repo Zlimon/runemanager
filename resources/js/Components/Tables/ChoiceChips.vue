@@ -9,6 +9,8 @@ defineProps({
     options: { type: Array, required: true },
     modelValue: { type: String, default: null },
     label: { type: String, default: null },
+    // 'sm' (default) or 'xs' for narrow cards, such as the quest journal.
+    size: { type: String, default: 'sm', validator: (value) => ['sm', 'xs'].includes(value) },
 });
 
 defineEmits(['update:modelValue']);
@@ -17,8 +19,8 @@ defineEmits(['update:modelValue']);
 <template>
     <div class="join border border-base-300" role="group" :aria-label="label">
         <button v-for="option in options" :key="option.value" type="button"
-                class="btn btn-sm join-item"
-                :class="modelValue === option.value ? 'btn-primary btn-active' : 'btn-ghost'"
+                class="btn join-item"
+                :class="[size === 'xs' ? 'btn-xs' : 'btn-sm', modelValue === option.value ? 'btn-primary btn-active' : 'btn-ghost']"
                 :aria-pressed="modelValue === option.value"
                 @click="$emit('update:modelValue', option.value)">
             {{ option.label }}

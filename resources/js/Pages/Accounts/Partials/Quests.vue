@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import Freshness from "@/Pages/Accounts/Partials/Freshness.vue";
 import Search from "@/Components/Form/Search.vue";
+import ChoiceChips from "@/Components/Tables/ChoiceChips.vue";
 
 const props = defineProps({
     quests: {
@@ -28,10 +29,10 @@ const QUEST_STATUS_COLORS = {
 };
 
 const STATUS_FILTERS = [
-    { key: 'all', label: 'All', status: null },
-    { key: 'completed', label: 'Completed', status: 2 },
-    { key: 'started', label: 'Started', status: 1 },
-    { key: 'not-started', label: 'Not started', status: 0 },
+    { value: 'all', label: 'All', status: null },
+    { value: 'completed', label: 'Completed', status: 2 },
+    { value: 'started', label: 'Started', status: 1 },
+    { value: 'not-started', label: 'Not started', status: 0 },
 ];
 
 const activeFilter = ref('all');
@@ -41,7 +42,7 @@ const list = computed(() => props.quests?.quests ?? []);
 const finished = computed(() => list.value.filter((q) => q[1] === 2).length);
 
 const visible = computed(() => {
-    const status = STATUS_FILTERS.find((f) => f.key === activeFilter.value)?.status ?? null;
+    const status = STATUS_FILTERS.find((f) => f.value === activeFilter.value)?.status ?? null;
     const needle = search.value.trim().toLowerCase();
 
     return list.value.filter(
@@ -58,14 +59,7 @@ const visible = computed(() => {
             <Freshness :updated-at="freshness" :stale-after-minutes="staleAfter" />
         </div>
 
-        <div role="tablist" class="tabs tabs-boxed mb-2">
-            <a v-for="filter in STATUS_FILTERS" :key="filter.key"
-               role="tab" class="tab resource-pack-tab tab-xs sm:tab-sm"
-               :class="{ 'tab-active': activeFilter === filter.key }"
-               @click="activeFilter = filter.key">
-                {{ filter.label }}
-            </a>
-        </div>
+        <ChoiceChips v-model="activeFilter" :options="STATUS_FILTERS" label="Quest status" size="xs" class="mb-2" />
 
         <Search v-model="search" placeholder="Search quests" class="input-sm mb-2" />
 
