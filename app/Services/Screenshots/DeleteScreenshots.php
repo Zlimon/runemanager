@@ -28,6 +28,18 @@ class DeleteScreenshots
     }
 
     /**
+     * Delete any account's screenshots by id, no ownership check — the admin
+     * moderation queue, gated by `can:manage instance` at the route. Returns
+     * how many were deleted.
+     *
+     * @param  array<int, int>  $ids
+     */
+    public function deleteAny(array $ids): int
+    {
+        return $this->clear(FeedEvent::query()->whereIn('id', $ids));
+    }
+
+    /**
      * Delete every screenshot of the given accounts. Safe inside a transaction:
      * the files go once it commits, so a rolled-back change keeps them.
      *

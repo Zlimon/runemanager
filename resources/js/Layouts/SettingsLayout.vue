@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import { adminItemsForSettingsHub } from '@/composables/useAdminNav.js';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 /*
@@ -8,6 +9,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
  * the right. Account sections are available to everyone; the Instance group is
  * admin-only. Each section is its own route, so the sidebar is plain Inertia
  * navigation with the active link highlighted.
+ *
+ * The Admin group below reuses composables/useAdminNav.js's item list (the
+ * same one AdminNav renders) so an admin who lands here from a Settings link
+ * — General, Feed, Integrations, Branding, Calendar — has a way back to
+ * Users, Traffic, News, Announcements, Screenshots and Resource packs without
+ * detouring through the dashboard.
  */
 defineProps({
     title: { type: String, default: 'Settings' },
@@ -33,9 +40,12 @@ const instanceSections = computed(() => page.props.is_admin ? [
     { label: 'Calendar', route: 'admin.calendar', active: 'admin.calendar' },
 ] : []);
 
+const adminSections = computed(() => (page.props.is_admin ? adminItemsForSettingsHub(page) : []));
+
 const groups = computed(() => [
     { heading: 'Account', sections: accountSections.value },
     ...(instanceSections.value.length ? [{ heading: 'Instance', sections: instanceSections.value }] : []),
+    ...(adminSections.value.length ? [{ heading: 'Admin', sections: adminSections.value }] : []),
 ]);
 </script>
 

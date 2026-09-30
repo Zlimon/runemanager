@@ -39,7 +39,13 @@ class AnnouncementController extends Controller
             DeliverWebhook::dispatch($url, WebhookPayload::forAnnouncement($announcement), 'announcement');
         }
 
-        return redirect()->route('announcements.index');
+        // Both callers are list pages (the public page or Admin →
+        // Announcements) with their own create dialog, so returning to
+        // wherever the request came from keeps the admin on their own list
+        // — query string (search, page) included — without singling out a
+        // route here. The fallback only matters when there is no previous
+        // URL to return to (e.g. a caller without a Referer).
+        return back(fallback: route('announcements.index'));
     }
 
     /**
@@ -58,6 +64,10 @@ class AnnouncementController extends Controller
 
         $announcement->delete();
 
-        return redirect()->route('announcements.index');
+        // Both callers (the public page, Admin → Announcements) are list
+        // pages; returning to wherever the request came from keeps the
+        // admin on their own list, query string included. The fallback only
+        // matters when there is no previous URL to return to.
+        return back(fallback: route('announcements.index'));
     }
 }

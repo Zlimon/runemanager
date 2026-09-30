@@ -32,11 +32,13 @@ Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:login')
     ->name('api.login');
 
+// Every route below carries a per-route `throttle:plugin-*` ceiling; the
+// limits and the plugin cadences behind them are in AppServiceProvider.
 Route::middleware([
     'auth:sanctum',
 ])->group(function () {
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
+    Route::get('/me', [AuthController::class, 'me'])->middleware('throttle:plugin-poll');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('throttle:plugin-poll')->name('api.logout');
 
     /*
      * Plugin push endpoints. The OSRS account is resolved by the plugin.account
@@ -44,62 +46,62 @@ Route::middleware([
      * the URL — usernames change but the hash is stable.
      */
     Route::middleware('plugin.account')->prefix('/plugin')->group(function () {
-        Route::put('/inventory', [InventoryController::class, 'update'])->name('api.plugin.inventory');
-        Route::put('/bank', [BankController::class, 'update'])->name('api.plugin.bank');
+        Route::put('/inventory', [InventoryController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.inventory');
+        Route::put('/bank', [BankController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.bank');
         // Shared Group Ironman group bank (GROUP mode); singleton, overwritten.
-        Route::put('/group-bank', [GroupBankController::class, 'update'])->name('api.plugin.group-bank');
-        Route::put('/equipment', [EquipmentController::class, 'update'])->name('api.plugin.equipment');
-        Route::put('/quests', [QuestController::class, 'update'])->name('api.plugin.quests');
+        Route::put('/group-bank', [GroupBankController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.group-bank');
+        Route::put('/equipment', [EquipmentController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.equipment');
+        Route::put('/quests', [QuestController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.quests');
         // Achievement Diary completion snapshot.
-        Route::put('/diaries', [DiaryController::class, 'update'])->name('api.plugin.diaries');
+        Route::put('/diaries', [DiaryController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.diaries');
         // Combat Achievement points + per-tier status snapshot,
         // plus a live task-unlock that records a feed event.
         Route::put('/combat-achievements', [CombatAchievementController::class, 'update'])
-            ->name('api.plugin.combat-achievements');
+            ->middleware('throttle:plugin-snapshot')->name('api.plugin.combat-achievements');
         Route::post('/combat-achievements/unlock', [CombatAchievementController::class, 'unlock'])
-            ->name('api.plugin.combat-achievements.unlock');
+            ->middleware('throttle:plugin-events')->name('api.plugin.combat-achievements.unlock');
         // Collection-log slot unlock → live feed (the full log is
         // pulled from TempleOSRS, not pushed).
         Route::post('/collection-log/unlock', [CollectionLogController::class, 'unlock'])
-            ->name('api.plugin.collection-log.unlock');
+            ->middleware('throttle:plugin-events')->name('api.plugin.collection-log.unlock');
         // Simple plugin-detected notable events (pet/death/reward).
-        Route::post('/feed', [PluginFeedController::class, 'store'])->name('api.plugin.feed');
+        Route::post('/feed', [PluginFeedController::class, 'store'])->middleware('throttle:plugin-events')->name('api.plugin.feed');
         // A clean screenshot attached to the matching feed event.
         Route::post('/feed/screenshot', [FeedScreenshotController::class, 'store'])
-            ->name('api.plugin.feed.screenshot');
-        Route::put('/looting-bag', [LootingBagController::class, 'update'])->name('api.plugin.looting-bag');
+            ->middleware('throttle:plugin-heavy')->name('api.plugin.feed.screenshot');
+        Route::put('/looting-bag', [LootingBagController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.looting-bag');
         // Loot is append-only — POST, not the snapshot PUT used by the others.
-        Route::post('/loot', [LootController::class, 'store'])->name('api.plugin.loot');
+        Route::post('/loot', [LootController::class, 'store'])->middleware('throttle:plugin-events')->name('api.plugin.loot');
         // Player 3D model from the RuneLite plugin (multipart OBJ + MTL).
-        Route::post('/avatar', [AvatarController::class, 'update'])->name('api.plugin.avatar');
+        Route::post('/avatar', [AvatarController::class, 'update'])->middleware('throttle:plugin-heavy')->name('api.plugin.avatar');
         // Presence ping — stamps last_seen_at; "online" is derived from it.
-        Route::put('/heartbeat', [HeartbeatController::class, 'update'])->name('api.plugin.heartbeat');
+        Route::put('/heartbeat', [HeartbeatController::class, 'update'])->middleware('throttle:plugin-live')->name('api.plugin.heartbeat');
         // Live Map position push — latest WorldPoint while sharing is enabled.
-        Route::put('/position', [PositionController::class, 'update'])->name('api.plugin.position');
+        Route::put('/position', [PositionController::class, 'update'])->middleware('throttle:plugin-live')->name('api.plugin.position');
         // Live status-orb values (HP/prayer/run/special) for the Account Show orbs.
-        Route::put('/vitals', [VitalsController::class, 'update'])->name('api.plugin.vitals');
+        Route::put('/vitals', [VitalsController::class, 'update'])->middleware('throttle:plugin-live')->name('api.plugin.vitals');
         // Current in-game activity (Discord-plugin style) for the account cards/header.
-        Route::put('/status', [StatusController::class, 'update'])->name('api.plugin.status');
+        Route::put('/status', [StatusController::class, 'update'])->middleware('throttle:plugin-live')->name('api.plugin.status');
         // Ask the server to refresh stats (skills/bosses/clues) from
         // the official OSRS hiscores. Part of the login full-account snapshot.
-        Route::put('/hiscores', [HiscoreController::class, 'sync'])->name('api.plugin.hiscores');
+        Route::put('/hiscores', [HiscoreController::class, 'sync'])->middleware('throttle:plugin-heavy')->name('api.plugin.hiscores');
         // In-game clan name + rank; mirrors onto website roles in CLAN mode.
-        Route::put('/clan', [ClanController::class, 'update'])->name('api.plugin.clan');
+        Route::put('/clan', [ClanController::class, 'update'])->middleware('throttle:plugin-snapshot')->name('api.plugin.clan');
         // In-game announcements: pull unacknowledged, then ack each.
-        Route::get('/announcements', [AnnouncementController::class, 'index'])->name('api.plugin.announcements');
+        Route::get('/announcements', [AnnouncementController::class, 'index'])->middleware('throttle:plugin-poll')->name('api.plugin.announcements');
         Route::put('/announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])
-            ->name('api.plugin.announcements.acknowledge');
+            ->middleware('throttle:plugin-poll')->name('api.plugin.announcements.acknowledge');
     });
 
     // The owner's clan roster push. Outside plugin.account: it
     // bootstraps accounts (incl. the owner's own) from nothing, so it must not
     // require the owner's account to already be resolved. Admin-gated in
     // StoreClanRosterRequest::authorize().
-    Route::post('/plugin/clan/roster', [ClanController::class, 'roster'])->name('api.plugin.clan.roster');
+    Route::post('/plugin/clan/roster', [ClanController::class, 'roster'])->middleware('throttle:plugin-snapshot')->name('api.plugin.clan.roster');
 
     // Resource pack is a user preference (not OSRS-account-scoped), so it
     // sits outside the plugin.account middleware. Plugin pushes a pack name;
     // backend resolves to an id and writes users.resource_pack_id.
     Route::put('/plugin/resource-pack', [UserResourcePackController::class, 'updateFromPlugin'])
-        ->name('api.plugin.resource-pack');
+        ->middleware('throttle:plugin-snapshot')->name('api.plugin.resource-pack');
 });

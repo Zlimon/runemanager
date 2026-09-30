@@ -12,6 +12,7 @@ use App\Models\GroupBank;
 use App\Models\Inventory;
 use App\Models\Loot;
 use App\Models\LootingBag;
+use App\Models\PluginRequest;
 use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
@@ -45,6 +46,8 @@ class ResetInstanceData
         CollectionLog::query()->delete();
         Loot::query()->delete();
         WomDailySnapshot::query()->delete();
+        // Request metadata names the accounts (id, hash, username) being wiped.
+        PluginRequest::query()->delete();
 
         // Instance-scoped, not account-scoped: one shared document for the
         // Group Ironman group, which the new mode's group must not inherit.

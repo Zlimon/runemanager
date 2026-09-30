@@ -137,6 +137,46 @@ Route::middleware([
                 ->name('admin.packs.reinstall-vanilla');
             Route::delete('/packs/{pack}', [Admin\ResourcePackController::class, 'destroy'])
                 ->whereNumber('pack')->name('admin.packs.destroy');
+            // Website users: suspend (blocks web + plugin login), roles,
+            // token revocation and deletion.
+            Route::get('/users', [Admin\UserController::class, 'index'])->name('admin.users');
+            Route::get('/users/{user}', [Admin\UserController::class, 'show'])
+                ->whereNumber('user')->name('admin.users.show');
+            Route::delete('/users/{user}', [Admin\UserController::class, 'destroy'])
+                ->whereNumber('user')->name('admin.users.destroy');
+            Route::post('/users/{user}/suspension', [Admin\UserSuspensionController::class, 'store'])
+                ->whereNumber('user')->name('admin.users.suspend');
+            Route::delete('/users/{user}/suspension', [Admin\UserSuspensionController::class, 'destroy'])
+                ->whereNumber('user')->name('admin.users.unsuspend');
+            Route::put('/users/{user}/role', [Admin\UserRoleController::class, 'update'])
+                ->whereNumber('user')->name('admin.users.role');
+            Route::delete('/users/{user}/tokens/{token?}', [Admin\UserTokenController::class, 'destroy'])
+                ->whereNumber(['user', 'token'])->name('admin.users.tokens.destroy');
+            // Content moderation: every account's screenshots, all news posts
+            // (drafts/scheduled included) and every announcement (expired
+            // included). Editing/creating/deleting news and announcements
+            // reuse the `news.*` and `announcements.*` routes below.
+            Route::get('/screenshots', [Admin\ScreenshotController::class, 'index'])->name('admin.screenshots');
+            Route::patch('/screenshots', [Admin\ScreenshotController::class, 'update'])
+                ->middleware('throttle:60,1,admin-screenshots')->name('admin.screenshots.update');
+            Route::delete('/screenshots', [Admin\ScreenshotController::class, 'destroy'])
+                ->middleware('throttle:60,1,admin-screenshots')->name('admin.screenshots.destroy');
+            Route::get('/news', [Admin\NewsController::class, 'index'])->name('admin.news');
+            Route::get('/announcements', [Admin\AnnouncementController::class, 'index'])->name('admin.announcements');
+            // Plugin API traffic monitor: request metadata, flags and
+            // suspicious users (PluginTraffic), overall and per user.
+            Route::get('/traffic', [Admin\PluginTrafficController::class, 'index'])->name('admin.traffic');
+            Route::get('/traffic/users/{user}', [Admin\PluginTrafficController::class, 'show'])
+                ->whereNumber('user')->name('admin.traffic.user');
+            // Failed queue jobs, shown on the dashboard's health panel. Keyed by
+            // uuid, not the row's numeric id — config/queue.php's `failed.driver`
+            // is `database-uuids`, and its provider looks jobs up by uuid. The
+            // optional param has to trail the URI (retries-all omits it), same
+            // shape as admin.users.tokens.destroy above.
+            Route::post('/jobs/retry/{failedJob?}', [Admin\FailedJobController::class, 'retry'])
+                ->whereUuid('failedJob')->name('admin.jobs.retry');
+            Route::delete('/jobs/{failedJob}', [Admin\FailedJobController::class, 'forget'])
+                ->whereUuid('failedJob')->name('admin.jobs.forget');
         });
 
         Route::middleware('can:manage members')->group(function () {

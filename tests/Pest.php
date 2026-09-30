@@ -6,6 +6,7 @@ use App\Models\GroupBank;
 use App\Models\Inventory;
 use App\Models\Loot;
 use App\Models\LootingBag;
+use App\Models\PluginRequest;
 use App\Models\Quest;
 use App\Models\ResourcePack;
 use App\Models\User;
@@ -41,7 +42,7 @@ uses(TestCase::class)->in('Feature', 'Unit');
 
 pest()->beforeEach(function () {
     try {
-        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, Quest::class, WomDailySnapshot::class] as $model) {
+        foreach ([Bank::class, CollectionLog::class, GroupBank::class, Inventory::class, Loot::class, LootingBag::class, PluginRequest::class, Quest::class, WomDailySnapshot::class] as $model) {
             $model::query()->delete();
         }
     } catch (Throwable) {

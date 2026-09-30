@@ -54,10 +54,19 @@ it('schedules exactly the expected commands and nothing else', function () {
         'collection-log:sync',
         'hiscores:sync',
         'items:sync',
+        'plugin-traffic:prune',
         'resourcepack:update',
         'wom:compact-snapshots',
         'wom:sync',
     ]);
+});
+
+it('prunes plugin traffic daily without reading its retention setting', function () {
+    $event = collect(app(Schedule::class)->events())
+        ->first(fn ($event) => str_contains((string) $event->command, 'plugin-traffic:prune'));
+
+    expect($event)->not->toBeNull()
+        ->and($event->expression)->toBe('30 4 * * *');
 });
 
 it('schedules the Wise Old Man sync daily without reading its toggle', function () {

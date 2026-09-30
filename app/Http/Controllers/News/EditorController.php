@@ -67,8 +67,16 @@ class EditorController extends Controller
     {
         $saveNewsPost->delete($newsPost);
 
-        return redirect()
-            ->route('news.index')
-            ->with('status', 'Article deleted.');
+        // Deleting from Admin → News returns there, search and page kept;
+        // anywhere else (the article page, the public archive) still lands
+        // on news.index. Admin → News is the only caller with a query
+        // string worth preserving, so this checks it by name rather than
+        // using back(), which would drop it.
+        $previous = url()->previous();
+        $redirect = str($previous)->startsWith(route('admin.news'))
+            ? redirect($previous)
+            : redirect()->route('news.index');
+
+        return $redirect->with('status', 'Article deleted.');
     }
 }

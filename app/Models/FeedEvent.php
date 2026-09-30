@@ -258,6 +258,13 @@ class FeedEvent extends Model
         $query->whereNotNull('screenshot_path');
     }
 
+    /** Screenshots hidden from everyone but their owner and instance admins. */
+    #[Scope]
+    protected function hiddenScreenshot(Builder $query): void
+    {
+        $query->where('screenshot_hidden', true);
+    }
+
     /** Events of the user's own accounts. */
     #[Scope]
     protected function ownedBy(Builder $query, User $user): void
