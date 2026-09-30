@@ -128,7 +128,8 @@ watch(hasNpc, (npc) => { showEquipment.value = !npc; }, { immediate: true });
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-5">
                     <RecentEvents ref="recentEventsList" class="md:col-span-3" :account="account" :events="recentEvents" />
 
-                    <TabbedCard class="md:col-span-2" :tabs="journalTabs" v-model="activeJournalTab">
+                    <TabbedCard class="md:col-span-2" :tabs="journalTabs" v-model="activeJournalTab"
+                                tab-class="flex-1 min-w-0 justify-center px-2">
                         <template #quests>
                             <Quests :quests="quests" :freshness="freshness.quests" :stale-after="staleAfter" />
                         </template>

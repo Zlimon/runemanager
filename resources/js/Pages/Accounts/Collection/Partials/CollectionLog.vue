@@ -1,8 +1,10 @@
 <script setup>
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
+import Card from "@/Components/Cards/Card.vue";
 import Loader from "@/Components/Display/Loader.vue";
 import ItemSlot from "@/Components/Game/Items/ItemSlot.vue";
+import ChoiceChips from "@/Components/Tables/ChoiceChips.vue";
 import dayjs from "dayjs";
 
 const props = defineProps({
@@ -15,6 +17,17 @@ const props = defineProps({
 const reloading = ref(false);
 const filter = ref('all');    // all | obtained | missing
 const order = ref('default'); // default | date
+
+const FILTERS = [
+    { value: 'all', label: 'All' },
+    { value: 'obtained', label: 'Obtained' },
+    { value: 'missing', label: 'Missing' },
+];
+
+const ORDERS = [
+    { value: 'default', label: 'Default' },
+    { value: 'date', label: 'Date' },
+];
 
 const GROUPS = [
     { key: 'bosses', label: 'Bosses' },
@@ -116,15 +129,18 @@ const bossIcon = (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png`;
             </span>
         </div>
 
-        <!-- Padding insets the columns so the pack's textured frame wraps the
-             whole panel instead of being covered by the scroll columns. -->
-        <div class="flex rounded bg-base-200 p-4 resource-pack-dialog">
+        <!-- A Card, so the untextured interface gets the card surface and edge
+             that set it apart from the page (a bare bg-base-200 panel matched
+             the page background). Padding insets the columns so the pack's
+             textured frame wraps the whole panel instead of being covered by
+             the scroll columns. -->
+        <Card frame="dialog" padding="p-4" class="flex">
             <!-- Left: accordion category list — group headers stay visible while
                  the open group's subcategories scroll within their own region. -->
             <div class="flex h-[454px] w-1/3 flex-col">
                 <template v-for="group in groupedCategories" :key="group.key">
                     <button type="button"
-                            class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left font-semibold hover:bg-base-content/5"
+                            class="flex w-full items-center justify-between gap-2 border-t border-base-300 px-3 py-2 first:border-t-0 text-left font-semibold hover:bg-base-content/5"
                             @click="toggleGroup(group.key)">
                         <span class="flex items-center gap-1.5">
                             <svg class="h-3 w-3 transition-transform"
@@ -172,27 +188,8 @@ const bossIcon = (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png`;
                     </div>
 
                     <div class="relative z-20 mt-2 flex flex-wrap items-center gap-2">
-                        <div class="join">
-                            <button v-for="f in ['all', 'obtained', 'missing']" :key="f"
-                                    type="button"
-                                    class="btn btn-outline btn-xs join-item capitalize"
-                                    :class="{ 'btn-active': filter === f }"
-                                    @click="filter = f">
-                                {{ f }}
-                            </button>
-                        </div>
-                        <div class="join">
-                            <button type="button" class="btn btn-outline btn-xs join-item"
-                                    :class="{ 'btn-active': order === 'default' }"
-                                    @click="order = 'default'">
-                                Default
-                            </button>
-                            <button type="button" class="btn btn-outline btn-xs join-item"
-                                    :class="{ 'btn-active': order === 'date' }"
-                                    @click="order = 'date'">
-                                Date
-                            </button>
-                        </div>
+                        <ChoiceChips v-model="filter" :options="FILTERS" label="Show" />
+                        <ChoiceChips v-model="order" :options="ORDERS" label="Order" />
                     </div>
 
                     <ul class="m-2 grid grid-cols-6 gap-2">
@@ -207,7 +204,7 @@ const bossIcon = (slug) => `/images/boss/${slug.replaceAll('_', '-')}.png`;
                     </ul>
                 </div>
             </div>
-        </div>
+        </Card>
     </div>
     <div v-else class="flex h-96 items-center justify-center">
         <p class="text-base-content/70">

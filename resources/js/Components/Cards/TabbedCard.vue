@@ -2,8 +2,12 @@
 import { computed, ref, useSlots } from "vue";
 
 /*
- * Reusable tabbed-card chrome: a `tabs tabs-lifted` strip sitting on top of a
- * bordered body that reads as one shape with the tabs. Centralises the pack-
+ * Reusable tabbed-card chrome: a `tabs` strip sitting on top of a bordered
+ * body that reads as one shape with the tabs. The body keeps its own top edge
+ * along its full width; the strip overlaps it (1px here, the sprite line's
+ * depth under a pack — see per-pack.css) and sits above it, so inactive tabs
+ * rest on that edge while the active tab paints over it and opens straight
+ * into the body. Centralises the pack-
  * aware classes (`resource-pack-tab`, `resource-pack-dialog-tabbed`) and the
  * active-tab styling so every tabbed card on the site stays in sync — see
  * Show.vue's Inventory/Looting Bag and Skills.vue's Skills/Bosses/Clues.
@@ -58,7 +62,9 @@ const hasNamedSlots = computed(() => props.tabs.some((tab) => slots[tab.key]));
 
 <template>
     <div>
-        <div class="tabs tabs-lifted" role="tablist">
+        <!-- One row, never wrapped: a wrapped second row would sit off the
+             body's edge. Tabs that don't fit scroll sideways instead. -->
+        <div class="tabs relative z-[1] -mb-px flex-nowrap overflow-x-auto [scrollbar-width:thin]" role="tablist">
             <a v-for="tab in tabs" :key="tab.key"
                class="tab resource-pack-tab gap-1.5"
                :class="[tabClass, { 'tab-active': active === tab.key }]"
@@ -74,7 +80,7 @@ const hasNamedSlots = computed(() => props.tabs.some((tab) => slots[tab.key]));
             </a>
         </div>
 
-        <div class="bg-base-200 border-x border-b border-base-300 rounded-b resource-pack-dialog-tabbed"
+        <div class="bg-base-200 border border-base-300 rounded-b resource-pack-dialog-tabbed"
              :class="bodyClass">
             <template v-if="hasNamedSlots">
                 <div v-for="tab in tabs" v-show="active === tab.key" :key="tab.key">

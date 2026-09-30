@@ -118,22 +118,38 @@
 }
 
 /*
- * Variant for panels that sit directly under a row of tabs — drops the two
- * top corners and the top edge so the panel reads as one shape with the tabs
- * above instead of closing off with its own frame. Same iron-rivets asset
- * family as .resource-pack-dialog.
+ * Variant for panels that sit directly under a row of tabs. Same iron-rivets
+ * asset family as .resource-pack-dialog, minus the two top corner plates: the
+ * first tab always sits over the top-left one, and a 25x30 plate would poke
+ * ~24px down into the panel under whichever tab covers it.
+ *
+ * The top edge line stays, so the panel is closed along its full width. The
+ * tab strip overlaps the panel by the line's 6px depth (rule below) and sits
+ * above it: an inactive tab's own bottom line lands exactly on this one, and
+ * the active tab — which drops its bottom line — paints its fill over it and
+ * opens straight into the panel.
  */
 .resource-pack-dialog-tabbed {
     background: url('dialog/iron_rivets_corner_bottom_left.png') no-repeat,
                 url('dialog/iron_rivets_corner_bottom_right.png') no-repeat,
+                url('dialog/iron_rivets_edge_top.png') repeat-x,
                 url('dialog/iron_rivets_vertical.png') repeat-y,
                 url('dialog/iron_rivets_edge_right.png') repeat-y,
                 url('dialog/iron_rivets_bottom.png') repeat-x,
                 url('dialog/background.png');
-    /* As .resource-pack-dialog but without the top (the tabs above close it). */
+    /* As .resource-pack-dialog, minus the top corners. */
     background-position: bottom left, bottom right,
+                         top -15px left,
                          left -15px top, right -15px top,
                          bottom -15px left, center;
+}
+
+/* The edge sprites carry a 6px line 15px into a 36px tile, so at the -15px
+   offsets a tab's bottom line and the panel's top line are each 6px deep.
+   Overlapping by that much makes them one line. Unlayered, so it beats the
+   strip's untextured `-mb-px` utility. */
+.tabs:has(+ .resource-pack-dialog-tabbed) {
+    margin-bottom: -6px;
 }
 
 .resource-pack-iron-rivets {
@@ -162,9 +178,9 @@
  * `100% 100%`, which distorted the sprite and made the strip look like a
  * foreign control glued to the card.
  *
- * The selected tab drops its bottom line and opens straight into the panel
- * below (which in turn drops its own top edge); an unselected tab keeps the
- * bottom line and reads as a closed box.
+ * The selected tab drops its bottom line and paints over the panel's top edge
+ * (see .resource-pack-dialog-tabbed), opening straight into the panel below;
+ * an unselected tab keeps the bottom line, which lands on the panel's own.
  *
  * Only the two TOP corner plates are painted. Those sprites are 25×30 of solid
  * art, so a second pair pinned to the bottom of a 40px tab would overlap the
