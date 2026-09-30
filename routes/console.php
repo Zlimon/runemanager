@@ -39,3 +39,9 @@ Schedule::command('wom:compact-snapshots')
     ->weeklyOn(0, '05:30')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Drops plugin traffic metadata older than PrunePluginRequests::RETENTION_DAYS.
+Schedule::command('plugin-traffic:prune')
+    ->dailyAt('04:30')
+    ->withoutOverlapping()
+    ->runInBackground();

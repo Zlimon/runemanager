@@ -46,6 +46,8 @@ class ResolvePluginAccount
         $username = $request->header('X-Account-Username');
 
         if (empty($hash) || empty($username)) {
+            LogPluginRequest::flag($request, LogPluginRequest::FLAG_MISSING_HEADERS);
+
             return response()->json([
                 'message' => 'Missing required headers.',
                 'errors' => [
@@ -62,6 +64,8 @@ class ResolvePluginAccount
         $account = Account::where('account_hash', $hash)->first();
 
         if ($account && $account->user_id !== $user->id) {
+            LogPluginRequest::flag($request, LogPluginRequest::FLAG_ACCOUNT_CONFLICT);
+
             return response()->json([
                 'message' => 'This account is linked to a different user.',
             ], 403);
@@ -77,6 +81,8 @@ class ResolvePluginAccount
 
             if ($byUsername && $byUsername->user_id !== null && $byUsername->user_id !== $user->id) {
                 // Owned by someone else — don't let the caller hijack it.
+                LogPluginRequest::flag($request, LogPluginRequest::FLAG_ACCOUNT_CONFLICT);
+
                 return response()->json([
                     'message' => 'This account is linked to a different user.',
                 ], 403);

@@ -451,7 +451,7 @@ class InstallResourcePack
     public function isReady(string $name): bool
     {
         return $this->isInstalled($name)
-            && ResourcePack::where('name', $name)->where('version', '!=', 'pending')->exists();
+            && ResourcePack::where('name', $name)->installed()->exists();
     }
 
     /**

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Support\Instance;
+use App\Support\Roles;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,7 +48,56 @@ class User extends Authenticatable
             'password' => 'hashed',
             'dark_mode' => 'boolean',
             'disable_resource_pack' => 'boolean',
+            'suspended_at' => 'datetime',
         ];
+    }
+
+    /**
+     * A suspended user cannot log in on the website or the plugin, and any
+     * session or token they still hold is refused (EnsureUserIsNotSuspended).
+     */
+    public function isSuspended(): bool
+    {
+        return $this->suspended_at !== null;
+    }
+
+    #[Scope]
+    protected function suspended(Builder $query): void
+    {
+        $query->whereNotNull('suspended_at');
+    }
+
+    #[Scope]
+    protected function notSuspended(Builder $query): void
+    {
+        $query->whereNull('suspended_at');
+    }
+
+    /**
+     * Holders of the Owner role. Queried through the relation rather than
+     * Spatie's `role()` scope, which throws while the role has not been seeded.
+     */
+    #[Scope]
+    protected function owners(Builder $query): void
+    {
+        $query->whereHas('roles', fn (Builder $roles) => $roles->where('name', Roles::OWNER));
+    }
+
+    /**
+     * Whether this user is the only Owner who can still log in. Suspending,
+     * demoting or deleting them would leave the instance without an owner.
+     * Both halves are read from the database rather than loaded relations, so
+     * LastOwnerGuard sees a concurrent change once it holds the owner locks.
+     */
+    public function isLastActiveOwner(): bool
+    {
+        return $this->roles()->where('name', Roles::OWNER)->exists()
+            && static::query()->owners()->notSuspended()->whereKeyNot($this->getKey())->doesntExist();
+    }
+
+    public function suspendedBy(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'suspended_by_user_id');
     }
 
     public function account(): HasMany

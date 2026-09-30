@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\ResourcePacks\PackPalette;
 use App\Support\Instance;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,21 @@ class ResourcePack extends Model
 
     /** Cookie value a logged-out visitor stores to opt out of resource packs. */
     public const GUEST_NO_PACK = 'none';
+
+    /**
+     * Rows past the stub stage: not left at version `pending`, the flag a
+     * still-queued fetch (or InstallResourcePack::upsertRow()) leaves until the
+     * pipeline populates the row's metadata. This is the row-only half of
+     * {@see \App\Services\ResourcePacks\InstallResourcePack::isReady()} — that
+     * method also checks the pack's files are on disk, which a query over this
+     * table alone cannot see. Use isReady() when the files matter (rendering a
+     * pack); use this scope for a plain "how many packs are installed" count.
+     */
+    #[Scope]
+    protected function installed(Builder $query): void
+    {
+        $query->where('version', '!=', 'pending');
+    }
 
     /** The member who installed this pack from the hub (null = instance-managed). */
     public function installedBy(): BelongsTo
@@ -103,7 +119,7 @@ class ResourcePack extends Model
     public static function navListFor(User $user): array
     {
         return self::query()
-            ->where('version', '!=', 'pending')
+            ->installed()
             ->where(fn (Builder $query) => $query
                 ->where('installed_by_user_id', $user->id)
                 ->orWhere('id', $user->resource_pack_id))

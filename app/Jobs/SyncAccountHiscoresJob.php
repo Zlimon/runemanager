@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Account;
 use App\Services\Hiscores\HiscoresSync;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,7 @@ use Throwable;
  * OSRS hiscores and upsert its AccountHiscore. Queued because it hits an
  * external API; triggered by the plugin's full-account snapshot on login.
  */
-class SyncAccountHiscoresJob implements ShouldQueue
+class SyncAccountHiscoresJob implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
@@ -22,7 +23,19 @@ class SyncAccountHiscoresJob implements ShouldQueue
 
     public int $backoff = 30;
 
+    /**
+     * One queued hiscores fetch per account: a repeated plugin trigger while
+     * one is pending is dropped. The lock lapses after ten minutes in case a
+     * worker dies holding it.
+     */
+    public int $uniqueFor = 600;
+
     public function __construct(public int $accountId) {}
+
+    public function uniqueId(): string
+    {
+        return (string) $this->accountId;
+    }
 
     public function handle(HiscoresSync $sync): void
     {

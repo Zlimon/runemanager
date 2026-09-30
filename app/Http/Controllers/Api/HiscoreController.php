@@ -7,6 +7,7 @@ use App\Jobs\SyncAccountCollectionLogJob;
 use App\Jobs\SyncAccountHiscoresJob;
 use App\Jobs\SyncWomPlayerJob;
 use App\Models\Account;
+use App\Models\CollectionLog;
 use App\Support\Instance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,13 +23,29 @@ use Illuminate\Http\Request;
  */
 class HiscoreController extends Controller
 {
+    /**
+     * A fetch newer than this is fresh enough to skip, so a plugin that
+     * relogs or world-hops cannot make us hammer the OSRS hiscores or
+     * TempleOSRS. The scheduled sweeps call the sync services directly and
+     * are not held back by it.
+     */
+    public const SYNC_COOLDOWN_MINUTES = 5;
+
     public function sync(Request $request): JsonResponse
     {
         /** @var Account $account */
         $account = $request->attributes->get('account');
 
-        SyncAccountHiscoresJob::dispatch($account->id);
-        SyncAccountCollectionLogJob::dispatch($account->id);
+        $fresh = now()->subMinutes(self::SYNC_COOLDOWN_MINUTES);
+
+        // Both jobs are also unique per account while queued.
+        if (! $account->hiscore()->where('fetched_at', '>=', $fresh)->exists()) {
+            SyncAccountHiscoresJob::dispatch($account->id);
+        }
+
+        if (! CollectionLog::query()->where('account_id', $account->id)->where('fetched_at', '>=', $fresh)->exists()) {
+            SyncAccountCollectionLogJob::dispatch($account->id);
+        }
 
         // Delayed so the official hiscores land first: their XP is what tells
         // the sync whether Wise Old Man is behind. Skipped when the last sync

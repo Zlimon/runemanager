@@ -105,6 +105,20 @@ class NewsPost extends Model
         $query->orderByRaw('COALESCE(published_at, created_at) DESC');
     }
 
+    /** Posts with no `published_at` at all — never published. */
+    #[Scope]
+    protected function draft(Builder $query): void
+    {
+        $query->whereNull('published_at');
+    }
+
+    /** Posts with a `published_at` still in the future. */
+    #[Scope]
+    protected function scheduled(Builder $query): void
+    {
+        $query->whereNotNull('published_at')->where('published_at', '>', now());
+    }
+
     public function isPublished(): bool
     {
         return $this->published_at !== null && $this->published_at->isPast();

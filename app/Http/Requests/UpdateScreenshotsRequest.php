@@ -5,10 +5,13 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Hide or show some of the user's screenshots (Settings → Screenshots). */
+/**
+ * Hide or show some screenshots: the owner's own (Settings → Screenshots) or,
+ * on the admin route, any account's (Admin → Screenshots).
+ */
 class UpdateScreenshotsRequest extends FormRequest
 {
-    /** The route is behind `auth`; which ids are the user's is checked after validation. */
+    /** Both routes are permission-gated (`auth`, or `can:manage instance`); ownership is checked after validation. */
     public function authorize(): bool
     {
         return true;

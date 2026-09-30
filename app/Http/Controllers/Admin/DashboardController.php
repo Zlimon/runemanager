@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Account;
-use App\Models\Announcement;
-use App\Models\User;
+use App\Services\Instance\AdminOverview;
+use App\Services\Instance\SystemHealth;
 use App\Support\Instance;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,14 +14,12 @@ use Inertia\Response;
  */
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(AdminOverview $overview, SystemHealth $health): Response
     {
         return Inertia::render('Admin/Dashboard/Index', [
-            'stats' => [
-                'users' => User::count(),
-                'accounts' => Account::count(),
-                'announcements' => Announcement::count(),
-            ],
+            'stats' => $overview->stats(),
+            'health' => $health->report(),
+            'suspiciousUsers' => $overview->suspiciousUsers(),
             'mode' => Instance::mode(),
             'instanceName' => Instance::name(),
         ]);
