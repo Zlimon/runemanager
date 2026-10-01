@@ -19,7 +19,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="flex flex-col items-center rounded px-2 py-3 pack-bg-card border pack-accent-border resource-pack-border md:max-w-xl md:flex-row">
+    <div class="flex flex-col items-center rounded h-24 px-3 py-3 pack-bg-card border pack-accent-border resource-pack-border md:max-w-xl md:flex-row">
         <Icon :account="account" />
         <div class="flex flex-col justify-between p-4 leading-normal">
             <div class="flex items-center space-x-1">

@@ -17,7 +17,7 @@ defineEmits(['update:modelValue']);
 </script>
 
 <template>
-    <div class="join border border-base-300" role="group" :aria-label="label">
+    <div class="join border pack-accent-border" role="group" :aria-label="label">
         <button v-for="option in options" :key="option.value" type="button"
                 class="btn join-item"
                 :class="[size === 'xs' ? 'btn-xs' : 'btn-sm', modelValue === option.value ? 'btn-primary btn-active' : 'btn-ghost']"
