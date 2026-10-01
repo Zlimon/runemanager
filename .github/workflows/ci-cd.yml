@@ -78,5 +78,5 @@ jobs:
           private_ssh_key: "${{ secrets.SSH_PRIVATE_KEY }}"
           ssh_known_hosts: "${{ secrets.SSH_KNOWN_HOSTS }}"
           php_executable: "php"
-          ssh_jump_host: "root@${{ secrets.AUSLANDSVEIEN_178_IP }}"
+          ssh_jump_host: "jump@${{ secrets.HOST_IP }}"
         run: tar -xf artifacts.tar.gz .github/deployment/prepare.sh -O | bash -se -- "$base_directory" "$ssh_user" "$ssh_host" "$ssh_port" "$private_ssh_key" "$ssh_known_hosts" "$php_executable" "$ssh_jump_host"
