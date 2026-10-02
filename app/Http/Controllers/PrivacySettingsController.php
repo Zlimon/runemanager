@@ -6,10 +6,12 @@ use App\Http\Requests\UpdateAccountPrivacyRequest;
 use App\Models\Account;
 use App\Models\WomPlayer;
 use App\Services\Accounts\UpdateAccountPrivacy;
+use App\Services\WiseOldMan\RequestWomSync;
 use App\Support\Instance;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -60,11 +62,22 @@ class PrivacySettingsController extends Controller
             : back();
     }
 
+    /** The owner asks for a Wise Old Man refresh, once a day per account. */
+    public function syncWom(Request $request, Account $account, RequestWomSync $sync): RedirectResponse
+    {
+        abort_unless(Instance::womEnabled(), 404);
+        abort_unless($request->user()->id === $account->user_id, HttpResponse::HTTP_FORBIDDEN);
+
+        return $sync->request($account)
+            ? back()->banner('Queued — Wise Old Man will update shortly.')
+            : back()->dangerBanner('This account was already synced in the last day. Please try again later.');
+    }
+
     /**
      * An account's Wise Old Man link and choices; an account never looked up
      * has the defaults a new row gets.
      *
-     * @return array{status: string, show_on_progress: bool, tracking_opt_in: bool}
+     * @return array{status: string, show_on_progress: bool, tracking_opt_in: bool, synced_at: ?string, sync_available_at: ?string}
      */
     private static function womChoices(?WomPlayer $player): array
     {
@@ -76,6 +89,8 @@ class PrivacySettingsController extends Controller
             },
             'show_on_progress' => $player?->show_on_progress ?? true,
             'tracking_opt_in' => $player?->tracking_opt_in ?? false,
+            'synced_at' => $player?->synced_at?->toIso8601String(),
+            'sync_available_at' => RequestWomSync::availableAt($player)?->toIso8601String(),
         ];
     }
 }

@@ -36,7 +36,7 @@ it('sends the old settings page to Privacy', function () {
 });
 
 it('lists the user\'s own accounts with their link status on the Privacy page', function () {
-    WomPlayer::factory()->for($this->account)->create(['tracking_opt_in' => true]);
+    $player = WomPlayer::factory()->for($this->account)->create(['tracking_opt_in' => true]);
     $unchecked = Account::factory()->for($this->owner)->create(['username' => 'Zed']);
     Account::factory()->create(['username' => 'SomeoneElse']);
 
@@ -48,9 +48,9 @@ it('lists the user\'s own accounts with their link status on the Privacy page', 
             ->where('wom_enabled', true)
             ->has('accounts', 2)
             ->where('accounts.0.username', 'Bartheez')
-            ->where('accounts.0.wom', ['status' => 'linked', 'show_on_progress' => true, 'tracking_opt_in' => true])
+            ->where('accounts.0.wom', ['status' => 'linked', 'show_on_progress' => true, 'tracking_opt_in' => true, 'synced_at' => $player->synced_at->toIso8601String(), 'sync_available_at' => null])
             ->where('accounts.1.id', $unchecked->id)
-            ->where('accounts.1.wom', ['status' => 'unchecked', 'show_on_progress' => true, 'tracking_opt_in' => false]),
+            ->where('accounts.1.wom', ['status' => 'unchecked', 'show_on_progress' => true, 'tracking_opt_in' => false, 'synced_at' => null, 'sync_available_at' => null]),
         );
 });
 

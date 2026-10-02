@@ -168,3 +168,53 @@ it('throttles the switches in their own bucket', function () {
         ->put(route('wise-old-man.update', $this->account), ['show_on_progress' => false])
         ->assertTooManyRequests();
 });
+
+it('queues a manual Wise Old Man sync once a day per account', function () {
+    $this->freezeSecond();
+    SettingHelper::setSetting('wom_enabled', true, 'bool');
+    Queue::fake();
+
+    $this->actingAs($this->owner)
+        ->post(route('privacy.wom-sync', $this->account))
+        ->assertRedirect()
+        ->assertSessionHas('flash.banner', 'Queued — Wise Old Man will update shortly.');
+
+    Queue::assertPushed(SyncWomPlayerJob::class, fn (SyncWomPlayerJob $job) => $job->accountId === $this->account->id && $job->requestUpdate);
+
+    $this->actingAs($this->owner)
+        ->get(route('privacy.index'))
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('accounts.0.wom.sync_available_at', now()->addDay()->toIso8601String()));
+
+    $this->travel(23)->hours();
+
+    $this->actingAs($this->owner)
+        ->post(route('privacy.wom-sync', $this->account))
+        ->assertSessionHas('flash.bannerStyle', 'danger');
+
+    Queue::assertPushed(SyncWomPlayerJob::class, 1);
+
+    $this->travel(1)->hours();
+
+    $this->actingAs($this->owner)
+        ->post(route('privacy.wom-sync', $this->account))
+        ->assertSessionHas('flash.bannerStyle', 'success');
+
+    Queue::assertPushed(SyncWomPlayerJob::class, 2);
+});
+
+it('only lets the owner sync an account, and only while the integration is on', function () {
+    Queue::fake();
+
+    $this->actingAs($this->owner)
+        ->post(route('privacy.wom-sync', $this->account))
+        ->assertNotFound();
+
+    SettingHelper::setSetting('wom_enabled', true, 'bool');
+
+    $this->actingAs($this->owner)
+        ->post(route('privacy.wom-sync', $this->theirs))
+        ->assertForbidden();
+
+    Queue::assertNothingPushed();
+});

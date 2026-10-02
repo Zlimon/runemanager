@@ -249,6 +249,9 @@ Route::middleware([
     Route::get('/settings/privacy', [PrivacySettingsController::class, 'index'])->name('privacy.index');
     Route::put('/settings/privacy/{account}', [PrivacySettingsController::class, 'update'])
         ->middleware('throttle:30,1,privacy')->name('privacy.update');
+    // A manual Wise Old Man refresh; the service allows one per account a day.
+    Route::post('/settings/privacy/{account}/wom-sync', [PrivacySettingsController::class, 'syncWom'])
+        ->middleware('throttle:6,1')->name('privacy.wom-sync');
 
     // Settings → Screenshots: the owner's gallery, where screenshots are hidden
     // or deleted in bulk (the events stay); the controller skips other

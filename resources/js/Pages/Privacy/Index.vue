@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
+import dayjs from 'dayjs';
 import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import Card from '@/Components/Cards/Card.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
@@ -18,7 +19,8 @@ import SecondaryButton from '@/Components/Buttons/SecondaryButton.vue';
 const props = defineProps({
     // [{ id, username, account_type, show_events_on_map, hide_new_screenshots,
     //    positioned_event_count, screenshot_count, hidden_screenshot_count,
-    //    wom: null | { status: 'linked'|'not_found'|'unchecked', show_on_progress, tracking_opt_in } }]
+    //    wom: null | { status: 'linked'|'not_found'|'unchecked', show_on_progress, tracking_opt_in,
+//                  synced_at, sync_available_at } }]
     accounts: { type: Array, default: () => [] },
     wom_enabled: { type: Boolean, default: false },
 });
@@ -79,6 +81,18 @@ const toggleTracking = (account, value, event) => {
 const confirmTracking = () => {
     save(confirmingTracking.value, 'tracking_opt_in', true);
     confirmingTracking.value = null;
+};
+
+// A manual Wise Old Man refresh; the server allows one per account a day and
+// says when the next one is due (sync_available_at).
+const syncing = ref(null);
+
+const syncWom = (account) => {
+    syncing.value = account.id;
+    router.post(route('privacy.wom-sync', { account: account.username }), {}, {
+        preserveScroll: true,
+        onFinish: () => { syncing.value = null; },
+    });
 };
 
 const count = (value, one, many) => `${value.toLocaleString('en-US')} ${value === 1 ? one : many}`;
@@ -178,8 +192,8 @@ const count = (value, one, many) => `${value.toLocaleString('en-US')} ${value ==
                                class="mt-1 text-xs text-base-content/60">
                                 We have not looked this account up on
                                 <a href="https://wiseoldman.net" target="_blank" rel="noopener" class="link">Wise Old Man</a>
-                                yet. It is checked on the next daily sync, after which you can choose here whether
-                                Wise Old Man keeps it updated.
+                                yet. It is checked on the next daily sync (or sync it now below), after which you can
+                                choose here whether Wise Old Man keeps it updated.
                             </p>
 
                             <div v-else class="mt-2 space-y-2">
@@ -213,6 +227,23 @@ const count = (value, one, many) => `${value.toLocaleString('en-US')} ${value ==
                                         </span>
                                     </span>
                                 </label>
+                            </div>
+
+                            <div class="mt-3 flex flex-wrap items-center gap-3">
+                                <SecondaryButton class="btn-sm"
+                                                 :disabled="syncing === account.id || !!account.wom?.sync_available_at"
+                                                 @click="syncWom(account)">
+                                    Sync now
+                                </SecondaryButton>
+                                <span class="text-xs text-base-content/50">
+                                    <template v-if="account.wom?.sync_available_at">
+                                        You can sync again {{ dayjs(account.wom.sync_available_at).fromNow() }}.
+                                    </template>
+                                    <template v-else>Once a day per account.</template>
+                                    <template v-if="account.wom?.synced_at">
+                                        Last updated {{ dayjs(account.wom.synced_at).fromNow() }}.
+                                    </template>
+                                </span>
                             </div>
                         </div>
                     </div>
