@@ -9,6 +9,8 @@ use App\Actions\Jetstream\DeleteUser;
 use App\Actions\Jetstream\InviteTeamMember;
 use App\Actions\Jetstream\RemoveTeamMember;
 use App\Actions\Jetstream\UpdateTeamName;
+use App\Models\Item;
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
 
@@ -36,6 +38,15 @@ class JetstreamServiceProvider extends ServiceProvider
         Jetstream::removeTeamMembersUsing(RemoveTeamMember::class);
         Jetstream::deleteTeamsUsing(DeleteTeam::class);
         Jetstream::deleteUsersUsing(DeleteUser::class);
+
+        // The profile form's avatar picker shows the current icon item.
+        Jetstream::inertia()->whenRendering('Profile/Show', function (Request $request, array $data): array {
+            $item = Item::lookupByOsrsId($request->user()->icon_id);
+
+            return $data + [
+                'iconItem' => $item['name'] === '' ? null : ['id' => $item['_id'], 'name' => $item['name'], 'icon' => $item['icon']],
+            ];
+        });
     }
 
     /**

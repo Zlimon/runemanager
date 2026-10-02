@@ -10,6 +10,7 @@ import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfile
 defineProps({
     confirmsTwoFactorAuthentication: Boolean,
     sessions: Array,
+    iconItem: { type: Object, default: null }, // { id, name, icon } of the avatar item
 });
 </script>
 
@@ -17,7 +18,7 @@ defineProps({
     <SettingsLayout title="Profile">
         <div class="space-y-10">
             <div v-if="$page.props.jetstream.canUpdateProfileInformation">
-                <UpdateProfileInformationForm :user="$page.props.auth.user" />
+                <UpdateProfileInformationForm :user="$page.props.auth.user" :icon-item="iconItem" />
                 <SectionBorder />
             </div>
 

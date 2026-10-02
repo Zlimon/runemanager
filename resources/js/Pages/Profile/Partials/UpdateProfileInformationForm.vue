@@ -5,18 +5,21 @@ import ActionMessage from '@/Components/Form/ActionMessage.vue';
 import FormSection from '@/Components/Form/FormSection.vue';
 import InputError from '@/Components/Form/InputError.vue';
 import InputLabel from '@/Components/Form/InputLabel.vue';
+import ItemPicker from '@/Components/Game/Items/ItemPicker.vue';
 import PrimaryButton from '@/Components/Buttons/PrimaryButton.vue';
 import SecondaryButton from '@/Components/Buttons/SecondaryButton.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 
 const props = defineProps({
     user: Object,
+    iconItem: { type: Object, default: null },
 });
 
 const form = useForm({
     _method: 'PUT',
     name: props.user.name,
     email: props.user.email,
+    icon_id: props.user.icon_id,
     photo: null,
 });
 
@@ -126,6 +129,15 @@ const clearPhotoFileInput = () => {
                 </SecondaryButton>
 
                 <InputError :message="form.errors.photo" class="mt-2" />
+            </div>
+
+            <!-- Icon: the OSRS item shown as the user's avatar -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="icon_id" value="Icon" />
+                <ItemPicker id="icon_id" v-model="form.icon_id" :model-item="iconItem" class="mt-1"
+                            :error="!!form.errors.icon_id" placeholder="Search for an item…" />
+                <p class="mt-1 text-xs text-base-content/60">Shown next to your accounts across the site.</p>
+                <InputError :message="form.errors.icon_id" class="mt-2" />
             </div>
 
             <!-- Name -->
