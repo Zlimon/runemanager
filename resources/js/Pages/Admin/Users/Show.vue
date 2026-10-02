@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { Link, router, useForm, usePage } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import Badge from '@/Components/Display/Badge.vue';
 import Card from '@/Components/Cards/Card.vue';
 import ConfirmationModal from '@/Components/Modals/ConfirmationModal.vue';
@@ -63,7 +63,7 @@ const refusal = computed(() => page.props.errors?.user ?? page.props.errors?.pas
 </script>
 
 <template>
-    <AdminLayout :title="user.name">
+    <SettingsLayout :title="user.name">
         <template #actions>
             <Link :href="route('admin.users')" class="btn btn-ghost btn-sm">All users</Link>
             <Link v-if="hasTrafficPage" :href="route('admin.traffic.user', user.id)" class="btn btn-outline btn-sm">
@@ -173,5 +173,5 @@ const refusal = computed(() => page.props.errors?.user ?? page.props.errors?.pas
                 </DangerButton>
             </template>
         </ConfirmationModal>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

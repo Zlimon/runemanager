@@ -3,7 +3,7 @@ import { computed } from "vue";
 import dayjs from "dayjs";
 import { Link, router } from "@inertiajs/vue3";
 import { formatBytes } from "@/composables/useAdminFormatters.js";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
+import SettingsLayout from "@/Layouts/SettingsLayout.vue";
 import Card from "@/Components/Cards/Card.vue";
 import StatTile from "@/Components/Display/StatTile.vue";
 import DataTable from "@/Components/Tables/DataTable.vue";
@@ -24,7 +24,7 @@ const hasUserPage = route().has('admin.users.show');
 const modeLabel = (mode) => mode.charAt(0).toUpperCase() + mode.slice(1);
 
 // Each tile links to the admin page that owns the number it shows, so the
-// overview doubles as a set of shortcuts on top of AdminNav.
+// overview doubles as a set of shortcuts on top of SettingsNav.
 const tiles = computed(() => [
     { label: 'Users', value: props.stats.users, href: route('admin.users') },
     { label: 'Suspended', value: props.stats.suspended_users, href: route('admin.users', { status: 'suspended' }) },
@@ -56,7 +56,7 @@ const formatSync = (value) => (value ? dayjs(value).fromNow() : 'Never');
 </script>
 
 <template>
-    <AdminLayout title="Admin">
+    <SettingsLayout title="Admin">
         <div class="space-y-8">
             <Card>
                 <p class="text-sm text-base-content/60">Instance mode</p>
@@ -166,5 +166,5 @@ const formatSync = (value) => (value ? dayjs(value).fromNow() : 'Never');
                 </Card>
             </div>
         </div>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

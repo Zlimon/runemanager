@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { formatArticleDateTime } from '@/composables/useAdminFormatters.js';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import DataTable from '@/Components/Tables/DataTable.vue';
 import Badge from '@/Components/Display/Badge.vue';
 import DialogModal from '@/Components/Modals/DialogModal.vue';
@@ -65,7 +65,7 @@ const destroy = (announcement) => {
 </script>
 
 <template>
-    <AdminLayout title="Announcements">
+    <SettingsLayout title="Announcements">
         <template #actions>
             <PrimaryButton @click="openCreate">New announcement</PrimaryButton>
         </template>
@@ -136,5 +136,5 @@ const destroy = (announcement) => {
                 </PrimaryButton>
             </template>
         </DialogModal>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

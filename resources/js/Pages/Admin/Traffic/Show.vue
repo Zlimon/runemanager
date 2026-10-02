@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import Badge from '@/Components/Display/Badge.vue';
 import Card from '@/Components/Cards/Card.vue';
 import ChoiceChips from '@/Components/Tables/ChoiceChips.vue';
@@ -46,7 +46,7 @@ const hasUserPage = route().has('admin.users.show');
 </script>
 
 <template>
-    <AdminLayout :title="`Plugin traffic · ${user.name}`">
+    <SettingsLayout :title="`Plugin traffic · ${user.name}`">
         <template #actions>
             <ChoiceChips v-model="form.window" :options="windowOptions" label="Time window" />
         </template>
@@ -140,5 +140,5 @@ const hasUserPage = route().has('admin.users.show');
                 <RequestsFeed :requests="requests" :only="['requests', 'flag']" :show-user="false" />
             </section>
         </div>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

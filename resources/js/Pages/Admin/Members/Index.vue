@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
+import SettingsLayout from "@/Layouts/SettingsLayout.vue";
 import Card from "@/Components/Cards/Card.vue";
 import InputError from "@/Components/Form/InputError.vue";
 import InputLabel from "@/Components/Form/InputLabel.vue";
@@ -37,7 +37,7 @@ const intro = computed(() => props.mode === 'clan'
 </script>
 
 <template>
-    <AdminLayout title="Members">
+    <SettingsLayout title="Members">
         <div class="max-w-3xl space-y-6">
             <p class="text-sm text-base-content/60">{{ intro }}</p>
 
@@ -94,5 +94,5 @@ const intro = computed(() => props.mode === 'clan'
                 </table>
             </Card>
         </div>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

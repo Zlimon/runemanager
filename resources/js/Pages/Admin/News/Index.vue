@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
 import { formatArticleDateTime } from '@/composables/useAdminFormatters.js';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import DataTable from '@/Components/Tables/DataTable.vue';
 import Badge from '@/Components/Display/Badge.vue';
 import Search from '@/Components/Form/Search.vue';
@@ -65,7 +65,7 @@ const destroy = (post) => {
 </script>
 
 <template>
-    <AdminLayout title="News">
+    <SettingsLayout title="News">
         <template #actions>
             <Link :href="route('news.create')">
                 <PrimaryButton>Write article</PrimaryButton>
@@ -95,5 +95,5 @@ const destroy = (post) => {
             </template>
             <template #empty>No news posts match this search.</template>
         </DataTable>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

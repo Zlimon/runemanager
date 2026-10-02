@@ -1,87 +1,32 @@
 <script setup>
-import { computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
-import { adminItemsForSettingsHub } from '@/composables/useAdminNav.js';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import SettingsNav from '@/Layouts/Partials/SettingsNav.vue';
 
 /*
- * Shared chrome for the settings hub: a left section list + a content slot on
- * the right. Account sections are available to everyone; the Instance group is
- * admin-only. Each section is its own route, so the sidebar is plain Inertia
- * navigation with the active link highlighted.
- *
- * The Admin group below reuses composables/useAdminNav.js's item list (the
- * same one AdminNav renders) so an admin who lands here from a Settings link
- * — General, Feed, Integrations, Branding, Calendar — has a way back to
- * Users, Traffic, News, Announcements, Screenshots and Resource packs without
- * detouring through the dashboard.
+ * The one frame for every account settings and admin page: SettingsNav on the
+ * left, the page title (with an optional `actions` slot for page buttons such
+ * as "Add member") and content on the right. Both areas render through this
+ * same layout so the sidebar never moves when navigating between them.
  */
 defineProps({
     title: { type: String, default: 'Settings' },
 });
-
-const page = usePage();
-
-const accountSections = computed(() => [
-    { label: 'Profile', route: 'profile.show', active: 'profile.show' },
-    { label: 'Appearance', route: 'themes.index', active: 'themes.*' },
-    { label: 'Privacy', route: 'privacy.index', active: 'privacy.*' },
-    { label: 'Screenshots', route: 'screenshots.index', active: 'screenshots.*' },
-    ...(page.props.jetstream?.hasApiFeatures
-        ? [{ label: 'API tokens', route: 'api-tokens.index', active: 'api-tokens.*' }]
-        : []),
-]);
-
-const instanceSections = computed(() => page.props.is_admin ? [
-    { label: 'General', route: 'admin.settings', active: 'admin.settings' },
-    { label: 'Branding', route: 'admin.branding', active: 'admin.branding' },
-    { label: 'Feed & sync', route: 'admin.feed', active: 'admin.feed' },
-    { label: 'Integrations', route: 'admin.integrations', active: 'admin.integrations' },
-    { label: 'Calendar', route: 'admin.calendar', active: 'admin.calendar' },
-] : []);
-
-const adminSections = computed(() => (page.props.is_admin ? adminItemsForSettingsHub(page) : []));
-
-const groups = computed(() => [
-    { heading: 'Account', sections: accountSections.value },
-    ...(instanceSections.value.length ? [{ heading: 'Instance', sections: instanceSections.value }] : []),
-    ...(adminSections.value.length ? [{ heading: 'Admin', sections: adminSections.value }] : []),
-]);
 </script>
 
 <template>
     <AppLayout :title="title">
         <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <h1 class="header-chatbox-sword mb-8 text-center text-2xl font-bold">Settings</h1>
-
             <div class="flex flex-col gap-8 md:flex-row">
-                <!-- Section list -->
-                <nav class="shrink-0 md:w-56">
-                    <div v-for="group in groups" :key="group.heading" class="mb-4">
-                        <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-base-content/50">
-                            {{ group.heading }}
-                        </p>
-                        <ul class="space-y-1">
-                            <li v-for="section in group.sections" :key="section.route">
-                                <!-- The DaisyUI classes below are the untextured
-                                     rendering; `settings-nav-link` / `is-active`
-                                     are the hooks app.css repaints from the pack
-                                     palette when one is loaded. -->
-                                <Link :href="route(section.route)"
-                                      class="settings-nav-link block rounded px-3 py-2 text-sm"
-                                      :class="route().current(section.active)
-                                          ? 'is-active bg-base-300 font-semibold text-base-content'
-                                          : 'text-base-content/70 hover:bg-base-300/50'">
-                                    {{ section.label }}
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
+                <SettingsNav />
 
-                <!-- Section content -->
                 <div class="min-w-0 flex-1">
-                    <h2 class="mb-4 text-xl font-bold">{{ title }}</h2>
+                    <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2">
+                        <h1 class="header-chatbox-sword text-2xl font-bold">{{ title }}</h1>
+                        <div v-if="$slots.actions" class="flex flex-wrap gap-2">
+                            <slot name="actions" />
+                        </div>
+                    </div>
+
                     <slot />
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
+import SettingsLayout from "@/Layouts/SettingsLayout.vue";
 import Badge from "@/Components/Display/Badge.vue";
 import Card from "@/Components/Cards/Card.vue";
 import PrimaryButton from "@/Components/Buttons/PrimaryButton.vue";
@@ -78,7 +78,7 @@ const confirmInstall = () => {
 </script>
 
 <template>
-    <AdminLayout title="Resource packs">
+    <SettingsLayout title="Resource packs">
         <div class="max-w-5xl space-y-6">
             <!-- The bundled default's files are gone — every pack falls back to it,
                  so prompt to restore them. -->
@@ -201,5 +201,5 @@ const confirmInstall = () => {
         <ResourcePackInstallModal ref="installer"
                                   :install-url="route('admin.packs.install')"
                                   :status-url="route('user.resource-pack.status')" />
-    </AdminLayout>
+    </SettingsLayout>
 </template>

@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import debounce from 'lodash/debounce';
 import { Link, router } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import Badge from '@/Components/Display/Badge.vue';
 import ChoiceChips from '@/Components/Tables/ChoiceChips.vue';
 import DataTable from '@/Components/Tables/DataTable.vue';
@@ -49,7 +49,7 @@ const columns = [
 </script>
 
 <template>
-    <AdminLayout title="Users">
+    <SettingsLayout title="Users">
         <div class="space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <Search v-model="form.search" class="w-full max-w-sm" placeholder="Search name or email" />
@@ -87,5 +87,5 @@ const columns = [
                 <template #empty>No users match.</template>
             </DataTable>
         </div>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

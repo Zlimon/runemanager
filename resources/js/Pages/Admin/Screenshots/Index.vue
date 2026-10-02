@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import Card from '@/Components/Cards/Card.vue';
 import Badge from '@/Components/Display/Badge.vue';
 import Checkbox from '@/Components/Form/Checkbox.vue';
@@ -115,7 +115,7 @@ const deleteCount = computed(() => confirmingDelete.value?.length ?? 0);
 </script>
 
 <template>
-    <AdminLayout title="Screenshots">
+    <SettingsLayout title="Screenshots">
         <p class="mb-6 text-sm text-base-content/70">
             Every screenshot the plugin has attached to a feed event, across every account. Hidden screenshots stay
             visible here — only players and guests are kept from them. Deleting a screenshot keeps its event.
@@ -230,5 +230,5 @@ const deleteCount = computed(() => confirmingDelete.value?.length ?? 0);
                 <DangerButton class="ms-3" @click="destroy">Delete</DangerButton>
             </template>
         </ConfirmationModal>
-    </AdminLayout>
+    </SettingsLayout>
 </template>

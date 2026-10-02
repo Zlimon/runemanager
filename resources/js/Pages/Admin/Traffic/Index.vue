@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SettingsLayout from '@/Layouts/SettingsLayout.vue';
 import Card from '@/Components/Cards/Card.vue';
 import ChoiceChips from '@/Components/Tables/ChoiceChips.vue';
 import DataTable from '@/Components/Tables/DataTable.vue';
@@ -59,7 +59,7 @@ const topUserColumns = [
 </script>
 
 <template>
-    <AdminLayout title="Plugin traffic">
+    <SettingsLayout title="Plugin traffic">
         <template #actions>
             <ChoiceChips v-model="form.window" :options="windowOptions" label="Time window" />
         </template>
@@ -152,5 +152,5 @@ const topUserColumns = [
                 <RequestsFeed :requests="flagged" :only="['flagged', 'filters']" />
             </section>
         </div>
-    </AdminLayout>
+    </SettingsLayout>
 </template>
