@@ -135,7 +135,7 @@ const clearPhotoFileInput = () => {
             <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="icon_id" value="Icon" />
                 <ItemPicker id="icon_id" v-model="form.icon_id" :model-item="iconItem" class="mt-1"
-                            :error="!!form.errors.icon_id" placeholder="Search for an item…" />
+                            :error="!!form.errors.icon_id" placeholder="Search for an item…" random />
                 <p class="mt-1 text-xs text-base-content/60">Shown next to your accounts across the site.</p>
                 <InputError :message="form.errors.icon_id" class="mt-2" />
             </div>

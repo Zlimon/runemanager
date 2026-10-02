@@ -5,6 +5,7 @@ import AuthenticationCardLogo from '@/Components/Auth/AuthenticationCardLogo.vue
 import Checkbox from '@/Components/Form/Checkbox.vue';
 import InputError from '@/Components/Form/InputError.vue';
 import InputLabel from '@/Components/Form/InputLabel.vue';
+import ItemPicker from '@/Components/Game/Items/ItemPicker.vue';
 import PrimaryButton from '@/Components/Buttons/PrimaryButton.vue';
 import TextInput from '@/Components/Form/TextInput.vue';
 import SelectInput from '@/Components/Form/SelectInput.vue';
@@ -12,6 +13,7 @@ import SelectInput from '@/Components/Form/SelectInput.vue';
 const props = defineProps({
     rosterRequired: { type: Boolean, default: false },
     rosterAccounts: { type: Array, default: () => [] },
+    defaultIcon: { type: Object, default: null }, // { id, name, icon }: a random starting avatar icon
 });
 
 const form = useForm({
@@ -20,6 +22,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     account_id: '',
+    icon_id: props.defaultIcon?.id ?? null,
     terms: false,
 });
 
@@ -94,6 +97,14 @@ const submit = () => {
                     autocomplete="username"
                 />
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="icon_id" value="Icon" />
+                <ItemPicker id="icon_id" v-model="form.icon_id" :model-item="defaultIcon" class="mt-1"
+                            :error="form.errors.icon_id !== undefined" placeholder="Search for an item…" random />
+                <p class="mt-1 text-xs text-base-content/60">Shown next to your accounts. You can change it later.</p>
+                <InputError class="mt-2" :message="form.errors.icon_id" />
             </div>
 
             <div class="mt-4">

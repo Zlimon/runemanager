@@ -387,6 +387,7 @@ it('turns the opt-in off when a released account is claimed on registration', fu
         'password' => 'password',
         'password_confirmation' => 'password',
         'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
         'account_id' => $released->id,
     ])->assertRedirect();
 

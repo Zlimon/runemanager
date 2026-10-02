@@ -450,7 +450,7 @@ it('rejects an item search term longer than 64 characters', function () {
         ->assertJsonValidationErrors('q');
 });
 
-it('requires authentication to search items', function () {
-    $this->get(route('items.search', ['q' => 'whip']))
-        ->assertRedirect(route('login'));
+it('lets guests search items, since the register page picks an icon', function () {
+    $this->getJson(route('items.search', ['q' => 'whip']))
+        ->assertOk();
 });

@@ -2,9 +2,8 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\Item;
 use App\Models\User;
-use Closure;
+use App\Rules\CatalogueItem;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -24,16 +23,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
             // The OSRS item shown as the user's avatar; must exist in the catalogue.
-            'icon_id' => ['sometimes', 'required', 'integer', 'min:1', function (string $attribute, mixed $value, Closure $fail): void {
-                if (Item::lookupByOsrsId((int) $value)['name'] === '') {
-                    $fail('That item does not exist.');
-                }
-            }],
+            'icon_id' => ['required', 'integer', 'min:1', new CatalogueItem],
         ])->validateWithBag('updateProfileInformation');
 
-        if (isset($input['icon_id'])) {
-            $user->forceFill(['icon_id' => (int) $input['icon_id']])->save();
-        }
+        $user->forceFill(['icon_id' => (int) $input['icon_id']])->save();
 
         if (isset($input['photo'])) {
             $user->updateProfilePhoto($input['photo']);

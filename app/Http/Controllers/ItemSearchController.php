@@ -7,9 +7,10 @@ use App\Models\Item;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Typeahead over the static OSRS item catalogue, backing the calendar's item
- * picker. Read-only and members-only — the catalogue is large, so
- * results are capped rather than paginated.
+ * Typeahead over the static OSRS item catalogue, backing the item picker
+ * (calendar events, avatar icons). Read-only and public, since the register
+ * page uses it; the catalogue is large, so results are capped rather than
+ * paginated.
  */
 class ItemSearchController extends Controller
 {

@@ -10,12 +10,16 @@ import TextInput from "@/Components/Form/TextInput.vue";
  * name) from the search results it fetches, or from `modelItem` when the
  * caller already has one on hand (e.g. editing an event that already has an
  * item attached) so we don't need an id → item lookup endpoint.
+ *
+ * `random` adds a "Click for random icon" button that swaps in a random
+ * catalogue item (the avatar icon on the register and profile pages).
  */
 const props = defineProps({
     modelValue: { type: Number, default: null },
     modelItem: { type: Object, default: null }, // { id, name, icon } | null
     error: { type: Boolean, default: false },
     placeholder: { type: String, default: "Search items…" },
+    random: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -65,6 +69,15 @@ const select = (item) => {
     open.value = false;
 };
 
+const rolling = ref(false);
+
+const pickRandom = () => {
+    rolling.value = true;
+    window.axios.get(route("items.random"))
+        .then(({ data }) => { if (data) select(data); })
+        .finally(() => { rolling.value = false; });
+};
+
 const clear = () => {
     resolved.value = null;
     emit("update:modelValue", null);
@@ -108,5 +121,9 @@ const onFocusOut = (event) => {
                 </template>
             </div>
         </template>
+        <button v-if="random" type="button" class="link link-hover mt-1 text-xs text-base-content/70"
+                :disabled="rolling" @click="pickRandom">
+            {{ rolling ? "Picking…" : "Click for random icon" }}
+        </button>
     </div>
 </template>

@@ -41,11 +41,7 @@ class JetstreamServiceProvider extends ServiceProvider
 
         // The profile form's avatar picker shows the current icon item.
         Jetstream::inertia()->whenRendering('Profile/Show', function (Request $request, array $data): array {
-            $item = Item::lookupByOsrsId($request->user()->icon_id);
-
-            return $data + [
-                'iconItem' => $item['name'] === '' ? null : ['id' => $item['_id'], 'name' => $item['name'], 'icon' => $item['icon']],
-            ];
+            return $data + ['iconItem' => Item::forPicker((int) $request->user()->icon_id)];
         });
     }
 

@@ -27,6 +27,7 @@ function registerPayload(array $overrides = []): array
         'password' => 'password',
         'password_confirmation' => 'password',
         'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
     ], $overrides);
 }
 

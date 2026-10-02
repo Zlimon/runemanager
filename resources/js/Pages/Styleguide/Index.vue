@@ -280,6 +280,7 @@ const choice = ref("b");
 const query = ref("");
 const saved = ref(true);
 const activeTab = ref("two");
+const pickedIcon = ref(null);
 const pickedItem = ref(null);
 const pickedPack = ref("");
 
@@ -1084,6 +1085,7 @@ const showConfirm = (action) => {
                             <div class="grid gap-4 md:grid-cols-2">
                                 <ItemPicker v-model="pickedItem" />
                                 <ItemPicker :model-value="null" error />
+                                <ItemPicker v-model="pickedIcon" random />
                             </div>
                         </div>
                     </div>

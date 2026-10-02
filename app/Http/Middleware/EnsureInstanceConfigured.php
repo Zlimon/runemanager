@@ -37,7 +37,8 @@ class EnsureInstanceConfigured
 
     /**
      * Routes that must stay reachable during setup: authentication (so the owner
-     * can sign in), the setup page itself, and per-user preferences.
+     * can sign in), the setup page itself, per-user preferences, and the item
+     * picker the register page uses.
      */
     private function isExempt(Request $request): bool
     {
@@ -47,6 +48,7 @@ class EnsureInstanceConfigured
             'password.*', 'two-factor.*',
             'admin.settings', 'admin.settings.update',
             'user.*',
+            'items.search', 'items.random',
         );
     }
 }

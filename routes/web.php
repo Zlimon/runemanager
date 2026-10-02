@@ -15,6 +15,7 @@ use App\Http\Controllers\MapEventsController;
 use App\Http\Controllers\News;
 use App\Http\Controllers\PrivacySettingsController;
 use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\RandomItemController;
 use App\Http\Controllers\ScreenshotFileController;
 use App\Http\Controllers\ScreenshotsController;
 use App\Http\Controllers\StyleguideController;
@@ -66,6 +67,14 @@ Route::put('/dark-mode', [UserDarkModeController::class, 'update'])->name('dark-
 // offers the light/dark toggle. Guests persist to a cookie, users to their account.
 Route::put('/user/resource-pack', [UserResourcePackController::class, 'update'])
     ->name('user.resource-pack.update');
+
+// The static item catalogue behind the item picker (calendar events, avatar
+// icons). Public because the register page picks an icon before there is a
+// login, and exempt from the setup gate for the first owner's registration.
+Route::middleware('throttle:60,1,items')->group(function () {
+    Route::get('/items/search', ItemSearchController::class)->name('items.search');
+    Route::get('/items/random', RandomItemController::class)->name('items.random');
+});
 
 // Component gallery for validating resource-pack textures against every
 // installed pack. Open locally on purpose: a login between a developer (or a
@@ -209,9 +218,6 @@ Route::middleware([
         ->name('calendar.rsvp');
     Route::delete('/calendar/{calendarEvent}/rsvp', [CalendarEventController::class, 'destroyRsvp'])
         ->name('calendar.rsvp.destroy');
-
-    // Typeahead over the static item catalogue, for the calendar's item picker.
-    Route::get('/items/search', ItemSearchController::class)->name('items.search');
 
     Route::middleware('can:manage announcements')->group(function () {
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');

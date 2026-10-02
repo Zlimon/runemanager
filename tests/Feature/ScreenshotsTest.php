@@ -566,6 +566,7 @@ it('deletes a released account\'s screenshots when it is claimed on registration
         'password' => 'password',
         'password_confirmation' => 'password',
         'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
         'account_id' => $released->id,
     ])->assertRedirect();
 

@@ -264,6 +264,21 @@ class Item extends Model
     }
 
     /**
+     * The `{id, name, icon}` shape the item picker shows, or null when the
+     * catalogue has no such item.
+     *
+     * @return array{id: int, name: string, icon: ?string}|null
+     */
+    public static function forPicker(int $osrsId): ?array
+    {
+        $item = $osrsId > 0 ? self::lookupByOsrsId($osrsId) : null;
+
+        return $item === null || $item['name'] === ''
+            ? null
+            : ['id' => $item['_id'], 'name' => $item['name'], 'icon' => $item['icon']];
+    }
+
+    /**
      * Single-item form of {@see self::lookupByOsrsIds()}; an unknown id yields
      * the same shape with empty values rather than null.
      *

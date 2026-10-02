@@ -47,6 +47,7 @@ class RegistrationTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+            'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
         ]);
 
         $this->assertAuthenticated();
@@ -65,6 +66,7 @@ class RegistrationTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+            'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
         ]);
 
         $this->post('/logout');
@@ -75,6 +77,7 @@ class RegistrationTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+            'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
         ]);
 
         $first = User::where('email', 'first@example.com')->firstOrFail();

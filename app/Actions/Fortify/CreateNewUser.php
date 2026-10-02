@@ -3,9 +3,9 @@
 namespace App\Actions\Fortify;
 
 use App\Models\Account;
-use App\Models\Item;
 use App\Models\Team;
 use App\Models\User;
+use App\Rules\CatalogueItem;
 use App\Support\Instance;
 use App\Support\Roles;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +35,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
+            // The OSRS item shown as the user's avatar.
+            'icon_id' => ['required', 'integer', 'min:1', new CatalogueItem],
             'account_id' => $rosterRequired
                 ? ['required', 'integer', Rule::exists('accounts', 'id')->whereNull('user_id')]
                 : ['nullable'],
@@ -42,6 +44,7 @@ class CreateNewUser implements CreatesNewUsers
         ], [
             'account_id.required' => 'Select the account you own to register.',
             'account_id.exists' => 'That account is unavailable — it may already be claimed.',
+            'icon_id.required' => 'Pick an icon.',
         ])->validate();
 
         return DB::transaction(function () use ($input, $rosterRequired) {
@@ -49,7 +52,7 @@ class CreateNewUser implements CreatesNewUsers
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
-                'icon_id' => Item::randomItemId(),
+                'icon_id' => (int) $input['icon_id'],
             ]), function (User $user) {
                 $this->createTeam($user);
                 $this->assignDefaultRole($user);

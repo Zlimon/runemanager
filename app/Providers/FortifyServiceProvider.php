@@ -8,6 +8,7 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Middleware\EnsureUserIsNotSuspended;
 use App\Models\Account;
+use App\Models\Item;
 use App\Models\User;
 use App\Services\Users\CredentialCheck;
 use App\Support\Instance;
@@ -76,6 +77,8 @@ class FortifyServiceProvider extends ServiceProvider
                         ->map(fn (Account $account): array => ['id' => $account->id, 'username' => $account->username])
                         ->all()
                     : [],
+                // A random avatar icon the form starts with.
+                'defaultIcon' => Item::forPicker(Item::randomItemId()),
             ]);
         });
 
