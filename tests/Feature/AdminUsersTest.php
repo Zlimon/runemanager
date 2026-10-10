@@ -37,7 +37,8 @@ it('forbids users without manage instance', function () {
 });
 
 it('lists users with counts, roles and the last token use', function () {
-    $admin = adminUser();
+    // The list sorts by name; pin the admin's so it always sorts after Bob.
+    $admin = tap(adminUser())->update(['name' => 'Zara Admin']);
     $member = plainUser(['name' => 'Bob Member']);
     Account::factory()->count(2)->create(['user_id' => $member->id]);
     $member->createToken('plugin');
