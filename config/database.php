@@ -119,7 +119,7 @@ return [
         'mongodb-static' => [
             'driver' => 'mongodb',
             'dsn' => env('MONGODB_STATIC_URI'),
-            'database' => env('MONGODB_STATIC_DATABASE', 'runemanager-static'),
+            'database' => env('MONGODB_STATIC_DATABASE', 'gamedata'),
         ],
 
     ],
