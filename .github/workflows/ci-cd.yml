@@ -5,12 +5,76 @@ on:
     branches:
       - master
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  # On pull requests from this repo, commit Pint's fixes to the branch instead of failing on them.
+  # Pushes made with GITHUB_TOKEN don't start workflows, so this dispatches the run for the fixed
+  # commit itself, and ci skips the unformatted one. Dependabot's token is read-only: its PRs still
+  # just fail the style check.
+  pint:
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    permissions:
+      contents: write
+      actions: write
+
+    outputs:
+      fixed: ${{ steps.commit.outputs.fixed }}
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.5'
+          tools: composer:v2
+          coverage: none
+
+      # Only Pint runs here, so extensions and package scripts aren't needed.
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist --no-scripts --ignore-platform-reqs
+
+      - name: Run Pint
+        run: vendor/bin/pint
+
+      - name: Commit fixes
+        id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          if git diff --quiet; then
+            echo "fixed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit --all --quiet --message 'Apply Pint formatting'
+          git push origin "HEAD:${BRANCH}"
+          gh workflow run ci-cd.yml --ref "$BRANCH"
+          echo "::notice::Pushed Pint fixes to ${BRANCH}; CI runs on the new commit."
+          echo "fixed=true" >> "$GITHUB_OUTPUT"
+
   ci:
+    needs: pint
+    if: ${{ !cancelled() && needs.pint.outputs.fixed != 'true' }}
+
+    permissions:
+      contents: read
+      statuses: write
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 
@@ -106,9 +170,23 @@ jobs:
       - name: Run tests
         run: php artisan test --compact
 
+      - name: Report result on the pull request
+        if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATE: ${{ job.status == 'success' && 'success' || 'failure' }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state="$STATE" -f context=ci -f target_url="$RUN_URL" \
+            -f description="Tests on the Pint-formatted commit"
+
   deploy:
     needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # ci runs after a skipped pint job, so check its result explicitly; manual runs never deploy.
+    if: >-
+      ${{ !cancelled() && needs.ci.result == 'success'
+      && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: production
