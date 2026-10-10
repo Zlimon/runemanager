@@ -4,8 +4,10 @@ use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\ResourcePacks\ResourcePackHub;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -70,7 +72,7 @@ it('caches a missing pack.properties so it is not refetched on every dialog', fu
 
 it('does not cache a network failure, since it says nothing about the pack', function () {
     $hub = propertiesHub([
-        new \GuzzleHttp\Exception\ConnectException('down', new \GuzzleHttp\Psr7\Request('GET', 'x')),
+        new ConnectException('down', new Request('GET', 'x')),
         new Response(200, [], "author=Someone\n"),
     ]);
 

@@ -1,8 +1,13 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\FortifyServiceProvider;
+use App\Providers\JetstreamServiceProvider;
+use MongoDB\Laravel\MongoDBServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
-    App\Providers\JetstreamServiceProvider::class,
-    MongoDB\Laravel\MongoDBServiceProvider::class,
+    AppServiceProvider::class,
+    FortifyServiceProvider::class,
+    JetstreamServiceProvider::class,
+    MongoDBServiceProvider::class,
 ];
