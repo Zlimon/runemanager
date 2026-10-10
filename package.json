@@ -6,31 +6,31 @@
         "build": "vite build"
     },
     "devDependencies": {
-        "@inertiajs/vue3": "^3.3.0",
-        "@tailwindcss/typography": "^0.5.19",
-        "@tailwindcss/vite": "^4.3.0",
-        "@vitejs/plugin-vue": "^6.0.7",
-        "axios": "^1.16.1",
-        "daisyui": "^5.5.20",
-        "laravel-vite-plugin": "^3.1.0",
+        "@inertiajs/vue3": "^3.8.0",
+        "@tailwindcss/typography": "^0.5.20",
+        "@tailwindcss/vite": "^4.3.3",
+        "@vitejs/plugin-vue": "^6.0.9",
+        "axios": "^1.20.0",
+        "daisyui": "^5.7.47",
+        "laravel-vite-plugin": "^3.2.0",
         "tailwindcss": "^4.3.0",
-        "vite": "^8.0.16",
-        "vue": "^3.5.35"
+        "vite": "^8.3.2",
+        "vue": "^3.5.43"
     },
     "dependencies": {
         "@popperjs/core": "^2.11.8",
-        "@tiptap/extension-image": "^3.31.3",
-        "@tiptap/extension-placeholder": "^3.31.3",
-        "@tiptap/starter-kit": "^3.31.3",
-        "@tiptap/vue-3": "^3.31.3",
+        "@tiptap/extension-image": "^3.31.4",
+        "@tiptap/extension-placeholder": "^3.31.4",
+        "@tiptap/starter-kit": "^3.31.4",
+        "@tiptap/vue-3": "^3.31.4",
         "chart.js": "^4.5.1",
-        "dayjs": "^1.11.21",
-        "laravel-echo": "^2.3.7",
+        "dayjs": "^1.11.23",
+        "laravel-echo": "^2.5.0",
         "laravel-vue-pagination": "^4.1.3",
         "leaflet": "^1.9.4",
         "lodash": "^4.18.1",
-        "pusher-js": "^8.5.0",
-        "three": "^0.184.0",
+        "pusher-js": "^8.6.0",
+        "three": "^0.186.1",
         "v-calendar": "^3.1.2"
     }
 }
