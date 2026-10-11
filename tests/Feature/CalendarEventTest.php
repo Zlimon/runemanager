@@ -7,15 +7,12 @@ use App\Models\Item;
 use App\Models\User;
 use App\Support\Instance;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia;
 use MongoDB\Driver\Monitoring\CommandFailedEvent;
 use MongoDB\Driver\Monitoring\CommandStartedEvent;
 use MongoDB\Driver\Monitoring\CommandSubscriber;
 use MongoDB\Driver\Monitoring\CommandSucceededEvent;
-
-uses(RefreshDatabase::class);
 
 /*
  * mongodb-static holds the real item catalogue and is shared + read-only in

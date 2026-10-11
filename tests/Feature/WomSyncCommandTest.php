@@ -6,12 +6,9 @@ use App\Models\Account;
 use App\Models\User;
 use App\Models\WomPlayer;
 use App\Services\WiseOldMan\SyncWomPlayer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Http::preventStrayRequests();

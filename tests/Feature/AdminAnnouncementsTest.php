@@ -4,10 +4,7 @@ use App\Models\Account;
 use App\Models\Announcement;
 use App\Models\User;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 it('forbids guests from the admin announcements page', function () {
     $this->get(route('admin.announcements'))->assertRedirect(route('login'));

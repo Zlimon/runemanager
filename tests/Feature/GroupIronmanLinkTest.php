@@ -4,10 +4,7 @@ use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\User;
 use App\Support\Instance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function gimHeaders(string $hash, string $username, ?string $type = null): array
 {

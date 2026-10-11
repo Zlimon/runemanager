@@ -4,13 +4,10 @@ use App\Models\Account;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
 use App\Services\WiseOldMan\BackfillWomSnapshots;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Http::preventStrayRequests();

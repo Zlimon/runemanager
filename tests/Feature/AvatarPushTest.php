@@ -7,14 +7,11 @@ use App\Services\Accounts\DeleteAccount;
 use App\Services\Accounts\MoveAvatarsToRandomDirectories;
 use App\Services\Accounts\StoreAvatar;
 use App\Services\Instance\ResetInstanceData;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('public');

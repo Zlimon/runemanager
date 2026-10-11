@@ -10,11 +10,8 @@ use App\Models\User;
 use App\Services\Instance\AdminOverview;
 use App\Support\Roles;
 use Database\Factories\ResourcePackFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use MongoDB\BSON\UTCDateTime;
-
-uses(RefreshDatabase::class);
 
 /**
  * Log one plugin request directly (mirrors PluginTrafficTest's trafficLog(),

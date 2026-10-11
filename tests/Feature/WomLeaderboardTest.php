@@ -4,9 +4,6 @@ use App\Models\Account;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
 use App\Services\WiseOldMan\WomLeaderboard;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 /**
  * A board member with a snapshot 8 days ago and one today.

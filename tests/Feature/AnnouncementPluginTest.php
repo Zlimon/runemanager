@@ -3,10 +3,7 @@
 use App\Models\Account;
 use App\Models\Announcement;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function announcementPluginHeaders(string $hash = 'hash-ann', string $username = 'Zlimon'): array
 {

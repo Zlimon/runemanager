@@ -5,9 +5,6 @@ use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
 use App\Services\WiseOldMan\WomMetricGains;
 use App\Services\WiseOldMan\WomSnapshotHistory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 /**
  * One daily snapshot with its metric maps; pass null for a map to store a

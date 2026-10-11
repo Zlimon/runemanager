@@ -3,10 +3,7 @@
 use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /**
  * @param  array<string, array<string, int>>  $skills

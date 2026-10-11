@@ -4,10 +4,7 @@ use App\Models\Account;
 use App\Models\CalendarEvent;
 use App\Models\CalendarEventRsvp;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 it('lets a member rsvp with an account they own', function () {
     $member = adminUser(Roles::USER);

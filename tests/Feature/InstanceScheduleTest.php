@@ -3,10 +3,7 @@
 use App\Helpers\SettingHelper;
 use App\Support\Instance;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-
-uses(RefreshDatabase::class);
 
 it('reads the configured hiscore refresh cadence', function () {
     SettingHelper::setSetting('hiscore_refresh_minutes', 30, 'int');

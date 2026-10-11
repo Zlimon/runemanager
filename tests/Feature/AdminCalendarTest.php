@@ -4,10 +4,7 @@ use App\Models\CalendarEvent;
 use App\Models\User;
 use App\Support\Instance;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 it('forbids guests from the admin calendar page', function () {
     $this->get(route('admin.calendar'))->assertRedirect(route('login'));

@@ -4,12 +4,9 @@ use App\Events\AccountDataUpdated;
 use App\Models\Account;
 use App\Models\AccountDiary;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function diaryHeaders(string $hash = 'hash-diary', string $username = 'Zlimon'): array
 {

@@ -5,10 +5,7 @@ use App\Models\AccountCombatAchievement;
 use App\Models\AccountHiscore;
 use App\Models\Loot;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /**
  * A board whose rows all tie has no order of its own, so without a final

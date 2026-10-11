@@ -7,11 +7,8 @@ use App\Models\WomAchievement;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
 use App\Models\WomRecord;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Http::preventStrayRequests();

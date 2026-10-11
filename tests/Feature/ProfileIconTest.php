@@ -2,13 +2,10 @@
 
 use App\Models\Item;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia;
 use Laravel\Jetstream\Jetstream;
-
-uses(RefreshDatabase::class);
 
 /*
  * The avatar icon is an OSRS item from the read-only catalogue, so these point

@@ -1,9 +1,6 @@
 <?php
 
 use App\Services\ResourcePacks\InstallResourcePack;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('downloads Vanilla when the files are missing', function () {
     $this->mock(InstallResourcePack::class, function ($mock) {

@@ -9,13 +9,10 @@ use App\Models\WomPlayer;
 use App\Services\WiseOldMan\WomCache;
 use App\Services\WiseOldMan\WomLeaderboard;
 use App\Services\WiseOldMan\WomProgress;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Http::preventStrayRequests();

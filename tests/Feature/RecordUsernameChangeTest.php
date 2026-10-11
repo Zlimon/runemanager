@@ -4,9 +4,6 @@ use App\Models\Account;
 use App\Models\User;
 use App\Models\UsernameHistory;
 use App\Services\Accounts\RecordUsernameChange;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 function makeAccountFor(string $username): Account
 {

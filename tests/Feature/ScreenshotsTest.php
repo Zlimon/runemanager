@@ -13,7 +13,6 @@ use App\Services\Screenshots\ScreenshotStorage;
 use App\Support\Instance;
 use App\Support\Roles;
 use Database\Seeders\DemoScreenshotsSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -24,8 +23,6 @@ use Laravel\Fortify\Features;
 use Laravel\Jetstream\Contracts\DeletesUsers;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     config(['inertia.ssr.enabled' => false]);

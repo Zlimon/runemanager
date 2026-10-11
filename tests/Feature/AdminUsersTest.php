@@ -5,13 +5,10 @@ use App\Models\User;
 use App\Services\Users\SuspendUser;
 use App\Services\Users\UpdateUserRole;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia;
 use Spatie\Permission\Models\Role;
-
-uses(RefreshDatabase::class);
 
 function plainUser(array $attributes = []): User
 {

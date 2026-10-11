@@ -7,11 +7,8 @@ use App\Models\GroupBank;
 use App\Models\User;
 use App\Support\Instance;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function groupBankHeaders(string $hash = 'hash-gb', string $username = 'GimGuy'): array
 {

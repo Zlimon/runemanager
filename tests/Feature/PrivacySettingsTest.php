@@ -7,13 +7,10 @@ use App\Models\FeedEvent;
 use App\Models\User;
 use App\Models\WomPlayer;
 use App\Services\WiseOldMan\WomCache;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     config(['inertia.ssr.enabled' => false]);

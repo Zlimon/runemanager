@@ -6,11 +6,8 @@ use App\Models\Item;
 use App\Models\User;
 use App\Services\CollectionLog\CollectionLogView;
 use App\Services\TempleOsrs\TempleOsrsClient;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use MongoDB\Driver\Exception\BulkWriteException;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // RefreshDatabase only resets the SQL DB; the Mongo collection persists across tests.

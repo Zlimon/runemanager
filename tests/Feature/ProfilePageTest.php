@@ -3,10 +3,7 @@
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Support\Instance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /**
  * /user/profile composes its sections through FormSection / ActionSection, which

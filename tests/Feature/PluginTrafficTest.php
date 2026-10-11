@@ -11,7 +11,6 @@ use App\Providers\AppServiceProvider;
 use App\Services\Instance\ResetInstanceData;
 use App\Services\Plugin\PluginTraffic;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
@@ -19,8 +18,6 @@ use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Sanctum\Sanctum;
 use MongoDB\BSON\UTCDateTime;
-
-uses(RefreshDatabase::class);
 
 function trafficUser(string $email = 'traffic@test.local'): User
 {

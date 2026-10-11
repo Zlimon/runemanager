@@ -3,11 +3,8 @@
 use App\Helpers\SettingHelper;
 use App\Support\Instance;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
-uses(RefreshDatabase::class);
 
 it('saves the instance description via settings', function () {
     $this->actingAs(adminUser())

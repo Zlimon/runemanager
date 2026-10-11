@@ -12,9 +12,6 @@ use App\Models\Quest;
 use App\Models\User;
 use App\Support\Instance;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 function groupAdmin(): User
 {

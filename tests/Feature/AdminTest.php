@@ -12,11 +12,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /**
  * Bind a GIM validator backed by a faked OSRS group page: true = a normal page,

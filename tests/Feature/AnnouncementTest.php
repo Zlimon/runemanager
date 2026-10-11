@@ -3,10 +3,7 @@
 use App\Models\Announcement;
 use App\Models\User;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 it('renders the announcements index publicly with only active announcements newest-first', function () {
     $author = User::factory()->withPersonalTeam()->create();

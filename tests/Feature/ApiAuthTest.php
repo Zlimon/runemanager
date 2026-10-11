@@ -1,11 +1,8 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
-
-uses(RefreshDatabase::class);
 
 function makeUser(string $email = 'plugin@test.local', string $password = 'correct-horse'): User
 {

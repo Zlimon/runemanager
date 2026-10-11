@@ -5,11 +5,8 @@ use App\Models\Account;
 use App\Models\User;
 use App\Support\Instance;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     if (! Features::enabled(Features::registration())) {

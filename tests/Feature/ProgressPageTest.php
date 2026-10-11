@@ -5,10 +5,7 @@ use App\Models\Account;
 use App\Models\User;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     SettingHelper::setSetting('wom_enabled', true, 'bool');

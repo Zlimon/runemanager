@@ -6,10 +6,7 @@ use App\Models\Announcement;
 use App\Models\CalendarEvent;
 use App\Services\Webhooks\WebhookPayload;
 use App\Support\Instance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
-
-uses(RefreshDatabase::class);
 
 const HOOK = 'https://discord.com/api/webhooks/123/abc';
 

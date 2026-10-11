@@ -2,10 +2,7 @@
 
 use App\Models\Account;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /**
  * "RuneManager rank" is an account's place among this instance's accounts by

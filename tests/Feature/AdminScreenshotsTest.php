@@ -5,12 +5,9 @@ use App\Models\FeedEvent;
 use App\Models\User;
 use App\Services\Screenshots\ScreenshotStorage;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('local');
