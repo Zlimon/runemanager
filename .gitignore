@@ -23,7 +23,22 @@ yarn-error.log
 /.vscode
 /resources/css/resource-pack*
 /app/Models/Npc*
-/.claude
-.mcp.json
-boost.json
 /.omc
+
+# AI agent files Laravel Boost generates from boost.json. After cloning: `vendor/bin/sail artisan boost:install -n --guidelines --skills --mcp`.
+# Custom guidelines, skills and rules live in .ai/guidelines, .ai/skills and .ai/rules and are committed.
+/.agents
+/.ai/mcp
+/.amp
+/.claude
+/.cursor
+/.factory
+/.grok
+/.junie
+/.kiro
+/.pi
+/.mcp.json
+/AGENTS.md
+/CLAUDE.md
+/opencode.json
+/opencode.jsonc
