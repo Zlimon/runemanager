@@ -86,7 +86,7 @@ jobs:
     # static game data (items/monsters/prayers) that the populate step loads.
     services:
       mongodb:
-        image: mongo:8
+        image: mongo:8.0
         env:
           MONGO_INITDB_ROOT_USERNAME: sail
           MONGO_INITDB_ROOT_PASSWORD: password
