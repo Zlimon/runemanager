@@ -4,10 +4,7 @@ use App\Helpers\SettingHelper;
 use App\Http\Resources\FeedEventResource;
 use App\Models\Account;
 use App\Models\FeedEvent;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-
-uses(RefreshDatabase::class);
 
 it('classifies level-ups: 99 and every tenth level are milestones', function (int $level, bool $milestone) {
     expect(FeedEvent::classify(FeedEvent::TYPE_LEVEL_UP, ['skill' => 'Hunter', 'level' => $level]))

@@ -98,7 +98,7 @@ jobs:
           --health-timeout=5s
           --health-retries=20
 
-    # phpunit.xml selects SQLite (database/testing.sqlite) and the runemanager_testing Mongo DB.
+    # phpunit.xml selects in-memory SQLite and the runemanager_testing Mongo DB.
     env:
       MONGODB_URI: mongodb://sail:password@127.0.0.1:27017/runemanager?authSource=admin
       MONGODB_STATIC_URI: mongodb://sail:password@127.0.0.1:27017/gamedata?authSource=admin
@@ -144,7 +144,6 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate --ansi
-          touch database/testing.sqlite
 
       # Same loader as the local mongodb-static-populate service (data ships in the osrsreboxed package).
       - name: Load static game data

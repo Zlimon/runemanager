@@ -5,7 +5,6 @@ use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\Item;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use MongoDB\Driver\Monitoring\CommandFailedEvent;
 use MongoDB\Driver\Monitoring\CommandStartedEvent;
@@ -14,8 +13,6 @@ use MongoDB\Driver\Monitoring\CommandSucceededEvent;
 
 use function MongoDB\Driver\Monitoring\addSubscriber;
 use function MongoDB\Driver\Monitoring\removeSubscriber;
-
-uses(RefreshDatabase::class);
 
 /**
  * The SQL run while $work executes. Registering the listener is enough to

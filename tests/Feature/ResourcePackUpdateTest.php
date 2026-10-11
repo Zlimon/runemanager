@@ -4,10 +4,7 @@ use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Queue::fake();

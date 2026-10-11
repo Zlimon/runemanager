@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\ResourcePack;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('excludes stub rows still at version pending', function () {
     makePack('pack-ready');

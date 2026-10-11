@@ -4,9 +4,6 @@ use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\ResourcePacks\PackInstallQuota;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 function quotaPack(string $name, ?User $installedBy = null): ResourcePack
 {

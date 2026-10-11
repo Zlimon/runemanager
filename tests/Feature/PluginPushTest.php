@@ -10,13 +10,10 @@ use App\Models\LootingBag;
 use App\Models\Quest;
 use App\Models\User;
 use App\Models\UsernameHistory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // RefreshDatabase only resets SQL; the Mongo collections persist between tests.

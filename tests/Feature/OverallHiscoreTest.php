@@ -3,10 +3,7 @@
 use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 function overallHiscore(Account $account, int $rank, int $level, int $xp): void
 {

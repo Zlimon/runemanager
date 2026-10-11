@@ -2,11 +2,8 @@
 
 use App\Support\Instance;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia as Assert;
-
-uses(RefreshDatabase::class);
 
 it('defaults to disabled, a 30-day window and a members-only progress page', function () {
     expect(Instance::womEnabled())->toBeFalse()

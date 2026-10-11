@@ -4,12 +4,9 @@ use App\Models\Announcement;
 use App\Models\NewsPost;
 use App\Models\User;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /** The smallest valid article payload, for the tests that vary one field. */
 function articlePayload(array $overrides = []): array

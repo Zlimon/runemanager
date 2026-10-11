@@ -41,12 +41,9 @@ use Database\Seeders\LiveWomSeeder;
 use Database\Seeders\SettingsSeeder;
 use Database\Seeders\Support\ItemPool;
 use Database\Seeders\UserSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 afterEach(function () {
     // The writable Mongo collections aren't wrapped by RefreshDatabase.

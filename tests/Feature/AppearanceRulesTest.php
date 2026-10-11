@@ -4,10 +4,7 @@ use App\Helpers\SettingHelper;
 use App\Models\ResourcePack;
 use App\Models\User;
 use App\Support\Instance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /**
  * Appearance rules:

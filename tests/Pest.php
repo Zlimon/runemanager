@@ -13,11 +13,17 @@ use App\Models\User;
 use App\Models\WomDailySnapshot;
 use App\Services\Screenshots\ScreenshotStorage;
 use App\Support\Roles;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-uses(TestCase::class)->in('Feature', 'Unit');
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->in('Feature');
+
+pest()->extend(TestCase::class)
+    ->in('Unit');
 
 /*
 |--------------------------------------------------------------------------

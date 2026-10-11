@@ -13,7 +13,6 @@ use App\Services\Map\EventMap;
 use App\Support\Instance;
 use App\Support\Roles;
 use Database\Seeders\DemoEventPositionsSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -22,8 +21,6 @@ use Laravel\Fortify\Features;
 use Laravel\Jetstream\Contracts\DeletesUsers;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     config(['inertia.ssr.enabled' => false]);

@@ -4,10 +4,7 @@ use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\Loot;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user = User::factory()->withPersonalTeam()->create();

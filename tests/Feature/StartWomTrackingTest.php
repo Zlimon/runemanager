@@ -5,11 +5,8 @@ use App\Models\Account;
 use App\Models\WomPlayer;
 use App\Services\WiseOldMan\StartWomTracking;
 use App\Services\WiseOldMan\StopWomTracking;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Http::preventStrayRequests();

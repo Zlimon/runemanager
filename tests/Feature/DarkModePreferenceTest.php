@@ -3,10 +3,7 @@
 use App\Helpers\SettingHelper;
 use App\Models\User;
 use App\Support\Instance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 it('persists the authenticated user dark-mode preference', function () {
     $user = User::factory()->create(['dark_mode' => false]);

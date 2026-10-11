@@ -5,13 +5,10 @@ use App\Models\ResourcePack;
 use App\Models\User;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Support\Instance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Queue::fake();

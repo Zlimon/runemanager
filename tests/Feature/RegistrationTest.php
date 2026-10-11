@@ -1,89 +1,76 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
-use Tests\TestCase;
 
-class RegistrationTest extends TestCase
-{
-    use RefreshDatabase;
-
-    public function test_registration_screen_can_be_rendered(): void
-    {
-        if (! Features::enabled(Features::registration())) {
-            $this->markTestSkipped('Registration support is not enabled.');
-        }
-
-        $response = $this->get('/register');
-
-        $response->assertStatus(200);
+test('registration screen can be rendered', function () {
+    if (! Features::enabled(Features::registration())) {
+        $this->markTestSkipped('Registration support is not enabled.');
     }
 
-    public function test_registration_screen_cannot_be_rendered_if_support_is_disabled(): void
-    {
-        if (Features::enabled(Features::registration())) {
-            $this->markTestSkipped('Registration support is enabled.');
-        }
+    $response = $this->get('/register');
 
-        $response = $this->get('/register');
+    $response->assertStatus(200);
+});
 
-        $response->assertStatus(404);
+test('registration screen cannot be rendered if support is disabled', function () {
+    if (Features::enabled(Features::registration())) {
+        $this->markTestSkipped('Registration support is enabled.');
     }
 
-    public function test_new_users_can_register(): void
-    {
-        if (! Features::enabled(Features::registration())) {
-            $this->markTestSkipped('Registration support is not enabled.');
-        }
+    $response = $this->get('/register');
 
-        $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
-            'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
-        ]);
+    $response->assertStatus(404);
+});
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+test('new users can register', function () {
+    if (! Features::enabled(Features::registration())) {
+        $this->markTestSkipped('Registration support is not enabled.');
     }
 
-    public function test_first_user_becomes_owner_and_later_users_become_members(): void
-    {
-        if (! Features::enabled(Features::registration())) {
-            $this->markTestSkipped('Registration support is not enabled.');
-        }
+    $response = $this->post('/register', [
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
+    ]);
 
-        $this->post('/register', [
-            'name' => 'First User',
-            'email' => 'first@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
-            'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
-        ]);
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('dashboard', absolute: false));
+});
 
-        $this->post('/logout');
-
-        $this->post('/register', [
-            'name' => 'Second User',
-            'email' => 'second@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
-            'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
-        ]);
-
-        $first = User::where('email', 'first@example.com')->firstOrFail();
-        $second = User::where('email', 'second@example.com')->firstOrFail();
-
-        $this->assertTrue($first->hasRole(Roles::OWNER));
-        $this->assertTrue($second->hasRole(Roles::USER));
+test('first user becomes owner and later users become members', function () {
+    if (! Features::enabled(Features::registration())) {
+        $this->markTestSkipped('Registration support is not enabled.');
     }
-}
+
+    $this->post('/register', [
+        'name' => 'First User',
+        'email' => 'first@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
+    ]);
+
+    $this->post('/logout');
+
+    $this->post('/register', [
+        'name' => 'Second User',
+        'email' => 'second@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        'icon_id' => 4151, // Abyssal whip, from the shared item catalogue
+    ]);
+
+    $first = User::where('email', 'first@example.com')->firstOrFail();
+    $second = User::where('email', 'second@example.com')->firstOrFail();
+
+    $this->assertTrue($first->hasRole(Roles::OWNER));
+    $this->assertTrue($second->hasRole(Roles::USER));
+});

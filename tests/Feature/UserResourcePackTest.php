@@ -5,15 +5,12 @@ use App\Jobs\FetchResourcePackJob;
 use App\Models\ResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Support\Instance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
     Queue::fake();
 });
-
-uses(RefreshDatabase::class);
 
 it('stores an unauthenticated preference as a cookie instead of rejecting it', function () {
     // The route is deliberately public: a guest must be able to opt out of packs

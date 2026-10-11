@@ -4,11 +4,8 @@ use App\Models\WomAchievement;
 use App\Models\WomPlayer;
 use App\Models\WomRecord;
 use App\Services\WiseOldMan\SyncWomMilestones;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Http::preventStrayRequests();

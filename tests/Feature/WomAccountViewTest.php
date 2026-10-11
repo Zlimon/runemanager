@@ -5,9 +5,6 @@ use App\Models\WomAchievement;
 use App\Models\WomPlayer;
 use App\Models\WomRecord;
 use App\Services\WiseOldMan\WomAccountView;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('has no summary before the account was ever looked up', function () {
     expect(app(WomAccountView::class)->summary(Account::factory()->create()))->toBeNull();

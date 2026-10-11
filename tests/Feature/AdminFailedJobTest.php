@@ -1,11 +1,8 @@
 <?php
 
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
-uses(RefreshDatabase::class);
 
 // The failed.driver in config/queue.php is database-uuids, so both
 // queue:retry and the FailedJobProviderInterface address rows by uuid, not

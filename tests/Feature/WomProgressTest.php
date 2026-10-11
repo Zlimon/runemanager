@@ -4,9 +4,6 @@ use App\Models\Account;
 use App\Models\WomDailySnapshot;
 use App\Models\WomPlayer;
 use App\Services\WiseOldMan\WomProgress;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 /**
  * @param  array<string, int>  $skills

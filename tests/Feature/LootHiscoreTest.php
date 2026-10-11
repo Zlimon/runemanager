@@ -3,10 +3,7 @@
 use App\Models\Account;
 use App\Models\Loot;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(fn () => Loot::query()->delete());
 

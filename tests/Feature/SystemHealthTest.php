@@ -4,12 +4,9 @@ use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\CollectionLog;
 use App\Services\Instance\SystemHealth;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->health = new SystemHealth;

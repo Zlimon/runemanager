@@ -3,10 +3,7 @@
 use App\Models\NewsPost;
 use App\Models\User;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 it('forbids guests from the admin news page', function () {
     $this->get(route('admin.news'))->assertRedirect(route('login'));

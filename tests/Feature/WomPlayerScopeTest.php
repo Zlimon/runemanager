@@ -3,9 +3,6 @@
 use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\WomPlayer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('counts only linked, WOM-active profiles that changed within the window as active', function () {
     $active = WomPlayer::factory()->create();

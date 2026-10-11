@@ -3,13 +3,10 @@
 use App\Events\AccountMoved;
 use App\Models\Account;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function mapUser(): User
 {

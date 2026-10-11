@@ -8,9 +8,14 @@ use Illuminate\Support\Facades\Schema;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Render Inertia pages without requiring a compiled Vite manifest, with the instance set up.
+     */
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->withoutVite();
 
         // Treat the instance as already set up by default so the first-time
         // setup gate doesn't redirect every test. Setup-specific tests reset

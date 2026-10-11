@@ -4,10 +4,7 @@ use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\FeedEvent;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // The Vite dev server's SSR endpoint would count as a stray request.

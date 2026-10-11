@@ -6,10 +6,7 @@ use App\Models\AccountDiary;
 use App\Models\AccountHiscore;
 use App\Models\CollectionLog;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user = User::factory()->withPersonalTeam()->create();

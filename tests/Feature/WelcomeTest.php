@@ -4,10 +4,7 @@ use App\Helpers\SettingHelper;
 use App\Models\Account;
 use App\Models\CalendarEvent;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 it('renders the public landing page for guests with the digest props', function () {
     $this->get(route('home'))

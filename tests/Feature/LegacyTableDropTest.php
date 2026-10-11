@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-
-uses(RefreshDatabase::class);
 
 $migration = fn () => require database_path('migrations/2026_09_23_060252_drop_legacy_calendars_and_logs_tables.php');
 

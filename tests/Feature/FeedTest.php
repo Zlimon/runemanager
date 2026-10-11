@@ -7,12 +7,9 @@ use App\Models\Item;
 use App\Models\Quest;
 use App\Models\User;
 use App\Services\Feed\RecordFeedEvent;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Mongo collections persist across RefreshDatabase resets.

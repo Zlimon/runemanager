@@ -6,11 +6,8 @@ use App\Models\Account;
 use App\Models\AccountHiscore;
 use App\Models\CollectionLog;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
-
-uses(RefreshDatabase::class);
 
 function hiscoreHeaders(string $hash = 'hash-hs', string $username = 'Zlimon'): array
 {

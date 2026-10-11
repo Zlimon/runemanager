@@ -4,11 +4,8 @@ use App\Models\ResourcePack;
 use App\Services\ResourcePacks\InstallResourcePack;
 use App\Services\ResourcePacks\PackPalette;
 use App\Support\Roles;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Inertia\Testing\AssertableInertia;
-
-uses(RefreshDatabase::class);
 
 /**
  * The suite runs with APP_ENV=testing, so these exercise the gated branch of the

@@ -1,10 +1,7 @@
 <?php
 
 use App\Services\ResourcePacks\InstallResourcePack;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
-
-uses(RefreshDatabase::class);
 
 /**
  * Create an installed-looking pack directory holding the given stylesheet.

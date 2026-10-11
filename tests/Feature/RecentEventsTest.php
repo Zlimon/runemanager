@@ -9,10 +9,7 @@ use App\Models\WomAchievement;
 use App\Models\WomRecord;
 use App\Services\Accounts\RecentEvent;
 use App\Services\Accounts\RecentEvents;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->travelTo(Carbon::parse('2026-09-28 06:00:00', 'UTC'));
