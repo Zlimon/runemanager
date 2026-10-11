@@ -79,7 +79,7 @@ services:
             pgsql:
                 condition: service_started
     pgsql:
-        image: 'postgres:16'
+        image: 'postgres:18'
         ports:
             - '${FORWARD_DB_PORT:-5432}:5432'
         environment:
@@ -87,7 +87,7 @@ services:
             POSTGRES_USER: '${DB_USERNAME-sail}'
             POSTGRES_PASSWORD: '${DB_PASSWORD:-password}'
         volumes:
-            - 'sail-pgsql:/var/lib/postgresql/data'
+            - 'sail-pgsql:/var/lib/postgresql'
             - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
@@ -103,7 +103,7 @@ services:
             retries: 3
             timeout: 5s
     mongodb:
-        image: 'mongodb/mongodb-atlas-local:latest'
+        image: 'mongodb/mongodb-atlas-local:8.0'
         hostname: mongodb
         environment:
             MONGODB_INITDB_DATABASE: '${MONGODB_DATABASE:-runemanager}'
@@ -125,7 +125,7 @@ services:
             retries: 3
             timeout: 5s
     mongodb-static:
-        image: 'mongodb/mongodb-atlas-local:latest'
+        image: 'mongodb/mongodb-atlas-local:8.0'
         hostname: mongodb-static
         environment:
             MONGODB_INITDB_DATABASE: '${MONGODB_STATIC_DATABASE:-gamedata}'
