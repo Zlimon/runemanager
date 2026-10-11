@@ -5,13 +5,11 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.4",
+        "php": "^8.5",
         "ext-curl": "*",
         "ext-intl": "*",
         "ext-zlib": "*",
-        "andreaselia/laravel-api-to-postman": "^2.3",
         "inertiajs/inertia-laravel": "^3.0",
-        "laravel/boost": "^2.4",
         "laravel/framework": "^13.0",
         "laravel/jetstream": "^5.5",
         "laravel/reverb": "^1.10",
@@ -21,12 +19,12 @@
         "mongodb/laravel-mongodb": "^5.7",
         "opcodesio/log-viewer": "^3.24",
         "spatie/laravel-permission": "^8.0",
-        "symfony/dom-crawler": "^7.4",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.7",
         "fakerphp/faker": "^1.24",
+        "laravel/boost": "^2.4",
         "laravel/pint": "^1.29",
         "laravel/sail": "^1.61",
         "mockery/mockery": "^1.6",
