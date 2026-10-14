@@ -14,7 +14,7 @@
         "daisyui": "^5.7.47",
         "laravel-vite-plugin": "^3.2.0",
         "tailwindcss": "^4.3.0",
-        "vite": "^8.3.2",
+        "vite": "^8.3.4",
         "vue": "^3.5.43"
     },
     "dependencies": {
@@ -24,7 +24,7 @@
         "@tiptap/vue-3": "^3.31.4",
         "chart.js": "^4.5.1",
         "dayjs": "^1.11.23",
-        "laravel-echo": "^2.5.0",
+        "laravel-echo": "^2.6.1",
         "leaflet": "^1.9.4",
         "lodash": "^4.18.1",
         "pusher-js": "^8.6.0",
