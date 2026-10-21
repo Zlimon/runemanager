@@ -4,7 +4,8 @@
 # Required env: VITO_URL, VITO_API_TOKEN, VITO_PROJECT_ID, VITO_SERVER_ID, VITO_SITE_ID
 # Optional env: VITO_TIMEOUT (seconds, default 900), VITO_POLL_INTERVAL (seconds, default 10),
 #   EXPECTED_COMMIT (fail unless Vito deployed exactly this commit),
-#   VITO_ALLOW_HTTP=1 (allow a plain http VITO_URL; http is otherwise only allowed for localhost)
+#   VITO_ALLOW_HTTP=1 (allow a plain http VITO_URL; http is otherwise only allowed for localhost),
+#   CF_ACCESS_CLIENT_ID + CF_ACCESS_CLIENT_SECRET (Cloudflare Access service token guarding the Vito API)
 set -euo pipefail
 
 for name in VITO_URL VITO_API_TOKEN VITO_PROJECT_ID VITO_SERVER_ID VITO_SITE_ID; do
@@ -31,6 +32,16 @@ trap 'rm -rf "$workdir"' EXIT
 
 # Keep the token out of the process list by passing headers through a file.
 (umask 077 && printf 'Authorization: Bearer %s\nAccept: application/json\n' "$VITO_API_TOKEN" > "$workdir/headers")
+
+# Vito sits behind Cloudflare Access; the service token lets this runner through.
+if [ -n "${CF_ACCESS_CLIENT_ID:-}" ] || [ -n "${CF_ACCESS_CLIENT_SECRET:-}" ]; then
+    if [ -z "${CF_ACCESS_CLIENT_ID:-}" ] || [ -z "${CF_ACCESS_CLIENT_SECRET:-}" ]; then
+        echo "::error::Set both CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET, or neither." >&2
+        exit 1
+    fi
+    printf 'CF-Access-Client-Id: %s\nCF-Access-Client-Secret: %s\n' \
+        "$CF_ACCESS_CLIENT_ID" "$CF_ACCESS_CLIENT_SECRET" >> "$workdir/headers"
+fi
 
 # request METHOD URL [curl args...]: writes the body to $workdir/body and prints the HTTP status.
 request() {

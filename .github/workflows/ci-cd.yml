@@ -223,5 +223,7 @@ jobs:
           VITO_SERVER_ID: ${{ vars.VITO_SERVER_ID }}
           VITO_SITE_ID: ${{ vars.VITO_SITE_ID }}
           VITO_API_TOKEN: ${{ secrets.VITO_API_TOKEN }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
           EXPECTED_COMMIT: ${{ github.sha }}
         run: bash .github/vito/trigger-deployment.sh
